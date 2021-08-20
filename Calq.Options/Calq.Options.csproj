@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <TargetFramework>net5.0</TargetFramework>
+    <RootNamespace>Calq.Options</RootNamespace>
+    <PackageId>Calq.Options</PackageId>
+    <Version>0.0.0</Version>
+  </PropertyGroup>
+
+</Project>

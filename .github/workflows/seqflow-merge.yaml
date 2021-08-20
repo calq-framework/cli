@@ -1,0 +1,27 @@
+name: seqflow-merge
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency: seqflow-merge
+
+jobs:
+  seqflow-merge:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 2
+    - uses: actions/setup-dotnet@v1
+    - uses: greg-chuchro/seqflow-merge@v0.0.1
+      with:
+        callback: |
+          if [ ! -z "${{secrets.NUGET_API_KEY}}" ]; then
+              NUPKG=$(dotnet pack $(find . -name *.csproj | grep --invert-match Test) --configuration Release | sed -n "s/.*\s[^/]*\(\/.*nupkg\).*/\1/p")
+              dotnet nuget push $NUPKG --source https://www.nuget.org --api-key ${{secrets.NUGET_API_KEY}}
+              git tag v$NEW_RELEASE_VERSION
+              git push origin v$NEW_RELEASE_VERSION
+          fi
+          
