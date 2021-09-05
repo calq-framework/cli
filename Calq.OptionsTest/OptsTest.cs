@@ -148,5 +148,13 @@ namespace Calq.OptionsTest
             });
             Assert.Equal($"option doesn't exist: m", ex.Message);
         }
+
+        [Fact]
+        public void Test18() {
+            var instance = new TestConfiguration();
+            Opts.Load(new string[] { "-b", "-x" }, instance);
+            Assert.True(instance.boolean);
+            Assert.True(instance.xtrueBoolean);
+        }
     }
 }
