@@ -4,7 +4,7 @@ namespace Calq.Options {
     public class Opts {
         public static void Load<T>(string[] args, T instance) {
             foreach (var (option, value) in new Reader<T>().Read(args)) {
-                var valueObj = Reflection.ParseValue(instance, option, value);
+                var valueObj = Reflection.ParseValue(Reflection.GetFieldOrPropertyType(instance.GetType(), option), value, option);
                 try {
                     Reflection.SetFieldOrPropertyValue(instance, option, valueObj);
                 } catch (ArgumentException ex) {

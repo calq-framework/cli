@@ -26,7 +26,7 @@ namespace Calq.Options {
                     return property.PropertyType;
                 }
             }
-            throw new MissingMemberException();
+            throw new Exception($"option doesn't exist: {fieldOrPropertyName}"); // new MissingMemberException();
         }
 
         public static void SetFieldOrPropertyValue(object obj, string fieldOrPropertyName, object? value) {
@@ -44,117 +44,116 @@ namespace Calq.Options {
             }
         }
 
-        public static object ParseValue(object obj, string fieldOrPropertyName, string value) {
-            var currentValue = GetFieldOrPropertyValue(obj, fieldOrPropertyName);
-            object newValue;
+        private static object ParseValue(Type type, string value) {
+            object objValue;
             try {
-                switch (currentValue) {
-                    case bool:
-                        newValue = bool.Parse(value);
+                switch (Type.GetTypeCode(type)) {
+                    case TypeCode.Boolean:
+                        objValue = bool.Parse(value);
                         break;
-                    case byte:
-                        newValue = byte.Parse(value);
+                    case TypeCode.Byte:
+                        objValue = byte.Parse(value);
                         break;
-                    case sbyte:
-                        newValue = sbyte.Parse(value);
+                    case TypeCode.SByte:
+                        objValue = sbyte.Parse(value);
                         break;
-                    case char:
-                        newValue = char.Parse(value);
+                    case TypeCode.Char:
+                        objValue = char.Parse(value);
                         break;
-                    case decimal:
-                        newValue = decimal.Parse(value);
+                    case TypeCode.Decimal:
+                        objValue = decimal.Parse(value);
                         break;
-                    case double:
-                        newValue = double.Parse(value);
+                    case TypeCode.Double:
+                        objValue = double.Parse(value);
                         break;
-                    case float:
-                        newValue = float.Parse(value);
+                    case TypeCode.Single:
+                        objValue = float.Parse(value);
                         break;
-                    case int:
-                        newValue = int.Parse(value);
+                    case TypeCode.Int32:
+                        objValue = int.Parse(value);
                         break;
-                    case uint:
-                        newValue = uint.Parse(value);
+                    case TypeCode.UInt32:
+                        objValue = uint.Parse(value);
                         break;
-                    case nint:
-                        newValue = nint.Parse(value);
+                    case TypeCode.Int64:
+                        objValue = long.Parse(value);
                         break;
-                    case nuint:
-                        newValue = nuint.Parse(value);
+                    case TypeCode.UInt64:
+                        objValue = ulong.Parse(value);
                         break;
-                    case long:
-                        newValue = long.Parse(value);
+                    case TypeCode.Int16:
+                        objValue = short.Parse(value);
                         break;
-                    case ulong:
-                        newValue = ulong.Parse(value);
+                    case TypeCode.UInt16:
+                        objValue = ushort.Parse(value);
                         break;
-                    case short:
-                        newValue = short.Parse(value);
-                        break;
-                    case ushort:
-                        newValue = ushort.Parse(value);
+                    case TypeCode.String:
+                        objValue = value;
                         break;
                     default:
-                        newValue = value; // assume string
-                        break;
+                        throw new ArgumentException($"type cannot be parsed: {type.Name}");
                 }
             } catch (OverflowException ex) {
                 long min;
                 ulong max;
-                switch (currentValue) {
-                    case byte:
+                switch (Type.GetTypeCode(type)) {
+                    case TypeCode.Byte:
                         min = byte.MinValue;
                         max = byte.MaxValue;
                         break;
-                    case sbyte:
+                    case TypeCode.SByte:
                         min = sbyte.MinValue;
                         max = (ulong)sbyte.MaxValue;
                         break;
-                    case char:
+                    case TypeCode.Char:
                         min = char.MinValue;
                         max = char.MaxValue;
                         break;
-                    case int:
+                    case TypeCode.Int32:
                         min = int.MinValue;
                         max = int.MaxValue;
                         break;
-                    case uint:
+                    case TypeCode.UInt32:
                         min = uint.MinValue;
                         max = uint.MaxValue;
                         break;
-                    case nint:
-                        min = nint.MinValue;
-                        max = (ulong)nint.MaxValue;
-                        break;
-                    case nuint:
-                        min = (long)nuint.MinValue;
-                        max = nuint.MaxValue;
-                        break;
-                    case long:
+                    case TypeCode.Int64:
                         min = long.MinValue;
                         max = long.MaxValue;
                         break;
-                    case ulong:
+                    case TypeCode.UInt64:
                         min = (long)ulong.MinValue;
                         max = ulong.MaxValue;
                         break;
-                    case short:
+                    case TypeCode.Int16:
                         min = short.MinValue;
                         max = (ulong)short.MaxValue;
                         break;
-                    case ushort:
+                    case TypeCode.UInt16:
                         min = ushort.MinValue;
                         max = ushort.MaxValue;
                         break;
                     default:
                         throw;
                 }
-                throw new Exception($"option value is out of range: {fieldOrPropertyName}={value} ({min}-{max})", ex);
+                throw new OverflowException($"{value} ({min}-{max})", ex);
             } catch (FormatException ex) {
-                var type = GetFieldOrPropertyType(obj.GetType(), fieldOrPropertyName);
+                throw new FormatException($"value type mismatch: {value} is not {type.Name}", ex);
+            }
+            return objValue;
+        }
+
+        public static object ParseValue(Type type, string value, string fieldOrPropertyName) {
+            object newValue;
+            try {
+                newValue = ParseValue(type, value);
+            } catch (OverflowException ex) {
+                throw new Exception($"option value is out of range: {fieldOrPropertyName}={ex.Message}", ex);
+            } catch (FormatException ex) {
+                throw new Exception($"option and value type mismatch: {fieldOrPropertyName}={value} ({fieldOrPropertyName} is {type.Name})", ex);
+            } catch (ArgumentException ex) {
                 throw new Exception($"option and value type mismatch: {fieldOrPropertyName}={value} ({fieldOrPropertyName} is {type.Name})", ex);
             }
-
             return newValue;
         }
     }
