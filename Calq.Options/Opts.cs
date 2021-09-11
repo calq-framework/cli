@@ -2,8 +2,9 @@
 
 namespace Calq.Options {
     public class Opts {
-        public static void Load<T>(string[] args, T instance) {
-            foreach (var (option, value) in new Reader<T>().Read(args)) {
+        public static int Load<T>(T instance, string[] args) where T : notnull {
+            var reader = new Reader<T>();
+            foreach (var (option, value) in reader.Read(args)) {
                 var valueObj = Reflection.ParseValue(Reflection.GetFieldOrPropertyType(instance.GetType(), option), value, option);
                 try {
                     Reflection.SetFieldOrPropertyValue(instance, option, valueObj);
@@ -12,6 +13,7 @@ namespace Calq.Options {
                     throw new Exception($"option and value type mismatch: {option}={value} ({option} is {type.Name})", ex);
                 }
             }
+            return reader.LastIndex;
         }
     }
 }

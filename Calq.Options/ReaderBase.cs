@@ -11,10 +11,12 @@ namespace Calq.Options {
             Plus = 2
         }
 
+        public int LastIndex { get; private set; }
+
         protected abstract string GetOptionName(char option);
         protected abstract Type GetOptionType(string option);
 
-        public IEnumerable<(string option, string value)> Read(string[] args) {
+        public IEnumerable<(string option, string value)> Read(string[] args, int startIndex = 0) {
 
             bool IsBoolean(string option) {
                 return GetOptionType(option) == typeof(bool);
@@ -51,68 +53,72 @@ namespace Calq.Options {
                 }
             }
 
-            int index = 0;
+            int index = startIndex;
 
-            while (true) {
-                if (index >= args.Length) {
-                    yield break;
-                }
+            try {
+                while (true) {
+                    if (index >= args.Length) {
+                        yield break;
+                    }
 
-                var arg = args[index];
+                    var arg = args[index];
 
-                if (arg.Length == 0) {
-                    throw new ArgumentException("arg length is 0");
-                }
+                    if (arg.Length == 0) {
+                        throw new ArgumentException("arg length is 0");
+                    }
 
-                if (arg.Length == 1) {
-                    yield break;
-                }
+                    if (arg.Length == 1) {
+                        yield break;
+                    }
 
-                var optionAttr = OptionFlags.None;
-                switch (arg[0]) {
-                    case '-':
-                        if (arg[1] != '-') {
-                            optionAttr |= OptionFlags.Short;
+                    var optionAttr = OptionFlags.None;
+                    switch (arg[0]) {
+                        case '-':
+                            if (arg[1] != '-') {
+                                optionAttr |= OptionFlags.Short;
+                            } else {
+                                if (arg.Length == 2) {
+                                    ++index;
+                                    yield break;
+                                }
+                            }
+                            break;
+                        case '+':
+                            optionAttr |= OptionFlags.Plus;
+                            if (arg[1] != '+') {
+                                optionAttr |= OptionFlags.Short;
+                            }
+                            break;
+                        default:
+                            yield break;
+                    }
+
+                    var (option, value) = ExtractOptionValuePair(arg, optionAttr);
+                    if (value == "") {
+                        if (IsBoolean(optionAttr.HasFlag(OptionFlags.Short) ? GetOptionName(option[0]) : option)) {
+                            value = optionAttr.HasFlag(OptionFlags.Plus) ? "false" : "true";
                         } else {
-                            if (arg.Length == 2) {
-                                ++index;
-                                yield break;
+                            ++index;
+                            try {
+                                value = args[index];
+                            } catch (IndexOutOfRangeException ex) {
+                                throw new Exception($"option requires value: {arg}", ex);
                             }
                         }
-                        break;
-                    case '+':
-                        optionAttr |= OptionFlags.Plus;
-                        if (arg[1] != '+') {
-                            optionAttr |= OptionFlags.Short;
-                        }
-                        break;
-                    default:
-                        yield break;
-                }
+                    }
 
-                var (option, value) = ExtractOptionValuePair(arg, optionAttr);
-                if (value == "") {
-                    if (IsBoolean(optionAttr.HasFlag(OptionFlags.Short) ? GetOptionName(option[0]) : option)) {
-                        value = optionAttr.HasFlag(OptionFlags.Plus) ? "false" : "true";
+                    if (optionAttr.HasFlag(OptionFlags.Short)) {
+                        foreach (var longOption in ReadShort(option)) {
+                            yield return (longOption, value);
+                        }
                     } else {
-                        ++index;
-                        try {
-                            value = args[index];
-                        } catch (IndexOutOfRangeException ex) {
-                            throw new Exception($"option requires value: {arg}", ex);
-                        }
+                        yield return (option, value);
                     }
-                }
 
-                if (optionAttr.HasFlag(OptionFlags.Short)) {
-                    foreach (var longOption in ReadShort(option)) {
-                        yield return (longOption, value);
-                    }
-                } else {
-                    yield return (option, value);
+                    ++index;
                 }
-
-                ++index;
+            } finally {
+                LastIndex = index;
             }
         }
     }
