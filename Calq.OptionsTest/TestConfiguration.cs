@@ -1,6 +1,6 @@
 ﻿#pragma warning disable CS0649
 
-namespace Calq.OptionsTest {
+namespace Ghbvft6.Calq.OptionsTest {
     class TestConfiguration {
         public class Inner { }
 

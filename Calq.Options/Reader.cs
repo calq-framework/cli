@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Calq.Options {
+namespace Ghbvft6.Calq.Options {
     public class Reader<T> : ReaderBase {
         protected override string GetOptionName(char option) {
             var type = typeof(T);

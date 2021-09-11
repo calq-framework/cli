@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Calq.Options {
+namespace Ghbvft6.Calq.Options {
     internal static class Reflection {
         public static object? GetFieldOrPropertyValue(object obj, string fieldOrPropertyName) {
             var type = obj.GetType();

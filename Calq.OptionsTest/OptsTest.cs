@@ -2,7 +2,7 @@ using Calq.Options;
 using System;
 using Xunit;
 
-namespace Calq.OptionsTest
+namespace Ghbvft6.Calq.OptionsTest
 {
     public class OptsTest
     {

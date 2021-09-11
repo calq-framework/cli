@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Calq.Options {
+namespace Ghbvft6.Calq.Options {
     public class Opts {
         public static int Load<T>(T instance, string[] args) where T : notnull {
             var reader = new Reader<T>();
