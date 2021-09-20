@@ -175,5 +175,16 @@ namespace Ghbvft6.Calq.OptionsTest
             Assert.Equal(2, index);
             Assert.Null(instance.text);
         }
+
+        [Fact]
+        public void Test21() {
+            Assert.NotEmpty(Environment.GetCommandLineArgs());
+            var instance = new CommandLineArgs();
+            var ex = Assert.Throws<Exception>(() => {
+                var index = Opts.Load(instance);
+            });
+            Assert.Contains("option doesn't exist", ex.Message);
+            Assert.NotEqual(0, instance.port);
+        }
     }
 }
