@@ -186,5 +186,22 @@ namespace Ghbvft6.Calq.OptionsTest
             Assert.Contains("option doesn't exist", ex.Message);
             Assert.NotEqual(0, instance.port);
         }
+
+        [Fact]
+        public void Test22() {
+            Assert.NotEmpty(Environment.GetCommandLineArgs());
+            var instance = new CommandLineArgs();
+            Opts.LoadSkipUnknown(instance);
+            Assert.NotEqual(0, instance.port);
+        }
+
+        [Fact]
+        public void Test23() {
+            var instance = new CommandLineArgs();
+            var ex = Assert.Throws<Exception>(() => {
+                Opts.LoadSkipUnknown(instance, new string [] { "--port", int.MaxValue.ToString() });
+            });
+            Assert.Equal($"option value is out of range: port=2147483647 (0-65535)", ex.Message);
+        }
     }
 }
