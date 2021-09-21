@@ -1,7 +1,36 @@
-﻿using System;
+﻿using Ghbvft6.Calq.Options.Attributes;
+using System;
 
 namespace Ghbvft6.Calq.Options {
     internal static class Reflection {
+
+        public static System.Reflection.MemberInfo GetFieldOrProperty(Type type, string option) {
+            foreach (var member in type.GetFields()) {
+                var name = (Attribute.GetCustomAttribute(member, typeof(NameAttribute)) as NameAttribute)?.Name;
+                if (name != null && name == option) {
+                    return member;
+                }
+            }
+            foreach (var member in type.GetType().GetProperties()) {
+                var name = (Attribute.GetCustomAttribute(member, typeof(NameAttribute)) as NameAttribute)?.Name;
+                if (name != null && name == option) {
+                    return member;
+                }
+            }
+
+            var field = type.GetField(option);
+            if (field != null) {
+                return field;
+            } else {
+                var property = type.GetProperty(option);
+                if (property != null) {
+                    return property;
+                }
+            }
+
+            throw new Exception($"option doesn't exist: {option}"); // new MissingMemberException();
+        }
+
         public static object? GetFieldOrPropertyValue(object obj, string fieldOrPropertyName) {
             var type = obj.GetType();
             var field = type.GetField(fieldOrPropertyName);
@@ -16,7 +45,8 @@ namespace Ghbvft6.Calq.Options {
             throw new Exception($"option doesn't exist: {fieldOrPropertyName}"); // new MissingMemberException();
         }
 
-        public static Type GetFieldOrPropertyType(Type type, string fieldOrPropertyName) {
+        public static Type GetFieldOrPropertyType(Type type, string option) {
+            var fieldOrPropertyName = Reflection.GetFieldOrProperty(type, option).Name;
             var field = type.GetField(fieldOrPropertyName);
             if (field != null) {
                 return field.FieldType;
@@ -29,8 +59,9 @@ namespace Ghbvft6.Calq.Options {
             throw new Exception($"option doesn't exist: {fieldOrPropertyName}"); // new MissingMemberException();
         }
 
-        public static void SetFieldOrPropertyValue(object obj, string fieldOrPropertyName, object? value) {
+        public static void SetFieldOrPropertyValue(object obj, string option, object? value) {
             var type = obj.GetType();
+            var fieldOrPropertyName = Reflection.GetFieldOrProperty(type, option).Name;
             var field = type.GetField(fieldOrPropertyName);
             if (field != null) {
                 field.SetValue(obj, value);

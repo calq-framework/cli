@@ -203,5 +203,34 @@ namespace Ghbvft6.Calq.OptionsTest
             });
             Assert.Equal($"option value is out of range: port=2147483647 (0-65535)", ex.Message);
         }
+
+        [Fact]
+        public void Test24() {
+            var instance = new TestConfiguration();
+            Opts.Load(instance, new string[] { "--customname" });
+            Assert.True(instance.longOption);
+        }
+
+        [Fact]
+        public void Test25() {
+            var instance = new TestConfiguration();
+            Opts.Load(instance, new string[] { "--shadowedfield" });
+            Assert.True(instance.usableOption);
+            Assert.False(instance.shadowedfield);
+        }
+
+        [Fact]
+        public void Test26() {
+            var instance = new TestConfiguration();
+            Opts.Load(instance, new string[] { "-y" });
+            Assert.True(instance.shortOption);
+        }
+
+        [Fact]
+        public void Test27() {
+            var instance = new TestConfiguration();
+            Opts.Load(instance, new string[] { "-c" });
+            Assert.True(instance.longOption);
+        }
     }
 }

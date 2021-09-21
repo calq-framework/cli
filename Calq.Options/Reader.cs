@@ -1,20 +1,36 @@
-﻿using System;
+﻿using Ghbvft6.Calq.Options.Attributes;
+using System;
 
 namespace Ghbvft6.Calq.Options {
     public class Reader<T> : ReaderBase {
         protected override string GetOptionName(char option) {
             var type = typeof(T);
-            foreach (var field in type.GetFields()) {
-                if (field.Name[0] == option) {
-                    return field.Name;
+
+            string? firstLetterMatch = null;
+            foreach (System.Reflection.MemberInfo member in type.GetFields()) {
+                if (Attribute.GetCustomAttribute(member, typeof(ShortNameAttribute)) is ShortNameAttribute shortName && shortName.Name == option) {
+                    return (Attribute.GetCustomAttribute(member, typeof(NameAttribute)) as NameAttribute)?.Name ?? member.Name;
+                }
+                var name = (Attribute.GetCustomAttribute(member, typeof(NameAttribute)) as NameAttribute)?.Name;
+                if (name != null && name[0] == option) {
+                    firstLetterMatch = name;
+                } else if (member.Name[0] == option) {
+                    firstLetterMatch = member.Name;
                 }
             }
-            foreach (var property in type.GetType().GetProperties()) {
-                if (property.Name[0] == option) {
-                    return property.Name;
+            foreach (System.Reflection.MemberInfo member in type.GetType().GetProperties()) {
+                if (Attribute.GetCustomAttribute(member, typeof(ShortNameAttribute)) is ShortNameAttribute shortName && shortName.Name == option) {
+                    return (Attribute.GetCustomAttribute(member, typeof(NameAttribute)) as NameAttribute)?.Name ?? member.Name;
+                }
+                var name = (Attribute.GetCustomAttribute(member, typeof(NameAttribute)) as NameAttribute)?.Name;
+                if (name != null && name[0] == option) {
+                    firstLetterMatch = name;
+                } else if (member.Name[0] == option) {
+                    firstLetterMatch = member.Name;
                 }
             }
-            throw new Exception($"option doesn't exist: {option}");
+
+            return firstLetterMatch ?? throw new Exception($"option doesn't exist: {option}");
         }
 
         protected override Type GetOptionType(string option) {
