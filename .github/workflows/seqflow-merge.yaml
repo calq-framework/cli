@@ -14,14 +14,13 @@ jobs:
     - uses: actions/checkout@v2
       with:
         fetch-depth: 2
-    - uses: actions/setup-dotnet@v1
     - uses: greg-chuchro/seqflow-merge@v0.0.1
       with:
         callback: |
           if [ ! -z "${{secrets.NUGET_API_KEY}}" ]; then
-              NUPKG=$(dotnet pack $(find . -name *.csproj | grep --invert-match Test) --configuration Release | sed -n "s/.*\s[^/]*\(\/.*nupkg\).*/\1/p")
+              PROJECT_FILE=$(find . -name *.*proj | grep --invert-match Test)
+              NUPKG=$(dotnet pack "$PROJECT_FILE" --configuration Release -p:ContinuousIntegrationBuild=true -p:EmbedUntrackedSources=true -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg -p:PublishRepositoryUrl=true -p:RepositoryBranch=$BRANCH_NAME | sed -n "s/[^/]*\(\/.*\.nupkg\).*/\1/p")
               dotnet nuget push $NUPKG --source https://www.nuget.org --api-key ${{secrets.NUGET_API_KEY}}
               git tag v$NEW_RELEASE_VERSION
               git push origin v$NEW_RELEASE_VERSION
           fi
-          
