@@ -232,5 +232,50 @@ namespace Ghbvft6.Calq.OptionsTest
             Opts.Load(instance, new string[] { "-c" });
             Assert.True(instance.longOption);
         }
+
+        [Fact]
+        public void Test28() {
+            var instance = new TestConfiguration();
+            Opts.LoadSkipUnknown(instance, new string[] { "--integer=10", "--", "--text=abc xyz" });
+            Assert.Equal(10, instance.integer);
+            Assert.Null(instance.text);
+        }
+
+        [Fact]
+        public void Test29() {
+            var instance = new TestConfiguration();
+            Opts.LoadSkipUnknown(instance, new string[] { "--unknown", "--text=abc" });
+            Assert.Equal("abc", instance.text);
+        }
+
+        [Fact]
+        public void Test30() {
+            var instance = new TestConfiguration();
+            Opts.LoadSkipUnknown(instance, new string[] { "--unknown", "value", "--text=abc" });
+            Assert.Equal("abc", instance.text);
+        }
+
+        [Fact]
+        public void Test31() {
+            var instance = new TestConfiguration();
+            Opts.LoadSkipUnknown(instance, new string[] { "--unknown", "-b", "--text=abc" });
+            Assert.Equal("abc", instance.text);
+            Assert.True(instance.boolean);
+        }
+
+        [Fact]
+        public void Test32() {
+            var instance = new TestConfiguration();
+            Opts.LoadSkipUnknown(instance, new string[] { "--unknown=-b", "--text=abc" });
+            Assert.Equal("abc", instance.text);
+            Assert.False(instance.boolean);
+        }
+
+        [Fact]
+        public void Test33() {
+            var instance = new TestConfiguration();
+            Opts.LoadSkipUnknown(instance, new string[] { "unknown", "--text=abc" });
+            Assert.Equal("abc", instance.text);
+        }
     }
 }

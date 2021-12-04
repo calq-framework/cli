@@ -36,6 +36,9 @@ namespace Ghbvft6.Calq.Options {
                     if (reader.LastIndex == startIndex) {
                         ++startIndex;
                     } else {
+                        if (args[reader.LastIndex - 1] == "--") {
+                            break;
+                        }
                         startIndex = reader.LastIndex;
                     }
                 } catch (Exception ex) {
