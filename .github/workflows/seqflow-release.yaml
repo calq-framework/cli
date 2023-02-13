@@ -36,4 +36,4 @@ jobs:
       run: |
         git clone --depth 1 --branch v0.0 https://${{ github.triggering_actor }}:${{ secrets.SEQFLOW_PAT }}@github.com/calq-framework/seqflow.git ./.github/actions/calq-framework/seqflow
         chmod +x ./.github/actions/calq-framework/seqflow/action.sh
-        ./.github/actions/calq-framework/seqflow/action.sh merge -r
+        ./.github/actions/calq-framework/seqflow/action.sh release
