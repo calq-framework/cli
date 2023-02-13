@@ -5,7 +5,7 @@ on:
     branches:
       - main
 
-concurrency: seqflow-merge
+concurrency: seqflow
 
 permissions:
   contents: write
