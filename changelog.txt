@@ -1,0 +1,1 @@
+    <TargetFramework>net7.0</TargetFramework>
