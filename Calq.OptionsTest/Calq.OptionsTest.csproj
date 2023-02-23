@@ -4,6 +4,8 @@
     <TargetFramework>net7.0</TargetFramework>
 
     <IsPackable>false</IsPackable>
+    <RestorePackagesWithLockFile Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestorePackagesWithLockFile>
+    <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
   </PropertyGroup>
 
   <ItemGroup>
