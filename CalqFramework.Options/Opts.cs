@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 
 namespace Ghbvft6.CalqFramework.Options {
     public class Opts {
@@ -14,11 +15,20 @@ namespace Ghbvft6.CalqFramework.Options {
 
         private static void Load<T>(Reader<T> reader, T instance, string[] args, int startIndex) where T : notnull {
             foreach (var (option, value) in reader.Read(args, startIndex)) {
-                var valueObj = Reflection.ParseValue(Reflection.GetFieldOrPropertyType(instance.GetType(), option), value, option);
+                var type = Reflection.GetFieldOrPropertyType(typeof(T), option);
+                var isCollection = type.GetInterface(nameof(ICollection)) != null;
+                if (isCollection) {
+                    type = type.GetGenericArguments()[0];
+                }
+                var valueObj = Reflection.ParseValue(type, value, option);
                 try {
-                    Reflection.SetFieldOrPropertyValue(instance, option, valueObj);
+                    if (isCollection == false) {
+                        Reflection.SetFieldOrPropertyValue(instance, option, valueObj);
+                    } else {
+                        var collection = Reflection.GetFieldOrPropertyValue(instance, option);
+                        Reflection.AddChildValue((collection as ICollection)!, valueObj);
+                    }
                 } catch (ArgumentException ex) {
-                    var type = Reflection.GetFieldOrPropertyType(typeof(T), option);
                     throw new Exception($"option and value type mismatch: {option}={value} ({option} is {type.Name})", ex);
                 }
             }

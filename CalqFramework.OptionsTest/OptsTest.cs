@@ -277,5 +277,13 @@ namespace Ghbvft6.CalqFramework.OptionsTest
             Opts.LoadSkipUnknown(instance, new string[] { "unknown", "--text=abc" });
             Assert.Equal("abc", instance.text);
         }
+
+        [Fact]
+        public void Test34() {
+            var instance = new TestConfiguration();
+            Opts.Load(instance, new string[] { "--initializedBoolList", "false", "--initializedBoolList", "true" });
+            Assert.False(instance.initializedBoolList[2]);
+            Assert.True(instance.initializedBoolList[3]);
+        }
     }
 }
