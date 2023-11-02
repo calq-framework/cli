@@ -1,8 +1,8 @@
-﻿using Ghbvft6.CalqFramework.Options.Attributes;
+﻿using CalqFramework.Options.Attributes;
 using System;
 using System.Collections;
 
-namespace Ghbvft6.CalqFramework.Options {
+namespace CalqFramework.Options {
     internal static class Reflection {
 
         public static System.Reflection.MemberInfo GetFieldOrProperty(Type type, string option) {

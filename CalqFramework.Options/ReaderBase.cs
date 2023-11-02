@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Ghbvft6.CalqFramework.Options {
+namespace CalqFramework.Options {
     public abstract class ReaderBase {
 
         [Flags]

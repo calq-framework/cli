@@ -1,8 +1,8 @@
-using Ghbvft6.CalqFramework.Options;
+using CalqFramework.Options;
 using System;
 using Xunit;
 
-namespace Ghbvft6.CalqFramework.OptionsTest
+namespace CalqFramework.OptionsTest
 {
     public class OptsTest
     {
