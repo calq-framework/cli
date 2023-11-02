@@ -1,9 +1,9 @@
 ﻿#pragma warning disable CS0649
 
-using Ghbvft6.CalqFramework.Options.Attributes;
+using CalqFramework.Options.Attributes;
 using System.Collections.Generic;
 
-namespace Ghbvft6.CalqFramework.OptionsTest {
+namespace CalqFramework.OptionsTest {
     class TestConfiguration {
         public class Inner { }
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 
-namespace Ghbvft6.CalqFramework.Options {
+namespace CalqFramework.Options {
     public class Opts {
         public static int Load<T>(T instance) where T : notnull {
             return Load(instance, Environment.GetCommandLineArgs(), 1);

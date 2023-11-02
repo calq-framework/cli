@@ -1,7 +1,7 @@
-﻿using Ghbvft6.CalqFramework.Options.Attributes;
+﻿using CalqFramework.Options.Attributes;
 using System;
 
-namespace Ghbvft6.CalqFramework.Options {
+namespace CalqFramework.Options {
     public class Reader<T> : ReaderBase {
         protected override string GetOptionName(char option) {
             var type = typeof(T);
