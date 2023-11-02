@@ -1,6 +1,7 @@
 ﻿#pragma warning disable CS0649
 
 using Ghbvft6.CalqFramework.Options.Attributes;
+using System.Collections.Generic;
 
 namespace Ghbvft6.CalqFramework.OptionsTest {
     class TestConfiguration {
@@ -20,5 +21,6 @@ namespace Ghbvft6.CalqFramework.OptionsTest {
         [NameAttribute("differentname")]
         [ShortNameAttribute('y')]
         public bool shortOption;
+        public List<bool> initializedBoolList = new List<bool>() { true, false };
     }
 }

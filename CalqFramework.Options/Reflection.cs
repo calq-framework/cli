@@ -1,5 +1,6 @@
 ﻿using Ghbvft6.CalqFramework.Options.Attributes;
 using System;
+using System.Collections;
 
 namespace Ghbvft6.CalqFramework.Options {
     internal static class Reflection {
@@ -186,6 +187,54 @@ namespace Ghbvft6.CalqFramework.Options {
                 throw new Exception($"option and value type mismatch: {fieldOrPropertyName}={value} ({fieldOrPropertyName} is {type.Name})", ex);
             }
             return newValue;
+        }
+
+        public static object? GetChildValue(ICollection collection, string key) {
+            return collection switch {
+                Array array => array.GetValue(int.Parse(key)),
+                IList list => list[int.Parse(key)],
+                IDictionary dictionary => dictionary[ParseValue(dictionary.GetType().GetGenericArguments()[0], key)],
+                _ => throw new Exception("unsupported collection")
+            };
+        }
+
+        public static void SetChildValue(ICollection collection, string key, object? value) {
+            switch (collection) {
+                case Array array:
+                    array.SetValue(value, int.Parse(key));
+                    break;
+                case IList list:
+                    list[int.Parse(key)] = value;
+                    break;
+                case IDictionary dictionary:
+                    dictionary[ParseValue(dictionary.GetType().GetGenericArguments()[0], key)] = value;
+                    break;
+                default:
+                    throw new Exception("unsupported collection");
+            }
+        }
+
+        public static void AddChildValue(ICollection collection, object? value) {
+            switch (collection) {
+                case IList list:
+                    list.Add(value);
+                    break;
+                default:
+                    throw new Exception("unsupported collection");
+            }
+        }
+
+        public static void DeleteChildValue(ICollection collection, string key) {
+            switch (collection) {
+                case IList list:
+                    list.RemoveAt(int.Parse(key));
+                    break;
+                case IDictionary dictionary:
+                    dictionary.Remove(key);
+                    break;
+                default:
+                    throw new Exception("unsupported collection");
+            }
         }
     }
 }
