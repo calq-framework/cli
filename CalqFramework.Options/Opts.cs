@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Ghbvft6.Calq.Options {
+namespace Ghbvft6.CalqFramework.Options {
     public class Opts {
         public static int Load<T>(T instance) where T : notnull {
             return Load(instance, Environment.GetCommandLineArgs(), 1);

@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Calq.Options\Calq.Options.csproj" />
+    <ProjectReference Include="..\CalqFramework.Options\CalqFramework.Options.csproj" />
   </ItemGroup>
 
 </Project>
