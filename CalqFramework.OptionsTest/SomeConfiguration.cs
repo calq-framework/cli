@@ -4,7 +4,7 @@ using CalqFramework.Options.Attributes;
 using System.Collections.Generic;
 
 namespace CalqFramework.OptionsTest {
-    class TestConfiguration {
+    class SomeConfiguration {
         public class Inner { }
 
         public Inner inner;
