@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 
 namespace CalqFramework.Options {
+    // TODO use CalqFramework.Serialization instead
     internal static class Reflection {
 
         public static System.Reflection.MemberInfo GetFieldOrProperty(Type type, string option) {
@@ -29,7 +30,7 @@ namespace CalqFramework.Options {
                 }
             }
 
-            throw new Exception($"option doesn't exist: {option}"); // new MissingMemberException();
+            throw new MissingMemberException($"option doesn't exist: {option}");
         }
 
         public static object? GetFieldOrPropertyValue(object obj, string fieldOrPropertyName) {
@@ -43,7 +44,7 @@ namespace CalqFramework.Options {
                     return property.GetValue(obj);
                 }
             }
-            throw new Exception($"option doesn't exist: {fieldOrPropertyName}"); // new MissingMemberException();
+            throw new MissingMemberException($"option doesn't exist: {fieldOrPropertyName}");
         }
 
         public static Type GetFieldOrPropertyType(Type type, string option) {
@@ -57,7 +58,7 @@ namespace CalqFramework.Options {
                     return property.PropertyType;
                 }
             }
-            throw new Exception($"option doesn't exist: {fieldOrPropertyName}"); // new MissingMemberException();
+            throw new MissingMemberException($"option doesn't exist: {fieldOrPropertyName}");
         }
 
         public static void SetFieldOrPropertyValue(object obj, string option, object? value) {
