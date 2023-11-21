@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Reflection;
 
 namespace CalqFramework.Options {
-    public class ParameterReader : ReaderBase {
+    public class ToMethodOptionsReader : OptionsReaderBase {
 
         IEnumerable<ParameterInfo> parameters;
 
-        public ParameterReader(IEnumerable<ParameterInfo> parameters) : base() {
+        public ToMethodOptionsReader(IEnumerable<ParameterInfo> parameters) : base() {
             this.parameters = parameters;
         }
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 
 namespace CalqFramework.Options {
-    public abstract class ReaderBase {
+    public abstract class OptionsReaderBase {
 
         [Flags]
         private enum OptionFlags {

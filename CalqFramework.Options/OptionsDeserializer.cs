@@ -2,18 +2,18 @@
 using System.Collections;
 
 namespace CalqFramework.Options {
-    public class Opts {
-        public static int Load<T>(T instance) where T : notnull {
-            return Load(instance, Environment.GetCommandLineArgs(), 1);
+    public class OptionsDeserializer {
+        public static int Deserialize<T>(T instance) where T : notnull {
+            return Deserialize(instance, Environment.GetCommandLineArgs(), 1);
         }
 
-        public static int Load<T>(T instance, string[] args, int startIndex = 0) where T : notnull {
-            var reader = new Reader<T>();
-            Load(reader, instance, args, startIndex);
+        public static int Deserialize<T>(T instance, string[] args, int startIndex = 0) where T : notnull {
+            var reader = new ToTypeOptionsReader<T>();
+            Deserialize(reader, instance, args, startIndex);
             return reader.LastIndex;
         }
 
-        private static void Load<T>(Reader<T> reader, T instance, string[] args, int startIndex) where T : notnull {
+        private static void Deserialize<T>(ToTypeOptionsReader<T> reader, T instance, string[] args, int startIndex) where T : notnull {
             foreach (var (option, value) in reader.Read(args, startIndex)) {
                 var type = Reflection.GetFieldOrPropertyType(typeof(T), option);
                 var isCollection = type.GetInterface(nameof(ICollection)) != null;
@@ -34,15 +34,15 @@ namespace CalqFramework.Options {
             }
         }
 
-        public static void LoadSkipUnknown<T>(T instance) where T : notnull {
-            LoadSkipUnknown(instance, Environment.GetCommandLineArgs(), 1);
+        public static void DeserializeSkipUnknown<T>(T instance) where T : notnull {
+            DeserializeSkipUnknown(instance, Environment.GetCommandLineArgs(), 1);
         }
 
-        public static void LoadSkipUnknown<T>(T instance, string[] args, int startIndex = 0) where T : notnull {
-            var reader = new Reader<T>();
+        public static void DeserializeSkipUnknown<T>(T instance, string[] args, int startIndex = 0) where T : notnull {
+            var reader = new ToTypeOptionsReader<T>();
             while (reader.LastIndex < args.Length) {
                 try {
-                    Load(reader, instance, args, startIndex);
+                    Deserialize(reader, instance, args, startIndex);
                     if (reader.LastIndex == startIndex) {
                         ++startIndex;
                     } else {
