@@ -12,7 +12,7 @@ namespace CalqFramework.Options {
         public static object? Execute(object instance, string[] args, CommandLineInterfaceOptions deserializerOptions) {
 
             int ReadOptions(ParameterInfo[] parameters, string[] args, int startIndex, ref object[] paramValues) {
-                var reader = new ParameterReader(parameters);
+                var reader = new ToMethodOptionsReader(parameters);
                 foreach (var (option, value) in reader.Read(args, startIndex)) {
                     var (parameter, index) = GetParameterIndexPair(parameters, option);
                     var valueObj = Reflection.ParseValue(parameter.ParameterType, value, option);

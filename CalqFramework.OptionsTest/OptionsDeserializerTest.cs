@@ -4,34 +4,34 @@ using Xunit;
 
 namespace CalqFramework.OptionsTest
 {
-    public class OptsTest
+    public class OptionsDeserializerTest
     {
         [Fact]
         public void Test1()
         {
             var instance = new SomeConfiguration();
-            Opts.Load(instance, new string[] { "--boolean" });
+            OptionsDeserializer.Deserialize(instance, new string[] { "--boolean" });
             Assert.True(instance.boolean);
         }
 
         [Fact]
         public void Test2() {
             var instance = new SomeConfiguration();
-            Opts.Load(instance, new string[] { "-b" });
+            OptionsDeserializer.Deserialize(instance, new string[] { "-b" });
             Assert.True(instance.boolean);
         }
 
         [Fact]
         public void Test3() {
             var instance = new SomeConfiguration();
-            Opts.Load(instance, new string[] { "+x" });
+            OptionsDeserializer.Deserialize(instance, new string[] { "+x" });
             Assert.False(instance.xtrueBoolean);
         }
 
         [Fact]
         public void Test4() {
             var instance = new SomeConfiguration();
-            Opts.Load(instance, new string[] { "-bx" });
+            OptionsDeserializer.Deserialize(instance, new string[] { "-bx" });
             Assert.True(instance.boolean);
             Assert.True(instance.xtrueBoolean);
         }
@@ -39,7 +39,7 @@ namespace CalqFramework.OptionsTest
         [Fact]
         public void Test5() {
             var instance = new SomeConfiguration();
-            Opts.Load(instance, new string[] { "--integer=10", "--text=abc xyz"});
+            OptionsDeserializer.Deserialize(instance, new string[] { "--integer=10", "--text=abc xyz"});
             Assert.Equal(10, instance.integer);
             Assert.Equal("abc xyz", instance.text);
         }
@@ -47,7 +47,7 @@ namespace CalqFramework.OptionsTest
         [Fact]
         public void Test6() {
             var instance = new SomeConfiguration();
-            var index = Opts.Load(instance, new string[] { "--integer=10", "--", "--text=abc xyz" });
+            var index = OptionsDeserializer.Deserialize(instance, new string[] { "--integer=10", "--", "--text=abc xyz" });
             Assert.Equal(10, instance.integer);
             Assert.Equal(2, index);
             Assert.Null(instance.text);
@@ -57,7 +57,7 @@ namespace CalqFramework.OptionsTest
         public void Test7() {
             var ex = Assert.Throws<Exception>(() => {
                 var instance = new SomeConfiguration();
-                Opts.Load(instance, new string[] { "-bi" });
+                OptionsDeserializer.Deserialize(instance, new string[] { "-bi" });
             });
             Assert.Equal("not all stacked options are boolean: bi", ex.Message);
         }
@@ -66,7 +66,7 @@ namespace CalqFramework.OptionsTest
         public void Test8() {
             var ex = Assert.Throws<Exception>(() => {
                 var instance = new SomeConfiguration();
-                Opts.Load(instance, new string[] { "-ib" });
+                OptionsDeserializer.Deserialize(instance, new string[] { "-ib" });
             });
             Assert.Equal("option requires value: -ib", ex.Message);
         }
@@ -75,7 +75,7 @@ namespace CalqFramework.OptionsTest
         public void Test9() {
             var ex = Assert.Throws<Exception>(() => {
                 var instance = new SomeConfiguration();
-                Opts.Load(instance, new string[] { "-ib", "0" });
+                OptionsDeserializer.Deserialize(instance, new string[] { "-ib", "0" });
             });
             Assert.Equal("not all stacked options are boolean: ib", ex.Message);
         }
@@ -84,7 +84,7 @@ namespace CalqFramework.OptionsTest
         public void Test10() {
             var ex = Assert.Throws<Exception>(() => {
                 var instance = new SomeConfiguration();
-                Opts.Load(instance, new string[] { "--integer" });
+                OptionsDeserializer.Deserialize(instance, new string[] { "--integer" });
             });
             Assert.Equal("option requires value: --integer", ex.Message);
         }
@@ -92,7 +92,7 @@ namespace CalqFramework.OptionsTest
         [Fact]
         public void Test11() {
             var instance = new SomeConfiguration();
-            Opts.Load(instance, new string[] { "++xtrueBoolean" });
+            OptionsDeserializer.Deserialize(instance, new string[] { "++xtrueBoolean" });
             Assert.False(instance.xtrueBoolean);
         }
 
@@ -100,7 +100,7 @@ namespace CalqFramework.OptionsTest
         public void Test12() {
             var ex = Assert.Throws<Exception>(() => {
                 var instance = new SomeConfiguration();
-                Opts.Load(instance, new string[] { "--inner=0" });
+                OptionsDeserializer.Deserialize(instance, new string[] { "--inner=0" });
             });
             Assert.Equal($"option and value type mismatch: inner=0 (inner is Inner)", ex.Message);
         }
@@ -109,7 +109,7 @@ namespace CalqFramework.OptionsTest
         public void Test13() {
             var ex = Assert.Throws<Exception>(() => {
                 var instance = new SomeConfiguration();
-                Opts.Load(instance, new string[] { "--integer=a" });
+                OptionsDeserializer.Deserialize(instance, new string[] { "--integer=a" });
             });
             Assert.Equal($"option and value type mismatch: integer=a (integer is Int32)", ex.Message);
         }
@@ -118,7 +118,7 @@ namespace CalqFramework.OptionsTest
         public void Test14() {
             var ex = Assert.Throws<Exception>(() => {
                 var instance = new SomeConfiguration();
-                Opts.Load(instance, new string[] { "--integer=0.1" });
+                OptionsDeserializer.Deserialize(instance, new string[] { "--integer=0.1" });
             });
             Assert.Equal($"option and value type mismatch: integer=0.1 (integer is Int32)", ex.Message);
         }
@@ -127,7 +127,7 @@ namespace CalqFramework.OptionsTest
         public void Test15() {
             var ex = Assert.Throws<Exception>(() => {
                 var instance = new SomeConfiguration();
-                Opts.Load(instance, new string[] { "--aByteNumber=256" });
+                OptionsDeserializer.Deserialize(instance, new string[] { "--aByteNumber=256" });
             });
             Assert.Equal($"option value is out of range: aByteNumber=256 (0-255)", ex.Message);
         }
@@ -136,7 +136,7 @@ namespace CalqFramework.OptionsTest
         public void Test16() {
             var ex = Assert.Throws<MissingMemberException>(() => {
                 var instance = new SomeConfiguration();
-                Opts.Load(instance, new string[] { "--missingMemmber=0" });
+                OptionsDeserializer.Deserialize(instance, new string[] { "--missingMemmber=0" });
             });
             Assert.Equal($"option doesn't exist: missingMemmber", ex.Message);
         }
@@ -145,7 +145,7 @@ namespace CalqFramework.OptionsTest
         public void Test17() {
             var ex = Assert.Throws<Exception>(() => {
                 var instance = new SomeConfiguration();
-                Opts.Load(instance, new string[] { "-m" });
+                OptionsDeserializer.Deserialize(instance, new string[] { "-m" });
             });
             Assert.Equal($"option doesn't exist: m", ex.Message);
         }
@@ -153,7 +153,7 @@ namespace CalqFramework.OptionsTest
         [Fact]
         public void Test18() {
             var instance = new SomeConfiguration();
-            Opts.Load(instance, new string[] { "-b", "-x" });
+            OptionsDeserializer.Deserialize(instance, new string[] { "-b", "-x" });
             Assert.True(instance.boolean);
             Assert.True(instance.xtrueBoolean);
         }
@@ -161,7 +161,7 @@ namespace CalqFramework.OptionsTest
         [Fact]
         public void Test19() {
             var instance = new SomeConfiguration();
-            var index = Opts.Load(instance, new string[] { "--integer=10", "notanoption", "--text=abc xyz" });
+            var index = OptionsDeserializer.Deserialize(instance, new string[] { "--integer=10", "notanoption", "--text=abc xyz" });
             Assert.Equal(10, instance.integer);
             Assert.Equal(1, index);
             Assert.Null(instance.text);
@@ -170,7 +170,7 @@ namespace CalqFramework.OptionsTest
         [Fact]
         public void Test20() {
             var instance = new SomeConfiguration();
-            var index = Opts.Load(instance, new string[] { "--integer", "10", "notanoption", "--text=abc xyz" });
+            var index = OptionsDeserializer.Deserialize(instance, new string[] { "--integer", "10", "notanoption", "--text=abc xyz" });
             Assert.Equal(10, instance.integer);
             Assert.Equal(2, index);
             Assert.Null(instance.text);
@@ -181,7 +181,7 @@ namespace CalqFramework.OptionsTest
             Assert.NotEmpty(Environment.GetCommandLineArgs());
             var instance = new ConfigurationWithXUnitCommandLineArgs();
             var ex = Assert.Throws<MissingMemberException>(() => {
-                var index = Opts.Load(instance);
+                var index = OptionsDeserializer.Deserialize(instance);
             });
             Assert.Contains("option doesn't exist", ex.Message);
             Assert.NotEqual(0, instance.port);
@@ -191,7 +191,7 @@ namespace CalqFramework.OptionsTest
         public void Test22() {
             Assert.NotEmpty(Environment.GetCommandLineArgs());
             var instance = new ConfigurationWithXUnitCommandLineArgs();
-            Opts.LoadSkipUnknown(instance);
+            OptionsDeserializer.DeserializeSkipUnknown(instance);
             Assert.NotEqual(0, instance.port);
         }
 
@@ -199,7 +199,7 @@ namespace CalqFramework.OptionsTest
         public void Test23() {
             var instance = new ConfigurationWithXUnitCommandLineArgs();
             var ex = Assert.Throws<Exception>(() => {
-                Opts.LoadSkipUnknown(instance, new string [] { "--port", int.MaxValue.ToString() });
+                OptionsDeserializer.DeserializeSkipUnknown(instance, new string [] { "--port", int.MaxValue.ToString() });
             });
             Assert.Equal($"option value is out of range: port=2147483647 (0-65535)", ex.Message);
         }
@@ -207,14 +207,14 @@ namespace CalqFramework.OptionsTest
         [Fact]
         public void Test24() {
             var instance = new SomeConfiguration();
-            Opts.Load(instance, new string[] { "--customname" });
+            OptionsDeserializer.Deserialize(instance, new string[] { "--customname" });
             Assert.True(instance.longOption);
         }
 
         [Fact]
         public void Test25() {
             var instance = new SomeConfiguration();
-            Opts.Load(instance, new string[] { "--shadowedfield" });
+            OptionsDeserializer.Deserialize(instance, new string[] { "--shadowedfield" });
             Assert.True(instance.usableOption);
             Assert.False(instance.shadowedfield);
         }
@@ -222,21 +222,21 @@ namespace CalqFramework.OptionsTest
         [Fact]
         public void Test26() {
             var instance = new SomeConfiguration();
-            Opts.Load(instance, new string[] { "-y" });
+            OptionsDeserializer.Deserialize(instance, new string[] { "-y" });
             Assert.True(instance.shortOption);
         }
 
         [Fact]
         public void Test27() {
             var instance = new SomeConfiguration();
-            Opts.Load(instance, new string[] { "-c" });
+            OptionsDeserializer.Deserialize(instance, new string[] { "-c" });
             Assert.True(instance.longOption);
         }
 
         [Fact]
         public void Test28() {
             var instance = new SomeConfiguration();
-            Opts.LoadSkipUnknown(instance, new string[] { "--integer=10", "--", "--text=abc xyz" });
+            OptionsDeserializer.DeserializeSkipUnknown(instance, new string[] { "--integer=10", "--", "--text=abc xyz" });
             Assert.Equal(10, instance.integer);
             Assert.Null(instance.text);
         }
@@ -244,21 +244,21 @@ namespace CalqFramework.OptionsTest
         [Fact]
         public void Test29() {
             var instance = new SomeConfiguration();
-            Opts.LoadSkipUnknown(instance, new string[] { "--unknown", "--text=abc" });
+            OptionsDeserializer.DeserializeSkipUnknown(instance, new string[] { "--unknown", "--text=abc" });
             Assert.Equal("abc", instance.text);
         }
 
         [Fact]
         public void Test30() {
             var instance = new SomeConfiguration();
-            Opts.LoadSkipUnknown(instance, new string[] { "--unknown", "value", "--text=abc" });
+            OptionsDeserializer.DeserializeSkipUnknown(instance, new string[] { "--unknown", "value", "--text=abc" });
             Assert.Equal("abc", instance.text);
         }
 
         [Fact]
         public void Test31() {
             var instance = new SomeConfiguration();
-            Opts.LoadSkipUnknown(instance, new string[] { "--unknown", "-b", "--text=abc" });
+            OptionsDeserializer.DeserializeSkipUnknown(instance, new string[] { "--unknown", "-b", "--text=abc" });
             Assert.Equal("abc", instance.text);
             Assert.True(instance.boolean);
         }
@@ -266,7 +266,7 @@ namespace CalqFramework.OptionsTest
         [Fact]
         public void Test32() {
             var instance = new SomeConfiguration();
-            Opts.LoadSkipUnknown(instance, new string[] { "--unknown=-b", "--text=abc" });
+            OptionsDeserializer.DeserializeSkipUnknown(instance, new string[] { "--unknown=-b", "--text=abc" });
             Assert.Equal("abc", instance.text);
             Assert.False(instance.boolean);
         }
@@ -274,14 +274,14 @@ namespace CalqFramework.OptionsTest
         [Fact]
         public void Test33() {
             var instance = new SomeConfiguration();
-            Opts.LoadSkipUnknown(instance, new string[] { "unknown", "--text=abc" });
+            OptionsDeserializer.DeserializeSkipUnknown(instance, new string[] { "unknown", "--text=abc" });
             Assert.Equal("abc", instance.text);
         }
 
         [Fact]
         public void Test34() {
             var instance = new SomeConfiguration();
-            Opts.Load(instance, new string[] { "--initializedBoolList", "false", "--initializedBoolList", "true" });
+            OptionsDeserializer.Deserialize(instance, new string[] { "--initializedBoolList", "false", "--initializedBoolList", "true" });
             Assert.False(instance.initializedBoolList[2]);
             Assert.True(instance.initializedBoolList[3]);
         }

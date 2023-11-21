@@ -2,7 +2,7 @@
 using System;
 
 namespace CalqFramework.Options {
-    public class Reader<T> : ReaderBase {
+    public class ToTypeOptionsReader<T> : OptionsReaderBase {
         protected override string GetOptionName(char option) {
             var type = typeof(T);
 
