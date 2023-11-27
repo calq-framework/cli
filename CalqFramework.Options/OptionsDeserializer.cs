@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CalqFramework.Serialization.Text;
+using System;
 using System.Collections;
 
 namespace CalqFramework.Options {
@@ -8,25 +9,27 @@ namespace CalqFramework.Options {
         }
 
         public static int Deserialize<T>(T instance, string[] args, int startIndex = 0) where T : notnull {
-            var reader = new ToTypeOptionsReader<T>();
-            Deserialize(reader, instance, args, startIndex);
+            var dataMemberAccessor = DataMemberAccess.DataMemberAccessorFactory.DefaultDataMemberAccessor;
+            var reader = new ToTypeOptionsReader<T>(dataMemberAccessor);
+            Deserialize(dataMemberAccessor, reader, instance, args, startIndex);
             return reader.LastIndex;
         }
 
-        private static void Deserialize<T>(ToTypeOptionsReader<T> reader, T instance, string[] args, int startIndex) where T : notnull {
+        private static void Deserialize<T>(Serialization.DataMemberAccess.IDataMemberAccessor dataMemberAccessor, ToTypeOptionsReader<T> reader, T instance, string[] args, int startIndex) where T : notnull {
             foreach (var (option, value) in reader.Read(args, startIndex)) {
-                var type = Reflection.GetFieldOrPropertyType(typeof(T), option);
+                //var type = Reflection.GetFieldOrPropertyType(typeof(T), option);
+                var type = dataMemberAccessor.GetDataMemberType(typeof(T), option);
                 var isCollection = type.GetInterface(nameof(ICollection)) != null;
                 if (isCollection) {
                     type = type.GetGenericArguments()[0];
                 }
-                var valueObj = Reflection.ParseValue(type, value, option);
+                var valueObj = ValueParser.ParseValue(value, type, option);
                 try {
                     if (isCollection == false) {
-                        Reflection.SetFieldOrPropertyValue(instance, option, valueObj);
+                        dataMemberAccessor.SetDataMemberValue(instance, option, valueObj);
                     } else {
-                        var collection = Reflection.GetFieldOrPropertyValue(instance, option);
-                        Reflection.AddChildValue((collection as ICollection)!, valueObj);
+                        var collection = dataMemberAccessor.GetDataMemberValue(instance, option);
+                        CollectionMemberAccessor.AddChildValue((collection as ICollection)!, valueObj);
                     }
                 } catch (ArgumentException ex) {
                     throw new Exception($"option and value type mismatch: {option}={value} ({option} is {type.Name})", ex);
@@ -39,10 +42,11 @@ namespace CalqFramework.Options {
         }
 
         public static void DeserializeSkipUnknown<T>(T instance, string[] args, int startIndex = 0) where T : notnull {
-            var reader = new ToTypeOptionsReader<T>();
+            var dataMemberAccessor = DataMemberAccess.DataMemberAccessorFactory.DefaultDataMemberAccessor;
+            var reader = new ToTypeOptionsReader<T>(dataMemberAccessor);
             while (reader.LastIndex < args.Length) {
                 try {
-                    Deserialize(reader, instance, args, startIndex);
+                    Deserialize(dataMemberAccessor, reader, instance, args, startIndex);
                     if (reader.LastIndex == startIndex) {
                         ++startIndex;
                     } else {
@@ -51,12 +55,8 @@ namespace CalqFramework.Options {
                         }
                         startIndex = reader.LastIndex;
                     }
-                } catch (Exception ex) {
-                    if (ex.Message.StartsWith("option doesn't exist")) {
-                        startIndex = reader.LastIndex + 1;
-                    } else {
-                        throw;
-                    }
+                } catch (MissingMemberException ex) {
+                    startIndex = reader.LastIndex + 1;
                 }
             }
         }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reflection;
-using System.Text.RegularExpressions;
 
 namespace CalqFramework.Options {
     public class CommandLineInterface {
@@ -15,7 +14,7 @@ namespace CalqFramework.Options {
                 var reader = new ToMethodOptionsReader(parameters);
                 foreach (var (option, value) in reader.Read(args, startIndex)) {
                     var (parameter, index) = GetParameterIndexPair(parameters, option);
-                    var valueObj = Reflection.ParseValue(parameter.ParameterType, value, option);
+                    var valueObj = ValueParser.ParseValue(value, parameter.ParameterType, option);
                     paramValues[index] = valueObj;
                 }
 
@@ -32,11 +31,13 @@ namespace CalqFramework.Options {
                 throw new Exception($"option doesn't exist: {option}");
             }
 
+            var dataMemberAccessor = DataMemberAccess.DataMemberAccessorFactory.DefaultDataMemberAccessor;
+
             var obj = instance;
             var i = 0;
             try {
                 for (; i < args.Length; ++i) {
-                    obj = Reflection.GetFieldOrPropertyValue(instance, args[i]);
+                    obj = dataMemberAccessor.GetDataMemberValue(instance, args[i]);
                 }
             } catch (MissingMemberException) {
                 var methodBindingFlags = BindingFlags.Public | BindingFlags.Instance;
