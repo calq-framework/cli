@@ -1,18 +1,36 @@
 ﻿using System;
 using System.Reflection;
+using static CalqFramework.Options.OptionsReaderBase;
 
 namespace CalqFramework.Options {
     public class CommandLineInterface {
 
         public static object? Execute(object instance, string[] args) {
-            return Execute(instance, args, CommandLineInterfaceOptions.None);
+            return Execute(instance, args, new CliSerializerOptions());
         }
         
-        public static object? Execute(object instance, string[] args, CommandLineInterfaceOptions deserializerOptions) {
+        public static object? Execute(object instance, string[] args, CliSerializerOptions options) {
 
             int ReadOptions(ParameterInfo[] parameters, string[] args, int startIndex, ref object[] paramValues) {
                 var reader = new ToMethodOptionsReader(parameters);
-                foreach (var (option, value) in reader.Read(args, startIndex)) {
+                var nolongerPositional = false;
+                var i = 0;
+                foreach (var (option, value, optionAttr) in reader.Read(args, startIndex)) {
+                    if (optionAttr.HasFlag(OptionFlags.NotAnOption)) {
+                        if (nolongerPositional) {
+                            throw new Exception("unexpected value");
+                        } else {
+                            if (i >= parameters.Length) {
+                                throw new Exception("passed too many args");
+                            }
+                            paramValues[i] = ValueParser.ParseValue(option, parameters[i].ParameterType, parameters[i].Name);
+                            ++i;
+                            continue;
+                        }
+                    } else {
+                        nolongerPositional = true;
+                    }
+
                     var (parameter, index) = GetParameterIndexPair(parameters, option);
                     var valueObj = ValueParser.ParseValue(value, parameter.ParameterType, option);
                     paramValues[index] = valueObj;
@@ -31,7 +49,7 @@ namespace CalqFramework.Options {
                 throw new Exception($"option doesn't exist: {option}");
             }
 
-            var dataMemberAccessor = DataMemberAccess.DataMemberAccessorFactory.DefaultDataMemberAccessor;
+            var dataMemberAccessor = DataMemberAccess.CliDataMemberAccessorFactory.Instance.CreateDataMemberAccessor(options);
 
             var obj = instance;
             var i = 0;
@@ -40,9 +58,9 @@ namespace CalqFramework.Options {
                     obj = dataMemberAccessor.GetDataMemberValue(instance, args[i]);
                 }
             } catch (MissingMemberException) {
-                var methodBindingFlags = BindingFlags.Public | BindingFlags.Instance;
-                methodBindingFlags = deserializerOptions.HasFlag(CommandLineInterfaceOptions.IgnoreCase) ? methodBindingFlags | BindingFlags.IgnoreCase : methodBindingFlags;
-                var method = obj.GetType().GetMethod(args[i], methodBindingFlags);
+                //var methodBindingFlags = BindingFlags.Public | BindingFlags.Instance;
+                //methodBindingFlags = deserializerOptions.HasFlag(CommandLineInterfaceOptions.IgnoreCase) ? methodBindingFlags | BindingFlags.IgnoreCase : methodBindingFlags;
+                var method = obj.GetType().GetMethod(args[i], options.BindingAttr);
                 if (method == null) {
                     throw new Exception($"invalid command");
                 }
@@ -50,39 +68,7 @@ namespace CalqFramework.Options {
                 ++i;
                 var parameters = method.GetParameters();
                 var parameterValues = new object[method.GetParameters().Length];
-                if (i < args.Length) {
-                    var parameterValuesIndex = 0;
-                    var lastReadIndex = ReadOptions(parameters, args, i, ref parameterValues);
-                    if (lastReadIndex == i) {
-                        try {
-                            parameterValues[parameterValuesIndex++] = args[i++];
-                        } catch (IndexOutOfRangeException) {
-                            throw new Exception($"incorrect usage: expected {method}");
-                        }
-                    } else {
-                        i = lastReadIndex;
-                    }
-                    for (; i < args.Length; ++i) {
-                        lastReadIndex = ReadOptions(parameters, args, i, ref parameterValues);
-                        if (lastReadIndex != i) {
-                            if (lastReadIndex < args.Length) {
-                                throw new Exception($"incorrect usage: expected {method}");
-                            }
-                            break;
-                        }
-                        try {
-                            parameterValues[parameterValuesIndex++] = args[i];
-                        } catch (IndexOutOfRangeException) {
-                            throw new Exception($"incorrect usage: expected {method}");
-                        }
-                    }
-
-                    for (var j = 0; j < parameters.Length; ++j) {
-                        if (parameters[j].ParameterType != parameterValues[j]?.GetType()) {
-                            throw new Exception($"incorrect usage: expected {method}");
-                        }
-                    }
-                }
+                ReadOptions(parameters, args, i, ref parameterValues);
 
                 return method.Invoke(obj, parameterValues);
             }

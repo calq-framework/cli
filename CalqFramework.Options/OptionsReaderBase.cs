@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace CalqFramework.Options {
     public abstract class OptionsReaderBase {
 
         [Flags]
-        private enum OptionFlags {
+        public enum OptionFlags {
             None = 0,
             Short = 1,
-            Plus = 2
+            Plus = 2,
+            NotAnOption = 4
         }
 
         public int LastIndex { get; private set; }
@@ -16,10 +18,14 @@ namespace CalqFramework.Options {
         protected abstract string GetOptionName(char option);
         protected abstract Type GetOptionType(string option);
 
-        public IEnumerable<(string option, string value)> Read(string[] args, int startIndex = 0) {
+        public IEnumerable<(string option, string value, OptionFlags optionAttr)> Read(string[] args, int startIndex = 0, bool skipUnknown = false) {
 
             bool IsBoolean(string option) {
                 return GetOptionType(option) == typeof(bool);
+            }
+
+            bool IsNumber(string input) {
+                return BigInteger.TryParse(input, out _);
             }
 
             (string option, string value) ExtractOptionValuePair(string arg, OptionFlags optionAttr) {
@@ -37,18 +43,19 @@ namespace CalqFramework.Options {
             }
 
             IEnumerable<string> ReadShort(string stackedOptions) {
-                var option = GetOptionName(stackedOptions[0]);
-                if (stackedOptions.Length > 1 && IsBoolean(option) == false) {
-                    throw new Exception($"not all stacked options are boolean: {stackedOptions}");
-                }
+                //var option = GetOptionName(stackedOptions[0]);
+                //if (stackedOptions.Length > 1 && IsBoolean(option) == false) {
+                //    throw new Exception($"not all stacked options are boolean: {stackedOptions}");
+                //}
 
-                yield return option;
+                //yield return option;
 
-                for (var i = 1; i < stackedOptions.Length; ++i) {
-                    option = GetOptionName(stackedOptions[i]);
-                    if (IsBoolean(option) == false) {
-                        throw new Exception($"not all stacked options are boolean: {stackedOptions}");
-                    }
+                for (var i = 0; i < stackedOptions.Length; ++i) {
+                    var option = stackedOptions[i].ToString();
+                    //option = GetOptionName(stackedOptions[i]);
+                    //if (IsBoolean(option) == false) {
+                    //    throw new Exception($"not all stacked options are boolean: {stackedOptions}");
+                    //}
                     yield return option;
                 }
             }
@@ -65,10 +72,6 @@ namespace CalqFramework.Options {
 
                     if (arg.Length == 0) {
                         throw new ArgumentException("arg length is 0");
-                    }
-
-                    if (arg.Length == 1) {
-                        yield break;
                     }
 
                     var optionAttr = OptionFlags.None;
@@ -90,29 +93,25 @@ namespace CalqFramework.Options {
                             }
                             break;
                         default:
-                            yield break;
+                            ++index;
+                            yield return (arg, "", OptionFlags.NotAnOption);
+                            continue;
                     }
 
                     var (option, value) = ExtractOptionValuePair(arg, optionAttr);
                     if (value == "") {
-                        if (IsBoolean(optionAttr.HasFlag(OptionFlags.Short) ? GetOptionName(option[0]) : option)) {
-                            value = optionAttr.HasFlag(OptionFlags.Plus) ? "false" : "true";
-                        } else {
+                        if (index + 1 < args.Length && (args[index + 1][0] != '-' || IsNumber(args[index + 1]))) {
                             ++index;
-                            try {
-                                value = args[index];
-                            } catch (IndexOutOfRangeException ex) {
-                                throw new Exception($"option requires value: {arg}", ex);
-                            }
+                            value = args[index];
                         }
                     }
 
                     if (optionAttr.HasFlag(OptionFlags.Short)) {
                         foreach (var longOption in ReadShort(option)) {
-                            yield return (longOption, value);
+                            yield return (longOption, value, optionAttr);
                         }
                     } else {
-                        yield return (option, value);
+                        yield return (option, value, optionAttr);
                     }
 
                     ++index;

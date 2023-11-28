@@ -1,29 +1,53 @@
-﻿using CalqFramework.Serialization.Text;
+﻿using CalqFramework.Options.DataMemberAccess;
+using CalqFramework.Serialization.DataMemberAccess;
+using CalqFramework.Serialization.Text;
 using System;
 using System.Collections;
+using System.ComponentModel.Design;
+using static CalqFramework.Options.OptionsReaderBase;
 
 namespace CalqFramework.Options {
     public class OptionsDeserializer {
-        public static int Deserialize<T>(T instance) where T : notnull {
-            return Deserialize(instance, Environment.GetCommandLineArgs(), 1);
+        public static int Deserialize<T>(T instance) {
+            return Deserialize(instance, new CliSerializerOptions());
         }
 
-        public static int Deserialize<T>(T instance, string[] args, int startIndex = 0) where T : notnull {
-            var dataMemberAccessor = DataMemberAccess.DataMemberAccessorFactory.DefaultDataMemberAccessor;
+        public static int Deserialize<T>(T instance, CliSerializerOptions options) {
+            return Deserialize(instance, options, Environment.GetCommandLineArgs(), 1);
+        }
+
+        public static int Deserialize<T>(T instance, string[] args, int startIndex = 0) {
+            return Deserialize(instance, new CliSerializerOptions(), args, startIndex);
+        }
+
+        public static int Deserialize<T>(T instance, CliSerializerOptions options, string[] args, int startIndex = 0) {
+            var dataMemberAccessor = CliDataMemberAccessorFactory.Instance.CreateDataMemberAccessor(options);
             var reader = new ToTypeOptionsReader<T>(dataMemberAccessor);
-            Deserialize(dataMemberAccessor, reader, instance, args, startIndex);
-            return reader.LastIndex;
-        }
 
-        private static void Deserialize<T>(Serialization.DataMemberAccess.IDataMemberAccessor dataMemberAccessor, ToTypeOptionsReader<T> reader, T instance, string[] args, int startIndex) where T : notnull {
-            foreach (var (option, value) in reader.Read(args, startIndex)) {
-                //var type = Reflection.GetFieldOrPropertyType(typeof(T), option);
-                var type = dataMemberAccessor.GetDataMemberType(typeof(T), option);
+            foreach (var (option, value, optionAttr) in reader.Read(args, startIndex)) {
+                if (optionAttr.HasFlag(OptionFlags.NotAnOption)) {
+                    throw new Exception("unexpected value");
+                }
+
+                Type type;
+                try {
+                    type = dataMemberAccessor.GetDataMemberType(typeof(T), option);
+                } catch (MissingMemberException) {
+                    if (options.SkipUnknown) {
+                        continue;
+                    }
+                    throw;
+                }
+
                 var isCollection = type.GetInterface(nameof(ICollection)) != null;
                 if (isCollection) {
                     type = type.GetGenericArguments()[0];
                 }
-                var valueObj = ValueParser.ParseValue(value, type, option);
+                string val = value;
+                if (type == typeof(bool) && value == "") {
+                    val = optionAttr.HasFlag(OptionFlags.Plus) ? "false" : "true";
+                }
+                var valueObj = ValueParser.ParseValue(val, type, option);
                 try {
                     if (isCollection == false) {
                         dataMemberAccessor.SetDataMemberValue(instance, option, valueObj);
@@ -35,30 +59,8 @@ namespace CalqFramework.Options {
                     throw new Exception($"option and value type mismatch: {option}={value} ({option} is {type.Name})", ex);
                 }
             }
-        }
 
-        public static void DeserializeSkipUnknown<T>(T instance) where T : notnull {
-            DeserializeSkipUnknown(instance, Environment.GetCommandLineArgs(), 1);
-        }
-
-        public static void DeserializeSkipUnknown<T>(T instance, string[] args, int startIndex = 0) where T : notnull {
-            var dataMemberAccessor = DataMemberAccess.DataMemberAccessorFactory.DefaultDataMemberAccessor;
-            var reader = new ToTypeOptionsReader<T>(dataMemberAccessor);
-            while (reader.LastIndex < args.Length) {
-                try {
-                    Deserialize(dataMemberAccessor, reader, instance, args, startIndex);
-                    if (reader.LastIndex == startIndex) {
-                        ++startIndex;
-                    } else {
-                        if (args[reader.LastIndex - 1] == "--") {
-                            break;
-                        }
-                        startIndex = reader.LastIndex;
-                    }
-                } catch (MissingMemberException ex) {
-                    startIndex = reader.LastIndex + 1;
-                }
-            }
+            return reader.LastIndex;
         }
     }
 }
