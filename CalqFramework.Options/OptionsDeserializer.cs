@@ -4,6 +4,7 @@ using CalqFramework.Serialization.Text;
 using System;
 using System.Collections;
 using System.ComponentModel.Design;
+using System.Text.Json.Serialization;
 using static CalqFramework.Options.OptionsReaderBase;
 
 namespace CalqFramework.Options {
@@ -43,11 +44,7 @@ namespace CalqFramework.Options {
                 if (isCollection) {
                     type = type.GetGenericArguments()[0];
                 }
-                string val = value;
-                if (type == typeof(bool) && value == "") {
-                    val = optionAttr.HasFlag(OptionFlags.Plus) ? "false" : "true";
-                }
-                var valueObj = ValueParser.ParseValue(val, type, option);
+                var valueObj = ValueParser.ParseValue(value, type, option);
                 try {
                     if (isCollection == false) {
                         dataMemberAccessor.SetDataMemberValue(instance, option, valueObj);

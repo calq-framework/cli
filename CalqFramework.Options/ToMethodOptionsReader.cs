@@ -1,4 +1,5 @@
 ﻿using CalqFramework.Options;
+using CalqFramework.Serialization.DataMemberAccess;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -12,22 +13,26 @@ namespace CalqFramework.Options {
             this.parameters = parameters;
         }
 
-        protected override string GetOptionName(char option) {
+        protected override bool TryGetOptionName(char option, out string result) {
             foreach (var param in parameters) {
-                if (param.Name[0] == option) { // TODO when null?
-                    return param.Name;
+                if (param.Name![0] == option) {
+                    result = param.Name;
+                    return true;
                 }
             }
-            throw new Exception($"option doesn't exist: {option}");
+            result = default!;
+            return false;
         }
 
-        protected override Type GetOptionType(string option) {
+        protected override bool TryGetOptionType(string option, out Type result) {
             foreach (var param in parameters) {
                 if (param.Name == option) {
-                    return param.ParameterType;
+                    result = param.ParameterType;
+                    return true;
                 }
             }
-            throw new Exception($"option doesn't exist: {option}");
+            result = default!;
+            return false;
         }
     }
 }
