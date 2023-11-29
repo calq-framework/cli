@@ -13,15 +13,27 @@ namespace CalqFramework.Options {
             DataMemberAccessor = dataMemberAccessor;
         }
 
-        protected override string GetOptionName(char option) {
-            var type = typeof(T);
-            var member = DataMemberAccessor.GetDataMember(type, option.ToString());
-            return member?.Name ?? throw new Exception($"option doesn't exist: {option}");
+        protected override bool TryGetOptionName(char option, out string result) {
+            try {
+                var type = typeof(T);
+                var member = DataMemberAccessor.GetDataMember(type, option.ToString());
+                result = member?.Name;
+                return result != null ? true : false;
+            } catch (Exception) {
+                result = default!;
+                return false;
+            }
         }
 
-        protected override Type GetOptionType(string option) {
-            var type = typeof(T);
-            return DataMemberAccessor.GetDataMemberType(type, option);
+        protected override bool TryGetOptionType(string option, out Type result) {
+            try {
+                var type = typeof(T);
+                result = DataMemberAccessor.GetDataMemberType(type, option);
+                return true;
+            } catch (Exception) {
+                result = default!;
+                return false;
+            }
         }
     }
 }
