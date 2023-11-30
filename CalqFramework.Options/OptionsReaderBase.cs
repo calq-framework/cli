@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data;
-using System.Net.Http.Headers;
 using System.Numerics;
 
 namespace CalqFramework.Options {
@@ -30,8 +28,8 @@ namespace CalqFramework.Options {
             }
 
             void ValidateOptionValue(string option, ref string value, ref OptionFlags optionAttr, ref int index) {
-                if (value == "") {
-                    if (TryGetOptionType(option, out Type type)) {
+                if (TryGetOptionType(option, out Type type)) {
+                    if (value == "") {
                         var isCollection = type.GetInterface(nameof(ICollection)) != null;
                         if (isCollection) {
                             type = type.GetGenericArguments()[0];
@@ -46,9 +44,9 @@ namespace CalqFramework.Options {
                                 optionAttr |= OptionFlags.Unassigned;
                             }
                         }
-                    } else {
-                        optionAttr |= OptionFlags.Unknown;
                     }
+                } else {
+                    optionAttr |= OptionFlags.Unknown;
                 }
             }
 
