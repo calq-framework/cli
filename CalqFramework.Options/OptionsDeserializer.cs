@@ -1,10 +1,7 @@
 ﻿using CalqFramework.Options.DataMemberAccess;
-using CalqFramework.Serialization.DataMemberAccess;
 using CalqFramework.Serialization.Text;
 using System;
 using System.Collections;
-using System.ComponentModel.Design;
-using System.Text.Json.Serialization;
 using static CalqFramework.Options.OptionsReaderBase;
 
 namespace CalqFramework.Options {
@@ -26,34 +23,32 @@ namespace CalqFramework.Options {
             var reader = new ToTypeOptionsReader<T>(dataMemberAccessor);
 
             foreach (var (option, value, optionAttr) in reader.Read(args, startIndex)) {
-                if (optionAttr.HasFlag(OptionFlags.NotAnOption)) {
-                    throw new Exception("unexpected value");
-                }
-
-                Type type;
-                try {
-                    type = dataMemberAccessor.GetDataMemberType(typeof(T), option);
-                } catch (MissingMemberException) {
+                if (optionAttr.HasFlag(OptionFlags.NotAnOption) || optionAttr.HasFlag(OptionFlags.Unknown)) {
                     if (options.SkipUnknown) {
                         continue;
+                    } else {
+                        throw new Exception("unexpected value");
                     }
-                    throw;
                 }
+
+                if (optionAttr.HasFlag(OptionFlags.Unassigned)) {
+                    throw new Exception("ambiguous syntax (try using --)");
+                }
+
+                var type = dataMemberAccessor.GetDataMemberType(typeof(T), option);
 
                 var isCollection = type.GetInterface(nameof(ICollection)) != null;
                 if (isCollection) {
                     type = type.GetGenericArguments()[0];
                 }
+
                 var valueObj = ValueParser.ParseValue(value, type, option);
-                try {
-                    if (isCollection == false) {
-                        dataMemberAccessor.SetDataMemberValue(instance, option, valueObj);
-                    } else {
-                        var collection = dataMemberAccessor.GetDataMemberValue(instance, option);
-                        CollectionMemberAccessor.AddChildValue((collection as ICollection)!, valueObj);
-                    }
-                } catch (ArgumentException ex) {
-                    throw new Exception($"option and value type mismatch: {option}={value} ({option} is {type.Name})", ex);
+
+                if (isCollection == false) {
+                    dataMemberAccessor.SetDataMemberValue(instance, option, valueObj);
+                } else {
+                    var collection = dataMemberAccessor.GetDataMemberValue(instance, option);
+                    CollectionMemberAccessor.AddChildValue((collection as ICollection)!, valueObj);
                 }
             }
 

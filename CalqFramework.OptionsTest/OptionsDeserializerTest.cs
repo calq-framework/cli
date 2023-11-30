@@ -132,7 +132,7 @@ namespace CalqFramework.OptionsTest
 
         [Fact]
         public void Test16() {
-            var ex = Assert.Throws<MissingMemberException>(() => {
+            var ex = Assert.Throws<Exception>(() => {
                 var instance = new SomeConfiguration();
                 OptionsDeserializer.Deserialize(instance, new string[] { "--missingMemmber=0" });
             });
@@ -141,7 +141,7 @@ namespace CalqFramework.OptionsTest
 
         [Fact]
         public void Test17() {
-            var ex = Assert.Throws<MissingMemberException>(() => {
+            var ex = Assert.Throws<Exception>(() => {
                 var instance = new SomeConfiguration();
                 OptionsDeserializer.Deserialize(instance, new string[] { "-m" });
             });
@@ -176,7 +176,7 @@ namespace CalqFramework.OptionsTest
         public void Test21() {
             Assert.NotEmpty(Environment.GetCommandLineArgs());
             var instance = new ConfigurationWithXUnitCommandLineArgs();
-            var ex = Assert.Throws<MissingMemberException>(() => {
+            var ex = Assert.Throws<Exception>(() => {
                 var index = OptionsDeserializer.Deserialize(instance);
             });
             // Assert.Contains("option doesn't exist", ex.Message); // TODO check assert message
@@ -241,12 +241,12 @@ namespace CalqFramework.OptionsTest
         public void Test28() {
             var instance = new SomeConfiguration();
             OptionsDeserializer.Deserialize(
-                    instance, new CliSerializerOptions() {
-                        SkipUnknown = true
-                    },
-                    new string[] { "--integer=10", "--", "--text=abc xyz" },
-                    0
-                );
+                instance, new CliSerializerOptions() {
+                    SkipUnknown = true
+                },
+                new string[] { "--integer=10", "--", "--text=abc xyz" },
+                0
+            );
             Assert.Equal(10, instance.integer);
             Assert.Null(instance.text);
         }
@@ -255,12 +255,12 @@ namespace CalqFramework.OptionsTest
         public void Test29() {
             var instance = new SomeConfiguration();
             OptionsDeserializer.Deserialize(
-                    instance, new CliSerializerOptions() {
-                        SkipUnknown = true
-                    },
-                    new string[] { "--unknown", "--text=abc" },
-                    0
-                );
+                instance, new CliSerializerOptions() {
+                    SkipUnknown = true
+                },
+                new string[] { "--unknown", "--text=abc" },
+                0
+            );
             Assert.Equal("abc", instance.text);
         }
 
@@ -268,12 +268,12 @@ namespace CalqFramework.OptionsTest
         public void Test30() {
             var instance = new SomeConfiguration();
             OptionsDeserializer.Deserialize(
-                    instance, new CliSerializerOptions() {
-                        SkipUnknown = true
-                    },
-                    new string[] { "--unknown", "value", "--text=abc" },
-                    0
-                );
+                instance, new CliSerializerOptions() {
+                    SkipUnknown = true
+                },
+                new string[] { "--unknown", "value", "--text=abc" },
+                0
+            );
             Assert.Equal("abc", instance.text);
         }
 
@@ -281,12 +281,12 @@ namespace CalqFramework.OptionsTest
         public void Test31() {
             var instance = new SomeConfiguration();
             OptionsDeserializer.Deserialize(
-                    instance, new CliSerializerOptions() {
-                        SkipUnknown = true
-                    },
-                    new string[] { "--unknown", "-b", "--text=abc" },
-                    0
-                );
+                instance, new CliSerializerOptions() {
+                    SkipUnknown = true
+                },
+                new string[] { "--unknown", "-b", "--text=abc" },
+                0
+            );
             Assert.Equal("abc", instance.text);
             Assert.True(instance.boolean);
         }
@@ -295,12 +295,12 @@ namespace CalqFramework.OptionsTest
         public void Test32() {
             var instance = new SomeConfiguration();
             OptionsDeserializer.Deserialize(
-                    instance, new CliSerializerOptions() {
-                        SkipUnknown = true
-                    },
-                    new string[] { "--unknown=-b", "--text=abc" },
-                    0
-                );
+                instance, new CliSerializerOptions() {
+                    SkipUnknown = true
+                },
+                new string[] { "--unknown=-b", "--text=abc" },
+                0
+            );
             Assert.Equal("abc", instance.text);
             Assert.False(instance.boolean);
         }
@@ -308,15 +308,14 @@ namespace CalqFramework.OptionsTest
         [Fact]
         public void Test33() {
             var instance = new SomeConfiguration();
-            Assert.Throws<Exception>(() => {
-                OptionsDeserializer.Deserialize(
-                        instance, new CliSerializerOptions() {
-                            SkipUnknown = true
-                        },
-                        new string[] { "unknown", "--text=abc" },
-                        0
-                    );
-            });
+            OptionsDeserializer.Deserialize(
+                instance, new CliSerializerOptions() {
+                    SkipUnknown = true
+                },
+                new string[] { "unknown", "--text=abc" },
+                0
+            );
+            Assert.Equal("abc", instance.text);
         }
 
         [Fact]
