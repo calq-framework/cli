@@ -15,6 +15,8 @@ namespace CalqFramework.OptionsTest {
 
         public void Foo() { }
 
+        public void FooWithOptionalParam(bool optional = true) { }
+
         public string Text(string text) {
             return text;
         }

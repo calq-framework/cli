@@ -1,7 +1,4 @@
-﻿using Microsoft.VisualBasic.FileIO;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -13,51 +10,55 @@ namespace CalqFramework.Options {
         public static object? Execute(object instance, string[] args) {
             return Execute(instance, args, new CliSerializerOptions() { SkipUnknown = true });
         }
-        
+
         public static object? Execute(object instance, string[] args, CliSerializerOptions options) {
 
             object[] ReadOptions(ParameterInfo[] parameters, string[] args, ICollection<string> whiteList, int startIndex) {
-                var paramValues = new object[parameters.Length];
+                var assignedParams = new HashSet<ParameterInfo>();
+
+                var paramValues = new object?[parameters.Length];
                 var reader = new ToMethodOptionsReader(parameters);
                 var i = 0;
                 foreach (var (option, value, optionAttr) in reader.Read(args, startIndex)) {
                     whiteList = whiteList.Select(x => ToMethodOptionsReader.GetOptionName(parameters, x)).ToHashSet(); // assure that Reader also return unresolved option names
 
-                    void Assign()
-                    {
-                        if (optionAttr.HasFlag(OptionFlags.NotAnOption))
-                        {
-                            if (i >= parameters.Length)
-                            {
+                    void Assign() {
+                        if (optionAttr.HasFlag(OptionFlags.NotAnOption)) {
+                            if (i >= parameters.Length) {
                                 throw new Exception("passed too many args");
                             }
                             paramValues[i] = ValueParser.ParseValue(option, parameters[i].ParameterType, parameters[i].Name);
+                            assignedParams.Add(parameters[i]);
                             ++i;
-                        }
-                        else
-                        {
+                        } else {
                             var (parameter, index) = GetParameterIndexPair(parameters, option);
                             var valueObj = ValueParser.ParseValue(value, parameter.ParameterType, option);
                             paramValues[index] = valueObj;
+                            assignedParams.Add(parameter);
                         }
                     }
 
-                    if (!optionAttr.HasFlag(OptionFlags.ValueUnassigned))
-                    {
-                        if (whiteList.Contains(option))
-                        {
+                    if (!optionAttr.HasFlag(OptionFlags.ValueUnassigned)) {
+                        if (whiteList.Contains(option)) {
                             throw new Exception($"unknown option {option}");
                         }
-
                         Assign();
-                    } else
-                    {
-                        if (!whiteList.Contains(option))
-                        {
+                    } else {
+                        if (!whiteList.Contains(option)) {
                             throw new Exception($"internal error - instance option and method option are the same {option}"); // TODO do not assume this error message - just throw its not whitelisted
                         }
-
                         Assign();
+                    }
+                }
+
+                var assignedParamNames = assignedParams.Select(x => x.Name).ToHashSet();
+                for (var j = 0; j < parameters.Length; ++j) {
+                    var param = parameters[j];
+                    if (!assignedParamNames.Contains(param.Name)) {
+                        if (!param.IsOptional) {
+                            throw new Exception($"unassigned option {param.Name}");
+                        }
+                        paramValues[j] = param.DefaultValue!;
                     }
                 }
 
@@ -84,8 +85,7 @@ namespace CalqFramework.Options {
                 }
             } catch (MissingMemberException) {
                 var method = obj.GetType().GetMethod(args[i], options.BindingAttr);
-                if (method == null)
-                {
+                if (method == null) {
                     throw new Exception($"invalid command");
                 }
                 ++i;

@@ -129,7 +129,22 @@ namespace CalqFramework.OptionsTest {
                     AccessFields = true,
                     BindingAttr = CliSerializerOptions.DefaultLookup | System.Reflection.BindingFlags.IgnoreCase
                 }
-            ); ;
+            );
+        }
+
+        [Fact]
+        public void Test18() {
+            var ex = Assert.Throws<Exception>(() => {
+                var tool = new SomeTool();
+                CommandLineInterface.Execute(tool, new[] { "Text" });
+            });
+            Assert.Equal("unassigned option text", ex.Message);
+        }
+
+        [Fact]
+        public void Test19() {
+            var tool = new SomeTool();
+            CommandLineInterface.Execute(tool, new[] { "FooWithOptionalParam" });
         }
     }
 }
