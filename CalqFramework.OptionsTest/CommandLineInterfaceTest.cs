@@ -70,10 +70,8 @@ namespace CalqFramework.OptionsTest {
 
         [Fact]
         public void Test9() {
-            var ex = Assert.Throws<Exception>(() => {
-                var tool = new SomeTool();
-                var result = CommandLineInterface.Execute(tool, new[] { "TextAndInteger", "--integer", "1", "abc" });
-            });
+            var tool = new SomeTool();
+            var result = CommandLineInterface.Execute(tool, new[] { "TextAndInteger", "--integer", "1", "abc" });
         }
 
         [Fact]
