@@ -1,4 +1,9 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.FileIO;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using static CalqFramework.Options.OptionsReaderBase;
 
@@ -6,37 +11,57 @@ namespace CalqFramework.Options {
     public class CommandLineInterface {
 
         public static object? Execute(object instance, string[] args) {
-            return Execute(instance, args, new CliSerializerOptions());
+            return Execute(instance, args, new CliSerializerOptions() { SkipUnknown = true });
         }
         
         public static object? Execute(object instance, string[] args, CliSerializerOptions options) {
 
-            int ReadOptions(ParameterInfo[] parameters, string[] args, int startIndex, ref object[] paramValues) {
+            object[] ReadOptions(ParameterInfo[] parameters, string[] args, ICollection<string> whiteList, int startIndex) {
+                var paramValues = new object[parameters.Length];
                 var reader = new ToMethodOptionsReader(parameters);
-                var nolongerPositional = false;
                 var i = 0;
                 foreach (var (option, value, optionAttr) in reader.Read(args, startIndex)) {
-                    if (optionAttr.HasFlag(OptionFlags.NotAnOption)) {
-                        if (nolongerPositional) {
-                            throw new Exception("unexpected value");
-                        } else {
-                            if (i >= parameters.Length) {
+                    whiteList = whiteList.Select(x => ToMethodOptionsReader.GetOptionName(parameters, x)).ToHashSet(); // assure that Reader also return unresolved option names
+
+                    void Assign()
+                    {
+                        if (optionAttr.HasFlag(OptionFlags.NotAnOption))
+                        {
+                            if (i >= parameters.Length)
+                            {
                                 throw new Exception("passed too many args");
                             }
                             paramValues[i] = ValueParser.ParseValue(option, parameters[i].ParameterType, parameters[i].Name);
                             ++i;
-                            continue;
                         }
-                    } else {
-                        nolongerPositional = true;
+                        else
+                        {
+                            var (parameter, index) = GetParameterIndexPair(parameters, option);
+                            var valueObj = ValueParser.ParseValue(value, parameter.ParameterType, option);
+                            paramValues[index] = valueObj;
+                        }
                     }
 
-                    var (parameter, index) = GetParameterIndexPair(parameters, option);
-                    var valueObj = ValueParser.ParseValue(value, parameter.ParameterType, option);
-                    paramValues[index] = valueObj;
+                    if (!optionAttr.HasFlag(OptionFlags.ValueUnassigned))
+                    {
+                        if (whiteList.Contains(option))
+                        {
+                            throw new Exception($"unknown option {option}");
+                        }
+
+                        Assign();
+                    } else
+                    {
+                        if (!whiteList.Contains(option))
+                        {
+                            throw new Exception($"internal error - instance option and method option are the same {option}"); // TODO do not assume this error message - just throw its not whitelisted
+                        }
+
+                        Assign();
+                    }
                 }
 
-                return reader.LastIndex;
+                return paramValues;
             }
 
             (ParameterInfo parameter, int index) GetParameterIndexPair(ParameterInfo[] parameters, string option) {
@@ -55,20 +80,20 @@ namespace CalqFramework.Options {
             var i = 0;
             try {
                 for (; i < args.Length; ++i) {
-                    obj = dataMemberAccessor.GetDataMemberValue(instance, args[i]);
+                    obj = dataMemberAccessor.GetDataMemberValue(instance, args[i]); // TODO TryGetDataMemberValue
                 }
             } catch (MissingMemberException) {
-                //var methodBindingFlags = BindingFlags.Public | BindingFlags.Instance;
-                //methodBindingFlags = deserializerOptions.HasFlag(CommandLineInterfaceOptions.IgnoreCase) ? methodBindingFlags | BindingFlags.IgnoreCase : methodBindingFlags;
                 var method = obj.GetType().GetMethod(args[i], options.BindingAttr);
-                if (method == null) {
+                if (method == null)
+                {
                     throw new Exception($"invalid command");
                 }
-
                 ++i;
+
+                var skippedOptions = OptionsDeserializer.Deserialize(instance, options, args, i);
+
                 var parameters = method.GetParameters();
-                var parameterValues = new object[method.GetParameters().Length];
-                ReadOptions(parameters, args, i, ref parameterValues);
+                var parameterValues = ReadOptions(parameters, args, skippedOptions, i);
 
                 return method.Invoke(obj, parameterValues);
             }

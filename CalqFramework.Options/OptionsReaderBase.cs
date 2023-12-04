@@ -11,9 +11,10 @@ namespace CalqFramework.Options {
             None = 0,
             Short = 1,
             Plus = 2,
-            NotAnOption = 4,
-            Unknown = 8,
-            Unassigned = 16 // ambiguous value (starts with '-')
+            ValueUnassigned = 4,
+            NotAnOption = 8 + ValueUnassigned,
+            Unknown = 16 + ValueUnassigned,
+            AmbigousValue = 32 + ValueUnassigned // ambiguous value (starts with '-')
         }
 
         public int LastIndex { get; private set; }
@@ -41,7 +42,7 @@ namespace CalqFramework.Options {
                                 ++index;
                                 value = args[index];
                             } else {
-                                optionAttr |= OptionFlags.Unassigned;
+                                optionAttr |= OptionFlags.ValueUnassigned;
                             }
                         }
                     }

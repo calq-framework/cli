@@ -45,9 +45,8 @@ namespace CalqFramework.OptionsTest
         [Fact]
         public void Test6() {
             var instance = new SomeConfiguration();
-            var index = OptionsDeserializer.Deserialize(instance, new string[] { "--integer=10", "--", "--text=abc xyz" });
+            var x = OptionsDeserializer.Deserialize(instance, new string[] { "--integer=10", "--", "--text=abc xyz" });
             Assert.Equal(10, instance.integer);
-            Assert.Equal(2, index);
             Assert.Null(instance.text);
         }
 
