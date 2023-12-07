@@ -7,8 +7,10 @@ using static CalqFramework.Options.OptionsReaderBase;
 namespace CalqFramework.Options {
     public class CommandLineInterface {
 
-        public static object? Execute(object instance, string[] args) {
-            return Execute(instance, args, new CliSerializerOptions() { SkipUnknown = true });
+    static object GetDefaultValue(ParameterInfo parameter) => parameter.HasDefaultValue ? parameter.DefaultValue : "N/A";
+
+    public static object? Execute(object instance, string[] args) {
+            return Execute(instance, args, new CliSerializerOptions() { SkipUnknown = true }); // FIXME - set SkipUnknown inside Execute method - maybe add public CliSerializerOptions(CliSerializerOptions options)
         }
 
         public static object? Execute(object instance, string[] args, CliSerializerOptions options) {
@@ -36,6 +38,13 @@ namespace CalqFramework.Options {
                             paramValues[index] = valueObj;
                             assignedParams.Add(parameter);
                         }
+                    }
+
+                    if ((option == "help" || option == "h") && !optionAttr.HasFlag(OptionFlags.NotAnOption)) {
+                        foreach (var parameter in parameters) {
+                            Console.WriteLine($"--{parameter.Name}, -{parameter.Name![0]} - Type: {parameter.ParameterType}, Required: {!parameter.IsOptional}, Default: {GetDefaultValue(parameter)}");
+                        }
+                        return Array.Empty<object>();
                     }
 
                     if (!optionAttr.HasFlag(OptionFlags.ValueUnassigned)) {
@@ -82,6 +91,32 @@ namespace CalqFramework.Options {
             try {
                 for (; i < args.Length; ++i) {
                     obj = dataMemberAccessor.GetDataMemberValue(instance, args[i]); // TODO TryGetDataMemberValue
+                    if (obj.GetType().IsPrimitive || obj.GetType() == typeof(string)) { // TODO if parseable
+                        throw new Exception($"{args[i]} is not a core command");
+                    }
+                    if (args[i] == "--help" || args[i] == "-h") { // TODO create HelpData Help() and void PrintHelp(HelpData)
+                        var membersByKeys = dataMemberAccessor.GetDataMembersByKeys(obj.GetType());
+                        var keysByMembers = membersByKeys.GroupBy(x => x.Value, x => x.Key).ToDictionary(x => x.Key, x => x.OrderBy(e => e.Length).ToList());
+                        var globalOptions = keysByMembers.Where(x => { var type = dataMemberAccessor.GetDataMemberType(obj.GetType(), x.Value[0]); return type.IsPrimitive || type == typeof(string); }); // TODO if parseable
+                        var coreCommands = keysByMembers.Where(x => { var type = dataMemberAccessor.GetDataMemberType(obj.GetType(), x.Value[0]); return !type.IsPrimitive && type != typeof(string); }); // TODO if parseable
+                        var actionCommands = obj.GetType().GetMethods(options.BindingAttr);
+                        // TODO move to separate method
+                        // TODO get sumnmaries from documentation
+                        Console.WriteLine("CORE COMMANDS:");
+                        foreach (var command in coreCommands) {
+                            Console.WriteLine($"Name: {command.Value}");
+                        }
+                        Console.WriteLine();
+                        Console.WriteLine("ACTION COMMANDS:");
+                        foreach (var methodInfo in actionCommands) {
+                            Console.WriteLine($"{methodInfo.Name}({string.Join(", ", methodInfo.GetParameters().Select(x => $"{x.ParameterType.Name} {x.Name}{(x.HasDefaultValue ? $" = {x.DefaultValue}" : "")}"))})"); // TODO method/param accessor to separate this logic
+                        }
+                        Console.WriteLine();
+                        Console.WriteLine("GLOBAL OPTIONS:");
+                        foreach (var option in globalOptions) {
+                            Console.WriteLine($"--{string.Join(", =", option.Value)} - Type: {dataMemberAccessor.GetDataMemberType(obj.GetType(), option.Key.Name)}, Default: {dataMemberAccessor.GetDataMemberValue(obj.GetType(), option.Key.Name)}");
+                        }
+                    }
                 }
             } catch (MissingMemberException) {
                 var method = obj.GetType().GetMethod(args[i], options.BindingAttr);
