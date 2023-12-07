@@ -47,8 +47,8 @@ namespace CalqFramework.Options {
                         return Array.Empty<object>();
                     }
 
-                    if (!optionAttr.HasFlag(OptionFlags.ValueUnassigned)) {
-                        if (whiteList.Contains(option)) {
+                    if (optionAttr.HasFlag(OptionFlags.ValueUnassigned)) {
+                        if (whiteList.Contains(option) && !optionAttr.HasFlag(OptionFlags.NotAnOption)) {
                             throw new Exception($"unknown option {option}");
                         }
                         Assign();
