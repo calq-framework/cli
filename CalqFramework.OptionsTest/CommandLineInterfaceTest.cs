@@ -37,8 +37,8 @@ namespace CalqFramework.OptionsTest {
             var tool = new SomeTool();
             var result = CommandLineInterface.Execute(tool, new[] { "TextAndInteger", "abc", "--integer", "1" });
             Assert.Null(result);
-            Assert.Equal("abc", tool.text);
-            Assert.Equal(1, tool.integer);
+            Assert.Equal("abc", tool.internalText);
+            Assert.Equal(1, tool.internalInteger);
         }
 
         [Fact]
@@ -46,8 +46,8 @@ namespace CalqFramework.OptionsTest {
             var tool = new SomeTool();
             var result = CommandLineInterface.Execute(tool, new[] { "IntegerAndText", "--integer", "1", "--text", "abc" });
             Assert.Null(result);
-            Assert.Equal(1, tool.integer);
-            Assert.Equal("abc", tool.text);
+            Assert.Equal(1, tool.internalInteger);
+            Assert.Equal("abc", tool.internalText);
         }
 
         [Fact]
@@ -151,9 +151,9 @@ namespace CalqFramework.OptionsTest {
         public void Test20() {
             var ex = Assert.Throws<Exception>(() => {
                 var tool = new SomeTool();
-                CommandLineInterface.Execute(tool, new[] { "text" });
+                CommandLineInterface.Execute(tool, new[] { "internalText" });
             });
-            Assert.Equal("text is not a core command", ex.Message);
+            Assert.Equal("internalText is not a core command", ex.Message);
         }
 
         [Fact]
@@ -166,6 +166,23 @@ namespace CalqFramework.OptionsTest {
         public void Test22() {
             var tool = new SomeTool();
             CommandLineInterface.Execute(tool, new[] { "Foo", "--help" });
+        }
+
+        [Fact]
+        public void Test23() {
+            var tool = new SomeTool();
+            var result = CommandLineInterface.Execute(tool, new[] { "TextAndBoolean", "abc", "--boolean" });
+            Assert.Null(result);
+            Assert.Equal("abc", tool.internalText);
+            Assert.Equal(true, tool.internalBoolean);
+        }
+
+        [Fact]
+        public void Test24() {
+            var ex = Assert.Throws<Exception>(() => {
+                var tool = new SomeTool();
+                var result = CommandLineInterface.Execute(tool, new[] { "TextAndBooleanError", "abc", "--theSameBoolean" });
+            });
         }
     }
 }

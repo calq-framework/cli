@@ -7,8 +7,10 @@ namespace CalqFramework.OptionsTest {
             public void InnerFoo() { }
         }
 
-        public string text;
-        public int integer;
+        public string internalText;
+        public int internalInteger;
+        public bool internalBoolean;
+        public bool theSameBoolean;
 
         public Inner inner = new Inner();
         public Inner nullInner;
@@ -26,13 +28,23 @@ namespace CalqFramework.OptionsTest {
         }
 
         public void TextAndInteger(string text, int integer) {
-            this.text = text;
-            this.integer = integer;
+            this.internalText = text;
+            this.internalInteger = integer;
         }
 
         public void IntegerAndText(int integer, string text) {
-            this.integer = integer;
-            this.text = text;
+            this.internalInteger = integer;
+            this.internalText = text;
+        }
+
+        public void TextAndBoolean(string text, bool boolean = false) {
+            this.internalText = text;
+            this.internalBoolean = boolean;
+        }
+
+        public void TextAndBooleanError(string text, bool theSameBoolean = false) {
+            this.internalText = text;
+            this.theSameBoolean = theSameBoolean;
         }
     }
 }
