@@ -146,5 +146,26 @@ namespace CalqFramework.OptionsTest {
             var tool = new SomeTool();
             CommandLineInterface.Execute(tool, new[] { "FooWithOptionalParam" });
         }
+
+        [Fact]
+        public void Test20() {
+            var ex = Assert.Throws<Exception>(() => {
+                var tool = new SomeTool();
+                CommandLineInterface.Execute(tool, new[] { "text" });
+            });
+            Assert.Equal("text is not a core command", ex.Message);
+        }
+
+        [Fact]
+        public void Test21() {
+            var tool = new SomeTool();
+            CommandLineInterface.Execute(tool, new[] { "--help" });
+        }
+
+        [Fact]
+        public void Test22() {
+            var tool = new SomeTool();
+            CommandLineInterface.Execute(tool, new[] { "Foo", "--help" });
+        }
     }
 }
