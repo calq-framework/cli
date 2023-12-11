@@ -7,20 +7,19 @@ using static CalqFramework.Options.OptionsReaderBase;
 
 namespace CalqFramework.Options {
     public class OptionsDeserializer {
-        public static IList<string> Deserialize(object instance) {
-            return Deserialize(instance, new CliSerializerOptions());
+        public static void Deserialize(object instance) {
+            Deserialize(instance, new CliSerializerOptions());
         }
 
-        public static IList<string> Deserialize(object instance, CliSerializerOptions options) {
-            return Deserialize(instance, options, Environment.GetCommandLineArgs(), 1);
+        public static void Deserialize(object instance, CliSerializerOptions options) {
+            Deserialize(instance, options, Environment.GetCommandLineArgs(), 1);
         }
 
-        public static IList<string> Deserialize(object instance, string[] args, int startIndex = 0) {
-            return Deserialize(instance, new CliSerializerOptions(), args, startIndex);
+        public static void Deserialize(object instance, string[] args, int startIndex = 0) {
+            Deserialize(instance, new CliSerializerOptions(), args, startIndex);
         }
 
-        public static IList<string> Deserialize(object instance, CliSerializerOptions options, string[] args, int startIndex = 0) {
-            var skippedOptions = new List<string>();
+        public static void Deserialize(object instance, CliSerializerOptions options, string[] args, int startIndex = 0) {
             var dataMemberAccessor = CliDataMemberAccessorFactory.Instance.CreateDataMemberAccessor(options);
             var reader = new ToTypeOptionsReader(dataMemberAccessor, instance.GetType());
 
@@ -31,7 +30,6 @@ namespace CalqFramework.Options {
                         throw new Exception("ambiguous syntax (try using --)");
                     }
                     if (options.SkipUnknown) {
-                        skippedOptions.Add(option);
                         continue;
                     } else {
                         throw new Exception("unexpected value");
@@ -54,8 +52,6 @@ namespace CalqFramework.Options {
                     CollectionMemberAccessor.AddChildValue((collection as ICollection)!, valueObj);
                 }
             }
-
-            return skippedOptions;
         }
     }
 }
