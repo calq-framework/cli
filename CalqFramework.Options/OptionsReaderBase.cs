@@ -19,7 +19,7 @@ namespace CalqFramework.Options {
 
         public int LastIndex { get; private set; }
 
-        protected abstract bool TryGetOptionName(char option, out string result);
+        protected abstract bool ValidateOptionName(char option);
         protected abstract bool TryGetOptionType(string option, out Type result);
 
         public IEnumerable<(string option, string value, OptionFlags optionAttr)> Read(string[] args, int startIndex = 0) {
@@ -121,9 +121,9 @@ namespace CalqFramework.Options {
 
                     if (optionAttr.HasFlag(OptionFlags.Short)) {
                         foreach (var shortOption in ReadShort(option)) {
-                            if (TryGetOptionName(shortOption, out var longOption)) {
-                                ValidateOptionValue(longOption, ref value, ref optionAttr, ref index);
-                                yield return (longOption, value, optionAttr);
+                            if (ValidateOptionName(shortOption)) {
+                                ValidateOptionValue(shortOption.ToString(), ref value, ref optionAttr, ref index);
+                                yield return (shortOption.ToString(), value, optionAttr);
                             } else {
                                 optionAttr |= OptionFlags.Unknown;
                                 yield return (shortOption.ToString(), value, optionAttr);

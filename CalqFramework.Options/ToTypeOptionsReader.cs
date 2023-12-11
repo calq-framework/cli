@@ -15,14 +15,26 @@ namespace CalqFramework.Options {
             Type = type;
         }
 
-        protected override bool TryGetOptionName(char option, out string result) {
-            try {
-                var member = DataMemberAccessor.GetDataMember(Type, option.ToString());
-                result = member?.Name;
-                return result != null ? true : false;
-            } catch (Exception) {
-                result = default!;
+        //protected override bool TryGetOptionName(char option, out string result) {
+        //    try {
+        //        var member = DataMemberAccessor.GetDataMember(Type, option.ToString());
+        //        result = member?.Name;
+        //        return result != null ? true : false;
+        //    } catch (Exception) {
+        //        result = default!;
+        //        return false;
+        //    }
+        //}
+
+        protected override bool ValidateOptionName(char option)
+        {
+            var member = DataMemberAccessor.GetDataMember(Type, option.ToString());
+            if (member == null)
+            {
                 return false;
+            } else
+            {
+                return true;
             }
         }
 

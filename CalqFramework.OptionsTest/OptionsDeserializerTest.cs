@@ -45,7 +45,7 @@ namespace CalqFramework.OptionsTest
         [Fact]
         public void Test6() {
             var instance = new SomeConfiguration();
-            var x = OptionsDeserializer.Deserialize(instance, new string[] { "--integer=10", "--", "--text=abc xyz" });
+            OptionsDeserializer.Deserialize(instance, new string[] { "--integer=10", "--", "--text=abc xyz" });
             Assert.Equal(10, instance.integer);
             Assert.Null(instance.text);
         }
@@ -159,7 +159,7 @@ namespace CalqFramework.OptionsTest
         public void Test19() {
             var instance = new SomeConfiguration();
             Assert.Throws<Exception>(() => {
-                var index = OptionsDeserializer.Deserialize(instance, new string[] { "--integer=10", "notanoption", "--text=abc xyz" });
+                OptionsDeserializer.Deserialize(instance, new string[] { "--integer=10", "notanoption", "--text=abc xyz" });
             });
         }
 
@@ -167,7 +167,7 @@ namespace CalqFramework.OptionsTest
         public void Test20() {
             var instance = new SomeConfiguration();
             Assert.Throws<Exception>(() => {
-                var index = OptionsDeserializer.Deserialize(instance, new string[] { "--integer", "10", "notanoption", "--text=abc xyz" });
+                OptionsDeserializer.Deserialize(instance, new string[] { "--integer", "10", "notanoption", "--text=abc xyz" });
             });
         }
 
@@ -176,7 +176,7 @@ namespace CalqFramework.OptionsTest
             Assert.NotEmpty(Environment.GetCommandLineArgs());
             var instance = new ConfigurationWithXUnitCommandLineArgs();
             var ex = Assert.Throws<Exception>(() => {
-                var index = OptionsDeserializer.Deserialize(instance);
+                OptionsDeserializer.Deserialize(instance);
             });
             // Assert.Contains("option doesn't exist", ex.Message); // TODO check assert message
             Assert.NotEqual(0, instance.port);
