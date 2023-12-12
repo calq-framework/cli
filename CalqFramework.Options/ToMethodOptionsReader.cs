@@ -9,7 +9,7 @@ namespace CalqFramework.Options
 
         public DataMemberAndMethodParamsAccessor DataMemberAndMethodParamsAccessor { get; }
 
-        public ToMethodOptionsReader(DataMemberAndMethodParamsAccessor dataMemberAndMethodParamsAccessor) : base() {
+        public ToMethodOptionsReader(string[] args, DataMemberAndMethodParamsAccessor dataMemberAndMethodParamsAccessor) : base(args) {
             DataMemberAndMethodParamsAccessor = dataMemberAndMethodParamsAccessor;
         }
 

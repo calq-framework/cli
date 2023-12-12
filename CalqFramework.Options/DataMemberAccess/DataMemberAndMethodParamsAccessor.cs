@@ -18,19 +18,6 @@ namespace CalqFramework.Options.DataMemberAccess {
             MethodParamsAccessor = methodParamsAccessor;
         }
 
-        //public (ICollection<List<string>> globalOptions, ICollection<List<string>> coreCommands) GetInstanceOptions(Type type) {
-        //    var membersByKeys = DataMemberAccessor.GetDataMembersByKeys(Obj.GetType());
-        //    var keysByMembers = membersByKeys.GroupBy(x => x.Value, x => x.Key).ToDictionary(x => x.Key, x => x.OrderByDescending(e => e.Length).ToList());
-        //    var globalOptions = keysByMembers.Where(x => { var type = DataMemberAccessor.GetDataMemberType(Obj.GetType(), x.Value[0]); return type.IsPrimitive || type == typeof(string); }); // TODO if parseable
-        //    var coreCommands = keysByMembers.Where(x => { var type = DataMemberAccessor.GetDataMemberType(Obj.GetType(), x.Value[0]); return !type.IsPrimitive && type != typeof(string); }); // TODO if parseable
-        //    var result = (globalOptions.Select(x => x.Value).ToList(), coreCommands.Select(x => x.Value).ToList());
-        //    return result;
-        //}
-
-        //ICollection<string> GetDataMembersByKeys() { }
-
-        //ICollection<string> GetAssociatedDataKeys(string dataMemberKey);
-
         public bool TryResolveDataMemberKey(string dataMemberKey, out string result) {
             result = default!;
 
@@ -98,10 +85,6 @@ namespace CalqFramework.Options.DataMemberAccess {
                 //result = dataMemberResult;
                 DataMemberAccessor.SetDataMemberValue(Obj, dataMemberKey, value);
             }
-        }
-
-        public void SetDataValue(int dataMemberKey, object? value) {
-            MethodParamsAccessor.SetDataValue(dataMemberKey, value);
         }
     }
 }

@@ -18,11 +18,17 @@ namespace CalqFramework.Options {
         }
 
         public int LastIndex { get; private set; }
+        public string[] Args { get; init; }
+        public int StartIndex { get; init; } = 0;
+
+        protected OptionsReaderBase(string[] args) {
+            Args = args;
+        }
 
         protected abstract bool ValidateOptionName(char option);
         protected abstract bool TryGetOptionType(string option, out Type result);
 
-        public IEnumerable<(string option, string value, OptionFlags optionAttr)> Read(string[] args, int startIndex = 0) {
+        public IEnumerable<(string option, string value, OptionFlags optionAttr)> Read() {
 
             bool IsNumber(string input) {
                 return BigInteger.TryParse(input, out _);
@@ -38,9 +44,9 @@ namespace CalqFramework.Options {
                         if (type == typeof(bool)) {
                             value = optionAttr.HasFlag(OptionFlags.Plus) ? "false" : "true";
                         } else {
-                            if (index + 1 < args.Length && (args[index + 1][0] != '-' || IsNumber(args[index + 1]))) { // fail if starts with '-' to prevent human error
+                            if (index + 1 < Args.Length && (Args[index + 1][0] != '-' || IsNumber(Args[index + 1]))) { // fail if starts with '-' to prevent human error
                                 ++index;
-                                value = args[index];
+                                value = Args[index];
                             } else {
                                 optionAttr |= OptionFlags.ValueUnassigned;
                             }
@@ -72,15 +78,15 @@ namespace CalqFramework.Options {
                 }
             }
 
-            int index = startIndex;
+            int index = StartIndex;
 
             try {
                 while (true) {
-                    if (index >= args.Length) {
+                    if (index >= Args.Length) {
                         yield break;
                     }
 
-                    var arg = args[index];
+                    var arg = Args[index];
 
                     if (arg.Length == 0) {
                         throw new ArgumentException("arg length is 0");
@@ -113,9 +119,9 @@ namespace CalqFramework.Options {
 
                     var (option, value) = ExtractOptionValuePair(arg, optionAttr);
                     if (value == "") {
-                        if (index + 1 < args.Length && (args[index + 1][0] != '-' || IsNumber(args[index + 1]))) {
+                        if (index + 1 < Args.Length && (Args[index + 1][0] != '-' || IsNumber(Args[index + 1]))) {
                             ++index;
-                            value = args[index];
+                            value = Args[index];
                         }
                     }
 
