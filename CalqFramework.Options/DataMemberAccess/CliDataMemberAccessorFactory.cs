@@ -3,13 +3,13 @@
 namespace CalqFramework.Options.DataMemberAccess {
     sealed public class CliDataMemberAccessorFactory : DataMemberAccessorFactoryBase {
 
-        public static CliDataMemberAccessorFactory Instance { get; }
+        public static CliDataMemberAccessorFactory targetObj { get; }
 
         public static IDataMemberAccessor DefaultDataMemberAccessor { get; }
 
         static CliDataMemberAccessorFactory() {
-            Instance = new CliDataMemberAccessorFactory();
-            DefaultDataMemberAccessor = Instance.CreateDataMemberAccessor(new CliSerializerOptions());
+            targetObj = new CliDataMemberAccessorFactory();
+            DefaultDataMemberAccessor = targetObj.CreateDataMemberAccessor(new CliSerializerOptions());
         }
 
         protected override IDataMemberAccessor CreateFieldAccessor(DataMemberAccessorOptions dataMemberAccessorOptions) {

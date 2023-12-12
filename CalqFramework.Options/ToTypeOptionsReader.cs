@@ -8,9 +8,7 @@ namespace CalqFramework.Options {
         public IDataMemberAccessor DataMemberAccessor { get; }
         public Type Type { get; }
 
-        private ToTypeOptionsReader() { }
-
-        public ToTypeOptionsReader(IDataMemberAccessor dataMemberAccessor, Type type) {
+        public ToTypeOptionsReader(string[] args, IDataMemberAccessor dataMemberAccessor, Type type) : base(args) {
             DataMemberAccessor = dataMemberAccessor;
             Type = type;
         }

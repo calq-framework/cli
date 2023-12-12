@@ -7,23 +7,23 @@ using static CalqFramework.Options.OptionsReaderBase;
 
 namespace CalqFramework.Options {
     public class OptionsDeserializer {
-        public static void Deserialize(object instance) {
-            Deserialize(instance, new CliSerializerOptions());
+        public static void Deserialize(object targetObj) {
+            Deserialize(targetObj, new CliSerializerOptions());
         }
 
-        public static void Deserialize(object instance, CliSerializerOptions options) {
-            Deserialize(instance, options, Environment.GetCommandLineArgs(), 1);
+        public static void Deserialize(object targetObj, CliSerializerOptions options) {
+            Deserialize(targetObj, options, Environment.GetCommandLineArgs(), 1);
         }
 
-        public static void Deserialize(object instance, string[] args, int startIndex = 0) {
-            Deserialize(instance, new CliSerializerOptions(), args, startIndex);
+        public static void Deserialize(object targetObj, string[] args, int startIndex = 0) {
+            Deserialize(targetObj, new CliSerializerOptions(), args, startIndex);
         }
 
-        public static void Deserialize(object instance, CliSerializerOptions options, string[] args, int startIndex = 0) {
-            var dataMemberAccessor = CliDataMemberAccessorFactory.Instance.CreateDataMemberAccessor(options);
-            var reader = new ToTypeOptionsReader(dataMemberAccessor, instance.GetType());
+        public static void Deserialize(object targetObj, CliSerializerOptions options, string[] args, int startIndex = 0) {
+            var dataMemberAccessor = CliDataMemberAccessorFactory.targetObj.CreateDataMemberAccessor(options);
+            var reader = new ToTypeOptionsReader(args, dataMemberAccessor, targetObj.GetType()) { StartIndex = startIndex };
 
-            foreach (var (option, value, optionAttr) in reader.Read(args, startIndex)) {
+            foreach (var (option, value, optionAttr) in reader.Read()) {
                 if (optionAttr.HasFlag(OptionFlags.ValueUnassigned)) {
                     if (optionAttr.HasFlag(OptionFlags.AmbigousValue))
                     {
@@ -36,7 +36,7 @@ namespace CalqFramework.Options {
                     }
                 }
 
-                var type = dataMemberAccessor.GetDataMemberType(instance.GetType(), option);
+                var type = dataMemberAccessor.GetDataMemberType(targetObj.GetType(), option);
 
                 var isCollection = type.GetInterface(nameof(ICollection)) != null;
                 if (isCollection) {
@@ -46,9 +46,9 @@ namespace CalqFramework.Options {
                 var valueObj = ValueParser.ParseValue(value, type, option);
 
                 if (isCollection == false) {
-                    dataMemberAccessor.SetDataMemberValue(instance, option, valueObj);
+                    dataMemberAccessor.SetDataMemberValue(targetObj, option, valueObj);
                 } else {
-                    var collection = dataMemberAccessor.GetDataMemberValue(instance, option);
+                    var collection = dataMemberAccessor.GetDataMemberValue(targetObj, option);
                     CollectionMemberAccessor.AddChildValue((collection as ICollection)!, valueObj);
                 }
             }
