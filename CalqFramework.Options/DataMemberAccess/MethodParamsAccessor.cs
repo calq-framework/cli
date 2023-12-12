@@ -4,15 +4,31 @@ using System.Reflection;
 
 namespace CalqFramework.Options.DataMemberAccess {
     public class MethodParamsAccessor {
-        public object Obj { get; }
-        public ParameterInfo[] Parameters { get; }
-        public object[] ParamValues { get; }
-        public HashSet<ParameterInfo> AssignedParameters { get; }
 
-        public MethodParamsAccessor(object obj, ParameterInfo[] parameters) {
-            Obj = obj;
-            Parameters = parameters;
-            ParamValues = new object?[parameters.Length];
+        public ParameterInfo[] Parameters { get; }
+        private object[] ParamValues { get; }
+        public HashSet<ParameterInfo> AssignedParameters { get; }
+        public object TargetObj { get; }
+        public string Action { get; }
+        public BindingFlags BindingAttr { get; }
+        public MethodInfo Method { get; }
+
+        private MethodInfo ResolveMethod(object targetObject, string action, BindingFlags bindingAttr) {
+            var method = targetObject.GetType().GetMethod(action, bindingAttr);
+            if (method == null) {
+                throw new Exception($"invalid command");
+            }
+            return method;
+        }
+
+        public MethodParamsAccessor(object targetObj, string action, BindingFlags bindingAttr) {
+            TargetObj = targetObj;
+            Action = action;
+            BindingAttr = bindingAttr;
+
+            Method = ResolveMethod(targetObj, Action, BindingAttr); 
+            Parameters = Method.GetParameters();
+            ParamValues = new object?[Parameters.Length];
             AssignedParameters = new HashSet<ParameterInfo>();
         }
 
@@ -75,9 +91,27 @@ namespace CalqFramework.Options.DataMemberAccess {
             }
         }
 
+        public string ResolveDataMemberKey(int dataMemberKey) {
+            if (dataMemberKey >= Parameters.Length) {
+                throw new Exception("passed too many args");
+            }
+            return Parameters[dataMemberKey].Name!;
+        }
+
+        public Type GetParameterType(int dataMemberKey) {
+            if (dataMemberKey >= Parameters.Length) {
+                throw new Exception("passed too many args");
+            }
+            return Parameters[dataMemberKey].ParameterType;
+        }
+
         public void SetDataValue(int dataMemberKey, object? value) {
             ParamValues[dataMemberKey] = value;
             AssignedParameters.Add(Parameters[dataMemberKey]);
+        }
+
+        internal object? Invoke() {
+            return Method.Invoke(TargetObj, ParamValues);
         }
     }
 }
