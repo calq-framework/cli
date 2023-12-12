@@ -13,7 +13,7 @@ namespace CalqFramework.Options {
             return Execute(targetObj, args, new CliSerializerOptions());
         }
 
-        private static object[] ReadOptions(ToMethodOptionsReader optionsReader) { //object targetObj, ParameterInfo[] parameters, string[] args, int startIndex) {
+        private static void ReadOptions(ToMethodOptionsReader optionsReader) {
             var currentIndex = 0;
             var accessor = optionsReader.DataMemberAndMethodParamsAccessor;
             var parameters = accessor.MethodParamsAccessor.Parameters;
@@ -31,10 +31,9 @@ namespace CalqFramework.Options {
                 }
 
                 if (optionAttr.HasFlag(OptionFlags.NotAnOption)) {
-                    if (currentIndex >= parameters.Length) {
-                        throw new Exception("passed too many args");
-                    }
-                    accessor.MethodParamsAccessor.SetDataValue(currentIndex, ValueParser.ParseValue(option, parameters[currentIndex].ParameterType, parameters[currentIndex].Name));
+                    var parameterName = accessor.MethodParamsAccessor.ResolveDataMemberKey(currentIndex);
+                    var parameterType = accessor.MethodParamsAccessor.GetParameterType(currentIndex);
+                    accessor.MethodParamsAccessor.SetDataValue(currentIndex, ValueParser.ParseValue(option, parameterType, parameterName));
                     ++currentIndex;
                 } else {
                     accessor.TryGetDataType(option, out var type);
@@ -54,8 +53,6 @@ namespace CalqFramework.Options {
                     accessor.MethodParamsAccessor.SetDataValue(j, param.DefaultValue!);
                 }
             }
-
-            return accessor.MethodParamsAccessor.ParamValues;
         }
 
         public static object? Execute(object targetObj, string[] args, CliSerializerOptions options) {
@@ -70,7 +67,7 @@ namespace CalqFramework.Options {
                     if (type.IsPrimitive || type == typeof(string)) {
                         throw new Exception($"{args[currentIndex]} is not a core command");
                     }
-                    currentObj = dataMemberAccessor.GetDataMemberValue(targetObj, args[currentIndex]);
+                    currentObj = dataMemberAccessor.GetDataMemberValue(targetObj, args[currentIndex])!;
                 }
             } catch (MissingMemberException) {
                 if (args[currentIndex] == "--help" || args[currentIndex] == "-h") {
@@ -108,24 +105,18 @@ namespace CalqFramework.Options {
                     return null;
                 }
 
-                var method = currentObj.GetType().GetMethod(args[currentIndex], options.BindingAttr);
-                if (method == null) {
-                    throw new Exception($"invalid command");
-                }
+                var methodParamsAccessor = new MethodParamsAccessor(currentObj, args[currentIndex], options.BindingAttr);
                 ++currentIndex;
 
-                try {
-                    var parameters = method.GetParameters();
-                    var methodParamsAccessor = new MethodParamsAccessor(targetObj, parameters);
-                    var accessor = new DataMemberAndMethodParamsAccessor(
-                        targetObj,
+                var accessor = new DataMemberAndMethodParamsAccessor(
+                        currentObj,
                         dataMemberAccessor,
                         methodParamsAccessor
                     );
-                    var optionsReader = new ToMethodOptionsReader(args, accessor) { StartIndex = currentIndex };
-                    var parameterValues = ReadOptions(optionsReader); //(parameters, args, currentIndex);
-
-                    return method.Invoke(currentObj, parameterValues);
+                var optionsReader = new ToMethodOptionsReader(args, accessor) { StartIndex = currentIndex };
+                try {
+                    ReadOptions(optionsReader);
+                    return methodParamsAccessor.Invoke();
                 } catch (InvokedHelpException) {
                     return null;
                 }
