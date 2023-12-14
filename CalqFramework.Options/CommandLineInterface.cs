@@ -1,4 +1,5 @@
 ﻿using CalqFramework.Options.DataMemberAccess;
+using CalqFramework.Serialization.DataMemberAccess;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -13,6 +14,50 @@ namespace CalqFramework.Options {
             return Execute(targetObj, args, new CliSerializerOptions());
         }
 
+        // TODO use accessors (remove Parameters)
+        // TODO separate data and printing
+        private static void HandleMethodHelp(MethodParamsAccessor methodParamsAccessor) {
+            foreach (var parameter in methodParamsAccessor.Parameters) {
+                Console.WriteLine($"--{parameter.Name}, -{parameter.Name![0]} - Type: {parameter.ParameterType}, Required: {!parameter.IsOptional}, Default: {GetDefaultValue(parameter)}");
+            }
+            throw new InvokedHelpException();
+        }
+
+        // TODO use accessors only (remove obj.GetType().GetMethods)
+        // TODO separate data and printing
+        private static void HandleInstanceHelp(IDataMemberAccessor dataMemberAccessor, object obj, CliSerializerOptions options) {
+            var membersByKeys = dataMemberAccessor.GetDataMembersByKeys(obj.GetType());
+            var keysByMembers = membersByKeys.GroupBy(x => x.Value, x => x.Key).ToDictionary(x => x.Key, x => x.OrderByDescending(e => e.Length).ToList());
+            var globalOptions = keysByMembers.Where(x => {
+                var type = dataMemberAccessor.GetDataMemberType(obj.GetType(), x.Value[0]);
+                return type.IsPrimitive || type == typeof(string); // TODO create IsParseable()
+            });
+            var coreCommands = keysByMembers.Where(x => {
+                var type = dataMemberAccessor.GetDataMemberType(obj.GetType(), x.Value[0]);
+                return !type.IsPrimitive && type != typeof(string); // TODO create IsParseable()
+            });
+            var actionCommands = obj.GetType().GetMethods(options.BindingAttr);
+
+            Console.WriteLine("CORE COMMANDS:");
+            foreach (var command in coreCommands) {
+                Console.WriteLine($"Name: {command.Value}");
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("ACTION COMMANDS:");
+            foreach (var methodInfo in actionCommands) {
+                Console.WriteLine($"{methodInfo.Name}({string.Join(", ", methodInfo.GetParameters().Select(x => $"{x.ParameterType.Name} {x.Name}{(x.HasDefaultValue ? $" = {x.DefaultValue}" : "")}"))})");
+            }
+
+            Console.WriteLine();
+            Console.WriteLine("GLOBAL OPTIONS:");
+            foreach (var option in globalOptions) {
+                var type = dataMemberAccessor.GetDataMemberType(obj.GetType(), option.Value[0]);
+                var defaultValue = dataMemberAccessor.GetDataMemberValue(obj, option.Value[0]);
+                Console.WriteLine($"--{string.Join(", =", option.Value)} - Type: {type}, Default: {defaultValue}");
+            }
+        }
+
         private static void ReadOptions(ToMethodOptionsReader optionsReader) {
             var currentIndex = 0;
             var accessor = optionsReader.DataMemberAndMethodParamsAccessor;
@@ -20,10 +65,7 @@ namespace CalqFramework.Options {
 
             foreach (var (option, value, optionAttr) in optionsReader.Read()) {
                 if ((option == "help" || option == "h") && !optionAttr.HasFlag(OptionFlags.NotAnOption)) {
-                    foreach (var parameter in parameters) {
-                        Console.WriteLine($"--{parameter.Name}, -{parameter.Name![0]} - Type: {parameter.ParameterType}, Required: {!parameter.IsOptional}, Default: {GetDefaultValue(parameter)}");
-                    }
-                    throw new InvokedHelpException();
+                    HandleMethodHelp(accessor.MethodParamsAccessor);
                 }
 
                 if (optionAttr.HasFlag(OptionFlags.ValueUnassigned) && !optionAttr.HasFlag(OptionFlags.NotAnOption)) {
@@ -42,8 +84,8 @@ namespace CalqFramework.Options {
                 }
             }
 
+            // TODO move to MethodParamsAccessor.Invoke()
             var assignedParamNames = accessor.MethodParamsAccessor.AssignedParameters.Select(x => x.Name).ToHashSet();
-
             for (var j = 0; j < parameters.Length; ++j) {
                 var param = parameters[j];
                 if (!assignedParamNames.Contains(param.Name)) {
@@ -71,37 +113,7 @@ namespace CalqFramework.Options {
                 }
             } catch (MissingMemberException) {
                 if (args[currentIndex] == "--help" || args[currentIndex] == "-h") {
-                    var membersByKeys = dataMemberAccessor.GetDataMembersByKeys(currentObj.GetType());
-                    var keysByMembers = membersByKeys.GroupBy(x => x.Value, x => x.Key).ToDictionary(x => x.Key, x => x.OrderByDescending(e => e.Length).ToList());
-                    var globalOptions = keysByMembers.Where(x => {
-                        var type = dataMemberAccessor.GetDataMemberType(currentObj.GetType(), x.Value[0]);
-                        return type.IsPrimitive || type == typeof(string);
-                    });
-                    var coreCommands = keysByMembers.Where(x => {
-                        var type = dataMemberAccessor.GetDataMemberType(currentObj.GetType(), x.Value[0]);
-                        return !type.IsPrimitive && type != typeof(string);
-                    });
-                    var actionCommands = currentObj.GetType().GetMethods(options.BindingAttr);
-
-                    Console.WriteLine("CORE COMMANDS:");
-                    foreach (var command in coreCommands) {
-                        Console.WriteLine($"Name: {command.Value}");
-                    }
-
-                    Console.WriteLine();
-                    Console.WriteLine("ACTION COMMANDS:");
-                    foreach (var methodInfo in actionCommands) {
-                        Console.WriteLine($"{methodInfo.Name}({string.Join(", ", methodInfo.GetParameters().Select(x => $"{x.ParameterType.Name} {x.Name}{(x.HasDefaultValue ? $" = {x.DefaultValue}" : "")}"))})");
-                    }
-
-                    Console.WriteLine();
-                    Console.WriteLine("GLOBAL OPTIONS:");
-                    foreach (var option in globalOptions) {
-                        var type = dataMemberAccessor.GetDataMemberType(currentObj.GetType(), option.Value[0]);
-                        var defaultValue = dataMemberAccessor.GetDataMemberValue(currentObj, option.Value[0]);
-                        Console.WriteLine($"--{string.Join(", =", option.Value)} - Type: {type}, Default: {defaultValue}");
-                    }
-
+                    HandleInstanceHelp(dataMemberAccessor, currentObj, options);
                     return null;
                 }
 
