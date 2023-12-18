@@ -1,4 +1,6 @@
-﻿using System;
+﻿using CalqFramework.Serialization.Text;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -81,9 +83,22 @@ namespace CalqFramework.Options.DataMemberAccess {
 
         //object? GetDataValue(string dataMemberKey);
 
+        // TODO unify collection handling logic with DataMemberAndMethodParamsAccessor
         public bool TrySetDataValue(string dataMemberKey, object? value) {
             if (TryGetParamIndex(dataMemberKey, out var index)) {
-                ParamValues[index] = value;
+                TryGetDataType(dataMemberKey, out var type);
+                var isCollection = type.GetInterface(nameof(ICollection)) != null;
+                if (isCollection == false) {
+                    ParamValues[index] = value;
+                } else {
+                    var collection = ParamValues[index];
+                    if (collection == null) {
+                        collection = Activator.CreateInstance(type);
+                        ParamValues[index] = collection;
+                    }
+                    CollectionMemberAccessor.AddChildValue((collection as ICollection)!, value);
+                }
+
                 AssignedParameters.Add(Parameters[index]);
                 return true;
             } else {

@@ -1,7 +1,9 @@
 ﻿using CalqFramework.Options.Attributes;
 using CalqFramework.Serialization.DataMemberAccess;
+using CalqFramework.Serialization.Text;
 using Microsoft.VisualBasic.FileIO;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -81,9 +83,21 @@ namespace CalqFramework.Options.DataMemberAccess {
                 // result = paramResult;
             }
 
+            // TODO unify collection handling logic with MethodParamsAccessor
             if (dataMemberSuccess) {
                 //result = dataMemberResult;
-                DataMemberAccessor.SetDataMemberValue(Obj, dataMemberKey, value);
+                var type = DataMemberAccessor.GetDataMemberType(Obj.GetType(), dataMemberKey);
+                var isCollection = type.GetInterface(nameof(ICollection)) != null;
+                if (isCollection == false) {
+                    DataMemberAccessor.SetDataMemberValue(Obj, dataMemberKey, value);
+                } else {
+                    var collection = DataMemberAccessor.GetDataMemberValue(Obj, dataMemberKey);
+                    if (collection == null) {
+                        collection = Activator.CreateInstance(type);
+                        DataMemberAccessor.SetDataMemberValue(Obj, dataMemberKey, collection);
+                    }
+                    CollectionMemberAccessor.AddChildValue((collection as ICollection)!, value);
+                }
             }
         }
     }

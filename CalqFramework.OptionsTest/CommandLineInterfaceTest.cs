@@ -1,5 +1,6 @@
 using CalqFramework.Options;
 using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace CalqFramework.OptionsTest {
@@ -183,6 +184,22 @@ namespace CalqFramework.OptionsTest {
                 var tool = new SomeTool();
                 var result = CommandLineInterface.Execute(tool, new[] { "TextAndBooleanError", "abc", "--theSameBoolean" });
             });
+        }
+
+        [Fact]
+        public void Test25() {
+            var tool = new SomeTool();
+            var result = CommandLineInterface.Execute(tool, new string[] { "Foo", "--initializedBoolList", "false", "--initializedBoolList", "true" });
+            Assert.False(tool.initializedBoolList[2]);
+            Assert.True(tool.initializedBoolList[3]);
+        }
+
+        [Fact]
+        public void Test26() {
+            var tool = new SomeTool();
+            var result = CommandLineInterface.Execute(tool, new string[] { "FooWithList", "--paramList", "false", "--paramList", "true" });
+            Assert.False(((List<bool>)result)[0]);
+            Assert.True(((List<bool>)result)[1]);
         }
     }
 }
