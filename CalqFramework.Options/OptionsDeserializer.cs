@@ -19,8 +19,10 @@ namespace CalqFramework.Options {
             Deserialize(targetObj, new CliSerializerOptions(), args, startIndex);
         }
 
+        // TODO? pass DeserializationHandler and Reader - handler will use accessors
+        // TODO? DataAccessor (not only DataMember)
         public static void Deserialize(object targetObj, CliSerializerOptions options, string[] args, int startIndex = 0) {
-            var dataMemberAccessor = CliDataMemberAccessorFactory.targetObj.CreateDataMemberAccessor(options);
+            var dataMemberAccessor = CliDataMemberAccessorFactory.Instance.CreateDataMemberAccessor(options);
             var reader = new ToTypeOptionsReader(args, dataMemberAccessor, targetObj.GetType()) { StartIndex = startIndex };
 
             foreach (var (option, value, optionAttr) in reader.Read()) {

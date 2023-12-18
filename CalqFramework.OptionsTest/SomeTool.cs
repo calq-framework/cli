@@ -1,5 +1,7 @@
 ﻿#pragma warning disable CS0649
 
+using System.Collections.Generic;
+
 namespace CalqFramework.OptionsTest {
     class SomeTool {
 
@@ -15,9 +17,15 @@ namespace CalqFramework.OptionsTest {
         public Inner inner = new Inner();
         public Inner nullInner;
 
+        public List<bool> initializedBoolList = new List<bool>() { true, false };
+
         public void Foo() { }
 
         public void FooWithOptionalParam(bool optional = true) { }
+
+        public List<bool> FooWithList(List<bool> paramList) {
+            return paramList;
+        }
 
         public string Text(string text) {
             return text;

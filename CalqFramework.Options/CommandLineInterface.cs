@@ -1,6 +1,7 @@
 ﻿using CalqFramework.Options.DataMemberAccess;
 using CalqFramework.Serialization.DataMemberAccess;
 using System;
+using System.Collections;
 using System.Linq;
 using System.Reflection;
 using static CalqFramework.Options.OptionsReaderBase;
@@ -79,6 +80,10 @@ namespace CalqFramework.Options {
                     ++currentIndex;
                 } else {
                     accessor.TryGetDataType(option, out var type);
+                    var isCollection = type.GetInterface(nameof(ICollection)) != null;
+                    if (isCollection) {
+                        type = type.GetGenericArguments()[0];
+                    }
                     var valueObj = ValueParser.ParseValue(value, type, option);
                     accessor.SetDataValue(option, valueObj);
                 }
@@ -98,7 +103,7 @@ namespace CalqFramework.Options {
         }
 
         public static object? Execute(object targetObj, string[] args, CliSerializerOptions options) {
-            var dataMemberAccessor = CliDataMemberAccessorFactory.targetObj.CreateDataMemberAccessor(options);
+            var dataMemberAccessor = CliDataMemberAccessorFactory.Instance.CreateDataMemberAccessor(options);
 
             var currentObj = targetObj;
             var currentIndex = 0;
