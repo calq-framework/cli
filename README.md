@@ -69,12 +69,14 @@ public class ExampleClassLibrary
 ```
 
 ### Example program
+```csharp
 public class Example
 {
     static void Main(string[] args) {
         CommandLineInterface.Execute(new ExampleClassLibrary(), args);
     }
 }
+```
 
 ### Example usage from command-line
 ```
