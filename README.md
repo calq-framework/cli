@@ -63,12 +63,12 @@ public class ExampleClassLibrary
     
     public void Stacked(bool all = false, bool be = false, bool created = false)
     {
-        Console.WriteLine($"Executing Stacked with options: {a}, {b}, {c}");
+        Console.WriteLine($"Executing Stacked with options: {all}, {be}, {created}");
     }
 }
 ```
 
-### Example program
+### Example tool
 ```csharp
 public class Example
 {
