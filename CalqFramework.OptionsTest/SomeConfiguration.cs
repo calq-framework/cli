@@ -13,13 +13,13 @@ namespace CalqFramework.OptionsTest {
         public bool boolean;
         public bool xtrueBoolean = true;
         public string text;
-        [NameAttribute("customname")]
+        [Name("customname")]
         public bool longOption;
-        [NameAttribute("shadowedfield")]
+        [Name("shadowedfield")]
         public bool usableOption;
         public bool shadowedfield;
-        [NameAttribute("differentname")]
-        [ShortNameAttribute('y')]
+        [Name("differentname")]
+        [ShortName('y')]
         public bool shortOption;
         public List<bool> initializedBoolList = new List<bool>() { true, false };
     }
