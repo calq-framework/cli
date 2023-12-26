@@ -2,10 +2,10 @@
 CalqFramework.Options helps to convert libraries into command-line tools compliant with GNU (and POSIX) [conventions](https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html). CalqFramework.Options exposes class data members and methods as commands, enabling users to interact with class instances via auto-generated CLI.
 
 ## Features
-- **Method invocation**: Executes class methods with regular and optional parameters, all at the same time treated as positional arguments.
+- **Method invocation**: Executes class methods with regular and optional parameters, both treated also as positional arguments.
 - **Parameter types**: Supports primitive types (integer, boolean, double, etc.), strings, and collections.
 - **GNU-style options**: Handles GNU-style options (e.g., `--text`, `--integer`) adhering to POSIX conventions for command-line arguments.
-- **Simple value validation**: Ensures the correctness of parameter values with built-in validation based on parameter types.
+- **Value validation**: Ensures the correctness of parameter values with validation based on parameter types.
 - **Help information**: Obtains help information based on reflection, providing available commands, their parameters, and global options. (TODO: extract help information from documentation)
 
 ## Usage
@@ -14,7 +14,7 @@ CalqFramework.Options helps to convert libraries into command-line tools complia
 ```csharp
 public class ExampleClassLibrary
 {
-    [ShortName("e")]
+    [ShortName('e')]
     public bool Enable { get; set; }
     
     [Name("verbose")]
