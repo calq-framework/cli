@@ -1,4 +1,4 @@
-﻿using CalqFramework.Serialization.DataMemberAccess;
+﻿using CalqFramework.Serialization.DataAccess.DataMemberAccess;
 
 namespace CalqFramework.Options {
     public class CliSerializerOptions : DataMemberAccessorOptions {
@@ -6,6 +6,7 @@ namespace CalqFramework.Options {
 
         public CliSerializerOptions() {
             AccessFields = true;
+            AccessProperties = false; // FIXME
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿using CalqFramework.Options.DataMemberAccess;
-using CalqFramework.Serialization.DataMemberAccess;
+using CalqFramework.Serialization.DataAccess.DataMemberAccess;
 using System;
 using System.Collections;
 using System.Linq;
@@ -26,15 +26,15 @@ namespace CalqFramework.Options {
 
         // TODO use accessors only (remove obj.GetType().GetMethods)
         // TODO separate data and printing
-        private static void HandleInstanceHelp(IDataMemberAccessor dataMemberAccessor, object obj, CliSerializerOptions options) {
-            var membersByKeys = dataMemberAccessor.GetDataMembersByKeys(obj.GetType());
+        private static void HandleInstanceHelp(DataMemberAccessorBase dataMemberAccessor, object obj, CliSerializerOptions options) {
+            var membersByKeys = dataMemberAccessor.GetDataMembersByKeys();
             var keysByMembers = membersByKeys.GroupBy(x => x.Value, x => x.Key).ToDictionary(x => x.Key, x => x.OrderByDescending(e => e.Length).ToList());
             var globalOptions = keysByMembers.Where(x => {
-                var type = dataMemberAccessor.GetDataMemberType(obj.GetType(), x.Value[0]);
+                var type = dataMemberAccessor.GetType(x.Value[0]);
                 return type.IsPrimitive || type == typeof(string); // TODO create IsParseable()
             });
             var coreCommands = keysByMembers.Where(x => {
-                var type = dataMemberAccessor.GetDataMemberType(obj.GetType(), x.Value[0]);
+                var type = dataMemberAccessor.GetType(x.Value[0]);
                 return !type.IsPrimitive && type != typeof(string); // TODO create IsParseable()
             });
             var actionCommands = obj.GetType().GetMethods(options.BindingAttr);
@@ -53,8 +53,8 @@ namespace CalqFramework.Options {
             Console.WriteLine();
             Console.WriteLine("GLOBAL OPTIONS:");
             foreach (var option in globalOptions) {
-                var type = dataMemberAccessor.GetDataMemberType(obj.GetType(), option.Value[0]);
-                var defaultValue = dataMemberAccessor.GetDataMemberValue(obj, option.Value[0]);
+                var type = dataMemberAccessor.GetType(option.Value[0]);
+                var defaultValue = dataMemberAccessor.GetValue(option.Value[0]);
                 Console.WriteLine($"--{string.Join(", =", option.Value)} - Type: {type}, Default: {defaultValue}");
             }
         }
@@ -103,18 +103,18 @@ namespace CalqFramework.Options {
         }
 
         public static object? Execute(object targetObj, string[] args, CliSerializerOptions options) {
-            var dataMemberAccessor = CliDataMemberAccessorFactory.Instance.CreateDataMemberAccessor(options);
+            var dataMemberAccessor = new CliDataMemberAccessorFactory(options).CreateDataMemberAccessor_FIXME(targetObj);
 
             var currentObj = targetObj;
             var currentIndex = 0;
 
             try {
                 for (; currentIndex < args.Length; ++currentIndex) {
-                    var type = dataMemberAccessor.GetDataMemberType(currentObj.GetType(), args[currentIndex]);
+                    var type = dataMemberAccessor.GetType(args[currentIndex]);
                     if (type.IsPrimitive || type == typeof(string)) {
                         throw new Exception($"{args[currentIndex]} is not a core command");
                     }
-                    currentObj = dataMemberAccessor.GetDataMemberValue(targetObj, args[currentIndex])!;
+                    currentObj = dataMemberAccessor.GetValue(args[currentIndex])!;
                 }
             } catch (MissingMemberException) {
                 if (args[currentIndex] == "--help" || args[currentIndex] == "-h") {
@@ -126,7 +126,6 @@ namespace CalqFramework.Options {
                 ++currentIndex;
 
                 var accessor = new DataMemberAndMethodParamsAccessor(
-                        currentObj,
                         dataMemberAccessor,
                         methodParamsAccessor
                     );

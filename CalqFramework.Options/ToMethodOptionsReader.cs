@@ -1,10 +1,7 @@
 ﻿using CalqFramework.Options.DataMemberAccess;
 using System;
-using System.Collections.Generic;
-using System.Reflection;
 
-namespace CalqFramework.Options
-{
+namespace CalqFramework.Options {
     public class ToMethodOptionsReader : OptionsReaderBase {
 
         public DataMemberAndMethodParamsAccessor DataMemberAndMethodParamsAccessor { get; }

@@ -1,22 +1,20 @@
 ﻿using CalqFramework.Options.Attributes;
-using CalqFramework.Serialization.DataMemberAccess;
-using Microsoft.VisualBasic.FileIO;
+using CalqFramework.Serialization.DataAccess.DataMemberAccess;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 
 namespace CalqFramework.Options.DataMemberAccess {
     // TODO unify with CliPropertyAccessor
     public class CliFieldAccessor : FieldAccessorBase {
-        public CliFieldAccessor(BindingFlags bindingAttr) : base(bindingAttr) {
+        public CliFieldAccessor(object obj, BindingFlags bindingAttr) : base(obj, bindingAttr) {
         }
 
-        public override IDictionary<string, MemberInfo> GetDataMembersByKeys(Type type) {
+        public override IDictionary<string, MemberInfo> GetDataMembersByKeys() {
             var result = new Dictionary<string, MemberInfo>();
             var membersWithShortNames = new HashSet<MemberInfo>();
             var shortNameDuplicates = new HashSet<string>();
-            var members = type.GetFields(BindingAttr);
+            var members = Type.GetFields(BindingAttr);
             foreach (var member in members) {
                 var name = member.GetCustomAttribute<NameAttribute>()?.Name;
                 if (name != null) {
@@ -44,9 +42,9 @@ namespace CalqFramework.Options.DataMemberAccess {
         }
 
         // FIXME do not assign the first occurances - check for duplicates. if duplicate found then then return null
-        public override MemberInfo? GetDataMember(Type type, string dataMemberKey) {
+        public override MemberInfo? GetDataMember(string dataMemberKey) {
             if (dataMemberKey.Length == 1) {
-                foreach (var member in type.GetFields(BindingAttr)) {
+                foreach (var member in Type.GetFields(BindingAttr)) {
                     var name = member.GetCustomAttribute<ShortNameAttribute>()?.Name;
                     if (name != null && name == dataMemberKey[0]) {
                         return member;
@@ -54,24 +52,24 @@ namespace CalqFramework.Options.DataMemberAccess {
                 }
             }
 
-            foreach (var member in type.GetFields(BindingAttr)) {
+            foreach (var member in Type.GetFields(BindingAttr)) {
                 var name = member.GetCustomAttribute<NameAttribute>()?.Name;
                 if (name != null && name == dataMemberKey) {
                     return member;
                 }
             }
 
-            var dataMember = type.GetField(dataMemberKey, BindingAttr);
+            var dataMember = Type.GetField(dataMemberKey, BindingAttr);
 
             if (dataMember == null && dataMemberKey.Length == 1) {
-                foreach (var member in type.GetFields(BindingAttr)) {
+                foreach (var member in Type.GetFields(BindingAttr)) {
                     var name = member.GetCustomAttribute<NameAttribute>()?.Name[0];
                     if (name != null && name == dataMemberKey[0]) {
                         return member;
                     }
                 }
 
-                foreach (var member in type.GetFields(BindingAttr)) {
+                foreach (var member in Type.GetFields(BindingAttr)) {
                     if (member.Name[0] == dataMemberKey[0]) {
                         return member;
                     }

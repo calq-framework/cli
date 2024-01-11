@@ -1,4 +1,4 @@
-﻿using CalqFramework.Serialization.Text;
+﻿using CalqFramework.Serialization.DataAccess;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -96,7 +96,7 @@ namespace CalqFramework.Options.DataMemberAccess {
                         collection = Activator.CreateInstance(type);
                         ParamValues[index] = collection;
                     }
-                    CollectionMemberAccessor.AddChildValue((collection as ICollection)!, value);
+                    CollectionAccessor.AddValue((collection as ICollection)!, value);
                 }
 
                 AssignedParameters.Add(Parameters[index]);

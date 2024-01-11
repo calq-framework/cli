@@ -1,16 +1,13 @@
-﻿using CalqFramework.Options.Attributes;
-using CalqFramework.Serialization.DataMemberAccess;
+﻿using CalqFramework.Serialization.DataAccess.DataMemberAccess;
 using System;
 
 namespace CalqFramework.Options {
     public class ToTypeOptionsReader : OptionsReaderBase {
 
-        public IDataMemberAccessor DataMemberAccessor { get; }
-        public Type Type { get; }
+        public DataMemberAccessorBase DataMemberAccessor { get; }
 
-        public ToTypeOptionsReader(string[] args, IDataMemberAccessor dataMemberAccessor, Type type) : base(args) {
+        public ToTypeOptionsReader(string[] args, DataMemberAccessorBase dataMemberAccessor) : base(args) {
             DataMemberAccessor = dataMemberAccessor;
-            Type = type;
         }
 
         //protected override bool TryGetOptionName(char option, out string result) {
@@ -26,7 +23,7 @@ namespace CalqFramework.Options {
 
         protected override bool ValidateOptionName(char option)
         {
-            var member = DataMemberAccessor.GetDataMember(Type, option.ToString());
+            var member = DataMemberAccessor.GetDataMember(option.ToString());
             if (member == null)
             {
                 return false;
@@ -38,7 +35,7 @@ namespace CalqFramework.Options {
 
         protected override bool TryGetOptionType(string option, out Type result) {
             try {
-                result = DataMemberAccessor.GetDataMemberType(Type, option);
+                result = DataMemberAccessor.GetType(option);
                 return true;
             } catch (Exception) {
                 result = default!;

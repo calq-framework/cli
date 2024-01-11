@@ -1,8 +1,7 @@
 ﻿using CalqFramework.Options.DataMemberAccess;
-using CalqFramework.Serialization.Text;
+using CalqFramework.Serialization.DataAccess;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using static CalqFramework.Options.OptionsReaderBase;
 
 namespace CalqFramework.Options {
@@ -22,8 +21,8 @@ namespace CalqFramework.Options {
         // TODO? pass DeserializationHandler and Reader - handler will use accessors
         // TODO? DataAccessor (not only DataMember)
         public static void Deserialize(object targetObj, CliSerializerOptions options, string[] args, int startIndex = 0) {
-            var dataMemberAccessor = CliDataMemberAccessorFactory.Instance.CreateDataMemberAccessor(options);
-            var reader = new ToTypeOptionsReader(args, dataMemberAccessor, targetObj.GetType()) { StartIndex = startIndex };
+            var dataMemberAccessor = new CliDataMemberAccessorFactory(options).CreateDataMemberAccessor_FIXME(targetObj);
+            var reader = new ToTypeOptionsReader(args, dataMemberAccessor) { StartIndex = startIndex };
 
             foreach (var (option, value, optionAttr) in reader.Read()) {
                 if (optionAttr.HasFlag(OptionFlags.ValueUnassigned)) {
@@ -38,7 +37,7 @@ namespace CalqFramework.Options {
                     }
                 }
 
-                var type = dataMemberAccessor.GetDataMemberType(targetObj.GetType(), option);
+                var type = dataMemberAccessor.GetType(option);
 
                 var isCollection = type.GetInterface(nameof(ICollection)) != null;
                 if (isCollection) {
@@ -48,10 +47,10 @@ namespace CalqFramework.Options {
                 var valueObj = ValueParser.ParseValue(value, type, option);
 
                 if (isCollection == false) {
-                    dataMemberAccessor.SetDataMemberValue(targetObj, option, valueObj);
+                    dataMemberAccessor.SetValue(option, valueObj);
                 } else {
-                    var collection = dataMemberAccessor.GetDataMemberValue(targetObj, option);
-                    CollectionMemberAccessor.AddChildValue((collection as ICollection)!, valueObj);
+                    var collection = dataMemberAccessor.GetValue(option);
+                    CollectionAccessor.AddValue((collection as ICollection)!, valueObj);
                 }
             }
         }
