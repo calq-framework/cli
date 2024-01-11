@@ -1,21 +1,14 @@
-﻿using CalqFramework.Options.Attributes;
-using CalqFramework.Serialization.DataMemberAccess;
-using CalqFramework.Serialization.Text;
-using Microsoft.VisualBasic.FileIO;
+﻿using CalqFramework.Serialization.DataAccess;
+using CalqFramework.Serialization.DataAccess.DataMemberAccess;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 
 namespace CalqFramework.Options.DataMemberAccess {
     public class DataMemberAndMethodParamsAccessor {
-        public object Obj { get; }
-        public IDataMemberAccessor DataMemberAccessor { get; }
+        public DataMemberAccessorBase DataMemberAccessor { get; }
         public MethodParamsAccessor MethodParamsAccessor { get; }
 
-        public DataMemberAndMethodParamsAccessor(object obj, IDataMemberAccessor dataMemberAccessor, MethodParamsAccessor methodParamsAccessor) {
-            Obj = obj;
+        public DataMemberAndMethodParamsAccessor(DataMemberAccessorBase dataMemberAccessor, MethodParamsAccessor methodParamsAccessor) {
             DataMemberAccessor = dataMemberAccessor;
             MethodParamsAccessor = methodParamsAccessor;
         }
@@ -24,7 +17,7 @@ namespace CalqFramework.Options.DataMemberAccess {
             result = default!;
 
             var paramSuccess = MethodParamsAccessor.TryResolveDataMemberKey(dataMemberKey, out var paramResult);
-            var dataMemberResult = DataMemberAccessor.GetDataMember(Obj.GetType(), dataMemberKey);
+            var dataMemberResult = DataMemberAccessor.GetDataMember(dataMemberKey);
             var dataMemberSuccess = dataMemberResult != null;
 
             if (paramSuccess && dataMemberSuccess) {
@@ -48,7 +41,7 @@ namespace CalqFramework.Options.DataMemberAccess {
             result = default!;
 
             var paramSuccess = MethodParamsAccessor.TryGetDataType(dataMemberKey, out var paramResult);
-            var dataMemberResult = DataMemberAccessor.GetDataMember(Obj.GetType(), dataMemberKey);
+            var dataMemberResult = DataMemberAccessor.GetDataMember(dataMemberKey);
             var dataMemberSuccess = dataMemberResult != null;
 
             if (paramSuccess && dataMemberSuccess) {
@@ -61,7 +54,7 @@ namespace CalqFramework.Options.DataMemberAccess {
             }
 
             if (dataMemberSuccess) {
-                result = DataMemberAccessor.GetDataMemberType(Obj.GetType(), dataMemberKey);
+                result = DataMemberAccessor.GetType(dataMemberKey);
                 return true;
             }
 
@@ -72,7 +65,7 @@ namespace CalqFramework.Options.DataMemberAccess {
 
         public void SetDataValue(string dataMemberKey, object? value) {
             var paramSuccess = MethodParamsAccessor.TrySetDataValue(dataMemberKey, value);
-            var dataMemberResult = DataMemberAccessor.GetDataMember(Obj.GetType(), dataMemberKey);
+            var dataMemberResult = DataMemberAccessor.GetDataMember(dataMemberKey);
             var dataMemberSuccess = dataMemberResult != null;
 
             if (paramSuccess && dataMemberSuccess) {
@@ -86,17 +79,17 @@ namespace CalqFramework.Options.DataMemberAccess {
             // TODO unify collection handling logic with MethodParamsAccessor
             if (dataMemberSuccess) {
                 //result = dataMemberResult;
-                var type = DataMemberAccessor.GetDataMemberType(Obj.GetType(), dataMemberKey);
+                var type = DataMemberAccessor.GetType(dataMemberKey);
                 var isCollection = type.GetInterface(nameof(ICollection)) != null;
                 if (isCollection == false) {
-                    DataMemberAccessor.SetDataMemberValue(Obj, dataMemberKey, value);
+                    DataMemberAccessor.SetValue(dataMemberKey, value);
                 } else {
-                    var collection = DataMemberAccessor.GetDataMemberValue(Obj, dataMemberKey);
+                    var collection = DataMemberAccessor.GetValue(dataMemberKey);
                     if (collection == null) {
                         collection = Activator.CreateInstance(type);
-                        DataMemberAccessor.SetDataMemberValue(Obj, dataMemberKey, collection);
+                        DataMemberAccessor.SetValue(dataMemberKey, collection);
                     }
-                    CollectionMemberAccessor.AddChildValue((collection as ICollection)!, value);
+                    CollectionAccessor.AddValue((collection as ICollection)!, value);
                 }
             }
         }
