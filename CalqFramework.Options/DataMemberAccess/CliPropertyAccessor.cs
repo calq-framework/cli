@@ -42,7 +42,7 @@ namespace CalqFramework.Options.DataMemberAccess {
         }
 
         // FIXME do not assign the first occurances - check for duplicates. if duplicate found then then return null
-        public override MemberInfo? GetDataMember(string dataMemberKey) {
+        protected override MemberInfo? GetDataMemberCore(string dataMemberKey) {
             if (dataMemberKey.Length == 1) {
                 foreach (var member in Type.GetProperties(BindingAttr)) {
                     var name = member.GetCustomAttribute<ShortNameAttribute>()?.Name;
