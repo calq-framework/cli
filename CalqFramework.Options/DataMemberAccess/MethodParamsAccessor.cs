@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Reflection;
 
 namespace CalqFramework.Options.DataMemberAccess {
-    public class MethodParamsAccessor {
+    public class MethodParamsAccessor : DataAccessorBase, IDataAccessor {
 
         public ParameterInfo[] Parameters { get; }
         private object[] ParamValues { get; }
@@ -34,14 +34,14 @@ namespace CalqFramework.Options.DataMemberAccess {
             AssignedParameters = new HashSet<ParameterInfo>();
         }
 
-        private bool TryGetParamIndex(string dataMemberKey, out int result) {
+        private bool TryGetParamIndex(string key, out int result) {
             result = default;
             var success = false;
 
-            if (dataMemberKey.Length == 1) {
+            if (key.Length == 1) {
                 for (var i = 0; i < Parameters.Length; i++) { 
                     var param = Parameters[i];
-                    if (param.Name == dataMemberKey) {
+                    if (param.Name == key) {
                         result = i;
                         success = true;
                     }
@@ -49,7 +49,7 @@ namespace CalqFramework.Options.DataMemberAccess {
             } else {
                 for (var i = 0; i < Parameters.Length; i++) {
                     var param = Parameters[i];
-                    if (param.Name == dataMemberKey) {
+                    if (param.Name == key) {
                         result = i;
                         success = true;
                     }
@@ -59,10 +59,10 @@ namespace CalqFramework.Options.DataMemberAccess {
             return success;
         }
 
-        public bool TryResolveDataMemberKey(string dataMemberKey, out string? result) {
+        public bool TryResolveDataMemberKey(string key, out string? result) {
             result = default;
 
-            if (TryGetParamIndex(dataMemberKey, out var index)) {
+            if (TryGetParamIndex(key, out var index)) {
                 result = Parameters[index].Name!;
                 return true;
             } else {
@@ -70,10 +70,10 @@ namespace CalqFramework.Options.DataMemberAccess {
             }
         }
 
-        public bool TryGetDataType(string dataMemberKey, out Type? result) {
+        public bool TryGetDataType(string key, out Type? result) {
             result = default;
 
-            if (TryGetParamIndex(dataMemberKey, out var index)) {
+            if (TryGetParamIndex(key, out var index)) {
                 result = Parameters[index].ParameterType;
                 return true;
             } else {
@@ -81,12 +81,12 @@ namespace CalqFramework.Options.DataMemberAccess {
             }
         }
 
-        //object? GetDataValue(string dataMemberKey);
+        //object? GetDataValue(string key);
 
         // TODO unify collection handling logic with DataMemberAndMethodParamsAccessor
-        public bool TrySetDataValue(string dataMemberKey, object? value) {
-            if (TryGetParamIndex(dataMemberKey, out var index)) {
-                TryGetDataType(dataMemberKey, out var type);
+        public bool TrySetDataValue(string key, object? value) {
+            if (TryGetParamIndex(key, out var index)) {
+                TryGetDataType(key, out var type);
                 var isCollection = type.GetInterface(nameof(ICollection)) != null;
                 if (isCollection == false) {
                     ParamValues[index] = value;
@@ -106,27 +106,80 @@ namespace CalqFramework.Options.DataMemberAccess {
             }
         }
 
-        public string ResolveDataMemberKey(int dataMemberKey) {
-            if (dataMemberKey >= Parameters.Length) {
+        public string ResolveDataMemberKey(int key) {
+            if (key >= Parameters.Length) {
                 throw new Exception("passed too many args");
             }
-            return Parameters[dataMemberKey].Name!;
+            return Parameters[key].Name!;
         }
 
-        public Type GetParameterType(int dataMemberKey) {
-            if (dataMemberKey >= Parameters.Length) {
+        public Type GetParameterType(int index) {
+            if (index >= Parameters.Length) {
                 throw new Exception("passed too many args");
             }
-            return Parameters[dataMemberKey].ParameterType;
+            return Parameters[index].ParameterType;
         }
 
-        public void SetDataValue(int dataMemberKey, object? value) {
-            ParamValues[dataMemberKey] = value;
-            AssignedParameters.Add(Parameters[dataMemberKey]);
+        public void SetDataValue(int key, object? value) {
+            ParamValues[key] = value;
+            AssignedParameters.Add(Parameters[key]);
         }
 
         internal object? Invoke() {
             return Method.Invoke(TargetObj, ParamValues);
+        }
+
+        public override object GetOrInitializeValue(string key) {
+            if (TryGetParamIndex(key, out var index)) {
+                var value = ParamValues[index] ??
+                   Activator.CreateInstance(Parameters[index].ParameterType) ??
+                   Activator.CreateInstance(Nullable.GetUnderlyingType(Parameters[index].ParameterType)!)!;
+                ParamValues[index] = value;
+                return value;
+            }
+            throw new MissingMemberException();
+        }
+
+        public override Type GetType(string key) {
+            if (TryGetParamIndex(key, out var index)) {
+                return Parameters[index].ParameterType;
+            }
+            throw new MissingMemberException();
+        }
+
+        public override object? GetValue(string key) {
+            if (TryGetParamIndex(key, out var index)) {
+                return ParamValues[index];
+            }
+            throw new MissingMemberException();
+        }
+
+        public override bool HasKey(string key) {
+            return TryGetParamIndex(key, out var _);
+        }
+
+        public override void SetValue(string key, object? value) {
+            if (TryGetParamIndex(key, out var index)) {
+                ParamValues[index] = value;
+                AssignedParameters.Add(Parameters[index]);
+                return;
+            }
+            throw new MissingMemberException();
+        }
+
+        public override bool SetOrAddValue(string key, object? value) {
+            var type = GetType(key);
+            var isCollection = type.GetInterface(nameof(ICollection)) != null;
+            if (isCollection == false) {
+                SetValue(key, value);
+                return false;
+            } else {
+                var collectionObj = (GetOrInitializeValue(key) as ICollection)!;
+                AddValue(collectionObj, value);
+                TryGetParamIndex(key, out var index);
+                AssignedParameters.Add(Parameters[index]);
+                return true;
+            }
         }
     }
 }

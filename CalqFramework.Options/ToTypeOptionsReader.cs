@@ -26,14 +26,12 @@ namespace CalqFramework.Options {
             return DataMemberAccessor.HasKey(option.ToString());
         }
 
-        protected override bool TryGetOptionType(string option, out Type result) {
-            try {
-                result = DataMemberAccessor.GetType(option);
-                return true;
-            } catch (Exception) {
-                result = default!;
-                return false;
-            }
+        protected override bool HasOption(string option) {
+            return DataMemberAccessor.HasKey(option);
+        }
+
+        protected override Type GetOptionType(string option) {
+            return DataMemberAccessor.GetType(option);
         }
     }
 }
