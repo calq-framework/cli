@@ -23,14 +23,7 @@ namespace CalqFramework.Options {
 
         protected override bool ValidateOptionName(char option)
         {
-            var member = DataMemberAccessor.GetDataMember(option.ToString());
-            if (member == null)
-            {
-                return false;
-            } else
-            {
-                return true;
-            }
+            return DataMemberAccessor.HasKey(option.ToString());
         }
 
         protected override bool TryGetOptionType(string option, out Type result) {

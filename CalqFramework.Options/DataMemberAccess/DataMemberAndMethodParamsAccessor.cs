@@ -17,8 +17,7 @@ namespace CalqFramework.Options.DataMemberAccess {
             result = default!;
 
             var paramSuccess = MethodParamsAccessor.TryResolveDataMemberKey(dataMemberKey, out var paramResult);
-            var dataMemberResult = DataMemberAccessor.GetDataMember(dataMemberKey);
-            var dataMemberSuccess = dataMemberResult != null;
+            var dataMemberSuccess = DataMemberAccessor.TryGetDataMember(dataMemberKey, out var dataMemberResult);
 
             if (paramSuccess && dataMemberSuccess) {
                 throw new Exception("collision");
@@ -41,8 +40,7 @@ namespace CalqFramework.Options.DataMemberAccess {
             result = default!;
 
             var paramSuccess = MethodParamsAccessor.TryGetDataType(dataMemberKey, out var paramResult);
-            var dataMemberResult = DataMemberAccessor.GetDataMember(dataMemberKey);
-            var dataMemberSuccess = dataMemberResult != null;
+            var dataMemberSuccess = DataMemberAccessor.HasKey(dataMemberKey);
 
             if (paramSuccess && dataMemberSuccess) {
                 throw new Exception("collision");
@@ -65,8 +63,7 @@ namespace CalqFramework.Options.DataMemberAccess {
 
         public void SetDataValue(string dataMemberKey, object? value) {
             var paramSuccess = MethodParamsAccessor.TrySetDataValue(dataMemberKey, value);
-            var dataMemberResult = DataMemberAccessor.GetDataMember(dataMemberKey);
-            var dataMemberSuccess = dataMemberResult != null;
+            var dataMemberSuccess = DataMemberAccessor.HasKey(dataMemberKey);
 
             if (paramSuccess && dataMemberSuccess) {
                 throw new Exception("collision");
