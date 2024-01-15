@@ -42,11 +42,11 @@ namespace CalqFramework.Options.DataMemberAccess {
         }
 
         // FIXME do not assign the first occurances - check for duplicates. if duplicate found then then return null
-        protected override MemberInfo? GetDataMemberCore(string dataMemberKey) {
-            if (dataMemberKey.Length == 1) {
+        protected override MemberInfo? GetDataMemberCore(string key) {
+            if (key.Length == 1) {
                 foreach (var member in Type.GetFields(BindingAttr)) {
                     var name = member.GetCustomAttribute<ShortNameAttribute>()?.Name;
-                    if (name != null && name == dataMemberKey[0]) {
+                    if (name != null && name == key[0]) {
                         return member;
                     }
                 }
@@ -54,23 +54,23 @@ namespace CalqFramework.Options.DataMemberAccess {
 
             foreach (var member in Type.GetFields(BindingAttr)) {
                 var name = member.GetCustomAttribute<NameAttribute>()?.Name;
-                if (name != null && name == dataMemberKey) {
+                if (name != null && name == key) {
                     return member;
                 }
             }
 
-            var dataMember = Type.GetField(dataMemberKey, BindingAttr);
+            var dataMember = Type.GetField(key, BindingAttr);
 
-            if (dataMember == null && dataMemberKey.Length == 1) {
+            if (dataMember == null && key.Length == 1) {
                 foreach (var member in Type.GetFields(BindingAttr)) {
                     var name = member.GetCustomAttribute<NameAttribute>()?.Name[0];
-                    if (name != null && name == dataMemberKey[0]) {
+                    if (name != null && name == key[0]) {
                         return member;
                     }
                 }
 
                 foreach (var member in Type.GetFields(BindingAttr)) {
-                    if (member.Name[0] == dataMemberKey[0]) {
+                    if (member.Name[0] == key[0]) {
                         return member;
                     }
                 }

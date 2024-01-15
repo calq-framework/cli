@@ -26,7 +26,9 @@ namespace CalqFramework.Options {
         }
 
         protected abstract bool ValidateOptionName(char option);
-        protected abstract bool TryGetOptionType(string option, out Type result);
+
+        protected abstract bool HasOption(string option);
+        protected abstract Type GetOptionType(string option);
 
         public IEnumerable<(string option, string value, OptionFlags optionAttr)> Read() {
 
@@ -35,7 +37,8 @@ namespace CalqFramework.Options {
             }
 
             void ValidateOptionValue(string option, ref string value, ref OptionFlags optionAttr, ref int index) {
-                if (TryGetOptionType(option, out Type type)) {
+                if (HasOption(option)) {
+                    var type = GetOptionType(option);
                     if (value == "") {
                         var isCollection = type.GetInterface(nameof(ICollection)) != null;
                         if (isCollection) {

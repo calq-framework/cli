@@ -11,11 +11,15 @@ namespace CalqFramework.Options {
         }
 
         protected override bool ValidateOptionName(char option) {
-            return DataMemberAndMethodParamsAccessor.TryResolveDataMemberKey(option.ToString(), out _);
+            return DataMemberAndMethodParamsAccessor.HasKey(option.ToString());
         }
 
-        protected override bool TryGetOptionType(string option, out Type result) {
-            return DataMemberAndMethodParamsAccessor.TryGetDataType(option, out result);
+        protected override bool HasOption(string option) {
+            return DataMemberAndMethodParamsAccessor.HasKey(option.ToString());
+        }
+
+        protected override Type GetOptionType(string option) {
+            return DataMemberAndMethodParamsAccessor.GetType(option);
         }
     }
 }

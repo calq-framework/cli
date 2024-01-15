@@ -79,13 +79,13 @@ namespace CalqFramework.Options {
                     accessor.MethodParamsAccessor.SetDataValue(currentIndex, ValueParser.ParseValue(option, parameterType, parameterName));
                     ++currentIndex;
                 } else {
-                    accessor.TryGetDataType(option, out var type);
+                    var type = accessor.GetType(option);
                     var isCollection = type.GetInterface(nameof(ICollection)) != null;
                     if (isCollection) {
                         type = type.GetGenericArguments()[0];
                     }
                     var valueObj = ValueParser.ParseValue(value, type, option);
-                    accessor.SetDataValue(option, valueObj);
+                    accessor.SetOrAddValue(option, valueObj);
                 }
             }
 
