@@ -1,9 +1,11 @@
-using CalqFramework.Options;
+using CalqFramework.Cli.Serialization;
+using CalqFramework.Serialization.DataAccess.DataMemberAccess;
 using System;
 using System.Collections.Generic;
 using Xunit;
 
-namespace CalqFramework.OptionsTest {
+namespace CalqFramework.CliTest
+{
     public class CommandLineInterfaceTest {
         [Fact]
         public void Execute_Should_SetTextProperty_When_TextOptionProvided() {
@@ -52,8 +54,8 @@ namespace CalqFramework.OptionsTest {
         }
 
         [Fact]
-        public void Execute_Should_ThrowException_When_InvalidUsage_NoIntegerOption() {
-            var ex = Assert.Throws<Exception>(() => {
+        public void Execute_Should_ThrowCliException_When_InvalidUsage_NoIntegerOption() {
+            var ex = Assert.Throws<CliException>(() => {
                 var tool = new SomeClassLibrary();
                 var result = CommandLineInterface.Execute(tool, new[] { $"{nameof(SomeClassLibrary.MethodWithIntegerAndText)}", "abc", $"--integer", "1" });
             });
@@ -61,8 +63,8 @@ namespace CalqFramework.OptionsTest {
         }
 
         [Fact]
-        public void Execute_Should_ThrowException_When_InvalidUsage_NoTextOption() {
-            var ex = Assert.Throws<Exception>(() => {
+        public void Execute_Should_ThrowCliException_When_InvalidUsage_NoTextOption() {
+            var ex = Assert.Throws<CliException>(() => {
                 var tool = new SomeClassLibrary();
                 var result = CommandLineInterface.Execute(tool, new[] { $"{nameof(SomeClassLibrary.MethodWithIntegerAndText)}", $"--integer", "1", "abc" });
             });
@@ -70,7 +72,7 @@ namespace CalqFramework.OptionsTest {
         }
 
         [Fact]
-        public void Execute_Should_ThrowException_When_InvalidUsage_NoIntegerValue() {
+        public void Execute_Should_ThrowCliException_When_InvalidUsage_NoIntegerValue() {
             var tool = new SomeClassLibrary();
             var result = CommandLineInterface.Execute(tool, new[] { $"{nameof(SomeClassLibrary.MethodWithTextAndInteger)}", $"--integer", "1", "abc" });
         }
@@ -82,8 +84,8 @@ namespace CalqFramework.OptionsTest {
         }
 
         [Fact]
-        public void Execute_Should_ThrowException_When_MethodCommandWithArgumentProvided() {
-            var ex = Assert.Throws<Exception>(() => {
+        public void Execute_Should_ThrowCliException_When_MethodCommandWithArgumentProvided() {
+            var ex = Assert.Throws<CliException>(() => {
                 var tool = new SomeClassLibrary();
                 CommandLineInterface.Execute(tool, new[] { $"{nameof(SomeClassLibrary.Method)}", "abc" });
             });
@@ -91,8 +93,8 @@ namespace CalqFramework.OptionsTest {
         }
 
         [Fact]
-        public void Execute_Should_ThrowException_When_UnknownCommandProvided() {
-            var ex = Assert.Throws<Exception>(() => {
+        public void Execute_Should_ThrowCliException_When_UnknownCommandProvided() {
+            var ex = Assert.Throws<CliException>(() => {
                 var tool = new SomeClassLibrary();
                 CommandLineInterface.Execute(tool, new[] { $"Unknown" });
             });
@@ -114,10 +116,14 @@ namespace CalqFramework.OptionsTest {
         }
 
         [Fact]
-        public void Execute_Should_ThrowException_When_InvalidCommandCaseProvided() {
-            var ex = Assert.Throws<Exception>(() => {
+        public void Execute_Should_ThrowCliException_When_InvalidCommandCaseProvided() {
+            var ex = Assert.Throws<CliException>(() => {
                 var tool = new SomeClassLibrary();
-                CommandLineInterface.Execute(tool, new[] { $"{nameof(SomeClassLibrary.Method).ToLower()}" });
+                CommandLineInterface.Execute(tool, new[] { $"{nameof(SomeClassLibrary.Method).ToLower()}" },
+                    new CliDeserializerOptions {
+                        DataMemberAccessorOptions = new DataMemberAccessorOptions { BindingAttr = DataMemberAccessorOptions.DefaultLookup }
+                    }
+                );
             });
             Assert.Equal("invalid command", ex.Message);
         }
@@ -125,17 +131,12 @@ namespace CalqFramework.OptionsTest {
         [Fact]
         public void Execute_Should_CallMethod_When_MethodCommandProvidedWithCustomOptions() {
             var tool = new SomeClassLibrary();
-            CommandLineInterface.Execute(tool, new[] { $"{nameof(SomeClassLibrary.Method).ToLower()}" },
-                new CliSerializerOptions() {
-                    AccessFields = true,
-                    BindingAttr = CliSerializerOptions.DefaultLookup | System.Reflection.BindingFlags.IgnoreCase
-                }
-            );
+            CommandLineInterface.Execute(tool, new[] { $"{nameof(SomeClassLibrary.Method).ToLower()}" });
         }
 
         [Fact]
-        public void Execute_Should_ThrowException_When_UnassignedOptionProvided() {
-            var ex = Assert.Throws<Exception>(() => {
+        public void Execute_Should_ThrowCliException_When_UnassignedOptionProvided() {
+            var ex = Assert.Throws<CliException>(() => {
                 var tool = new SomeClassLibrary();
                 CommandLineInterface.Execute(tool, new[] { $"{nameof(SomeClassLibrary.MethodWithText)}" });
             });
@@ -149,8 +150,8 @@ namespace CalqFramework.OptionsTest {
         }
 
         [Fact]
-        public void Execute_Should_ThrowException_When_InternalTextOptionProvided() {
-            var ex = Assert.Throws<Exception>(() => {
+        public void Execute_Should_ThrowCliException_When_InternalTextOptionProvided() {
+            var ex = Assert.Throws<CliException>(() => {
                 var tool = new SomeClassLibrary();
                 CommandLineInterface.Execute(tool, new[] { $"{nameof(SomeClassLibrary.textField)}" });
             });
@@ -179,8 +180,8 @@ namespace CalqFramework.OptionsTest {
         }
 
         [Fact]
-        public void Execute_Should_ThrowException_When_BooleanOptionHasNamingConflict() {
-            var ex = Assert.Throws<Exception>(() => {
+        public void Execute_Should_ThrowCliException_When_BooleanOptionHasNamingConflict() {
+            var ex = Assert.Throws<CliException>(() => {
                 var tool = new SomeClassLibrary();
                 var result = CommandLineInterface.Execute(tool, new[] { $"{nameof(SomeClassLibrary.MethodWithTextAndBooleanError)}", "abc", $"--{nameof(SomeClassLibrary.booleanConflict)}" });
             });

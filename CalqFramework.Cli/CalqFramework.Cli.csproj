@@ -3,8 +3,8 @@
   <PropertyGroup>
     <Nullable>enable</Nullable>
     <TargetFramework>net7.0</TargetFramework>
-    <RootNamespace>CalqFramework.Options</RootNamespace>
-    <PackageId>CalqFramework.Options</PackageId>
+    <RootNamespace>CalqFramework.Cli</RootNamespace>
+    <PackageId>CalqFramework.Cli</PackageId>
     <Version>0.2.10</Version>
   </PropertyGroup>
 

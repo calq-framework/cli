@@ -1,5 +1,5 @@
-# CalqFramework.Options
-CalqFramework.Options helps to convert libraries into command-line tools compliant with GNU (and POSIX) [conventions](https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html). CalqFramework.Options exposes class data members and methods as commands, enabling users to interact with class instances via auto-generated CLI.
+# CalqFramework.Cli
+CalqFramework.Cli helps to convert libraries into command-line tools compliant with GNU (and POSIX) [conventions](https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html). CalqFramework.Cli exposes class data members and methods as commands, enabling users to interact with class instances via auto-generated CLI.
 
 ## Features
 - **Method invocation**: Executes class methods with regular and optional parameters, both treated also as positional arguments.

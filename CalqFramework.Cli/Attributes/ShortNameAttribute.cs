@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CalqFramework.Options.Attributes {
+namespace CalqFramework.Cli.Attributes {
     [System.AttributeUsage(System.AttributeTargets.All)]
     public class ShortNameAttribute : System.Attribute {
         public char Name { get; }

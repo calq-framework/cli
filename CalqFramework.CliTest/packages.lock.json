@@ -37,8 +37,8 @@
       },
       "CalqFramework.Serialization": {
         "type": "Transitive",
-        "resolved": "0.12.0",
-        "contentHash": "vvANIb7feAT7UXkQcq9djWDFCwgls0P1gbpvT9N+d7Hdh3sY6Ru+xGDoWeO0gcU7gyR0PeLmF2Ht6T6RASD4+w==",
+        "resolved": "0.14.0",
+        "contentHash": "UJpwuFD3TUd6/VGvv4qMVAl9nulEMZHVmCnQYniEOcPQ4VXqaIMape8wD/rvlTv/pVRYcJhbMMCz4hJ49CYmhg==",
         "dependencies": {
           "Newtonsoft.Json": "13.0.3"
         }
@@ -1018,7 +1018,7 @@
           "xunit.extensibility.core": "[2.4.1]"
         }
       },
-      "calqframework.options": {
+      "calqframework.cli": {
         "type": "Project",
         "dependencies": {
           "CalqFramework.Serialization": "[*, )"
