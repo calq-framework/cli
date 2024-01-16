@@ -1,9 +1,9 @@
 ﻿#pragma warning disable CS0649
 
-using CalqFramework.Options.Attributes;
+using CalqFramework.Cli.Attributes;
 using System.Collections.Generic;
 
-namespace CalqFramework.OptionsTest {
+namespace CalqFramework.CliTest {
     class SomeConfiguration {
         public class Inner { }
 

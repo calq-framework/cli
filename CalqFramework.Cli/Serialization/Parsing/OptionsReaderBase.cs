@@ -3,11 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 
-namespace CalqFramework.Options {
-    public abstract class OptionsReaderBase {
+namespace CalqFramework.Cli.Serialization.Parsing
+{
+    internal abstract class OptionsReaderBase
+    {
 
         [Flags]
-        public enum OptionFlags {
+        internal enum OptionFlags
+        {
             None = 0,
             Short = 1,
             Plus = 2,
@@ -21,61 +24,82 @@ namespace CalqFramework.Options {
         public string[] Args { get; init; }
         public int StartIndex { get; init; } = 0;
 
-        protected OptionsReaderBase(string[] args) {
+        protected OptionsReaderBase(string[] args)
+        {
             Args = args;
         }
 
-        protected abstract bool ValidateOptionName(char option);
+        protected abstract bool HasOption(char option);
 
         protected abstract bool HasOption(string option);
         protected abstract Type GetOptionType(string option);
 
-        public IEnumerable<(string option, string value, OptionFlags optionAttr)> Read() {
+        public IEnumerable<(string option, string value, OptionFlags optionAttr)> Read()
+        {
 
-            bool IsNumber(string input) {
+            bool IsNumber(string input)
+            {
                 return BigInteger.TryParse(input, out _);
             }
 
-            void ValidateOptionValue(string option, ref string value, ref OptionFlags optionAttr, ref int index) {
-                if (HasOption(option)) {
+            void ValidateOptionValue(string option, ref string value, ref OptionFlags optionAttr, ref int index)
+            {
+                if (HasOption(option))
+                {
                     var type = GetOptionType(option);
-                    if (value == "") {
+                    if (value == "")
+                    {
                         var isCollection = type.GetInterface(nameof(ICollection)) != null;
-                        if (isCollection) {
+                        if (isCollection)
+                        {
                             type = type.GetGenericArguments()[0];
                         }
-                        if (type == typeof(bool)) {
+                        if (type == typeof(bool))
+                        {
                             value = optionAttr.HasFlag(OptionFlags.Plus) ? "false" : "true";
-                        } else {
-                            if (index + 1 < Args.Length && (Args[index + 1][0] != '-' || IsNumber(Args[index + 1]))) { // fail if starts with '-' to prevent human error
+                        }
+                        else
+                        {
+                            if (index + 1 < Args.Length && (Args[index + 1][0] != '-' || IsNumber(Args[index + 1])))
+                            { // fail if starts with '-' to prevent human error
                                 ++index;
                                 value = Args[index];
-                            } else {
+                            }
+                            else
+                            {
                                 optionAttr |= OptionFlags.ValueUnassigned;
                             }
                         }
                     }
-                } else {
+                }
+                else
+                {
                     optionAttr |= OptionFlags.Unknown;
                 }
             }
 
-            (string option, string value) ExtractOptionValuePair(string arg, OptionFlags optionAttr) {
+            (string option, string value) ExtractOptionValuePair(string arg, OptionFlags optionAttr)
+            {
                 var optionValueSplit = arg.Split('=', 2);
                 string value = optionValueSplit.Length == 1 ? "" : optionValueSplit[1];
 
                 string option;
-                if (optionAttr.HasFlag(OptionFlags.Short)) {
+                if (optionAttr.HasFlag(OptionFlags.Short))
+                {
                     option = optionValueSplit[0][1..];
-                } else {
+                }
+                else
+                {
                     option = optionValueSplit[0][2..];
                 }
 
                 return (option, value);
             }
 
-            IEnumerable<char> ReadShort(string stackedOptions) {
-                for (var i = 0; i < stackedOptions.Length; ++i) {
+            IEnumerable<char> ReadShort(string stackedOptions)
+            {
+                for (var i = 0; i < stackedOptions.Length; ++i)
+                {
                     var option = stackedOptions[i];
                     yield return option;
                 }
@@ -83,25 +107,34 @@ namespace CalqFramework.Options {
 
             int index = StartIndex;
 
-            try {
-                while (true) {
-                    if (index >= Args.Length) {
+            try
+            {
+                while (true)
+                {
+                    if (index >= Args.Length)
+                    {
                         yield break;
                     }
 
                     var arg = Args[index];
 
-                    if (arg.Length == 0) {
+                    if (arg.Length == 0)
+                    {
                         throw new ArgumentException("arg length is 0");
                     }
 
                     var optionAttr = OptionFlags.None;
-                    switch (arg[0]) {
+                    switch (arg[0])
+                    {
                         case '-':
-                            if (arg[1] != '-') {
+                            if (arg[1] != '-')
+                            {
                                 optionAttr |= OptionFlags.Short;
-                            } else {
-                                if (arg.Length == 2) {
+                            }
+                            else
+                            {
+                                if (arg.Length == 2)
+                                {
                                     ++index;
                                     yield break;
                                 }
@@ -109,7 +142,8 @@ namespace CalqFramework.Options {
                             break;
                         case '+':
                             optionAttr |= OptionFlags.Plus;
-                            if (arg[1] != '+') {
+                            if (arg[1] != '+')
+                            {
                                 optionAttr |= OptionFlags.Short;
                             }
                             break;
@@ -121,31 +155,42 @@ namespace CalqFramework.Options {
                     }
 
                     var (option, value) = ExtractOptionValuePair(arg, optionAttr);
-                    if (value == "") {
-                        if (index + 1 < Args.Length && (Args[index + 1][0] != '-' || IsNumber(Args[index + 1]))) {
+                    if (value == "")
+                    {
+                        if (index + 1 < Args.Length && (Args[index + 1][0] != '-' || IsNumber(Args[index + 1])))
+                        {
                             ++index;
                             value = Args[index];
                         }
                     }
 
-                    if (optionAttr.HasFlag(OptionFlags.Short)) {
-                        foreach (var shortOption in ReadShort(option)) {
-                            if (ValidateOptionName(shortOption)) {
+                    if (optionAttr.HasFlag(OptionFlags.Short))
+                    {
+                        foreach (var shortOption in ReadShort(option))
+                        {
+                            if (HasOption(shortOption))
+                            {
                                 ValidateOptionValue(shortOption.ToString(), ref value, ref optionAttr, ref index);
                                 yield return (shortOption.ToString(), value, optionAttr);
-                            } else {
+                            }
+                            else
+                            {
                                 optionAttr |= OptionFlags.Unknown;
                                 yield return (shortOption.ToString(), value, optionAttr);
                             }
                         }
-                    } else {
+                    }
+                    else
+                    {
                         ValidateOptionValue(option, ref value, ref optionAttr, ref index);
                         yield return (option, value, optionAttr);
                     }
 
                     ++index;
                 }
-            } finally {
+            }
+            finally
+            {
                 LastIndex = index;
             }
         }

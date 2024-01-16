@@ -2,7 +2,7 @@
 
 using System.Collections.Generic;
 
-namespace CalqFramework.OptionsTest {
+namespace CalqFramework.CliTest {
     class SomeClassLibrary {
 
         public class Nested {
