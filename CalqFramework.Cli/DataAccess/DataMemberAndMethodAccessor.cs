@@ -1,7 +1,10 @@
-﻿using CalqFramework.Serialization.DataAccess.DataMemberAccess;
+﻿using CalqFramework.Cli.Serialization;
+using CalqFramework.Serialization.DataAccess.DataMemberAccess;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace CalqFramework.Cli.DataAccess
 {
@@ -10,13 +13,26 @@ namespace CalqFramework.Cli.DataAccess
         private IDataMemberAccessor DataMemberAccessor { get; }
         public object Obj { get; }
         public BindingFlags BindingAttr { get; }
-        public MethodInfo[] Methods { get => Obj.GetType().GetMethods(BindingAttr); }
+        public IEnumerable<MethodInfo> Methods { get => Obj.GetType().GetMethods(BindingAttr).Where(x => IsDotnetSpecific(x)); }
 
         public DataMemberAndMethodAccessor(IDataMemberAccessor dataMemberAccessor, BindingFlags methodBindingAttr)
         {
             DataMemberAccessor = dataMemberAccessor;
             Obj = dataMemberAccessor.Obj;
             BindingAttr = methodBindingAttr;
+        }
+
+        public static bool IsDotnetSpecific(MethodInfo methodInfo) {
+            return methodInfo.DeclaringType == typeof(object) || methodInfo.GetCustomAttributes<CompilerGeneratedAttribute>().Any();
+        }
+
+        public MethodInfo GetMethod(string key) {
+            var result = Obj.GetType().GetMethod(key, BindingAttr);
+            if (result != null && !IsDotnetSpecific(result)) {
+                return result;
+            } else {
+                throw new CliException($"invalid command");
+            }
         }
 
         public bool TryGetDataMember(string key, out MemberInfo result)
