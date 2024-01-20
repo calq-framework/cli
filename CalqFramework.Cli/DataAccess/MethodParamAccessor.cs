@@ -14,34 +14,17 @@ namespace CalqFramework.Cli.DataAccess
         public ParameterInfo[] Parameters { get; }
         private object?[] ParamValues { get; }
         public HashSet<ParameterInfo> AssignedParameters { get; }
-        public object TargetObj { get; }
-        public string MethodName { get; }
-        public BindingFlags BindingAttr { get; }
         public MethodInfo Method { get; }
 
-        public MethodParamAccessor(object targetObj, string methodName, BindingFlags methodBindingAttr)
+        public MethodParamAccessor(MethodInfo method)
         {
-            TargetObj = targetObj;
-            MethodName = methodName;
-            BindingAttr = methodBindingAttr;
-
-            Method = ResolveMethod(targetObj, MethodName, BindingAttr);
+            Method = method;
             Parameters = Method.GetParameters();
             ParamValues = new object?[Parameters.Length];
             AssignedParameters = new HashSet<ParameterInfo>();
         }
 
-        private MethodInfo ResolveMethod(object targetObject, string action, BindingFlags bindingAttr)
-        {
-            var method = targetObject.GetType().GetMethod(action, bindingAttr);
-            if (method == null)
-            {
-                throw new CliException($"invalid command");
-            }
-            return method;
-        }
-
-        public object? Invoke()
+        public object? Invoke(object? obj)
         {
             var assignedParamNames = AssignedParameters.Select(x => x.Name).ToHashSet();
             for (var j = 0; j < Parameters.Length; ++j)
@@ -56,7 +39,7 @@ namespace CalqFramework.Cli.DataAccess
                     SetValue(j, param.DefaultValue!);
                 }
             }
-            return Method.Invoke(TargetObj, ParamValues);
+            return Method.Invoke(obj, ParamValues);
         }
 
         private bool TryGetParamIndex(string key, out int result)

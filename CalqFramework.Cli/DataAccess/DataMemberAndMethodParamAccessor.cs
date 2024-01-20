@@ -8,18 +8,20 @@ namespace CalqFramework.Cli.DataAccess
 {
     internal class DataMemberAndMethodParamAccessor : DualDataAccessor
     {
+        public IDataMemberAccessor DataMemberAccessor { get; }
         private MethodParamAccessor MethodParamsAccessor { get; }
 
         public ParameterInfo[] Parameters { get => MethodParamsAccessor.Parameters; }
 
         public DataMemberAndMethodParamAccessor(IDataMemberAccessor dataMemberAccessor, MethodParamAccessor methodParamsAccessor) : base(dataMemberAccessor, methodParamsAccessor)
         {
+            DataMemberAccessor = dataMemberAccessor;
             MethodParamsAccessor = methodParamsAccessor;
         }
 
         public object? Invoke()
         {
-            return MethodParamsAccessor.Invoke();
+            return MethodParamsAccessor.Invoke(DataMemberAccessor.Obj);
         }
 
         public string GetKey(int index)
