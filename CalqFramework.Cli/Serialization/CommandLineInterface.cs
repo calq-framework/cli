@@ -120,7 +120,7 @@ namespace CalqFramework.Cli.Serialization
                     var type = dataMemberAccessor.GetType(optionOrAction);
                     if (type.IsPrimitive || type == typeof(string))
                     {
-                        throw new CliException($"{optionOrAction} is not a core command");
+                        break;
                     }
                     obj = dataMemberAccessor.GetValue(optionOrAction)!;
                 }
