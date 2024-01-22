@@ -40,7 +40,7 @@ namespace CalqFramework.Cli.Serialization
             Console.WriteLine("CORE COMMANDS:");
             foreach (var command in coreCommands)
             {
-                Console.WriteLine($"Name: {command.Value}");
+                Console.WriteLine($"{command.Value[0]}");
             }
 
             Console.WriteLine();
@@ -56,7 +56,7 @@ namespace CalqFramework.Cli.Serialization
             {
                 var type = accessor.GetType(option.Value[0]);
                 var defaultValue = accessor.GetValue(option.Value[0]);
-                Console.WriteLine($"--{string.Join(", =", option.Value)} - Type: {type}, Default: {defaultValue}");
+                Console.WriteLine($"--{string.Join(", -", option.Value)} [{type.Name}: {defaultValue}]");
             }
         }
 
