@@ -52,7 +52,7 @@ namespace CalqFramework.Cli.DataAccess
                 for (var i = 0; i < Parameters.Length; i++)
                 {
                     var param = Parameters[i];
-                    if (param.Name == key)
+                    if (param.Name[0] == key[0])
                     {
                         result = i;
                         success = true;
