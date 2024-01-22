@@ -155,7 +155,7 @@ namespace CalqFramework.CliTest
                 var tool = new SomeClassLibrary();
                 CommandLineInterface.Execute(tool, new[] { $"{nameof(SomeClassLibrary.textField)}" });
             });
-            Assert.Equal("textField is not a core command", ex.Message);
+            Assert.Equal("invalid command", ex.Message);
         }
 
         [Fact]
