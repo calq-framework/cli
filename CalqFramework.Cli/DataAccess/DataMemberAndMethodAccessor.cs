@@ -13,7 +13,7 @@ namespace CalqFramework.Cli.DataAccess
         private IDataMemberAccessor DataMemberAccessor { get; }
         public object Obj { get; }
         public BindingFlags BindingAttr { get; }
-        public IEnumerable<MethodInfo> Methods { get => Obj.GetType().GetMethods(BindingAttr).Where(x => IsDotnetSpecific(x)); }
+        public IEnumerable<MethodInfo> Methods { get => Obj.GetType().GetMethods(BindingAttr).Where(x => !IsDotnetSpecific(x)); }
 
         public DataMemberAndMethodAccessor(IDataMemberAccessor dataMemberAccessor, BindingFlags methodBindingAttr)
         {
@@ -22,7 +22,7 @@ namespace CalqFramework.Cli.DataAccess
             BindingAttr = methodBindingAttr;
         }
 
-        public static bool IsDotnetSpecific(MethodInfo methodInfo) {
+        private static bool IsDotnetSpecific(MethodInfo methodInfo) {
             return methodInfo.DeclaringType == typeof(object) || methodInfo.GetCustomAttributes<CompilerGeneratedAttribute>().Any();
         }
 
