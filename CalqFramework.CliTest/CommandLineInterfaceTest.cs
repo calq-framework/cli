@@ -1,3 +1,4 @@
+using CalqFramework.Cli;
 using CalqFramework.Cli.Serialization;
 using CalqFramework.Serialization.DataAccess.DataMemberAccess;
 using System;

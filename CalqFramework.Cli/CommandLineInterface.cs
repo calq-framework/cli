@@ -5,8 +5,9 @@ using System.Linq;
 using System.Reflection;
 using CalqFramework.Cli.Serialization.Parsing;
 using static CalqFramework.Cli.Serialization.Parsing.OptionsReaderBase;
+using CalqFramework.Cli.Serialization;
 
-namespace CalqFramework.Cli.Serialization
+namespace CalqFramework.Cli
 {
     public class CommandLineInterface
     {
@@ -65,43 +66,59 @@ namespace CalqFramework.Cli.Serialization
             var optionsReader = new OptionsReader(args, accessor) { StartIndex = index };
 
             var parameterIndex = 0;
-            void SetPositionalParameter(string option) {
+            void SetPositionalParameter(string option)
+            {
                 var parameterName = accessor.GetKey(parameterIndex);
                 var parameterType = accessor.GetType(parameterIndex);
                 accessor.SetValue(parameterIndex, ValueParser.ParseValue(option, parameterType, parameterName));
                 ++parameterIndex;
             }
 
-            try {
-                foreach (var (option, value, optionAttr) in optionsReader.Read()) {
-                    if ((option == "help" || option == "h") && !optionAttr.HasFlag(OptionFlags.NotAnOption)) {
+            try
+            {
+                foreach (var (option, value, optionAttr) in optionsReader.Read())
+                {
+                    if ((option == "help" || option == "h") && !optionAttr.HasFlag(OptionFlags.NotAnOption))
+                    {
                         HandleMethodHelp(accessor);
                         return false;
                     }
 
-                    if (optionAttr.HasFlag(OptionFlags.ValueUnassigned) && !optionAttr.HasFlag(OptionFlags.NotAnOption)) {
+                    if (optionAttr.HasFlag(OptionFlags.ValueUnassigned) && !optionAttr.HasFlag(OptionFlags.NotAnOption))
+                    {
                         throw new CliException($"unknown option {option}");
                     }
 
-                    if (optionAttr.HasFlag(OptionFlags.NotAnOption)) {
+                    if (optionAttr.HasFlag(OptionFlags.NotAnOption))
+                    {
                         SetPositionalParameter(option);
-                    } else {
+                    }
+                    else
+                    {
                         var type = accessor.GetType(option);
                         var valueObj = ValueParser.ParseValue(value, type, option);
                         accessor.SetOrAddValue(option, valueObj);
                     }
                 }
-                for (var i = optionsReader.LastIndex; i < args.Length; i++) {
+                for (var i = optionsReader.LastIndex; i < args.Length; i++)
+                {
                     SetPositionalParameter(args[i]);
                 }
-            } catch (Exception ex) { // TODO rename the exception in CalqFramework.Serialization
-                if (ex.Message == "collision") {
+            }
+            catch (Exception ex)
+            { // TODO rename the exception in CalqFramework.Serialization
+                if (ex.Message == "collision")
+                {
                     throw new CliException(ex.Message, ex);
                 }
                 throw;
             }
 
             return true;
+        }
+
+        public static object? Execute(object targetObj) {
+            return Execute(targetObj, Environment.GetCommandLineArgs());
         }
 
         public static object? Execute(object targetObj, string[] args)
@@ -120,7 +137,7 @@ namespace CalqFramework.Cli.Serialization
             var optionOrAction = args[index];
 
             // explore object tree until optionOrAction definitely cannot be an action (object not found by name)
-            for (; index < args.Length; )
+            for (; index < args.Length;)
             {
                 if (dataMemberAccessor.HasKey(optionOrAction))
                 {
