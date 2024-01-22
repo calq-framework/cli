@@ -63,7 +63,14 @@ namespace CalqFramework.Cli.Serialization
         private static bool TryReadOptions(string[] args, int index, DataMemberAndMethodParamAccessor accessor)
         {
             var optionsReader = new OptionsReader(args, accessor) { StartIndex = index };
+
             var parameterIndex = 0;
+            void SetPositionalParameter(string option) {
+                var parameterName = accessor.GetKey(parameterIndex);
+                var parameterType = accessor.GetType(parameterIndex);
+                accessor.SetValue(parameterIndex, ValueParser.ParseValue(option, parameterType, parameterName));
+                ++parameterIndex;
+            }
 
             try {
                 foreach (var (option, value, optionAttr) in optionsReader.Read()) {
@@ -77,15 +84,15 @@ namespace CalqFramework.Cli.Serialization
                     }
 
                     if (optionAttr.HasFlag(OptionFlags.NotAnOption)) {
-                        var parameterName = accessor.GetKey(parameterIndex);
-                        var parameterType = accessor.GetType(parameterIndex);
-                        accessor.SetValue(parameterIndex, ValueParser.ParseValue(option, parameterType, parameterName));
-                        ++parameterIndex;
+                        SetPositionalParameter(option);
                     } else {
                         var type = accessor.GetType(option);
                         var valueObj = ValueParser.ParseValue(value, type, option);
                         accessor.SetOrAddValue(option, valueObj);
                     }
+                }
+                for (var i = optionsReader.LastIndex; i < args.Length; i++) {
+                    SetPositionalParameter(args[i]);
                 }
             } catch (Exception ex) { // TODO rename the exception in CalqFramework.Serialization
                 if (ex.Message == "collision") {

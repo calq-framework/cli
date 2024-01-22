@@ -202,5 +202,14 @@ namespace CalqFramework.CliTest
             Assert.False(((List<bool>)result)[0]);
             Assert.True(((List<bool>)result)[1]);
         }
+
+        [Fact]
+        public void Execute_Should_SetTextAndIntegerProperties_When_TextAndIntegerOptionsProvidedAfterDoubleDash() {
+            var tool = new SomeClassLibrary();
+            var result = CommandLineInterface.Execute(tool, new[] { $"{nameof(SomeClassLibrary.MethodWithTextAndInteger)}", "--", "--text", "-1" });
+            Assert.Null(result);
+            Assert.Equal("--text", tool.textField);
+            Assert.Equal(-1, tool.integerField);
+        }
     }
 }
