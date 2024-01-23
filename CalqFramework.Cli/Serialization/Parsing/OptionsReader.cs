@@ -1,5 +1,6 @@
 ﻿using CalqFramework.Serialization.DataAccess;
 using System;
+using System.Collections.Generic;
 
 namespace CalqFramework.Cli.Serialization.Parsing
 {
@@ -7,7 +8,7 @@ namespace CalqFramework.Cli.Serialization.Parsing
     {
         private IDataAccessor DataAccessor { get; }
 
-        public OptionsReader(string[] args, IDataAccessor dataAccessor) : base(args)
+        public OptionsReader(IEnumerator<string> argsEnumerator, IDataAccessor dataAccessor) : base(argsEnumerator)
         {
             DataAccessor = dataAccessor;
         }
@@ -20,6 +21,10 @@ namespace CalqFramework.Cli.Serialization.Parsing
         protected override bool HasOption(string option)
         {
             return DataAccessor.HasKey(option);
+        }
+
+        protected override Type GetOptionType(char option) {
+            return DataAccessor.GetType(option.ToString());
         }
 
         protected override Type GetOptionType(string option)

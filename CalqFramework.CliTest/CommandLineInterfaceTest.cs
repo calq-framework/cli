@@ -120,10 +120,11 @@ namespace CalqFramework.CliTest
         public void Execute_Should_ThrowCliException_When_InvalidCommandCaseProvided() {
             var ex = Assert.Throws<CliException>(() => {
                 var tool = new SomeClassLibrary();
-                CommandLineInterface.Execute(tool, new[] { $"{nameof(SomeClassLibrary.Method).ToLower()}" },
+                CommandLineInterface.Execute(tool,
                     new CliDeserializerOptions {
                         DataMemberAccessorOptions = new DataMemberAccessorOptions { BindingAttr = DataMemberAccessorOptions.DefaultLookup }
-                    }
+                    },
+                    new[] { $"{nameof(SomeClassLibrary.Method).ToLower()}" }
                 );
             });
             Assert.Equal("invalid command", ex.Message);

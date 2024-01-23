@@ -2,17 +2,17 @@
 
 namespace CalqFramework.Cli.DataAccess.DataMemberAccess
 {
-    sealed internal class DataMemberAccessorFactory : DataMemberAccessorFactoryBase
+    sealed internal class AliasableDataMemberAccessorFactory : DataMemberAccessorFactoryBase
     {
 
-        public static DataMemberAccessorFactory Instance { get; }
+        public static AliasableDataMemberAccessorFactory Instance { get; }
 
-        static DataMemberAccessorFactory()
+        static AliasableDataMemberAccessorFactory()
         {
-            Instance = new DataMemberAccessorFactory(new DataMemberAccessorOptions());
+            Instance = new AliasableDataMemberAccessorFactory(new DataMemberAccessorOptions());
         }
 
-        public DataMemberAccessorFactory(DataMemberAccessorOptions dataMemberAccessorOptions) : base(dataMemberAccessorOptions)
+        public AliasableDataMemberAccessorFactory(DataMemberAccessorOptions dataMemberAccessorOptions) : base(dataMemberAccessorOptions)
         {
         }
 

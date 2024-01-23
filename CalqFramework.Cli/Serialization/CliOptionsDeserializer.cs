@@ -1,48 +1,51 @@
 ﻿using CalqFramework.Cli.DataAccess.DataMemberAccess;
 using CalqFramework.Cli.Serialization.Parsing;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using static CalqFramework.Cli.Serialization.Parsing.OptionsReaderBase;
 
-namespace CalqFramework.Cli.Serialization
-{
+namespace CalqFramework.Cli.Serialization {
     public class CliOptionsDeserializer
     {
-        public static void Deserialize(object targetObj)
+        public static void Deserialize(object obj)
         {
-            Deserialize(targetObj, new CliDeserializerOptions());
+            Deserialize(obj, new CliDeserializerOptions());
         }
 
-        public static void Deserialize(object targetObj, CliDeserializerOptions options)
+        public static void Deserialize(object obj, CliDeserializerOptions options)
         {
-            Deserialize(targetObj, options, Environment.GetCommandLineArgs(), 1);
+            Deserialize(obj, options, Environment.GetCommandLineArgs().Skip(1));
         }
 
-        public static void Deserialize(object targetObj, string[] args, int startIndex = 0)
+        public static void Deserialize(object obj, IEnumerable<string> args)
         {
-            Deserialize(targetObj, new CliDeserializerOptions(), args, startIndex);
+            Deserialize(obj, new CliDeserializerOptions(), args);
         }
 
-        public static void Deserialize(object targetObj, CliDeserializerOptions options, string[] args, int startIndex = 0)
+        public static void Deserialize(object obj, CliDeserializerOptions options, IEnumerable<string> args)
         {
-            var accessor = new DataMemberAccessorFactory(options.DataMemberAccessorOptions).CreateDataMemberAccessor(targetObj);
-            var reader = new OptionsReader(args, accessor) { StartIndex = startIndex };
+            using var argsEnumerator = args.GetEnumerator();
+            var accessor = new AliasableDataMemberAccessorFactory(options.DataMemberAccessorOptions).CreateDataMemberAccessor(obj);
+            var reader = new OptionsReader(argsEnumerator, accessor);
 
             foreach (var (option, value, optionAttr) in reader.Read())
             {
                 if (optionAttr.HasFlag(OptionFlags.ValueUnassigned))
                 {
+                    if (optionAttr.HasFlag(OptionFlags.Unknown))
+                    {
+                        if (options.SkipUnknown)
+                        {
+                            continue;
+                        }
+                        throw new CliException($"unknown value {option}");
+                    }
                     if (optionAttr.HasFlag(OptionFlags.AmbigousValue))
                     {
                         throw new CliException($"ambiguous syntax around {option} (try using --)");
                     }
-                    if (options.SkipUnknown)
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        throw new CliException($"unexpected value {option}");
-                    }
+                    throw new CliException($"unexpected value {option}");
                 }
 
                 var type = accessor.GetType(option);
