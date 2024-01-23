@@ -13,6 +13,7 @@ namespace CalqFramework.Cli.Serialization {
             get => _methodBindingAttr == null ? DataMemberAccessorOptions.BindingAttr : (BindingFlags)_methodBindingAttr;
             init => _methodBindingAttr = value;
         }
+        public bool UseRevisionVersion { get; init; } = true;
 
         public CliDeserializerOptions()
         {

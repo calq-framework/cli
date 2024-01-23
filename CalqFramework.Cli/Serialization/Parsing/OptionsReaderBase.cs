@@ -20,61 +20,34 @@ namespace CalqFramework.Cli.Serialization.Parsing
             AmbigousValue = 32 + ValueUnassigned // ambiguous value (starts with '-')
         }
 
-        public int LastIndex { get; private set; }
-        public string[] Args { get; init; }
-        public int StartIndex { get; init; } = 0;
+        public IEnumerator<string> ArgsEnumerator { get; }
 
-        protected OptionsReaderBase(string[] args)
+        protected OptionsReaderBase(IEnumerator<string> argsEnumerator)
         {
-            Args = args;
+            ArgsEnumerator = argsEnumerator;
         }
 
         protected abstract bool HasOption(char option);
-
         protected abstract bool HasOption(string option);
+        protected abstract Type GetOptionType(char option);
         protected abstract Type GetOptionType(string option);
 
         public IEnumerable<(string option, string value, OptionFlags optionAttr)> Read()
         {
-
             bool IsNumber(string input)
             {
                 return BigInteger.TryParse(input, out _);
             }
 
-            void ValidateOptionValue(string option, ref string value, ref OptionFlags optionAttr, ref int index)
+            void TrySelfAssign(Type type, ref string value, ref OptionFlags optionAttr)
             {
-                if (HasOption(option))
-                {
-                    var type = GetOptionType(option);
-                    if (value == "")
-                    {
-                        var isCollection = type.GetInterface(nameof(ICollection)) != null;
-                        if (isCollection)
-                        {
-                            type = type.GetGenericArguments()[0];
-                        }
-                        if (type == typeof(bool))
-                        {
-                            value = optionAttr.HasFlag(OptionFlags.Plus) ? "false" : "true";
-                        }
-                        else
-                        {
-                            if (index + 1 < Args.Length && (Args[index + 1][0] != '-' || IsNumber(Args[index + 1])))
-                            { // fail if starts with '-' to prevent human error
-                                ++index;
-                                value = Args[index];
-                            }
-                            else
-                            {
-                                optionAttr |= OptionFlags.ValueUnassigned;
-                            }
-                        }
-                    }
+                var isCollection = type.GetInterface(nameof(ICollection)) != null;
+                if (isCollection) {
+                    type = type.GetGenericArguments()[0];
                 }
-                else
-                {
-                    optionAttr |= OptionFlags.Unknown;
+                if (type == typeof(bool)) {
+                    value = optionAttr.HasFlag(OptionFlags.Plus) ? "false" : "true";
+                    optionAttr ^= OptionFlags.AmbigousValue; // assume OptionFlags.AmbigousValue is set, assume AmbigousValue = 32 + ValueUnassigned
                 }
             }
 
@@ -105,93 +78,85 @@ namespace CalqFramework.Cli.Serialization.Parsing
                 }
             }
 
-            int index = StartIndex;
-
-            try
+            var moved = false;
+            while (moved || ArgsEnumerator.MoveNext())
             {
-                while (true)
+                moved = false;
+                var arg = ArgsEnumerator.Current;
+
+                if (arg.Length == 0)
                 {
-                    if (index >= Args.Length)
-                    {
-                        yield break;
-                    }
-
-                    var arg = Args[index];
-
-                    if (arg.Length == 0)
-                    {
-                        throw new ArgumentException("arg length is 0");
-                    }
-
-                    var optionAttr = OptionFlags.None;
-                    switch (arg[0])
-                    {
-                        case '-':
-                            if (arg[1] != '-')
-                            {
-                                optionAttr |= OptionFlags.Short;
-                            }
-                            else
-                            {
-                                if (arg.Length == 2)
-                                {
-                                    ++index;
-                                    yield break;
-                                }
-                            }
-                            break;
-                        case '+':
-                            optionAttr |= OptionFlags.Plus;
-                            if (arg[1] != '+')
-                            {
-                                optionAttr |= OptionFlags.Short;
-                            }
-                            break;
-                        default:
-                            ++index;
-                            optionAttr |= OptionFlags.NotAnOption;
-                            yield return (arg, "", optionAttr);
-                            continue;
-                    }
-
-                    var (option, value) = ExtractOptionValuePair(arg, optionAttr);
-                    if (value == "")
-                    {
-                        if (index + 1 < Args.Length && (Args[index + 1][0] != '-' || IsNumber(Args[index + 1])))
-                        {
-                            ++index;
-                            value = Args[index];
-                        }
-                    }
-
-                    if (optionAttr.HasFlag(OptionFlags.Short))
-                    {
-                        foreach (var shortOption in ReadShort(option))
-                        {
-                            if (HasOption(shortOption))
-                            {
-                                ValidateOptionValue(shortOption.ToString(), ref value, ref optionAttr, ref index);
-                                yield return (shortOption.ToString(), value, optionAttr);
-                            }
-                            else
-                            {
-                                optionAttr |= OptionFlags.Unknown;
-                                yield return (shortOption.ToString(), value, optionAttr);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        ValidateOptionValue(option, ref value, ref optionAttr, ref index);
-                        yield return (option, value, optionAttr);
-                    }
-
-                    ++index;
+                    throw new ArgumentException("arg length is 0");
                 }
-            }
-            finally
-            {
-                LastIndex = index;
+
+                var optionAttr = OptionFlags.None;
+                switch (arg[0])
+                {
+                    case '-':
+                        if (arg[1] == '-')
+                        {
+                            if (arg.Length == 2) {
+                                yield break;
+                            }
+                        }
+                        else
+                        {
+                            optionAttr |= OptionFlags.Short;
+                        }
+                        break;
+                    case '+':
+                        optionAttr |= OptionFlags.Plus;
+                        if (arg[1] != '+')
+                        {
+                            optionAttr |= OptionFlags.Short;
+                        }
+                        break;
+                    default:
+                        optionAttr |= OptionFlags.NotAnOption;
+                        yield return (arg, "", optionAttr);
+                        continue;
+                }
+
+                var (option, value) = ExtractOptionValuePair(arg, optionAttr);
+                if (value == "") {
+                    moved = ArgsEnumerator.MoveNext();
+                    if (moved) {
+                        if (ArgsEnumerator.Current[0] != '-' || IsNumber(ArgsEnumerator.Current)) {
+                            value = ArgsEnumerator.Current;
+                            moved = false;
+                        } else {
+                            optionAttr |= OptionFlags.AmbigousValue; // fail if starts with '-' to prevent human error
+                        }
+                    } else {
+                        optionAttr |= OptionFlags.ValueUnassigned;
+                    }
+                }
+
+                if (optionAttr.HasFlag(OptionFlags.Short))
+                {
+                    foreach (var shortOption in ReadShort(option))
+                    {
+                        if (HasOption(shortOption)) {
+                            if (optionAttr.HasFlag(OptionFlags.ValueUnassigned)) {
+                                TrySelfAssign(GetOptionType(shortOption), ref value, ref optionAttr);
+                            }
+                        } else {
+                            optionAttr |= OptionFlags.Unknown;
+                        }
+                        yield return (shortOption.ToString(), value, optionAttr);
+                    }
+                }
+                else
+                {
+                    if (HasOption(option)) {
+                        if (optionAttr.HasFlag(OptionFlags.ValueUnassigned)) {
+                            TrySelfAssign(GetOptionType(option), ref value, ref optionAttr);
+                        }
+                    } else {
+                        optionAttr |= OptionFlags.Unknown;
+                    }
+                    yield return (option, value, optionAttr);
+                }
             }
         }
     }
