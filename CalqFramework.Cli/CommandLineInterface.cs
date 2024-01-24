@@ -199,6 +199,10 @@ namespace CalqFramework.Cli {
                 HandleInstanceHelp(dataMemberAndMethodAccessor, options);
                 return null;
             }
+            if (optionOrAction == "--version" || optionOrAction == "-v") {
+                Console.WriteLine(Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3));
+                return null;
+            }
 
             var method = dataMemberAndMethodAccessor.GetMethod(optionOrAction);
             var methodParamsAccessor = new MethodParamAccessor(method);
