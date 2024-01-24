@@ -48,7 +48,6 @@ public class Classlib {
 }
 
 public class Nested {
-
     public DoubleNested DoubleNested { get; } = new();
 
     public void Command1(string text) {
@@ -73,34 +72,41 @@ public class DoubleNested {
 ```
 dotnet Example.dll --help
 ```
->CORE COMMANDS:<br/>
->Nested<br/>
+>[CORE COMMANDS]<br/>
+>nested<br/>
 ><br/>
->ACTION COMMANDS:<br/>
->Option(String opt1, String opt2)<br/>
->Collection(List```1 numbers)<br/>
->Feature()<br/>
->Verbose()<br/>
->Stacked(Boolean all = False, Boolean be = False, Boolean created = False)<br/>
+>[ACTION COMMANDS]<br/>
+>option(string opt1, string opt2)<br/>
+>collection(list<int32> numbers)<br/>
+>feature()<br/>
+>verbose()<br/>
+>stacked(boolean all = false, boolean be = false, boolean created = false)<br/>
 ><br/>
->GLOBAL OPTIONS:<br/>
->--Enable, -x [Boolean: False]<br/>
->--verbose, -V [Boolean: False]<br/>
+>[OPTIONS]<br/>
+>-x, --enable # boolean (false)<br/>
+>-v, --verbose # boolean (false)<br/>
 ```
 dotnet Example.dll nested --help
 ```
->CORE COMMANDS:<br/>
->DoubleNested<br/>
+>[CORE COMMANDS]<br/>
+>doublenested<br/>
 ><br/>
->ACTION COMMANDS:<br/>
->Command1(String text)<br/>
->Command2(Int32 number)<br/>
+>[ACTION COMMANDS]<br/>
+>command1(string text)<br/>
+>command2(int32 number)<br/>
 ><br/>
->GLOBAL OPTIONS:<br/>
+>[OPTIONS]<br/>
 ```
-dotnet Example.dll nested command1 --help
+dotnet Example.dll stacked --help
 ```
->--text, -t - Type: System.String, Required: True, Default: N/A
+>[POSITIONAL PARAMETERS]<br/>
+>-a, --all # boolean (false)<br/>
+>-b, --be # boolean (false)<br/>
+>-c, --created # boolean (false)<br/>
+><br/>
+>[OPTIONS]<br/>
+>-x, --enable # boolean (false)<br/>
+>-v, --verbose # boolean (false)<br/>
 ```
 dotnet Example.dll nested command1 --text Hello
 ```
