@@ -77,7 +77,7 @@ dotnet Example.dll --help
 ><br/>
 >[ACTION COMMANDS]<br/>
 >option(string opt1, string opt2)<br/>
->collection(list<int32> numbers)<br/>
+>collection(list\<int32\> numbers)<br/>
 >feature()<br/>
 >verbose()<br/>
 >stacked(boolean all = false, boolean be = false, boolean created = false)<br/>
