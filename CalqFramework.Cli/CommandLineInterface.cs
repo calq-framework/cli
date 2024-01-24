@@ -12,25 +12,55 @@ using CalqFramework.Serialization.DataAccess.DataMemberAccess;
 namespace CalqFramework.Cli {
     public class CommandLineInterface
     {
-        private static object GetDefaultValue(ParameterInfo parameter) => parameter.HasDefaultValue ? parameter.DefaultValue! : "N/A";
+        private static string? GetDefaultValue(ParameterInfo parameter) => parameter.HasDefaultValue ? $"({parameter.DefaultValue?.ToString()!.ToLower()})" : "";
 
+        private static string GetTypeName(Type type) {
+            if (type.IsGenericType) {
+                string genericArguments = string.Join(", ", type.GetGenericArguments().Select(x => x.Name.ToLower()).ToList());
+                return $"{type.Name.ToLower().Substring(0, type.Name.ToLower().IndexOf("`"))}<{genericArguments}>";
+            }
+            return type.Name.ToLower();
+        }
+
+        // TODO move ToLower() logic to accessors
         // TODO separate data and printing
-        private static void HandleMethodHelp(DataMemberAndMethodParamAccessor accessor)
+        private static void HandleMethodHelp(DataMemberAndMethodParamAccessor accessor, CliDeserializerOptions options)
         {
+            Console.WriteLine("[POSITIONAL PARAMETERS]");
             foreach (var parameter in accessor.Parameters)
             {
-                Console.WriteLine($"--{parameter.Name}, -{parameter.Name![0]} - Type: {parameter.ParameterType}, Required: {!parameter.IsOptional}, Default: {GetDefaultValue(parameter)}");
+                var name = options.DataMemberAccessorOptions.BindingAttr.HasFlag(BindingFlags.IgnoreCase) ? parameter.Name!.ToLower() : parameter.Name;
+                var shortName = options.DataMemberAccessorOptions.BindingAttr.HasFlag(BindingFlags.IgnoreCase) ? char.ToLower(parameter.Name![0]) : parameter.Name![0];
+                Console.WriteLine($"-{shortName}, --{name} # {GetTypeName(parameter.ParameterType)} {GetDefaultValue(parameter)}");
+            }
+
+            // TODO DRY with HandleInstanceHelp
+            var membersByKeys = accessor.DataMemberAccessor.GetDataMembersByKeys();
+            var keysByMembers = membersByKeys.GroupBy(x => x.Value, x => x.Key).ToDictionary(x => x.Key, x => x.OrderBy(e => e.Length).ToList());
+            var coreCommandOptions = keysByMembers.Where(x => {
+                var type = accessor.GetType(x.Value[0]); // TODO maybe create bool TryGetDataMemberType(this MemberInfo, out Type result) in CalqFramework.Serialization
+                return type.IsPrimitive || type == typeof(string); // TODO create IsParseable()
+            });
+
+            Console.WriteLine();
+            Console.WriteLine("[OPTIONS]");
+            foreach (var option in coreCommandOptions) {
+                var type = accessor.GetType(option.Value[0]);
+                var defaultValue = accessor.GetValue(option.Value[0])?.ToString()!.ToLower();
+                var values = options.DataMemberAccessorOptions.BindingAttr.HasFlag(BindingFlags.IgnoreCase) ? option.Value.Select(x => x.ToLower()).ToList() : option.Value;
+                Console.WriteLine($"-{string.Join(", --", values)} # {GetTypeName(type)} ({defaultValue})");
             }
         }
 
+        // TODO move ToLower() logic to accessors
         // TODO separate data and printing
-        private static void HandleInstanceHelp(DataMemberAndMethodAccessor accessor)
+        private static void HandleInstanceHelp(DataMemberAndMethodAccessor accessor, CliDeserializerOptions options)
         {
             var membersByKeys = accessor.GetDataMembersByKeys();
-            var keysByMembers = membersByKeys.GroupBy(x => x.Value, x => x.Key).ToDictionary(x => x.Key, x => x.OrderByDescending(e => e.Length).ToList());
-            var globalOptions = keysByMembers.Where(x =>
+            var keysByMembers = membersByKeys.GroupBy(x => x.Value, x => x.Key).ToDictionary(x => x.Key, x => x.OrderBy(e => e.Length).ToList());
+            var coreCommandOptions = keysByMembers.Where(x =>
             {
-                var type = accessor.GetType(x.Value[0]);
+                var type = accessor.GetType(x.Value[0]); // TODO maybe create bool TryGetDataMemberType(this MemberInfo, out Type result) in CalqFramework.Serialization
                 return type.IsPrimitive || type == typeof(string); // TODO create IsParseable()
             });
             var coreCommands = keysByMembers.Where(x =>
@@ -39,26 +69,29 @@ namespace CalqFramework.Cli {
                 return !type.IsPrimitive && type != typeof(string); // TODO create IsParseable()
             });
 
-            Console.WriteLine("CORE COMMANDS:");
+            Console.WriteLine("[CORE COMMANDS]");
             foreach (var command in coreCommands)
             {
-                Console.WriteLine($"{command.Value[0]}");
+                var value = options.DataMemberAccessorOptions.BindingAttr.HasFlag(BindingFlags.IgnoreCase) ? command.Value.Last().ToLower() : command.Value.Last();
+                Console.WriteLine($"{value}");
             }
 
             Console.WriteLine();
-            Console.WriteLine("ACTION COMMANDS:");
+            Console.WriteLine("[ACTION COMMANDS]");
             foreach (var methodInfo in accessor.Methods)
             {
-                Console.WriteLine($"{methodInfo.Name}({string.Join(", ", methodInfo.GetParameters().Select(x => $"{x.ParameterType.Name} {x.Name}{(x.HasDefaultValue ? $" = {x.DefaultValue}" : "")}"))})");
+                var name = options.MethodBindingAttr.HasFlag(BindingFlags.IgnoreCase) ? methodInfo.Name!.ToLower() : methodInfo.Name;
+                Console.WriteLine($"{name}({string.Join(", ", methodInfo.GetParameters().Select(x => $"{GetTypeName(x.ParameterType)} {x.Name}{(x.HasDefaultValue ? $" = {x.DefaultValue?.ToString()!.ToLower()}" : "")}"))})");
             }
 
             Console.WriteLine();
-            Console.WriteLine("GLOBAL OPTIONS:");
-            foreach (var option in globalOptions)
+            Console.WriteLine("[OPTIONS]");
+            foreach (var option in coreCommandOptions)
             {
                 var type = accessor.GetType(option.Value[0]);
-                var defaultValue = accessor.GetValue(option.Value[0]);
-                Console.WriteLine($"--{string.Join(", -", option.Value)} [{type.Name}: {defaultValue}]");
+                var defaultValue = accessor.GetValue(option.Value[0])?.ToString()!.ToLower();
+                var values = options.DataMemberAccessorOptions.BindingAttr.HasFlag(BindingFlags.IgnoreCase) ? option.Value.Select(x => x.ToLower()).ToList() : option.Value;
+                Console.WriteLine($"-{string.Join(", --", values)} # {GetTypeName(type)} ({defaultValue})");
             }
         }
 
@@ -81,7 +114,7 @@ namespace CalqFramework.Cli {
                 {
                     if ((option == "help" || option == "h") && !optionAttr.HasFlag(OptionFlags.NotAnOption))
                     {
-                        HandleMethodHelp(accessor);
+                        HandleMethodHelp(accessor, options);
                         return false;
                     }
 
@@ -163,7 +196,7 @@ namespace CalqFramework.Cli {
             var dataMemberAndMethodAccessor = new DataMemberAndMethodAccessor(dataMemberAccessor, options.MethodBindingAttr);
             if (optionOrAction == "--help" || optionOrAction == "-h")
             {
-                HandleInstanceHelp(dataMemberAndMethodAccessor);
+                HandleInstanceHelp(dataMemberAndMethodAccessor, options);
                 return null;
             }
 

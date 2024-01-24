@@ -31,7 +31,6 @@ public class Classlib {
 }
 
 public class Nested {
-
     public DoubleNested DoubleNested { get; } = new();
 
     public void Command1(string text) {
