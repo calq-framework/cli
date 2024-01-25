@@ -155,3 +155,7 @@ dotnet Example.dll stacked -abc
 dotnet Example.dll stacked +abc
 ```
 >Stacked with options: False, False, False
+```
+dotnet Example.dll return -x
+```
+>{"enable":true}

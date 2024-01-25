@@ -1,3 +1,7 @@
 ﻿using CalqFramework.Cli;
+using System.Text.Json;
 
-CommandLineInterface.Execute(new Classlib());
+var result = CommandLineInterface.Execute(new Classlib());
+if (result != null) {
+    Console.WriteLine(JsonSerializer.Serialize(result));
+}
