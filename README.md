@@ -12,7 +12,10 @@ CalqFramework.Cli helps to convert libraries into command-line tools compliant w
 
 ### Example tool
 ```csharp
-CommandLineInterface.Execute(new Classlib());
+var result = CommandLineInterface.Execute(new Classlib());
+if (result != null) {
+    Console.WriteLine(JsonSerializer.Serialize(result));
+}
 ```
 
 ### Example class library
