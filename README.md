@@ -48,6 +48,12 @@ public class Classlib {
     public void Stacked(bool all = false, bool be = false, bool created = false) {
         Console.WriteLine($"Stacked with options: {all}, {be}, {created}");
     }
+
+    public object Return() {
+        return new {
+            enable = Enable
+        };
+    }
 }
 
 public class Nested {
