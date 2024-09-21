@@ -8,6 +8,7 @@ using static CalqFramework.Cli.Serialization.Parsing.OptionsReaderBase;
 using CalqFramework.Cli.Serialization;
 using System.Collections.Generic;
 using CalqFramework.Serialization.DataAccess.DataMemberAccess;
+using CalqFramework.Extensions.System.Reflection;
 
 namespace CalqFramework.Cli {
     public class CommandLineInterface
@@ -38,14 +39,13 @@ namespace CalqFramework.Cli {
             var membersByKeys = accessor.DataMemberAccessor.GetDataMembersByKeys();
             var keysByMembers = membersByKeys.GroupBy(x => x.Value, x => x.Key).ToDictionary(x => x.Key, x => x.OrderBy(e => e.Length).ToList());
             var coreCommandOptions = keysByMembers.Where(x => {
-                var type = accessor.GetType(x.Value[0]); // TODO maybe create bool TryGetDataMemberType(this MemberInfo, out Type result) in CalqFramework.Serialization
-                return ValueParser.IsParseable(type);
+                return ValueParser.IsParseable(x.Key.GetUnderlyingType());
             });
 
             Console.WriteLine();
             Console.WriteLine("[OPTIONS]");
             foreach (var option in coreCommandOptions) {
-                var type = accessor.GetType(option.Value[0]);
+                var type = option.Key.GetUnderlyingType();
                 var defaultValue = accessor.GetValue(option.Value[0])?.ToString()!.ToLower();
                 var values = options.DataMemberAccessorOptions.BindingAttr.HasFlag(BindingFlags.IgnoreCase) ? option.Value.Select(x => x.ToLower()).ToList() : option.Value;
                 Console.WriteLine($"-{string.Join(", --", values)} # {GetTypeName(type)} ({defaultValue})");
@@ -60,13 +60,11 @@ namespace CalqFramework.Cli {
             var keysByMembers = membersByKeys.GroupBy(x => x.Value, x => x.Key).ToDictionary(x => x.Key, x => x.OrderBy(e => e.Length).ToList());
             var coreCommandOptions = keysByMembers.Where(x =>
             {
-                var type = accessor.GetType(x.Value[0]); // TODO maybe create bool TryGetDataMemberType(this MemberInfo, out Type result) in CalqFramework.Serialization
-                return ValueParser.IsParseable(type);
+                return ValueParser.IsParseable(x.Key.GetUnderlyingType());
             });
             var coreCommands = keysByMembers.Where(x =>
             {
-                var type = accessor.GetType(x.Value[0]);
-                return !ValueParser.IsParseable(type);
+                return !ValueParser.IsParseable(x.Key.GetUnderlyingType());
             });
 
             Console.WriteLine("[CORE COMMANDS]");
@@ -88,7 +86,7 @@ namespace CalqFramework.Cli {
             Console.WriteLine("[OPTIONS]");
             foreach (var option in coreCommandOptions)
             {
-                var type = accessor.GetType(option.Value[0]);
+                var type = option.Key.GetUnderlyingType();
                 var defaultValue = accessor.GetValue(option.Value[0])?.ToString()!.ToLower();
                 var values = options.DataMemberAccessorOptions.BindingAttr.HasFlag(BindingFlags.IgnoreCase) ? option.Value.Select(x => x.ToLower()).ToList() : option.Value;
                 Console.WriteLine($"-{string.Join(", --", values)} # {GetTypeName(type)} ({defaultValue})");
