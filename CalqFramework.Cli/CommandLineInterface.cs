@@ -39,7 +39,7 @@ namespace CalqFramework.Cli {
             var keysByMembers = membersByKeys.GroupBy(x => x.Value, x => x.Key).ToDictionary(x => x.Key, x => x.OrderBy(e => e.Length).ToList());
             var coreCommandOptions = keysByMembers.Where(x => {
                 var type = accessor.GetType(x.Value[0]); // TODO maybe create bool TryGetDataMemberType(this MemberInfo, out Type result) in CalqFramework.Serialization
-                return type.IsPrimitive || type == typeof(string); // TODO create IsParseable()
+                return ValueParser.IsParseable(type);
             });
 
             Console.WriteLine();
@@ -61,12 +61,12 @@ namespace CalqFramework.Cli {
             var coreCommandOptions = keysByMembers.Where(x =>
             {
                 var type = accessor.GetType(x.Value[0]); // TODO maybe create bool TryGetDataMemberType(this MemberInfo, out Type result) in CalqFramework.Serialization
-                return type.IsPrimitive || type == typeof(string); // TODO create IsParseable()
+                return ValueParser.IsParseable(type);
             });
             var coreCommands = keysByMembers.Where(x =>
             {
                 var type = accessor.GetType(x.Value[0]);
-                return !type.IsPrimitive && type != typeof(string); // TODO create IsParseable()
+                return !ValueParser.IsParseable(type);
             });
 
             Console.WriteLine("[CORE COMMANDS]");
