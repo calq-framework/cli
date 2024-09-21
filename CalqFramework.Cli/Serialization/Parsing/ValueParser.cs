@@ -5,6 +5,11 @@ using System.Collections;
 namespace CalqFramework.Cli.Serialization.Parsing;
 public static class ValueParser
 {
+    public static bool IsParseable(Type type)
+    {
+        return CalqFramework.Serialization.Text.ValueParser.IsParseable(type) || type.GetInterface(nameof(ICollection)) != null;
+    }
+
     internal static object ParseValue(string value, Type type, string option)
     {
         try
