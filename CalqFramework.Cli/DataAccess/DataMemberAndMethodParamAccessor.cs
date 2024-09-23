@@ -9,7 +9,7 @@ namespace CalqFramework.Cli.DataAccess
     internal class DataMemberAndMethodParamAccessor : DualDataAccessor
     {
         public IDataMemberAccessor DataMemberAccessor { get; }
-        private MethodParamAccessor MethodParamsAccessor { get; }
+        public MethodParamAccessor MethodParamsAccessor { get; }
 
         public ParameterInfo[] Parameters { get => MethodParamsAccessor.Parameters; }
 
@@ -22,21 +22,6 @@ namespace CalqFramework.Cli.DataAccess
         public object? Invoke()
         {
             return MethodParamsAccessor.Invoke(DataMemberAccessor.Obj);
-        }
-
-        public string GetKey(int index)
-        {
-            return MethodParamsAccessor.GetKey(index);
-        }
-
-        public Type GetType(int index)
-        {
-            return MethodParamsAccessor.GetType(index);
-        }
-
-        public void SetValue(int index, object? value)
-        {
-            MethodParamsAccessor.SetValue(index, value);
         }
     }
 }
