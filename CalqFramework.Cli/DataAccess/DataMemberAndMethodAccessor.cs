@@ -1,5 +1,6 @@
 ﻿using CalqFramework.Cli.Serialization;
 using CalqFramework.Serialization.DataAccess.DataMemberAccess;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -78,6 +79,38 @@ namespace CalqFramework.Cli.DataAccess
         public bool SetOrAddValue(string key, object? value)
         {
             return DataMemberAccessor.SetOrAddValue(key, value);
+        }
+
+        public string DataMemberToString(MemberInfo memberInfo) {
+            return DataMemberAccessor.DataMemberToString(memberInfo);
+        }
+
+        public bool HasDataMember(MemberInfo memberInfo) {
+            return DataMemberAccessor.HasDataMember(memberInfo);
+        }
+
+        public bool Contains(MemberInfo member) {
+            return DataMemberAccessor.Contains(member);
+        }
+
+        public Type GetType(MemberInfo member) {
+            return DataMemberAccessor.GetType(member);
+        }
+
+        public object? GetValue(MemberInfo member) {
+            return DataMemberAccessor.GetValue(member);
+        }
+
+        public object GetOrInitializeValue(MemberInfo member) {
+            return DataMemberAccessor.GetOrInitializeValue(member);
+        }
+
+        public void SetValue(MemberInfo member, object? value) {
+            DataMemberAccessor.SetValue(member, value);
+        }
+
+        public bool SetOrAddValue(MemberInfo member, object? value) {
+            return DataMemberAccessor.SetOrAddValue(member, value);
         }
     }
 }

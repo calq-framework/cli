@@ -39,7 +39,7 @@ namespace CalqFramework.Cli {
             var membersByKeys = accessor.DataMemberAccessor.GetDataMembersByKeys();
             var keysByMembers = membersByKeys.GroupBy(x => x.Value, x => x.Key).ToDictionary(x => x.Key, x => x.OrderBy(e => e.Length).ToList());
             var coreCommandOptions = keysByMembers.Where(x => {
-                return ValueParser.IsParseable(x.Key.GetUnderlyingType());
+                return ValueParser.IsParseable(accessor.DataMemberAccessor.GetType(x.Key));
             });
 
             Console.WriteLine();
@@ -56,22 +56,20 @@ namespace CalqFramework.Cli {
         // TODO separate data and printing
         private static void HandleInstanceHelp(DataMemberAndMethodAccessor accessor, CliDeserializerOptions options)
         {
-            var membersByKeys = accessor.GetDataMembersByKeys();
-            var keysByMembers = membersByKeys.GroupBy(x => x.Value, x => x.Key).ToDictionary(x => x.Key, x => x.OrderBy(e => e.Length).ToList());
-            var coreCommandOptions = keysByMembers.Where(x =>
+            var members = accessor.GetDataMembersByKeys().Values.Distinct();
+            var coreCommandOptions = members.Where(x =>
             {
-                return ValueParser.IsParseable(x.Key.GetUnderlyingType());
+                return ValueParser.IsParseable(accessor.GetType(x));
             });
-            var coreCommands = keysByMembers.Where(x =>
+            var coreCommands = members.Where(x =>
             {
-                return !ValueParser.IsParseable(x.Key.GetUnderlyingType());
+                return !ValueParser.IsParseable(accessor.GetType(x));
             });
 
             Console.WriteLine("[CORE COMMANDS]");
             foreach (var command in coreCommands)
             {
-                var value = options.DataMemberAccessorOptions.BindingAttr.HasFlag(BindingFlags.IgnoreCase) ? command.Value.Last().ToLower() : command.Value.Last();
-                Console.WriteLine($"{value}");
+                Console.WriteLine($"{accessor.DataMemberToString(command)}");
             }
 
             Console.WriteLine();
@@ -86,10 +84,9 @@ namespace CalqFramework.Cli {
             Console.WriteLine("[OPTIONS]");
             foreach (var option in coreCommandOptions)
             {
-                var type = option.Key.GetUnderlyingType();
-                var defaultValue = accessor.GetValue(option.Value[0])?.ToString()!.ToLower();
-                var values = options.DataMemberAccessorOptions.BindingAttr.HasFlag(BindingFlags.IgnoreCase) ? option.Value.Select(x => x.ToLower()).ToList() : option.Value;
-                Console.WriteLine($"-{string.Join(", --", values)} # {GetTypeName(type)} ({defaultValue})");
+                var type = option.GetType();
+                var defaultValue = accessor.GetValue(option);
+                Console.WriteLine($"{accessor.DataMemberToString(option)} # {GetTypeName(type)} ({defaultValue})");
             }
         }
 

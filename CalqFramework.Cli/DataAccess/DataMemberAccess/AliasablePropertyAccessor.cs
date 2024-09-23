@@ -1,4 +1,6 @@
 ﻿using CalqFramework.Cli.Attributes;
+using CalqFramework.Cli.Serialization.Parsing;
+using CalqFramework.Extensions.System.Reflection;
 using CalqFramework.Serialization.DataAccess.DataMemberAccess;
 using System;
 using System.Collections.Generic;
@@ -11,6 +13,16 @@ namespace CalqFramework.Cli.DataAccess.DataMemberAccess
     {
         public AliasablePropertyAccessor(object obj, BindingFlags bindingAttr) : base(obj, bindingAttr)
         {
+        }
+
+        public override string DataMemberToString(MemberInfo memberInfo) {
+            var name = memberInfo.GetCustomAttribute<NameAttribute>()?.Name ?? memberInfo.Name;
+            name = BindingAttr.HasFlag(BindingFlags.IgnoreCase) ? name.ToLower() : name;
+
+            var shortName = memberInfo.GetCustomAttribute<ShortNameAttribute>()?.Name ?? memberInfo.Name[0];
+            shortName = BindingAttr.HasFlag(BindingFlags.IgnoreCase) ? shortName.ToString().ToLower()[0] : shortName;
+
+            return ValueParser.IsParseable(memberInfo.GetUnderlyingType()) ? $"--{name}, -{shortName}" : $"{name}";
         }
 
         public override IDictionary<string, MemberInfo> GetDataMembersByKeys()
@@ -52,6 +64,10 @@ namespace CalqFramework.Cli.DataAccess.DataMemberAccess
                 result.Remove(duplicate);
             }
             return result;
+        }
+
+        public override bool HasDataMember(MemberInfo memberInfo) {
+            return memberInfo is PropertyInfo;
         }
 
         // FIXME do not assign the first occurances - check for duplicates. if duplicate found then then return null
