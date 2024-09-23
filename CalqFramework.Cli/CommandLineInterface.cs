@@ -163,7 +163,7 @@ namespace CalqFramework.Cli {
                 dataMemberAccessor = dataMemberAccessorFactory.CreateDataMemberAccessor(nestedObj);
                 if (dataMemberAccessor.HasKey(optionOrAction)) {
                     var type = dataMemberAccessor.GetType(optionOrAction);
-                    if (type.IsPrimitive || type == typeof(string)) {
+                    if (ValueParser.IsParseable(type)) {
                         break;
                     }
                     nestedObj = dataMemberAccessor.GetValue(optionOrAction)!;
