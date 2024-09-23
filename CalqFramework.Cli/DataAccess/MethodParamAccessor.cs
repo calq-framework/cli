@@ -1,4 +1,7 @@
-﻿using CalqFramework.Cli.Serialization;
+﻿using CalqFramework.Cli.Attributes;
+using CalqFramework.Cli.Serialization;
+using CalqFramework.Cli.Serialization.Parsing;
+using CalqFramework.Extensions.System.Reflection;
 using CalqFramework.Serialization.DataAccess;
 using System;
 using System.Collections;
@@ -22,6 +25,16 @@ namespace CalqFramework.Cli.DataAccess
             Parameters = Method.GetParameters();
             ParamValues = new object?[Parameters.Length];
             AssignedParameters = new HashSet<ParameterInfo>();
+        }
+
+        public string ParameterToString(ParameterInfo parameter, BindingFlags bindingAttr) {
+            var name = parameter.GetCustomAttribute<NameAttribute>()?.Name ?? parameter.Name;
+            name = bindingAttr.HasFlag(BindingFlags.IgnoreCase) ? name.ToLower() : name;
+
+            var shortName = parameter.GetCustomAttribute<ShortNameAttribute>()?.Name ?? parameter.Name[0];
+            shortName = bindingAttr.HasFlag(BindingFlags.IgnoreCase) ? shortName.ToString().ToLower()[0] : shortName;
+
+            return ValueParser.IsParseable(parameter.ParameterType) ? $"--{name}, -{shortName}" : $"{name}";
         }
 
         public object? Invoke(object? obj)

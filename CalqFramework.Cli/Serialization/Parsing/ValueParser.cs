@@ -1,6 +1,7 @@
 ﻿using CalqFramework.Cli.Serialization;
 using System;
 using System.Collections;
+using System.Linq;
 
 namespace CalqFramework.Cli.Serialization.Parsing;
 public static class ValueParser
