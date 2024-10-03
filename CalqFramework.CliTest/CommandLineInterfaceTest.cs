@@ -142,7 +142,7 @@ namespace CalqFramework.CliTest
                 var tool = new SomeClassLibrary();
                 CommandLineInterface.Execute(tool, new[] { $"{nameof(SomeClassLibrary.MethodWithText)}" });
             });
-            Assert.Equal("unassigned option text", ex.Message);
+            Assert.Equal("unassigned parameter text", ex.Message);
         }
 
         [Fact]

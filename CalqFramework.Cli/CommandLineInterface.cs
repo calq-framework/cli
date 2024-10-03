@@ -7,9 +7,7 @@ using CalqFramework.Cli.Serialization.Parsing;
 using static CalqFramework.Cli.Serialization.Parsing.OptionsReaderBase;
 using CalqFramework.Cli.Serialization;
 using System.Collections.Generic;
-using CalqFramework.Serialization.DataAccess.DataMemberAccess;
-using CalqFramework.Extensions.System.Reflection;
-using Microsoft.VisualBasic.FileIO;
+using CalqFramework.Serialization.DataAccess;
 
 namespace CalqFramework.Cli {
     public class CommandLineInterface
@@ -17,60 +15,18 @@ namespace CalqFramework.Cli {
         // TODO separate data and printing
         private static void HandleMethodHelp(DataMemberAndMethodParamAccessor accessor, CliDeserializerOptions options)
         {
-            Console.WriteLine("[POSITIONAL PARAMETERS]");
-            foreach (var parameter in accessor.Parameters)
-            {
-                Console.WriteLine($"{accessor.MethodParamsAccessor.ParameterToString(parameter, options.DataMemberAccessorOptions.BindingAttr)} # {ToStringHelper.GetTypeName(parameter.ParameterType)} {ToStringHelper.GetDefaultValue(parameter)}");
-            }
-
-            // TODO DRY with HandleInstanceHelp
-            var members = accessor.DataMemberAccessor.GetDataMembersByKeys().Values.Distinct(); ;
-            var coreCommandOptions = members.Where(x => {
-                return ValueParser.IsParseable(accessor.DataMemberAccessor.GetType(x));
-            });
-
-            Console.WriteLine();
-            Console.WriteLine("[OPTIONS]");
-            foreach (var option in coreCommandOptions) {
-                var type = accessor.DataMemberAccessor.GetType(option);
-                var defaultValue = accessor.DataMemberAccessor.GetValue(option);
-                Console.WriteLine($"{accessor.DataMemberAccessor.DataMemberToString(option)} # {ToStringHelper.GetTypeName(type)} ({defaultValue})");
-            }
+            
         }
 
         // TODO separate data and printing
-        private static void HandleInstanceHelp(IDataMemberAccessor accessor, MethodResolver methodResolver, CliDeserializerOptions options)
+        private static void HandleInstanceHelp(IDataAccessor<string, object?, MemberInfo?> accessor, MethodResolver methodResolver, CliDeserializerOptions options)
         {
-            var members = accessor.GetDataMembersByKeys().Values.Distinct();
-            var coreCommandOptions = members.Where(x =>
-            {
-                return ValueParser.IsParseable(accessor.GetType(x));
-            });
-            var coreCommands = members.Where(x =>
-            {
-                return !ValueParser.IsParseable(accessor.GetType(x));
-            });
-
-            Console.WriteLine("[CORE COMMANDS]");
-            foreach (var command in coreCommands)
-            {
-                Console.WriteLine($"{accessor.DataMemberToString(command)}");
-            }
+            Console.WriteLine(accessor);
 
             Console.WriteLine();
             Console.WriteLine("[ACTION COMMANDS]");
-            foreach (var methodInfo in methodResolver.Methods)
-            {
+            foreach (var methodInfo in methodResolver.Methods) {
                 Console.WriteLine(methodResolver.MethodToString(methodInfo));
-            }
-
-            Console.WriteLine();
-            Console.WriteLine("[OPTIONS]");
-            foreach (var option in coreCommandOptions)
-            {
-                var type = accessor.GetType(option);
-                var defaultValue = accessor.GetValue(option);
-                Console.WriteLine($"{accessor.DataMemberToString(option)} # {ToStringHelper.GetTypeName(type)} ({defaultValue})");
             }
         }
 
@@ -111,9 +67,9 @@ namespace CalqFramework.Cli {
                     }
                     else
                     {
-                        var type = accessor.GetType(option);
+                        var type = accessor.GetDataType(option);
                         var valueObj = ValueParser.ParseValue(value, type, option);
-                        accessor.SetOrAddValue(option, valueObj);
+                        accessor[option] = valueObj;
                     }
                 }
                 while (args.MoveNext()) {
@@ -153,26 +109,26 @@ namespace CalqFramework.Cli {
             }
             string optionOrAction;
 
-            var nestedObj = obj;
-            var dataMemberAccessorFactory = new AliasableDataMemberAccessorFactory(options.DataMemberAccessorOptions);
-            IDataMemberAccessor dataMemberAccessor;
+            var targetObj = obj;
+            var dataMemberAccessorFactory = new CliDataMemberAccessorFactory(options.DataMemberAccessorOptions);
+            IDataAccessor<string, object?, MemberInfo> dataMemberAccessor;
 
             // explore object tree until optionOrAction definitely cannot be an action (object not found by name)
             do {
                 optionOrAction = en.Current;
-                dataMemberAccessor = dataMemberAccessorFactory.CreateDataMemberAccessor(nestedObj);
-                if (dataMemberAccessor.HasKey(optionOrAction)) {
-                    var type = dataMemberAccessor.GetType(optionOrAction);
+                dataMemberAccessor = dataMemberAccessorFactory.CreateDataMemberAccessor(targetObj);
+                if (dataMemberAccessor.ContainsKey(optionOrAction)) {
+                    var type = dataMemberAccessor.GetDataType(optionOrAction);
                     if (ValueParser.IsParseable(type)) {
                         break;
                     }
-                    nestedObj = dataMemberAccessor.GetValue(optionOrAction)!;
+                    targetObj = dataMemberAccessor[optionOrAction]!;
                 } else {
                     break;
                 }
             } while (en.MoveNext());
 
-            var methodResolver = new MethodResolver(dataMemberAccessor.Obj, options.MethodBindingAttr);
+            var methodResolver = new MethodResolver(targetObj, options.MethodBindingAttr);
             if (optionOrAction == "--help" || optionOrAction == "-h")
             {
                 HandleInstanceHelp(dataMemberAccessor, methodResolver, options);
@@ -184,8 +140,8 @@ namespace CalqFramework.Cli {
             }
 
             var method = methodResolver.GetMethod(optionOrAction);
-            var methodParamsAccessor = new MethodParamAccessor(method);
-            var accessor = new DataMemberAndMethodParamAccessor(dataMemberAccessor, methodParamsAccessor);
+            var methodParamsAccessor = new CliMethodParamAccessor(method, options.MethodBindingAttr);
+            var accessor = new DataMemberAndMethodParamAccessor(dataMemberAccessor, methodParamsAccessor, targetObj);
             if (TryReadOptions(en, accessor, options))
             {
                 return accessor.Invoke();
