@@ -5,8 +5,8 @@
       "CalqFramework.Serialization": {
         "type": "Direct",
         "requested": "[*, )",
-        "resolved": "0.15.0",
-        "contentHash": "691P9wqxhMb500npRBll5TTEg0hz2IyWkcj6OOrHwubUwbwF2Li2eoRsc4ZEjd57CantYNJ1UriLSestu3QGCA==",
+        "resolved": "0.25.0",
+        "contentHash": "klJ/0rzzCxhjVXneg9H1tdUuptk4j+P4VOnkNvSxwuYTQ4BE1guQssVINZcWPutBvg44rPlJWR9R56uE8trkEg==",
         "dependencies": {
           "Newtonsoft.Json": "13.0.3"
         }

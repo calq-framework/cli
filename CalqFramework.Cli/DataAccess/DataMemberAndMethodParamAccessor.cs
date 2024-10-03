@@ -1,27 +1,25 @@
-﻿using CalqFramework.Serialization.DataAccess;
-using CalqFramework.Serialization.DataAccess.DataMemberAccess;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using CalqFramework.Cli.DataAccess.DataMemberAccess;
+using CalqFramework.Serialization.DataAccess;
 using System.Reflection;
 
-namespace CalqFramework.Cli.DataAccess
-{
-    internal class DataMemberAndMethodParamAccessor : DualDataAccessor
-    {
-        public IDataMemberAccessor DataMemberAccessor { get; }
-        public MethodParamAccessor MethodParamsAccessor { get; }
+namespace CalqFramework.Cli.DataAccess {
+    internal class DataMemberAndMethodParamAccessor : DualDataAccessor<string,  object?> {
+        public IDataAccessor<string, object?> DataMemberAccessor { get; }
+        public CliMethodParamAccessor MethodParamsAccessor { get; }
+        public object ParentObj { get; }
 
-        public ParameterInfo[] Parameters { get => MethodParamsAccessor.Parameters; }
+        //        public ParameterInfo[] Parameters { get => MethodParamsAccessor.Parameters; }
 
-        public DataMemberAndMethodParamAccessor(IDataMemberAccessor dataMemberAccessor, MethodParamAccessor methodParamsAccessor) : base(dataMemberAccessor, methodParamsAccessor)
+        public DataMemberAndMethodParamAccessor(IDataAccessor<string, object?, MemberInfo?> dataMemberAccessor, CliMethodParamAccessor methodParamsAccessor, object parentObj) : base(dataMemberAccessor, methodParamsAccessor)
         {
             DataMemberAccessor = dataMemberAccessor;
             MethodParamsAccessor = methodParamsAccessor;
+            ParentObj = parentObj;
         }
 
         public object? Invoke()
         {
-            return MethodParamsAccessor.Invoke(DataMemberAccessor.Obj);
+            return MethodParamsAccessor.Invoke(ParentObj);
         }
     }
 }

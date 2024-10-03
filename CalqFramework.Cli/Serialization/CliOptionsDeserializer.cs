@@ -26,8 +26,9 @@ namespace CalqFramework.Cli.Serialization {
         public static void Deserialize(object obj, CliDeserializerOptions options, IEnumerable<string> args)
         {
             using var argsEnumerator = args.GetEnumerator();
-            var accessor = new AliasableDataMemberAccessorFactory(options.DataMemberAccessorOptions).CreateDataMemberAccessor(obj);
+            var accessor = new CliDataMemberAccessorFactory(options.DataMemberAccessorOptions).CreateDataMemberAccessor(obj);
             var reader = new OptionsReader(argsEnumerator, accessor);
+            var x = accessor.ToString();
 
             foreach (var (option, value, optionAttr) in reader.Read())
             {
@@ -48,10 +49,10 @@ namespace CalqFramework.Cli.Serialization {
                     throw new CliException($"unexpected value {option}");
                 }
 
-                var type = accessor.GetType(option);
+                var type = accessor.GetDataType(option);
                 var valueObj = ValueParser.ParseValue(value, type, option);
 
-                accessor.SetOrAddValue(option, valueObj);
+                accessor[option] = valueObj;
             }
         }
     }
