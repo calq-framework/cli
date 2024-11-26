@@ -34,16 +34,6 @@ namespace CalqFramework.Cli.DataAccess.DataMemberAccess {
         {
         }
 
-        protected new string DataMediatorToString(MemberInfo memberInfo) {
-            var name = memberInfo.GetCustomAttribute<NameAttribute>()?.Name ?? memberInfo.Name;
-            name =  BindingAttr.HasFlag(BindingFlags.IgnoreCase) ? name.ToLower() : name;
-
-            var shortName = memberInfo.GetCustomAttribute<ShortNameAttribute>()?.Name ?? memberInfo.Name[0];
-            shortName = BindingAttr.HasFlag(BindingFlags.IgnoreCase) ? shortName.ToString().ToLower()[0] : shortName;
-
-            return ValueParser.IsParseable(memberInfo.GetUnderlyingType()) ? $"--{name}, -{shortName}" : $"{name}";
-        }
-
         // FIXME do not assign the first occurances - check for duplicates. if duplicate found then then return null
         protected override MemberInfo? GetClassMember(string key) {
             if (key.Length == 1)
@@ -105,7 +95,7 @@ namespace CalqFramework.Cli.DataAccess.DataMemberAccess {
 
             result += "[CORE COMMANDS]\n";
             foreach (var command in coreCommands) {
-                result += $"{DataMediatorToString(command)}\n";
+                result += $"{ToStringHelper.MemberInfoToString(command)}\n";
             }
 
             result += "\n";
@@ -113,7 +103,7 @@ namespace CalqFramework.Cli.DataAccess.DataMemberAccess {
             foreach (var option in options) {
                 var type = GetDataType(option);
                 var defaultValue = this[option];
-                result += $"{DataMediatorToString(option)} # {ToStringHelper.GetTypeName(type)} ({defaultValue})\n";
+                result += $"{ToStringHelper.MemberInfoToString(option)} # {ToStringHelper.GetTypeName(type)} ({defaultValue})\n";
             }
 
             //Console.WriteLine();
