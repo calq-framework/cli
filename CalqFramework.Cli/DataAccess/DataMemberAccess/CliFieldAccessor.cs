@@ -17,7 +17,7 @@ namespace CalqFramework.Cli.DataAccess.DataMemberAccess {
                 if (base[dataMediator] is not ICollection collection) {
                     result = base[dataMediator];
                 } else {
-                    result = new CollectionAccessor(collection)["0"];
+                    result = new CollectionAccessor(collection)["0"]; // FIXME return whole collection instead just first element. this is used for reading default value so print whole collection
                 }
                 return result;
             }
