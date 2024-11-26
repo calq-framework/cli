@@ -22,7 +22,7 @@ namespace CalqFramework.Cli.DataAccess.DataMemberAccess {
 
             result += "[CORE COMMANDS]\n";
             foreach (var command in coreCommands) {
-                result += $"{DataMediatorToString(command)}\n";
+                result += $"{ToStringHelper.MemberInfoToString(command)}\n";
             }
 
             result += "\n";
@@ -30,7 +30,7 @@ namespace CalqFramework.Cli.DataAccess.DataMemberAccess {
             foreach (var option in options) {
                 var type = GetDataType(option);
                 var defaultValue = this[option];
-                result += $"{DataMediatorToString(option)} # {ToStringHelper.GetTypeName(type)} ({defaultValue})\n";
+                result += $"{ToStringHelper.MemberInfoToString(option)} # {ToStringHelper.GetTypeName(type)} ({defaultValue})\n";
             }
 
             //Console.WriteLine();
