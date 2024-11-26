@@ -28,7 +28,6 @@ namespace CalqFramework.Cli.Serialization {
             using var argsEnumerator = args.GetEnumerator();
             var accessor = new CliDataMemberAccessorFactory(options.DataMemberAccessorOptions).CreateDataMemberAccessor(obj);
             var reader = new OptionsReader(argsEnumerator, accessor);
-            var x = accessor.ToString();
 
             foreach (var (option, value, optionAttr) in reader.Read())
             {
