@@ -1,6 +1,6 @@
-﻿using CalqFramework.Serialization.DataAccess;
+﻿using CalqFramework.Cli.Serialization;
+using CalqFramework.Serialization.DataAccess;
 using CalqFramework.Serialization.DataAccess.DataMemberAccess;
-using System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess.DataMemberAccess {
     sealed internal class CliDataMemberAccessorFactory : DataMemberAccessorFactoryBase<string, object?>
@@ -17,16 +17,20 @@ namespace CalqFramework.Cli.DataAccess.DataMemberAccess {
         {
         }
 
-        protected override IDataAccessor<string, object?, MemberInfo> CreateFieldAndPropertyAccessor(object obj) {
-            return new CliDualDataAccessor(CreateFieldAccessor(obj), CreatePropertyAccessor(obj));
+        public ICliDataMemberAccessor CreateCliAccessor(object obj) {
+            return (CreateDataMemberAccessor(obj) as ICliDataMemberAccessor)!;
         }
 
-        protected override IDataAccessor<string, object?, MemberInfo> CreateFieldAccessor(object obj) {
-            return new CliFieldAccessor(obj, DataMemberAccessorOptions.BindingAttr);
+        protected override ICliDataMemberAccessor CreateFieldAndPropertyAccessor(object obj) {
+            return new CliDualDataAccessor(CreateFieldAccessor(obj), CreatePropertyAccessor(obj), new CliDataMemberSerializerFactory(DataMemberAccessorOptions.BindingAttr));
         }
 
-        protected override IDataAccessor<string, object?, MemberInfo> CreatePropertyAccessor(object obj) {
-            return new CliPropertyAccessor(obj, DataMemberAccessorOptions.BindingAttr);
+        protected override ICliDataMemberAccessor CreateFieldAccessor(object obj) {
+            return new CliFieldAccessor(obj, DataMemberAccessorOptions.BindingAttr, new CliDataMemberSerializerFactory(DataMemberAccessorOptions.BindingAttr));
+        }
+
+        protected override ICliDataMemberAccessor CreatePropertyAccessor(object obj) {
+            return new CliPropertyAccessor(obj, DataMemberAccessorOptions.BindingAttr, new CliDataMemberSerializerFactory(DataMemberAccessorOptions.BindingAttr));
         }
     }
 }

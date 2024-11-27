@@ -1,15 +1,15 @@
 ﻿using CalqFramework.Cli.Attributes;
-using CalqFramework.Cli.Serialization.Parsing;
-using CalqFramework.Extensions.System.Reflection;
 using CalqFramework.Serialization.DataAccess.DataMemberAccess;
-using System.Linq;
 using System.Reflection;
 using CalqFramework.Serialization.DataAccess;
 using System.Collections;
+using CalqFramework.Cli.Serialization;
 
 namespace CalqFramework.Cli.DataAccess.DataMemberAccess {
     // TODO unify with FieldAccessor
-    internal class CliPropertyAccessor : PropertyAccessorBase<string> {
+    internal class CliPropertyAccessor : PropertyAccessorBase<string>, ICliDataMemberAccessor {
+        public ICliDataMemberSerializer CliSerializer { get; }
+
         public override object? this[MemberInfo dataMediator] {
             get {
                 object? result = null;
@@ -29,7 +29,8 @@ namespace CalqFramework.Cli.DataAccess.DataMemberAccess {
             }
         }
 
-        public CliPropertyAccessor(object obj, BindingFlags bindingAttr) : base(obj, bindingAttr) {
+        public CliPropertyAccessor(object obj, BindingFlags bindingAttr, ICliDataMemberSerializerFactory cliSerializerFactory) : base(obj, bindingAttr) {
+            CliSerializer = cliSerializerFactory.CreateCliSerializer(() => DataMediators, (x) => GetDataType(x), (x) => this[x]);
         }
 
         // FIXME do not assign the first occurances - check for duplicates. if duplicate found then then return null
@@ -68,39 +69,6 @@ namespace CalqFramework.Cli.DataAccess.DataMemberAccess {
             }
 
             return dataMember;
-        }
-
-        public override string ToString() {
-            var result = "";
-
-            var members = DataMediators.ToList();
-            var options = members.Where(x => {
-                return ValueParser.IsParseable(GetDataType(x));
-            });
-            var coreCommands = members.Where(x => {
-                return !ValueParser.IsParseable(GetDataType(x));
-            });
-
-            result += "[CORE COMMANDS]\n";
-            foreach (var command in coreCommands) {
-                result += $"{ToStringHelper.MemberInfoToString(command)}\n";
-            }
-
-            result += "\n";
-            result += "[OPTIONS]\n";
-            foreach (var option in options) {
-                var type = GetDataType(option);
-                var defaultValue = this[option];
-                result += $"{ToStringHelper.MemberInfoToString(option)} # {ToStringHelper.GetTypeName(type)} ({defaultValue})\n";
-            }
-
-            //Console.WriteLine();
-            //Console.WriteLine("[ACTION COMMANDS]");
-            //foreach (var methodInfo in methodResolver.Methods) {
-            //    Console.WriteLine(methodResolver.MethodToString(methodInfo));
-            //}
-
-            return result;
         }
     }
 }
