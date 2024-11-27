@@ -19,11 +19,10 @@ namespace CalqFramework.Cli {
         }
 
         // TODO separate data and printing
-        private static void HandleInstanceHelp(IDataAccessor<string, object?, MemberInfo?> accessor, MethodResolver methodResolver, CliDeserializerOptions options)
+        private static void HandleInstanceHelp(ICliDataMemberAccessor accessor, MethodResolver methodResolver, CliDeserializerOptions options)
         {
-            Console.WriteLine(accessor);
+            Console.WriteLine(accessor.CliSerializer.GetHelpString());
 
-            Console.WriteLine();
             Console.WriteLine("[ACTION COMMANDS]");
             foreach (var methodInfo in methodResolver.Methods) {
                 Console.WriteLine(methodResolver.MethodToString(methodInfo));
@@ -111,12 +110,12 @@ namespace CalqFramework.Cli {
 
             var targetObj = obj;
             var dataMemberAccessorFactory = new CliDataMemberAccessorFactory(options.DataMemberAccessorOptions);
-            IDataAccessor<string, object?, MemberInfo> dataMemberAccessor;
+            ICliDataMemberAccessor dataMemberAccessor;
 
             // explore object tree until optionOrAction definitely cannot be an action (object not found by name)
             do {
                 optionOrAction = en.Current;
-                dataMemberAccessor = dataMemberAccessorFactory.CreateDataMemberAccessor(targetObj);
+                dataMemberAccessor = dataMemberAccessorFactory.CreateCliAccessor(targetObj);
                 if (dataMemberAccessor.ContainsKey(optionOrAction)) {
                     var type = dataMemberAccessor.GetDataType(optionOrAction);
                     if (ValueParser.IsParseable(type)) {
