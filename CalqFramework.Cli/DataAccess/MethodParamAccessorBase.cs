@@ -9,16 +9,16 @@ using System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess {
     // TODO abstract
-    public class MethodParamAccessorBase : IDataAccessor<string, object?, ParameterInfo> {
+    public class MethodParamStoreBase : IKeyValueStore<string, object?, ParameterInfo> {
         protected ParameterInfo[] Parameters { get; }
         protected object?[] ParamValues { get; }
         protected HashSet<ParameterInfo> AssignedParameters { get; }
         protected MethodInfo Method { get; }
         protected BindingFlags BindingAttr { get; }
 
-        public IEnumerable<ParameterInfo> DataMediators => Parameters;
+        public IEnumerable<ParameterInfo> Accessors => Parameters;
 
-        public object? this[ParameterInfo dataMediator] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public object? this[ParameterInfo accessor] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public object? this[string key] {
             get {
@@ -37,14 +37,14 @@ namespace CalqFramework.Cli.DataAccess {
                     }
                 } else {
                     var collectionObj = (GetValueOrInitialize(key) as ICollection)!;
-                    new CollectionAccessor(collectionObj).AddValue(value);
+                    new CollectionStore(collectionObj).AddValue(value);
                     TryGetParamIndex(key, out var index);
                     AssignedParameters.Add(Parameters[index]);
                 }
             }
         }
 
-        public MethodParamAccessorBase(MethodInfo method, BindingFlags bindingAttr) {
+        public MethodParamStoreBase(MethodInfo method, BindingFlags bindingAttr) {
             Method = method;
             BindingAttr = bindingAttr;
             Parameters = Method.GetParameters();
@@ -143,14 +143,14 @@ namespace CalqFramework.Cli.DataAccess {
                 return false;
             } else {
                 var collectionObj = (GetValueOrInitialize(key) as ICollection)!;
-                new CollectionAccessor(collectionObj).AddValue(value);
+                new CollectionStore(collectionObj).AddValue(value);
                 TryGetParamIndex(key, out var index);
                 AssignedParameters.Add(Parameters[index]);
                 return true;
             }
         }
 
-        public bool TryGetDataMediator(string key, [MaybeNullWhen(false)] out ParameterInfo result) {
+        public bool TryGetAccessor(string key, [MaybeNullWhen(false)] out ParameterInfo result) {
             var found = TryGetParamIndex(key, out int index);
             if (found) {
                 result = Parameters[index];
@@ -160,23 +160,23 @@ namespace CalqFramework.Cli.DataAccess {
             return found;
         }
 
-        public ParameterInfo GetDataMediator(string key) {
+        public ParameterInfo GetAccessor(string key) {
             throw new NotImplementedException();
         }
 
-        public bool ContainsDataMediator(ParameterInfo key) {
+        public bool ContainsAccessor(ParameterInfo key) {
             throw new NotImplementedException();
         }
 
-        public string DataMediatorToString(ParameterInfo dataMediator) {
-            return dataMediator.Name;
+        public string AccessorToString(ParameterInfo accessor) {
+            return accessor.Name;
         }
 
-        public Type GetDataType(ParameterInfo dataMediator) {
+        public Type GetDataType(ParameterInfo accessor) {
             throw new NotImplementedException();
         }
 
-        public object? GetValueOrInitialize(ParameterInfo dataMediator) {
+        public object? GetValueOrInitialize(ParameterInfo accessor) {
             throw new NotImplementedException();
         }
     }
