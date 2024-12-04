@@ -4,11 +4,11 @@ using System.Linq;
 using System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess {
-    internal class CliMethodParamAccessor : MethodParamAccessorBase {
-        public CliMethodParamAccessor(MethodInfo method, BindingFlags bindingAttr) : base(method, bindingAttr) {
+    internal class CliMethodParamStore : MethodParamStoreBase {
+        public CliMethodParamStore(MethodInfo method, BindingFlags bindingAttr) : base(method, bindingAttr) {
         }
 
-        public override string ToString() {
+        public string ToString() {
             var result = "";
 
             result += "[POSITIONAL PARAMETERS]\n";
@@ -17,7 +17,7 @@ namespace CalqFramework.Cli.DataAccess {
             }
 
             // TODO DRY with HandleInstanceHelp
-            var members = DataMediators.ToList();
+            var members = Accessors.ToList();
             var coreCommandOptions = members.Where(x => {
                 return ValueParser.IsParseable(GetDataType(x));
             });

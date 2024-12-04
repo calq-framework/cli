@@ -1,4 +1,4 @@
-﻿using CalqFramework.Serialization.DataAccess.DataMemberAccess;
+﻿using CalqFramework.Serialization.DataAccess.ClassMember;
 using System.Reflection;
 
 namespace CalqFramework.Cli.Serialization {
@@ -6,20 +6,20 @@ namespace CalqFramework.Cli.Serialization {
     {
         private BindingFlags? _methodBindingAttr = null;
 
-        public DataMemberAccessorOptions DataMemberAccessorOptions { get; init; }
+        public ClassDataMemberStoreFactoryOptions ClassDataMemberStoreFactoryOptions { get; init; }
         public bool SkipUnknown { get; init; } = false;
         public BindingFlags MethodBindingAttr
         {
-            get => _methodBindingAttr == null ? DataMemberAccessorOptions.BindingAttr : (BindingFlags)_methodBindingAttr;
+            get => _methodBindingAttr == null ? ClassDataMemberStoreFactoryOptions.BindingAttr : (BindingFlags)_methodBindingAttr;
             init => _methodBindingAttr = value;
         }
         public bool UseRevisionVersion { get; init; } = true;
 
         public CliDeserializerOptions()
         {
-            DataMemberAccessorOptions = new DataMemberAccessorOptions {
+            ClassDataMemberStoreFactoryOptions = new ClassDataMemberStoreFactoryOptions {
                 AccessFields = true,
-                BindingAttr = DataMemberAccessorOptions.DefaultLookup | BindingFlags.IgnoreCase
+                BindingAttr = ClassDataMemberStoreFactoryOptions.DefaultLookup | BindingFlags.IgnoreCase
             };
         }
     }

@@ -1,36 +1,36 @@
 ﻿using CalqFramework.Cli.Attributes;
-using CalqFramework.Serialization.DataAccess.DataMemberAccess;
+using CalqFramework.Serialization.DataAccess.ClassMember;
 using System.Reflection;
 using CalqFramework.Serialization.DataAccess;
 using System.Collections;
 using CalqFramework.Cli.Serialization;
 
 namespace CalqFramework.Cli.DataAccess.DataMemberAccess {
-    // TODO unify with FieldAccessor
-    internal class CliPropertyAccessor : PropertyAccessorBase<string>, ICliDataMemberAccessor {
+    // TODO unify with FieldStore
+    internal class CliPropertyStore : PropertyStoreBase<string>, ICliDataMemberStore {
         public ICliDataMemberSerializer CliSerializer { get; }
 
-        public override object? this[MemberInfo dataMediator] {
+        public override object? this[MemberInfo accessor] {
             get {
                 object? result = null;
-                if (base[dataMediator] is not ICollection collection) {
-                    result = base[dataMediator];
+                if (base[accessor] is not ICollection collection) {
+                    result = base[accessor];
                 } else {
-                    result = new CollectionAccessor(collection)["0"]; // FIXME return whole collection instead just first element. this is used for reading default value so print whole collection
+                    result = new CollectionStore(collection)["0"]; // FIXME return whole collection instead just first element. this is used for reading default value so print whole collection
                 }
                 return result;
             }
             set {
-                if (base[dataMediator] is not ICollection collection) {
-                    base[dataMediator] = value;
+                if (base[accessor] is not ICollection collection) {
+                    base[accessor] = value;
                 } else {
-                    new CollectionAccessor(collection).AddValue(value);
+                    new CollectionStore(collection).AddValue(value);
                 }
             }
         }
 
-        public CliPropertyAccessor(object obj, BindingFlags bindingAttr, ICliDataMemberSerializerFactory cliSerializerFactory) : base(obj, bindingAttr) {
-            CliSerializer = cliSerializerFactory.CreateCliSerializer(() => DataMediators, (x) => GetDataType(x), (x) => this[x]);
+        public CliPropertyStore(object obj, BindingFlags bindingAttr, ICliDataMemberSerializerFactory cliSerializerFactory) : base(obj, bindingAttr) {
+            CliSerializer = cliSerializerFactory.CreateCliSerializer(() => Accessors, (x) => GetDataType(x), (x) => this[x]);
         }
 
         // FIXME do not assign the first occurances - check for duplicates. if duplicate found then then return null
@@ -69,6 +69,10 @@ namespace CalqFramework.Cli.DataAccess.DataMemberAccess {
             }
 
             return dataMember;
+        }
+
+        public override bool ContainsAccessor(MemberInfo accessor) {
+            return accessor is PropertyInfo && accessor.DeclaringType == ParentType;
         }
     }
 }

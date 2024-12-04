@@ -1,6 +1,6 @@
 using CalqFramework.Cli;
 using CalqFramework.Cli.Serialization;
-using CalqFramework.Serialization.DataAccess.DataMemberAccess;
+using CalqFramework.Serialization.DataAccess.ClassMember;
 using System;
 using System.Collections.Generic;
 using Xunit;
@@ -122,7 +122,7 @@ namespace CalqFramework.CliTest
                 var tool = new SomeClassLibrary();
                 CommandLineInterface.Execute(tool,
                     new CliDeserializerOptions {
-                        DataMemberAccessorOptions = new DataMemberAccessorOptions { BindingAttr = DataMemberAccessorOptions.DefaultLookup }
+                        DataMemberStoreFactoryOptions = new DataMemberStoreFactoryOptions { BindingAttr = DataMemberStoreFactoryOptions.DefaultLookup }
                     },
                     new[] { $"{nameof(SomeClassLibrary.Method).ToLower()}" }
                 );

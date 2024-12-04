@@ -3,11 +3,11 @@ using CalqFramework.Serialization.DataAccess;
 using System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess.DataMemberAccess {
-    internal class CliDualDataAccessor : DualDataAccessor<string, object?, MemberInfo>, ICliDataMemberAccessor {
+    internal class CliDualKeyValueStore : DualDataAccessor<string, object?, MemberInfo>, ICliDataMemberStore {
         public ICliDataMemberSerializer CliSerializer { get; }
 
-        public CliDualDataAccessor(IDataAccessor<string, object?, MemberInfo> primaryAccessor, IDataAccessor<string, object?, MemberInfo> secondaryAccessor, ICliDataMemberSerializerFactory cliSerializerFactory) : base(primaryAccessor, secondaryAccessor) {
-            CliSerializer = cliSerializerFactory.CreateCliSerializer(() => DataMediators, (x) => GetDataType(x), (x) => this[x]);
+        public CliDualKeyValueStore(IKeyValueStore<string, object?, MemberInfo> primaryStore, IKeyValueStore<string, object?, MemberInfo> secondaryStore, ICliDataMemberSerializerFactory cliSerializerFactory) : base(primaryStore, secondaryStore) {
+            CliSerializer = cliSerializerFactory.CreateCliSerializer(() => Accessors, (x) => GetDataType(x), (x) => this[x]);
         }
     }
 }

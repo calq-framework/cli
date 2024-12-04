@@ -1,23 +1,23 @@
 ﻿using CalqFramework.Serialization.DataAccess;
 
 namespace CalqFramework.Cli.DataAccess {
-    internal class DataMemberAndMethodParamAccessor : DualDataAccessor<string,  object?> {
-        public ICliDataMemberAccessor DataMemberAccessor { get; }
-        public CliMethodParamAccessor MethodParamsAccessor { get; }
+    internal class DataMemberAndMethodParamStore : DualKeyValueStore<string,  object?> {
+        public ICliDataMemberStore DataMemberStore { get; }
+        public CliMethodParamStore MethodParamsStore { get; }
         public object ParentObj { get; }
 
-        //        public ParameterInfo[] Parameters { get => MethodParamsAccessor.Parameters; }
+        //        public ParameterInfo[] Parameters { get => MethodParamsStore.Parameters; }
 
-        public DataMemberAndMethodParamAccessor(ICliDataMemberAccessor dataMemberAccessor, CliMethodParamAccessor methodParamsAccessor, object parentObj) : base(dataMemberAccessor, methodParamsAccessor)
+        public DataMemberAndMethodParamStore(ICliDataMemberStore dataMemberStore, CliMethodParamStore methodParamsStore, object parentObj) : base(dataMemberStore, methodParamsStore)
         {
-            DataMemberAccessor = dataMemberAccessor;
-            MethodParamsAccessor = methodParamsAccessor;
+            DataMemberStore = dataMemberStore;
+            MethodParamsStore = methodParamsStore;
             ParentObj = parentObj;
         }
 
         public object? Invoke()
         {
-            return MethodParamsAccessor.Invoke(ParentObj);
+            return MethodParamsStore.Invoke(ParentObj);
         }
     }
 }
