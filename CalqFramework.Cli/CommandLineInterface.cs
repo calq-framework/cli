@@ -1,5 +1,5 @@
 ﻿using CalqFramework.Cli.DataAccess;
-using CalqFramework.Cli.DataAccess.DataMemberAccess;
+using CalqFramework.Cli.DataAccess.ClassMember;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -13,15 +13,15 @@ namespace CalqFramework.Cli {
     public class CommandLineInterface
     {
         // TODO separate data and printing
-        private static void HandleMethodHelp(DataMemberAndMethodParamStore Store, CliDeserializerOptions options)
+        private static void HandleMethodHelp(ClassDataMemberAndMethodParamStore store, CliDeserializerOptions options)
         {
             
         }
 
         // TODO separate data and printing
-        private static void HandleInstanceHelp(ICliDataMemberStore Store, MethodResolver methodResolver, CliDeserializerOptions options)
+        private static void HandleInstanceHelp(ICliKeyValueStore store, MethodResolver methodResolver, CliDeserializerOptions options)
         {
-            Console.WriteLine(Store.CliSerializer.GetHelpString());
+            Console.WriteLine(store.CliSerializer.GetHelpString());
 
             Console.WriteLine("[ACTION COMMANDS]");
             foreach (var methodInfo in methodResolver.Methods) {
@@ -29,16 +29,16 @@ namespace CalqFramework.Cli {
             }
         }
 
-        private static bool TryReadOptions(IEnumerator<string> args, DataMemberAndMethodParamStore Store, CliDeserializerOptions options)
+        private static bool TryReadOptions(IEnumerator<string> args, ClassDataMemberAndMethodParamStore store, CliDeserializerOptions options)
         {
-            var optionsReader = new OptionsReader(args, Store);
+            var optionsReader = new OptionsReader(args, store);
 
             var parameterIndex = 0;
             void SetPositionalParameter(string option)
             {
-                var parameterName = Store.MethodParamsStore.GetKey(parameterIndex);
-                var parameterType = Store.MethodParamsStore.GetType(parameterIndex);
-                Store.MethodParamsStore.SetValue(parameterIndex, ValueParser.ParseValue(option, parameterType, parameterName));
+                var parameterName = store.MethodParamsStore.GetKey(parameterIndex);
+                var parameterType = store.MethodParamsStore.GetType(parameterIndex);
+                store.MethodParamsStore.SetValue(parameterIndex, ValueParser.ParseValue(option, parameterType, parameterName));
                 ++parameterIndex;
             }
 
@@ -48,7 +48,7 @@ namespace CalqFramework.Cli {
                 {
                     if ((option == "help" || option == "h") && !optionAttr.HasFlag(OptionFlags.NotAnOption))
                     {
-                        HandleMethodHelp(Store, options);
+                        HandleMethodHelp(store, options);
                         return false;
                     }
 
@@ -66,9 +66,9 @@ namespace CalqFramework.Cli {
                     }
                     else
                     {
-                        var type = Store.GetDataType(option);
+                        var type = store.GetDataType(option);
                         var valueObj = ValueParser.ParseValue(value, type, option);
-                        Store[option] = valueObj;
+                        store[option] = valueObj;
                     }
                 }
                 while (args.MoveNext()) {
@@ -110,7 +110,7 @@ namespace CalqFramework.Cli {
 
             var targetObj = obj;
             var classDataMemberStoreFactory = new CliClassDataMemberStoreFactory(options.ClassDataMemberStoreFactoryOptions);
-            ICliDataMemberStore dataMemberStore;
+            ICliKeyValueStore dataMemberStore;
 
             // explore object tree until optionOrAction definitely cannot be an action (object not found by name)
             do {
@@ -140,10 +140,10 @@ namespace CalqFramework.Cli {
 
             var method = methodResolver.GetMethod(optionOrAction);
             var methodParamsStore = new CliMethodParamStore(method, options.MethodBindingAttr);
-            var Store = new DataMemberAndMethodParamStore(dataMemberStore, methodParamsStore, targetObj);
-            if (TryReadOptions(en, Store, options))
+            var store = new ClassDataMemberAndMethodParamStore(dataMemberStore, methodParamsStore, targetObj);
+            if (TryReadOptions(en, store, options))
             {
-                return Store.Invoke();
+                return store.Invoke();
             }
             else
             {

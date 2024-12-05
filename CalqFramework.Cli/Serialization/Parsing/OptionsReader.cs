@@ -7,30 +7,30 @@ namespace CalqFramework.Cli.Serialization.Parsing
 {
     internal class OptionsReader : OptionsReaderBase
     {
-        private IKeyValueStore<string, object?> DataStore { get; }
+        private IKeyValueStore<string, object?> Store { get; }
 
         public OptionsReader(IEnumerator<string> argsEnumerator, IKeyValueStore<string, object?> dataStore) : base(argsEnumerator)
         {
-            DataStore = dataStore;
+            Store = dataStore;
         }
 
         protected override bool HasOption(char option)
         {
-            return DataStore.ContainsKey(option.ToString());
+            return Store.ContainsKey(option.ToString());
         }
 
         protected override bool HasOption(string option)
         {
-            return DataStore.ContainsKey(option);
+            return Store.ContainsKey(option);
         }
 
         protected override Type GetOptionType(char option) {
-            return DataStore.GetDataType(option.ToString());
+            return Store.GetDataType(option.ToString());
         }
 
         protected override Type GetOptionType(string option)
         {
-            return DataStore.GetDataType(option);
+            return Store.GetDataType(option);
         }
     }
 }

@@ -1,9 +1,9 @@
-﻿using CalqFramework.Cli.Serialization;
-using System;
+﻿using System;
 using System.Collections;
-using System.Linq;
 
 namespace CalqFramework.Cli.Serialization.Parsing;
+
+// TODO convert to a regular class
 public static class ValueParser
 {
     public static bool IsParseable(Type type)

@@ -1,12 +1,10 @@
 using CalqFramework.Cli;
-using CalqFramework.Cli.Serialization;
 using CalqFramework.Serialization.DataAccess.ClassMember;
 using System;
 using System.Collections.Generic;
 using Xunit;
 
-namespace CalqFramework.CliTest
-{
+namespace CalqFramework.CliTest {
     public class CommandLineInterfaceTest {
         [Fact]
         public void Execute_Should_SetTextProperty_When_TextOptionProvided() {
@@ -122,7 +120,7 @@ namespace CalqFramework.CliTest
                 var tool = new SomeClassLibrary();
                 CommandLineInterface.Execute(tool,
                     new CliDeserializerOptions {
-                        DataMemberStoreFactoryOptions = new DataMemberStoreFactoryOptions { BindingAttr = DataMemberStoreFactoryOptions.DefaultLookup }
+                        ClassDataMemberStoreFactoryOptions = new ClassDataMemberStoreFactoryOptions { BindingAttr = ClassDataMemberStoreFactoryOptions.DefaultLookup }
                     },
                     new[] { $"{nameof(SomeClassLibrary.Method).ToLower()}" }
                 );
