@@ -37,8 +37,8 @@
       },
       "CalqFramework.Serialization": {
         "type": "Transitive",
-        "resolved": "0.28.1",
-        "contentHash": "0ZBtmmm9+428sDjC8eWnesaasUdMq2LRk0BDNLbFBw4CvU2OHNgM4PXqGdv0dnzoZzdPV+IDBw6w6ojkK/R0ag==",
+        "resolved": "0.29.0",
+        "contentHash": "YsDS0JsQInsxXQeU6OkNWyVEvVNF3nboGAJUu3WC+Nxf2OC/p3ONn2LXoFJ9C8fz1BHtO8XN/hJDOsFxihpAWQ==",
         "dependencies": {
           "Newtonsoft.Json": "13.0.3"
         }
