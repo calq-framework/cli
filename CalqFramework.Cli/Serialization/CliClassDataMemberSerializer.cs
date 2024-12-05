@@ -7,13 +7,13 @@ using System.Linq;
 using System.Reflection;
 
 namespace CalqFramework.Cli.Serialization {
-    internal class CliDataMemberSerializer : ICliDataMemberSerializer {
+    internal class CliClassDataMemberSerializer : ICliClassDataMemberSerializer {
         private BindingFlags BindingAttr { get; set; }
         private Func<IEnumerable<MemberInfo>> GetMembers;
         private Func<MemberInfo, Type> GetDataType;
         private Func<MemberInfo, object?> GetDataValue;
 
-        public CliDataMemberSerializer(BindingFlags bindingAttr, Func<IEnumerable<MemberInfo>> getMembers, Func<MemberInfo, Type> getDataType, Func<MemberInfo, object?> getDataValue) {
+        public CliClassDataMemberSerializer(BindingFlags bindingAttr, Func<IEnumerable<MemberInfo>> getMembers, Func<MemberInfo, Type> getDataType, Func<MemberInfo, object?> getDataValue) {
             BindingAttr = bindingAttr;
             GetMembers = getMembers;
             GetDataType = getDataType;

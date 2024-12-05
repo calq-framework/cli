@@ -1,5 +1,5 @@
 ﻿namespace CalqFramework.Cli.Serialization {
-    public interface ICliDataMemberSerializer {
+    public interface ICliClassDataMemberSerializer {
         string GetHelpString();
     }
 }

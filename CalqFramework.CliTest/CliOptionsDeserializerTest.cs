@@ -1,10 +1,8 @@
 using CalqFramework.Cli;
-using CalqFramework.Cli.Serialization;
 using System;
 using Xunit;
 
-namespace CalqFramework.CliTest
-{
+namespace CalqFramework.CliTest {
     public class CliOptionsDeserializerTest {
         [Fact]
         public void Should_SetBooleanProperty_When_LongOptionProvided() {
