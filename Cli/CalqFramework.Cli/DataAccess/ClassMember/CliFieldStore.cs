@@ -1,9 +1,8 @@
 ﻿using CalqFramework.Cli.Attributes;
 using CalqFramework.Cli.Serialization;
-using CalqFramework.Serialization.DataAccess;
-using CalqFramework.Serialization.DataAccess.ClassMember;
+using CalqFramework.DataAccess;
+using CalqFramework.DataAccess.ClassMember;
 using System.Collections;
-using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess.ClassMember {

@@ -1,4 +1,4 @@
-﻿using CalqFramework.Serialization.DataAccess.ClassMember;
+﻿using CalqFramework.DataAccess.ClassMember;
 using System.Reflection;
 
 namespace CalqFramework.Cli {

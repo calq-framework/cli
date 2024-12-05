@@ -1,4 +1,4 @@
-﻿using CalqFramework.Serialization.DataAccess;
+﻿using CalqFramework.DataAccess;
 
 namespace CalqFramework.Cli.DataAccess {
     internal class ClassDataMemberAndMethodParamStore : DualKeyValueStore<string,  object?> {

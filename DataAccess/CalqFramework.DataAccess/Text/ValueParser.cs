@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.Serialization.Text;
+﻿namespace CalqFramework.DataAccess.Text;
 public static class ValueParser
 {
     public static bool IsParseable(Type type)

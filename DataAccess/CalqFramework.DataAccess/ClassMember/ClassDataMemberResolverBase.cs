@@ -1,7 +1,8 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using CalqFramework.DataAccess;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
-namespace CalqFramework.Serialization.DataAccess.ClassMember {
+namespace CalqFramework.DataAccess.ClassMember {
     public abstract class ClassDataMemberResolverBase<TKey, TValue> : IKeyAccessorResolver<TKey, MemberInfo> {
         protected object ParentObject { get; }
         protected Type ParentType { get; }

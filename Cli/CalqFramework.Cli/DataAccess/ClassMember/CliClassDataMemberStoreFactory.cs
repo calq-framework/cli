@@ -1,6 +1,6 @@
 ﻿using CalqFramework.Cli.Serialization;
-using CalqFramework.Serialization.DataAccess;
-using CalqFramework.Serialization.DataAccess.ClassMember;
+using CalqFramework.DataAccess.ClassMember;
+using CalqFramework.DataAccess;
 
 namespace CalqFramework.Cli.DataAccess.ClassMember {
     sealed internal class CliClassDataMemberStoreFactory : ClassDataMemberStoreFactoryBase<string, object?>

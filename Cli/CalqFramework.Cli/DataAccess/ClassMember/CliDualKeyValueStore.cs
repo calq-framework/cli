@@ -1,5 +1,5 @@
 ﻿using CalqFramework.Cli.Serialization;
-using CalqFramework.Serialization.DataAccess;
+using CalqFramework.DataAccess;
 using System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess.ClassMember {

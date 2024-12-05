@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace CalqFramework.Serialization.DataAccess.ClassMember {
+namespace CalqFramework.DataAccess.ClassMember {
     sealed public class PropertyStoreNoValidation : PropertyStoreBase<string> {
         public PropertyStoreNoValidation(object obj, BindingFlags bindingAttr) : base(obj, bindingAttr) {
         }

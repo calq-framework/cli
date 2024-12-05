@@ -1,10 +1,9 @@
-﻿using CalqFramework.Serialization.DataAccess;
+﻿using CalqFramework.DataAccess;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace CalqFramework.Cli.Serialization.Parsing
-{
+namespace CalqFramework.Cli.Serialization.Parsing {
     internal class OptionsReader : OptionsReaderBase
     {
         private IKeyValueStore<string, object?> Store { get; }

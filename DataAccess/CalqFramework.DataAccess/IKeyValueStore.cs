@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.Serialization.DataAccess {
+﻿namespace CalqFramework.DataAccess {
 
     public interface IKeyValueStore<TKey, TValue> {
         public TValue this[TKey key] { get; set; }
