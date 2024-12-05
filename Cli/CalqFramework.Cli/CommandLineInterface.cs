@@ -5,9 +5,8 @@ using System.Linq;
 using System.Reflection;
 using CalqFramework.Cli.Serialization.Parsing;
 using static CalqFramework.Cli.Serialization.Parsing.OptionsReaderBase;
-using CalqFramework.Cli.Serialization;
 using System.Collections.Generic;
-using CalqFramework.Serialization.DataAccess;
+using CalqFramework.DataAccess;
 
 namespace CalqFramework.Cli {
     public class CommandLineInterface
@@ -76,7 +75,7 @@ namespace CalqFramework.Cli {
                 }
             }
             catch (Exception ex)
-            { // TODO rename the exception in CalqFramework.Serialization
+            { // TODO rename the exception in CalqFramework.DataAccess
                 if (ex.Message == "collision")
                 {
                     throw new CliException(ex.Message, ex);

@@ -1,6 +1,7 @@
-﻿using System.Reflection;
+﻿using CalqFramework.DataAccess;
+using System.Reflection;
 
-namespace CalqFramework.Serialization.DataAccess.ClassMember {
+namespace CalqFramework.DataAccess.ClassMember {
     public abstract class PropertyStoreBase<TKey> : ClassDataMemberResolverBase<TKey, object?>, IKeyValueStore<TKey, object?, MemberInfo> {
         public IEnumerable<MemberInfo> Accessors => ParentType.GetProperties();
 

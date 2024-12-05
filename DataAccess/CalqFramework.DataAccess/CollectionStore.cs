@@ -1,11 +1,10 @@
 ﻿using System.Collections;
-using CalqFramework.Serialization.Text;
+using CalqFramework.DataAccess.Text;
 
-namespace CalqFramework.Serialization.DataAccess;
+namespace CalqFramework.DataAccess;
 
 // TODO consider CollectionStoreFactory and accessor per collection type
-public class CollectionStore : IKeyValueStore<string, object?>
-{
+public class CollectionStore : IKeyValueStore<string, object?> {
     protected object ParentCollection { get; }
 
     public object? this[string key] {
@@ -20,7 +19,8 @@ public class CollectionStore : IKeyValueStore<string, object?>
                 _ => throw new Exception("unsupported collection")
             };
 
-        } set {
+        }
+        set {
             switch (ParentCollection) {
                 case Array array:
                     array.SetValue(value, int.Parse(key));
@@ -36,7 +36,7 @@ public class CollectionStore : IKeyValueStore<string, object?>
             }
         }
     }
-   
+
     public CollectionStore(ICollection collection) {
         ParentCollection = collection;
     }

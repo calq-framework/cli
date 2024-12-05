@@ -8,7 +8,7 @@ public static class ValueParser
 {
     public static bool IsParseable(Type type)
     {
-        return CalqFramework.Serialization.Text.ValueParser.IsParseable(type) || type.GetInterface(nameof(ICollection)) != null;
+        return CalqFramework.DataAccess.Text.ValueParser.IsParseable(type) || type.GetInterface(nameof(ICollection)) != null;
     }
 
     internal static object ParseValue(string value, Type type, string option)
@@ -21,7 +21,7 @@ public static class ValueParser
                 type = type.GetGenericArguments()[0];
             }
 
-            var newValue = CalqFramework.Serialization.Text.ValueParser.ParseValue(value, type);
+            var newValue = CalqFramework.DataAccess.Text.ValueParser.ParseValue(value, type);
             return newValue;
         }
         catch (OverflowException ex)

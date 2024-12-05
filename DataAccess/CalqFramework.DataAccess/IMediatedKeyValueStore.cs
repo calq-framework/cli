@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.Serialization.DataAccess {
+﻿namespace CalqFramework.DataAccess {
     public interface IMediatedKeyValueStore<TAccessor, TValue> {
         protected internal TValue this[TAccessor accessor] { get; set; }
 

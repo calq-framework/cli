@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace CalqFramework.Serialization.DataAccess {
+namespace CalqFramework.DataAccess {
     public class DualKeyValueStore<TKey, TValue> : IKeyValueStore<TKey, TValue> {
         public IKeyValueStore<TKey, TValue> PrimaryAccessor { get; }
         public IKeyValueStore<TKey, TValue> SecondaryAccessor { get; }

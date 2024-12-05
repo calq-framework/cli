@@ -1,9 +1,9 @@
 ﻿using CalqFramework.Cli.Attributes;
-using CalqFramework.Serialization.DataAccess.ClassMember;
 using System.Reflection;
-using CalqFramework.Serialization.DataAccess;
 using System.Collections;
 using CalqFramework.Cli.Serialization;
+using CalqFramework.DataAccess.ClassMember;
+using CalqFramework.DataAccess;
 
 namespace CalqFramework.Cli.DataAccess.ClassMember {
     // TODO unify with FieldStore

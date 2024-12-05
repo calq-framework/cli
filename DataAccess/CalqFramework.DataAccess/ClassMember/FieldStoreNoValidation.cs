@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 
-namespace CalqFramework.Serialization.DataAccess.ClassMember
-{
+namespace CalqFramework.DataAccess.ClassMember {
     sealed public class FieldStoreNoValidation : FieldStoreBase<string> {
         public FieldStoreNoValidation(object obj, BindingFlags bindingAttr) : base(obj, bindingAttr) {
         }

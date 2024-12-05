@@ -1,9 +1,7 @@
 ﻿using System.Reflection;
 
-namespace CalqFramework.Serialization.DataAccess.ClassMember
-{
-    public class ClassDataMemberStoreFactoryOptions
-    {
+namespace CalqFramework.DataAccess.ClassMember {
+    public class ClassDataMemberStoreFactoryOptions {
 
         public const BindingFlags DefaultLookup = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public;
 
@@ -12,8 +10,7 @@ namespace CalqFramework.Serialization.DataAccess.ClassMember
 
         public BindingFlags BindingAttr { get; init; } = DefaultLookup;
 
-        public ClassDataMemberStoreFactoryOptions()
-        {
+        public ClassDataMemberStoreFactoryOptions() {
         }
     }
 }

@@ -1,5 +1,5 @@
 using CalqFramework.Cli;
-using CalqFramework.Serialization.DataAccess.ClassMember;
+using CalqFramework.DataAccess.ClassMember;
 using System;
 using System.Collections.Generic;
 using Xunit;
