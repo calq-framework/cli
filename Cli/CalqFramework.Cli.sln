@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26124.0
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35506.116 d17.12
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalqFramework.Cli", "CalqFramework.Cli\CalqFramework.Cli.csproj", "{6ECAD2FC-9223-4935-9574-1F800AA0DC33}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalqFramework.CliTest", "CalqFramework.CliTest\CalqFramework.CliTest.csproj", "{D1D4EAD4-56D4-40B5-B6E1-235CBA147352}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalqFramework.DataAccess", "..\DataAccess\CalqFramework.DataAccess\CalqFramework.DataAccess.csproj", "{33E4EF02-5920-43B6-B229-5D9C77718E9B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,9 +17,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{6ECAD2FC-9223-4935-9574-1F800AA0DC33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -44,5 +43,20 @@ Global
 		{D1D4EAD4-56D4-40B5-B6E1-235CBA147352}.Release|x64.Build.0 = Release|Any CPU
 		{D1D4EAD4-56D4-40B5-B6E1-235CBA147352}.Release|x86.ActiveCfg = Release|Any CPU
 		{D1D4EAD4-56D4-40B5-B6E1-235CBA147352}.Release|x86.Build.0 = Release|Any CPU
+		{33E4EF02-5920-43B6-B229-5D9C77718E9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{33E4EF02-5920-43B6-B229-5D9C77718E9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{33E4EF02-5920-43B6-B229-5D9C77718E9B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{33E4EF02-5920-43B6-B229-5D9C77718E9B}.Debug|x64.Build.0 = Debug|Any CPU
+		{33E4EF02-5920-43B6-B229-5D9C77718E9B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{33E4EF02-5920-43B6-B229-5D9C77718E9B}.Debug|x86.Build.0 = Debug|Any CPU
+		{33E4EF02-5920-43B6-B229-5D9C77718E9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{33E4EF02-5920-43B6-B229-5D9C77718E9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{33E4EF02-5920-43B6-B229-5D9C77718E9B}.Release|x64.ActiveCfg = Release|Any CPU
+		{33E4EF02-5920-43B6-B229-5D9C77718E9B}.Release|x64.Build.0 = Release|Any CPU
+		{33E4EF02-5920-43B6-B229-5D9C77718E9B}.Release|x86.ActiveCfg = Release|Any CPU
+		{33E4EF02-5920-43B6-B229-5D9C77718E9B}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal
