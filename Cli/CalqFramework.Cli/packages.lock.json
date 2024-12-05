@@ -2,15 +2,6 @@
   "version": 1,
   "dependencies": {
     "net7.0": {
-      "CalqFramework.Serialization": {
-        "type": "Direct",
-        "requested": "[*, )",
-        "resolved": "0.29.0",
-        "contentHash": "YsDS0JsQInsxXQeU6OkNWyVEvVNF3nboGAJUu3WC+Nxf2OC/p3ONn2LXoFJ9C8fz1BHtO8XN/hJDOsFxihpAWQ==",
-        "dependencies": {
-          "Newtonsoft.Json": "13.0.3"
-        }
-      },
       "Microsoft.SourceLink.GitHub": {
         "type": "Direct",
         "requested": "[1.1.1, )",
@@ -31,10 +22,8 @@
         "resolved": "1.1.1",
         "contentHash": "WMcGpWKrmJmzrNeuaEb23bEMnbtR/vLmvZtkAP5qWu7vQsY59GqfRJd65sFpBszbd2k/bQ8cs8eWawQKAabkVg=="
       },
-      "Newtonsoft.Json": {
-        "type": "Transitive",
-        "resolved": "13.0.3",
-        "contentHash": "HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ=="
+      "calqframework.dataaccess": {
+        "type": "Project"
       }
     }
   }

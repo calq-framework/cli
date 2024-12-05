@@ -2,7 +2,6 @@
 using CalqFramework.Cli.Serialization;
 using CalqFramework.Cli.Serialization.Parsing;
 using CalqFramework.Serialization.DataAccess.ClassMember;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
