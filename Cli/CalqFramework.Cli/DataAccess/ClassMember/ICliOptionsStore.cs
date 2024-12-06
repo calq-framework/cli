@@ -3,7 +3,7 @@ using CalqFramework.DataAccess;
 using System.Reflection;
 
 namespace CalqFramework.DataAccess {
-    public interface ICliKeyValueStore : IKeyValueStore<string, object?, MemberInfo> {
+    public interface ICliOptionsStore : IKeyValueStore<string, object?, MemberInfo> {
         public ICliClassDataMemberSerializer CliSerializer { get; }
     }
 }
