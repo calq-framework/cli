@@ -1,5 +1,4 @@
-﻿using CalqFramework.Cli.Serialization;
-using CalqFramework.DataAccess;
+﻿using CalqFramework.DataAccess;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,6 +8,7 @@ using System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess {
     // TODO abstract
+    // FIXME fix and move to DataAccess project
     public class MethodParamStoreBase : IKeyValueStore<string, object?, ParameterInfo> {
         protected ParameterInfo[] Parameters { get; }
         protected object?[] ParamValues { get; }
@@ -18,7 +18,7 @@ namespace CalqFramework.Cli.DataAccess {
 
         public IEnumerable<ParameterInfo> Accessors => Parameters;
 
-        public object? this[ParameterInfo accessor] { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public object? this[ParameterInfo accessor] { get => this[accessor.Name!]; set => this[accessor.Name!] = value; }
 
         public object? this[string key] {
             get {
@@ -173,7 +173,7 @@ namespace CalqFramework.Cli.DataAccess {
         }
 
         public Type GetDataType(ParameterInfo accessor) {
-            throw new NotImplementedException();
+            return GetDataType(accessor.Name!);
         }
 
         public object? GetValueOrInitialize(ParameterInfo accessor) {

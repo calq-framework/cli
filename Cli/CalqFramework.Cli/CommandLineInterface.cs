@@ -14,7 +14,7 @@ namespace CalqFramework.Cli {
         // TODO separate data and printing
         private static void HandleMethodHelp(ClassDataMemberAndMethodParamStore store, CliDeserializerOptions options)
         {
-            
+            Console.WriteLine(store.MethodParamsStore.GetHelpString());
         }
 
         // TODO separate data and printing
