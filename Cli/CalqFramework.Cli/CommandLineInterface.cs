@@ -12,15 +12,15 @@ namespace CalqFramework.Cli {
     public class CommandLineInterface
     {
         // TODO separate data and printing
-        private static void HandleMethodHelp(ClassDataMemberAndMethodParamStore store, CliDeserializerOptions options)
+        private static void HandleMethodHelp(CliOptionsAndActionParametersStore optionsAndParams)
         {
-            Console.WriteLine(store.MethodParamsStore.GetHelpString());
+            Console.WriteLine(optionsAndParams.ActionParameters.GetHelpString());
         }
 
         // TODO separate data and printing
-        private static void HandleInstanceHelp(ICliKeyValueStore store, MethodResolver methodResolver, CliDeserializerOptions options)
+        private static void HandleInstanceHelp(ICliOptionsStore options, MethodResolver methodResolver)
         {
-            Console.WriteLine(store.CliSerializer.GetHelpString());
+            Console.WriteLine(options.CliSerializer.GetHelpString());
 
             Console.WriteLine("[ACTION COMMANDS]");
             foreach (var methodInfo in methodResolver.Methods) {
@@ -28,16 +28,16 @@ namespace CalqFramework.Cli {
             }
         }
 
-        private static bool TryReadOptions(IEnumerator<string> args, ClassDataMemberAndMethodParamStore store, CliDeserializerOptions options)
+        private static bool TryReadOptionsAndActionParams(IEnumerator<string> args, CliOptionsAndActionParametersStore optionsAndParams, CliDeserializerOptions deserializerOptions)
         {
-            var optionsReader = new OptionsReader(args, store);
+            var optionsReader = new OptionsReader(args, optionsAndParams);
 
             var parameterIndex = 0;
             void SetPositionalParameter(string option)
             {
-                var parameterName = store.MethodParamsStore.GetKey(parameterIndex);
-                var parameterType = store.MethodParamsStore.GetType(parameterIndex);
-                store.MethodParamsStore.SetValue(parameterIndex, ValueParser.ParseValue(option, parameterType, parameterName));
+                var parameterName = optionsAndParams.ActionParameters.GetKey(parameterIndex);
+                var parameterType = optionsAndParams.ActionParameters.GetType(parameterIndex);
+                optionsAndParams.ActionParameters.SetValue(parameterIndex, ValueParser.ParseValue(option, parameterType, parameterName));
                 ++parameterIndex;
             }
 
@@ -47,13 +47,13 @@ namespace CalqFramework.Cli {
                 {
                     if ((option == "help" || option == "h") && !optionAttr.HasFlag(OptionFlags.NotAnOption))
                     {
-                        HandleMethodHelp(store, options);
+                        HandleMethodHelp(optionsAndParams);
                         return false;
                     }
 
                     if (optionAttr.HasFlag(OptionFlags.ValueUnassigned) && !optionAttr.HasFlag(OptionFlags.NotAnOption))
                     {
-                        if (options.SkipUnknown) {
+                        if (deserializerOptions.SkipUnknown) {
                             continue;
                         }
                         throw new CliException($"unknown option {option}");
@@ -65,9 +65,9 @@ namespace CalqFramework.Cli {
                     }
                     else
                     {
-                        var type = store.GetDataType(option);
+                        var type = optionsAndParams.GetDataType(option);
                         var valueObj = ValueParser.ParseValue(value, type, option);
-                        store[option] = valueObj;
+                        optionsAndParams[option] = valueObj;
                     }
                 }
                 while (args.MoveNext()) {
@@ -108,19 +108,19 @@ namespace CalqFramework.Cli {
             string optionOrAction;
 
             var targetObj = obj;
-            var classDataMemberStoreFactory = new CliClassDataMemberStoreFactory(options.ClassDataMemberStoreFactoryOptions);
-            ICliKeyValueStore dataMemberStore;
+            var classDataMemberStoreFactory = new CliOptionsStoreFactory(options.ClassDataMemberStoreFactoryOptions);
+            ICliOptionsStore cliOptions;
 
             // explore object tree until optionOrAction definitely cannot be an action (object not found by name)
             do {
                 optionOrAction = en.Current;
-                dataMemberStore = classDataMemberStoreFactory.CreateCliStore(targetObj);
-                if (dataMemberStore.ContainsKey(optionOrAction)) {
-                    var type = dataMemberStore.GetDataType(optionOrAction);
+                cliOptions = classDataMemberStoreFactory.CreateCliStore(targetObj);
+                if (cliOptions.ContainsKey(optionOrAction)) {
+                    var type = cliOptions.GetDataType(optionOrAction);
                     if (ValueParser.IsParseable(type)) {
                         break;
                     }
-                    targetObj = dataMemberStore[optionOrAction]!;
+                    targetObj = cliOptions[optionOrAction]!;
                 } else {
                     break;
                 }
@@ -129,7 +129,7 @@ namespace CalqFramework.Cli {
             var methodResolver = new MethodResolver(targetObj, options.MethodBindingAttr);
             if (optionOrAction == "--help" || optionOrAction == "-h")
             {
-                HandleInstanceHelp(dataMemberStore, methodResolver, options);
+                HandleInstanceHelp(cliOptions, methodResolver);
                 return null;
             }
             if (optionOrAction == "--version" || optionOrAction == "-v") {
@@ -137,12 +137,12 @@ namespace CalqFramework.Cli {
                 return null;
             }
 
-            var method = methodResolver.GetMethod(optionOrAction);
-            var methodParamsStore = new CliMethodParamStore(method, options.MethodBindingAttr);
-            var store = new ClassDataMemberAndMethodParamStore(dataMemberStore, methodParamsStore, targetObj);
-            if (TryReadOptions(en, store, options))
+            var cliAction = methodResolver.GetMethod(optionOrAction);
+            var actionParams = new CliActionParametersStore(cliAction, options.MethodBindingAttr);
+            var optionsAndActionParams = new CliOptionsAndActionParametersStore(cliOptions, actionParams, targetObj);
+            if (TryReadOptionsAndActionParams(en, optionsAndActionParams, options))
             {
-                return store.Invoke();
+                return optionsAndActionParams.Invoke();
             }
             else
             {

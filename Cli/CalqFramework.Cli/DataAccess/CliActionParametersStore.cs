@@ -4,8 +4,8 @@ using System.Linq;
 using System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess {
-    internal class CliMethodParamStore : MethodParamStoreBase {
-        public CliMethodParamStore(MethodInfo method, BindingFlags bindingAttr) : base(method, bindingAttr) {
+    internal class CliActionParametersStore : MethodParamStoreBase {
+        public CliActionParametersStore(MethodInfo method, BindingFlags bindingAttr) : base(method, bindingAttr) {
         }
 
         public string GetHelpString() {

@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess.ClassMember {
     // TODO unify with PropertyStore
-    internal class CliFieldStore : FieldStoreBase<string>, ICliKeyValueStore
+    internal class CliFieldStore : FieldStoreBase<string>, ICliOptionsStore
     {
         public ICliClassDataMemberSerializer CliSerializer { get; }
 

@@ -7,7 +7,7 @@ using CalqFramework.DataAccess;
 
 namespace CalqFramework.Cli.DataAccess.ClassMember {
     // TODO unify with FieldStore
-    internal class CliPropertyStore : PropertyStoreBase<string>, ICliKeyValueStore {
+    internal class CliPropertyStore : PropertyStoreBase<string>, ICliOptionsStore {
         public ICliClassDataMemberSerializer CliSerializer { get; }
 
         public override object? this[MemberInfo accessor] {

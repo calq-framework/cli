@@ -9,7 +9,7 @@ using System.Reflection;
 namespace CalqFramework.Cli.DataAccess {
     // TODO abstract
     // FIXME fix and move to DataAccess project
-    public class MethodParamStoreBase : IKeyValueStore<string, object?, ParameterInfo> {
+    internal class MethodParamStoreBase : IKeyValueStore<string, object?, ParameterInfo> {
         protected ParameterInfo[] Parameters { get; }
         protected object?[] ParamValues { get; }
         protected HashSet<ParameterInfo> AssignedParameters { get; }
