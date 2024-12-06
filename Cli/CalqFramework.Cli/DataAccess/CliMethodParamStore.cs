@@ -8,7 +8,7 @@ namespace CalqFramework.Cli.DataAccess {
         public CliMethodParamStore(MethodInfo method, BindingFlags bindingAttr) : base(method, bindingAttr) {
         }
 
-        public string ToString() {
+        public string GetHelpString() {
             var result = "";
 
             result += "[POSITIONAL PARAMETERS]\n";
