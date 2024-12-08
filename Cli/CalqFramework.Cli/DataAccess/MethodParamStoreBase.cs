@@ -13,7 +13,7 @@ namespace CalqFramework.Cli.DataAccess {
         protected ParameterInfo[] Parameters { get; }
         protected object?[] ParamValues { get; }
         protected HashSet<ParameterInfo> AssignedParameters { get; }
-        protected MethodInfo Method { get; }
+        public MethodInfo Method { get; }
         protected BindingFlags BindingAttr { get; }
 
         public IEnumerable<ParameterInfo> Accessors => Parameters;

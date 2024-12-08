@@ -30,13 +30,28 @@ namespace CalqFramework.Cli.Serialization {
             return ValueParser.IsParseable(memberInfo.GetUnderlyingType()) ? $"--{name}, -{shortName}" : $"{name}";
         }
 
-        public string GetHelpString() {
+        public string GetOptionsString() {
             var result = "";
 
             var members = GetMembers().ToList();
             var options = members.Where(x => {
                 return ValueParser.IsParseable(GetDataType(x));
             });
+;
+            result += "[OPTIONS]\n";
+            foreach (var option in options) {
+                var type = GetDataType(option);
+                var defaultValue = GetDataValue(option);
+                result += $"{MemberInfoToString(option)} # {ToStringHelper.GetTypeName(type)} ({defaultValue?.ToString()!.ToLower()})\n";
+            }
+
+            return result;
+        }
+
+        public string GetCommandsString() {
+            var result = "";
+
+            var members = GetMembers().ToList();
             var coreCommands = members.Where(x => {
                 return !ValueParser.IsParseable(GetDataType(x));
             });
@@ -45,20 +60,6 @@ namespace CalqFramework.Cli.Serialization {
             foreach (var command in coreCommands) {
                 result += $"{MemberInfoToString(command)}\n";
             }
-
-            result += "\n";
-            result += "[OPTIONS]\n";
-            foreach (var option in options) {
-                var type = GetDataType(option);
-                var defaultValue = GetDataValue(option);
-                result += $"{MemberInfoToString(option)} # {ToStringHelper.GetTypeName(type)} ({defaultValue})\n";
-            }
-
-            //Console.WriteLine();
-            //Console.WriteLine("[ACTION COMMANDS]");
-            //foreach (var methodInfo in methodResolver.Methods) {
-            //    Console.WriteLine(methodResolver.MethodToString(methodInfo));
-            //}
 
             return result;
         }

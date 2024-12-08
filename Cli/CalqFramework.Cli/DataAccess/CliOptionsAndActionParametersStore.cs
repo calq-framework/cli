@@ -1,4 +1,5 @@
-﻿using CalqFramework.DataAccess;
+﻿using CalqFramework.Cli.Serialization.Parsing;
+using CalqFramework.DataAccess;
 
 namespace CalqFramework.Cli.DataAccess {
     internal class CliOptionsAndActionParametersStore : DualKeyValueStore<string,  object?> {
@@ -18,6 +19,16 @@ namespace CalqFramework.Cli.DataAccess {
         public object? Invoke()
         {
             return ActionParameters.Invoke(ParentObj);
+        }
+
+        public string GetHelpString() {
+            var result = "";
+
+            result += ActionParameters.GetHelpString();
+            result += "\n";
+            result += Options.CliSerializer.GetOptionsString();
+
+            return result;
         }
     }
 }

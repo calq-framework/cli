@@ -45,6 +45,9 @@ public class Classlib {
         Console.WriteLine($"Verbose with VerboseMode set to: {VerboseMode}");
     }
 
+    /// <summary>
+    /// Method with optional parameters.
+    /// </summary>
     public void Stacked(bool all = false, bool be = false, bool created = false) {
         Console.WriteLine($"Stacked with options: {all}, {be}, {created}");
     }
@@ -81,6 +84,9 @@ public class DoubleNested {
 ```
 dotnet Example.dll --help
 ```
+>[DESCRIPTION]<br/>
+>Method with optional parameters.<br/>
+><br/>
 >[CORE COMMANDS]<br/>
 >nested<br/>
 ><br/>

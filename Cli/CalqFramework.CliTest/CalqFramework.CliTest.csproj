@@ -6,6 +6,7 @@
     <IsPackable>false</IsPackable>
     <RestorePackagesWithLockFile Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestorePackagesWithLockFile>
     <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
+	<GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
