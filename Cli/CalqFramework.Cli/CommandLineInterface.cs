@@ -1,5 +1,4 @@
 ﻿using CalqFramework.Cli.DataAccess;
-using CalqFramework.Cli.DataAccess.ClassMember;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -9,23 +8,27 @@ using System.Collections.Generic;
 using CalqFramework.DataAccess;
 
 namespace CalqFramework.Cli {
+    // TODO create separate class for help/version logic
     public class CommandLineInterface
     {
         // TODO separate data and printing
         private static void HandleMethodHelp(CliOptionsAndActionParametersStore optionsAndParams)
         {
-            Console.WriteLine(optionsAndParams.ActionParameters.GetHelpString());
+            Console.Write(optionsAndParams.GetHelpString());
         }
 
         // TODO separate data and printing
         private static void HandleInstanceHelp(ICliOptionsStore options, MethodResolver methodResolver)
         {
-            Console.WriteLine(options.CliSerializer.GetHelpString());
+            Console.WriteLine(options.CliSerializer.GetCommandsString());
 
             Console.WriteLine("[ACTION COMMANDS]");
             foreach (var methodInfo in methodResolver.Methods) {
                 Console.WriteLine(methodResolver.MethodToString(methodInfo));
             }
+            Console.WriteLine();
+
+            Console.Write(options.CliSerializer.GetOptionsString());
         }
 
         private static bool TryReadOptionsAndActionParams(IEnumerator<string> args, CliOptionsAndActionParametersStore optionsAndParams, CliDeserializerOptions deserializerOptions)
@@ -33,6 +36,7 @@ namespace CalqFramework.Cli {
             var optionsReader = new OptionsReader(args, optionsAndParams);
 
             var parameterIndex = 0;
+            // TODO move this logic to the store
             void SetPositionalParameter(string option)
             {
                 var parameterName = optionsAndParams.ActionParameters.GetKey(parameterIndex);

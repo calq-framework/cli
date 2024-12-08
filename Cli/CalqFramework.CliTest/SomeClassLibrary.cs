@@ -3,6 +3,10 @@
 using System.Collections.Generic;
 
 namespace CalqFramework.CliTest {
+
+    /// <summary>
+    /// Some summary.
+    /// </summary>
     class SomeClassLibrary {
 
         public class Nested {
@@ -19,6 +23,9 @@ namespace CalqFramework.CliTest {
 
         public List<bool> initializedBoolList = new List<bool>() { true, false };
 
+        /// <summary>
+        /// Does nothing.
+        /// </summary>
         public void Method() { }
 
         public void MethodWithOptionalParam(bool optional = true) { }

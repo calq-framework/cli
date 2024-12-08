@@ -1,33 +1,29 @@
 ﻿using CalqFramework.Cli.Serialization.Parsing;
-using System;
-using System.Linq;
 using System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess {
+    // TODO move this logic into serializer
     internal class CliActionParametersStore : MethodParamStoreBase {
         public CliActionParametersStore(MethodInfo method, BindingFlags bindingAttr) : base(method, bindingAttr) {
         }
 
+        public static string? GetDefaultValue(ParameterInfo parameter) => parameter.HasDefaultValue ? $"({parameter.DefaultValue?.ToString()!.ToLower()})" : "";
+
+        public static string ParameterToString(ParameterInfo parameterInfo) {
+            return parameterInfo.Name!;
+        }
+
+        // TODO inherit from interface
         public string GetHelpString() {
             var result = "";
 
+            result += "[DESCRIPTION]\n";
+            result += ToStringHelper.GetMemberSummary(Method);
+            result += "\n";
+
             result += "[POSITIONAL PARAMETERS]\n";
             foreach (var parameter in Parameters) {
-                result += $"{ToStringHelper.ParameterToString(parameter)} # {ToStringHelper.GetTypeName(parameter.ParameterType)} {ToStringHelper.GetDefaultValue(parameter)}\n";
-            }
-
-            // TODO DRY with HandleInstanceHelp
-            var members = Accessors.ToList();
-            var coreCommandOptions = members.Where(x => {
-                return ValueParser.IsParseable(GetDataType(x));
-            });
-
-            result += "\n";
-            result += "[OPTIONS]\n";
-            foreach (var option in coreCommandOptions) {
-                var type = GetDataType(option);
-                var defaultValue = this[option];
-                result += $"{ToStringHelper.ParameterToString(option)} # {ToStringHelper.GetTypeName(type)} ({defaultValue})\n";
+                result += $"{ParameterToString(parameter)} # {ToStringHelper.GetTypeName(parameter.ParameterType)} {GetDefaultValue(parameter)}\n";
             }
 
             return result;
