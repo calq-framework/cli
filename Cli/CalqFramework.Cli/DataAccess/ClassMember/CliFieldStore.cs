@@ -9,7 +9,14 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
     // TODO unify with PropertyStore
     internal class CliFieldStore : FieldStoreBase<string>, ICliOptionsStore
     {
-        public ICliClassDataMemberSerializer CliSerializer { get; }
+        private ICliClassDataMemberSerializerFactory _cliSerializerFactory;
+        private ICliClassDataMemberSerializer _cliSerializer;
+        public ICliClassDataMemberSerializer CliSerializer {
+            get {
+                _cliSerializer = _cliSerializer == null ? _cliSerializerFactory.CreateCliSerializer(Accessors, (x) => GetDataType(x), (x) => this[x]) : _cliSerializer;
+                return _cliSerializer;
+            }
+        }
 
         public override object? this[MemberInfo accessor] {
             get {
@@ -32,7 +39,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
 
         public CliFieldStore(object obj, BindingFlags bindingAttr, ICliClassDataMemberSerializerFactory cliSerializerFactory) : base(obj, bindingAttr)
         {
-            CliSerializer = cliSerializerFactory.CreateCliSerializer(() => Accessors, (x) => GetDataType(x), (x) => this[x]);
+            _cliSerializerFactory = cliSerializerFactory;
         }
 
         // FIXME do not assign the first occurances - check for duplicates. if duplicate found then then return null

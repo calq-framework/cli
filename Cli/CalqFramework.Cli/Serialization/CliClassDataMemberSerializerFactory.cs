@@ -10,8 +10,8 @@ namespace CalqFramework.Cli.Serialization {
             BindingAttr = bindingAttr;
         }
 
-        public ICliClassDataMemberSerializer CreateCliSerializer(Func<IEnumerable<MemberInfo>> getMembers, Func<MemberInfo, Type> getDataType, Func<MemberInfo, object?> getDataValue) {
-            return new CliClassDataMemberSerializer(BindingAttr, getMembers, getDataType, getDataValue);
+        public ICliClassDataMemberSerializer CreateCliSerializer(IEnumerable<MemberInfo> members, Func<MemberInfo, Type> getDataType, Func<MemberInfo, object?> getDataValue) {
+            return new CliClassDataMemberSerializer(BindingAttr, members, getDataType, getDataValue);
         }
     }
 }
