@@ -26,7 +26,7 @@ namespace CalqFramework.Cli.DataAccess {
 
             result += ActionParameters.GetHelpString();
             result += "\n";
-            result += Options.CliSerializer.GetOptionsString();
+            result += Options.GetOptionsString();
 
             return result;
         }
