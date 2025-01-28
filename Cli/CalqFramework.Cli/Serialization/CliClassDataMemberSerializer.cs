@@ -9,13 +9,13 @@ using System.Reflection;
 namespace CalqFramework.Cli.Serialization {
     internal class CliClassDataMemberSerializer : ICliClassDataMemberSerializer {
         private BindingFlags BindingAttr { get; set; }
-        private Func<IEnumerable<MemberInfo>> GetMembers;
+        private IEnumerable<MemberInfo> Members;
         private Func<MemberInfo, Type> GetDataType;
         private Func<MemberInfo, object?> GetDataValue;
 
-        public CliClassDataMemberSerializer(BindingFlags bindingAttr, Func<IEnumerable<MemberInfo>> getMembers, Func<MemberInfo, Type> getDataType, Func<MemberInfo, object?> getDataValue) {
+        public CliClassDataMemberSerializer(BindingFlags bindingAttr, IEnumerable<MemberInfo> members, Func<MemberInfo, Type> getDataType, Func<MemberInfo, object?> getDataValue) {
             BindingAttr = bindingAttr;
-            GetMembers = getMembers;
+            Members = members;
             GetDataType = getDataType;
             GetDataValue = getDataValue;
         }
@@ -33,7 +33,7 @@ namespace CalqFramework.Cli.Serialization {
         public string GetOptionsString() {
             var result = "";
 
-            var members = GetMembers().ToList();
+            var members = Members.ToList();
             var options = members.Where(x => {
                 return ValueParser.IsParseable(GetDataType(x));
             });
@@ -51,7 +51,7 @@ namespace CalqFramework.Cli.Serialization {
         public string GetCommandsString() {
             var result = "";
 
-            var members = GetMembers().ToList();
+            var members = Members.ToList();
             var coreCommands = members.Where(x => {
                 return !ValueParser.IsParseable(GetDataType(x));
             });
