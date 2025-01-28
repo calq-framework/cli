@@ -2,17 +2,14 @@
 using CalqFramework.DataAccess.ClassMember;
 using CalqFramework.DataAccess;
 using CalqFramework.Cli.DataAccess.ClassMember;
+using System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess {
-    sealed internal class CliOptionsStoreFactory : ClassDataMemberStoreFactoryBase<string, object?> {
+    sealed public class CliOptionsStoreFactory : ClassDataMemberStoreFactoryBase<string, object?> {
 
-        public static CliOptionsStoreFactory Instance { get; }
-
-        static CliOptionsStoreFactory() {
-            Instance = new CliOptionsStoreFactory(new ClassDataMemberStoreFactoryOptions());
-        }
-
-        public CliOptionsStoreFactory(ClassDataMemberStoreFactoryOptions classDataMemberStoreFactoryOptions) : base(classDataMemberStoreFactoryOptions) {
+        public CliOptionsStoreFactory() {
+            AccessFields = true;
+            BindingAttr = DefaultLookup | BindingFlags.IgnoreCase;
         }
 
         public ICliOptionsStore CreateCliStore(object obj) {
@@ -20,15 +17,15 @@ namespace CalqFramework.Cli.DataAccess {
         }
 
         protected override ICliOptionsStore CreateFieldAndPropertyStore(object obj) {
-            return new CliDualKeyValueStore(CreateFieldStore(obj), CreatePropertyStore(obj), new CliClassDataMemberSerializerFactory(ClassDataMemberStoreFactoryOptions.BindingAttr));
+            return new CliDualKeyValueStore(CreateFieldStore(obj), CreatePropertyStore(obj), new CliClassDataMemberSerializerFactory(BindingAttr));
         }
 
         protected override ICliOptionsStore CreateFieldStore(object obj) {
-            return new CliFieldStore(obj, ClassDataMemberStoreFactoryOptions.BindingAttr, new CliClassDataMemberSerializerFactory(ClassDataMemberStoreFactoryOptions.BindingAttr));
+            return new CliFieldStore(obj, BindingAttr, new CliClassDataMemberSerializerFactory(BindingAttr));
         }
 
         protected override ICliOptionsStore CreatePropertyStore(object obj) {
-            return new CliPropertyStore(obj, ClassDataMemberStoreFactoryOptions.BindingAttr, new CliClassDataMemberSerializerFactory(ClassDataMemberStoreFactoryOptions.BindingAttr));
+            return new CliPropertyStore(obj, BindingAttr, new CliClassDataMemberSerializerFactory(BindingAttr));
         }
     }
 }

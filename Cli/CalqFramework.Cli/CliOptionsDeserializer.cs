@@ -21,7 +21,7 @@ namespace CalqFramework.Cli {
 
         public static void Deserialize(object obj, CliDeserializerOptions options, IEnumerable<string> args) {
             using var argsEnumerator = args.GetEnumerator();
-            var store = new CliOptionsStoreFactory(options.ClassDataMemberStoreFactoryOptions).CreateDataMemberStore(obj);
+            var store = options.CliOptionsStoreFactory.CreateDataMemberStore(obj);
             var reader = new OptionsReader(argsEnumerator, store);
 
             foreach (var (option, value, optionAttr) in reader.Read()) {
