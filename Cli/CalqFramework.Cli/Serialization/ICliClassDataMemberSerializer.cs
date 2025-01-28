@@ -1,7 +1,10 @@
-﻿namespace CalqFramework.Cli.Serialization {
-    public interface ICliClassDataMemberSerializer {
-        string GetOptionsString();
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
 
-        string GetCommandsString();
+namespace CalqFramework.Cli.Serialization {
+    internal interface ICliClassDataMemberSerializer {
+        string GetCommandsString(IEnumerable<MemberInfo> members, Func<MemberInfo, Type> getDataType, Func<MemberInfo, object?> getDataValue, BindingFlags bindingAttr);
+        string GetOptionsString(IEnumerable<MemberInfo> members, Func<MemberInfo, Type> getDataType, Func<MemberInfo, object?> getDataValue, BindingFlags bindingAttr);
     }
 }

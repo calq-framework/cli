@@ -26,7 +26,7 @@ namespace CalqFramework.Cli {
         public bool UseRevisionVersion { get; init; } = true;
 
         public CommandLineInterface() {
-            CliOptionsStoreFactory ??= new CliOptionsStoreFactory();
+            CliOptionsStoreFactory = new CliOptionsStoreFactory();
         }
 
         // TODO separate data and printing
@@ -38,7 +38,7 @@ namespace CalqFramework.Cli {
         // TODO separate data and printing
         private static void HandleInstanceHelp(ICliOptionsStore options, MethodResolver methodResolver)
         {
-            Console.WriteLine(options.CliSerializer.GetCommandsString());
+            Console.WriteLine(options.GetCommandsString());
 
             Console.WriteLine("[ACTION COMMANDS]");
             foreach (var methodInfo in methodResolver.Methods) {
@@ -46,7 +46,7 @@ namespace CalqFramework.Cli {
             }
             Console.WriteLine();
 
-            Console.Write(options.CliSerializer.GetOptionsString());
+            Console.Write(options.GetOptionsString());
         }
 
         private bool TryReadOptionsAndActionParams(IEnumerator<string> args, CliOptionsAndActionParametersStore optionsAndParams)

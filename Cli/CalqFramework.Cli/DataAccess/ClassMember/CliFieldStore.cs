@@ -9,14 +9,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
     // TODO unify with PropertyStore
     internal class CliFieldStore : FieldStoreBase<string>, ICliOptionsStore
     {
-        private ICliClassDataMemberSerializerFactory _cliSerializerFactory;
-        private ICliClassDataMemberSerializer _cliSerializer;
-        public ICliClassDataMemberSerializer CliSerializer {
-            get {
-                _cliSerializer = _cliSerializer == null ? _cliSerializerFactory.CreateCliSerializer(Accessors, (x) => GetDataType(x), (x) => this[x]) : _cliSerializer;
-                return _cliSerializer;
-            }
-        }
+        private ICliClassDataMemberSerializer CliSerializer { get; }
 
         public override object? this[MemberInfo accessor] {
             get {
@@ -37,9 +30,9 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
             }
         }
 
-        public CliFieldStore(object obj, BindingFlags bindingAttr, ICliClassDataMemberSerializerFactory cliSerializerFactory) : base(obj, bindingAttr)
+        public CliFieldStore(object obj, BindingFlags bindingAttr, ICliClassDataMemberSerializer cliSerializer) : base(obj, bindingAttr)
         {
-            _cliSerializerFactory = cliSerializerFactory;
+            CliSerializer = cliSerializer;
         }
 
         // FIXME do not assign the first occurances - check for duplicates. if duplicate found then then return null
@@ -92,6 +85,14 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
 
         public override bool ContainsAccessor(MemberInfo accessor) {
             return accessor is FieldInfo && accessor.DeclaringType == ParentType;
+        }
+
+        public string GetCommandsString() {
+            return CliSerializer.GetCommandsString(Accessors, (x) => GetDataType(x), (x) => this[x], BindingAttr);
+        }
+
+        public string GetOptionsString() {
+            return CliSerializer.GetOptionsString(Accessors, (x) => GetDataType(x), (x) => this[x], BindingAttr);
         }
     }
 }

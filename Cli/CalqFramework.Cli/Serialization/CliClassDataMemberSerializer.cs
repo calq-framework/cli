@@ -8,57 +8,44 @@ using System.Reflection;
 
 namespace CalqFramework.Cli.Serialization {
     internal class CliClassDataMemberSerializer : ICliClassDataMemberSerializer {
-        private BindingFlags BindingAttr { get; set; }
-        private IEnumerable<MemberInfo> Members;
-        private Func<MemberInfo, Type> GetDataType;
-        private Func<MemberInfo, object?> GetDataValue;
 
-        public CliClassDataMemberSerializer(BindingFlags bindingAttr, IEnumerable<MemberInfo> members, Func<MemberInfo, Type> getDataType, Func<MemberInfo, object?> getDataValue) {
-            BindingAttr = bindingAttr;
-            Members = members;
-            GetDataType = getDataType;
-            GetDataValue = getDataValue;
-        }
-
-        protected string MemberInfoToString(MemberInfo memberInfo) {
+        protected string MemberInfoToString(MemberInfo memberInfo, BindingFlags bindingAttr) {
             var name = memberInfo.GetCustomAttribute<NameAttribute>()?.Name ?? memberInfo.Name;
-            name = BindingAttr.HasFlag(BindingFlags.IgnoreCase) ? name.ToLower() : name;
+            name = bindingAttr.HasFlag(BindingFlags.IgnoreCase) ? name.ToLower() : name;
 
             var shortName = memberInfo.GetCustomAttribute<ShortNameAttribute>()?.Name ?? memberInfo.Name[0];
-            shortName = BindingAttr.HasFlag(BindingFlags.IgnoreCase) ? shortName.ToString().ToLower()[0] : shortName;
+            shortName = bindingAttr.HasFlag(BindingFlags.IgnoreCase) ? shortName.ToString().ToLower()[0] : shortName;
 
             return ValueParser.IsParseable(memberInfo.GetUnderlyingType()) ? $"--{name}, -{shortName}" : $"{name}";
         }
 
-        public string GetOptionsString() {
+        public string GetOptionsString(IEnumerable<MemberInfo> members, Func<MemberInfo, Type> getDataType, Func<MemberInfo, object?> getDataValue, BindingFlags bindingAttr) {
             var result = "";
 
-            var members = Members.ToList();
             var options = members.Where(x => {
-                return ValueParser.IsParseable(GetDataType(x));
+                return ValueParser.IsParseable(getDataType(x));
             });
-;
+            ;
             result += "[OPTIONS]\n";
             foreach (var option in options) {
-                var type = GetDataType(option);
-                var defaultValue = GetDataValue(option);
-                result += $"{MemberInfoToString(option)} # {ToStringHelper.GetTypeName(type)} ({defaultValue?.ToString()!.ToLower()})\n";
+                var type = getDataType(option);
+                var defaultValue = getDataValue(option);
+                result += $"{MemberInfoToString(option, bindingAttr)} # {ToStringHelper.GetTypeName(type)} ({defaultValue?.ToString()!.ToLower()})\n";
             }
 
             return result;
         }
 
-        public string GetCommandsString() {
+        public string GetCommandsString(IEnumerable<MemberInfo> members, Func<MemberInfo, Type> getDataType, Func<MemberInfo, object?> getDataValue, BindingFlags bindingAttr) {
             var result = "";
 
-            var members = Members.ToList();
             var coreCommands = members.Where(x => {
-                return !ValueParser.IsParseable(GetDataType(x));
+                return !ValueParser.IsParseable(getDataType(x));
             });
 
             result += "[CORE COMMANDS]\n";
             foreach (var command in coreCommands) {
-                result += $"{MemberInfoToString(command)}\n";
+                result += $"{MemberInfoToString(command, bindingAttr)}\n";
             }
 
             return result;
