@@ -5,7 +5,7 @@ using CalqFramework.Cli.DataAccess.ClassMember;
 using System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess {
-    sealed public class CliOptionsStoreFactory : ClassDataMemberStoreFactoryBase<string, object?> {
+    sealed public class CliOptionsStoreFactory : ClassDataMemberStoreFactoryBase<string, object?>, ICliOptionsStoreFactory {
 
         internal ICliClassDataMemberSerializer CliClassDataMemberSerializer { get; }
 
