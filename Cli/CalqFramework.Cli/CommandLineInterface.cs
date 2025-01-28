@@ -6,11 +6,29 @@ using CalqFramework.Cli.Serialization.Parsing;
 using static CalqFramework.Cli.Serialization.Parsing.OptionsReaderBase;
 using System.Collections.Generic;
 using CalqFramework.DataAccess;
+using CalqFramework.DataAccess.ClassMember;
 
 namespace CalqFramework.Cli {
     // TODO create separate class for help/version logic
     public class CommandLineInterface
     {
+        private BindingFlags? _methodBindingAttr = null;
+
+        public CliOptionsStoreFactory CliOptionsStoreFactory { get; init; }
+
+        public bool SkipUnknown { get; init; } = false;
+
+        public BindingFlags MethodBindingAttr {
+            get => _methodBindingAttr == null ? CliOptionsStoreFactory.BindingAttr : (BindingFlags)_methodBindingAttr;
+            init => _methodBindingAttr = value;
+        }
+
+        public bool UseRevisionVersion { get; init; } = true;
+
+        public CommandLineInterface() {
+            CliOptionsStoreFactory ??= new CliOptionsStoreFactory();
+        }
+
         // TODO separate data and printing
         private static void HandleMethodHelp(CliOptionsAndActionParametersStore optionsAndParams)
         {
@@ -31,7 +49,7 @@ namespace CalqFramework.Cli {
             Console.Write(options.CliSerializer.GetOptionsString());
         }
 
-        private static bool TryReadOptionsAndActionParams(IEnumerator<string> args, CliOptionsAndActionParametersStore optionsAndParams, CliDeserializerOptions deserializerOptions)
+        private bool TryReadOptionsAndActionParams(IEnumerator<string> args, CliOptionsAndActionParametersStore optionsAndParams)
         {
             var optionsReader = new OptionsReader(args, optionsAndParams);
 
@@ -57,7 +75,7 @@ namespace CalqFramework.Cli {
 
                     if (optionAttr.HasFlag(OptionFlags.ValueUnassigned) && !optionAttr.HasFlag(OptionFlags.NotAnOption))
                     {
-                        if (deserializerOptions.SkipUnknown) {
+                        if (SkipUnknown) {
                             continue;
                         }
                         throw new CliException($"unknown option {option}");
@@ -91,19 +109,10 @@ namespace CalqFramework.Cli {
         }
 
         public object? Execute(object obj) {
-            return Execute(obj, new CliDeserializerOptions());
-        }
-
-        public object? Execute(object obj, CliDeserializerOptions options) {
-            return Execute(obj, options, Environment.GetCommandLineArgs().Skip(1));
+            return Execute(obj, Environment.GetCommandLineArgs().Skip(1));
         }
 
         public object? Execute(object obj, IEnumerable<string> args)
-        {
-            return Execute(obj, new CliDeserializerOptions(), args);
-        }
-
-        public object? Execute(object obj, CliDeserializerOptions options, IEnumerable<string> args)
         {
             using var en = args.GetEnumerator();
             if (!en.MoveNext()) {
@@ -112,13 +121,12 @@ namespace CalqFramework.Cli {
             string optionOrAction;
 
             var targetObj = obj;
-            var classDataMemberStoreFactory = new CliOptionsStoreFactory(options.ClassDataMemberStoreFactoryOptions);
             ICliOptionsStore cliOptions;
 
             // explore object tree until optionOrAction definitely cannot be an action (object not found by name)
             do {
                 optionOrAction = en.Current;
-                cliOptions = classDataMemberStoreFactory.CreateCliStore(targetObj);
+                cliOptions = CliOptionsStoreFactory.CreateCliStore(targetObj);
                 if (cliOptions.ContainsKey(optionOrAction)) {
                     var type = cliOptions.GetDataType(optionOrAction);
                     if (ValueParser.IsParseable(type)) {
@@ -130,7 +138,7 @@ namespace CalqFramework.Cli {
                 }
             } while (en.MoveNext());
 
-            var methodResolver = new MethodResolver(targetObj, options.MethodBindingAttr);
+            var methodResolver = new MethodResolver(targetObj, MethodBindingAttr);
             if (optionOrAction == "--help" || optionOrAction == "-h")
             {
                 HandleInstanceHelp(cliOptions, methodResolver);
@@ -142,9 +150,9 @@ namespace CalqFramework.Cli {
             }
 
             var cliAction = methodResolver.GetMethod(optionOrAction);
-            var actionParams = new CliActionParametersStore(cliAction, options.MethodBindingAttr);
+            var actionParams = new CliActionParametersStore(cliAction, MethodBindingAttr);
             var optionsAndActionParams = new CliOptionsAndActionParametersStore(cliOptions, actionParams, targetObj);
-            if (TryReadOptionsAndActionParams(en, optionsAndActionParams, options))
+            if (TryReadOptionsAndActionParams(en, optionsAndActionParams))
             {
                 return optionsAndActionParams.Invoke();
             }

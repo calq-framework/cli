@@ -1,4 +1,5 @@
 using CalqFramework.Cli;
+using CalqFramework.Cli.DataAccess;
 using CalqFramework.DataAccess.ClassMember;
 using System;
 using System.Collections.Generic;
@@ -118,10 +119,9 @@ namespace CalqFramework.CliTest {
         public void Execute_Should_ThrowCliException_When_InvalidCommandCaseProvided() {
             var ex = Assert.Throws<CliException>(() => {
                 var tool = new SomeClassLibrary();
-                new CommandLineInterface().Execute(tool,
-                    new CliDeserializerOptions {
-                        ClassDataMemberStoreFactoryOptions = new ClassDataMemberStoreFactoryOptions { BindingAttr = ClassDataMemberStoreFactoryOptions.DefaultLookup }
-                    },
+                new CommandLineInterface() {
+                    CliOptionsStoreFactory = new CliOptionsStoreFactory { BindingAttr = CliOptionsStoreFactory.DefaultLookup }
+                }.Execute(tool,
                     new[] { $"{nameof(SomeClassLibrary.Method).ToLower()}" }
                 );
             });
