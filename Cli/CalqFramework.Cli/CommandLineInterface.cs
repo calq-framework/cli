@@ -14,7 +14,7 @@ namespace CalqFramework.Cli {
     {
         private BindingFlags? _methodBindingAttr = null;
 
-        public CliOptionsStoreFactory CliOptionsStoreFactory { get; init; }
+        public ICliOptionsStoreFactory CliOptionsStoreFactory { get; init; }
 
         public bool SkipUnknown { get; init; } = false;
 

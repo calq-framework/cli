@@ -2,7 +2,7 @@
 using System.Reflection;
 
 namespace CalqFramework.DataAccess.ClassMember;
-public abstract class ClassDataMemberStoreFactoryBase<TKey, TValue> {
+public abstract class ClassDataMemberStoreFactoryBase<TKey, TValue> : IClassDataMemberStoreFactory<TKey, TValue> {
 
     public const BindingFlags DefaultLookup = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public;
 
