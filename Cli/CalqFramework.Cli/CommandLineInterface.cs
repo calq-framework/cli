@@ -90,20 +90,20 @@ namespace CalqFramework.Cli {
             return true;
         }
 
-        public static object? Execute(object obj) {
+        public object? Execute(object obj) {
             return Execute(obj, new CliDeserializerOptions());
         }
 
-        public static object? Execute(object obj, CliDeserializerOptions options) {
+        public object? Execute(object obj, CliDeserializerOptions options) {
             return Execute(obj, options, Environment.GetCommandLineArgs().Skip(1));
         }
 
-        public static object? Execute(object obj, IEnumerable<string> args)
+        public object? Execute(object obj, IEnumerable<string> args)
         {
             return Execute(obj, new CliDeserializerOptions(), args);
         }
 
-        public static object? Execute(object obj, CliDeserializerOptions options, IEnumerable<string> args)
+        public object? Execute(object obj, CliDeserializerOptions options, IEnumerable<string> args)
         {
             using var en = args.GetEnumerator();
             if (!en.MoveNext()) {
