@@ -50,10 +50,6 @@ namespace CalqFramework.DataAccess.ClassMember {
             return GetDataType(accessor);
         }
 
-        public string AccessorToString(MemberInfo accessor) {
-            return accessor.Name;
-        }
-
         public abstract bool ContainsAccessor(MemberInfo accessor);
     }
 }
