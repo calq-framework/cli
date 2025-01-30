@@ -168,10 +168,6 @@ namespace CalqFramework.Cli.DataAccess {
             throw new NotImplementedException();
         }
 
-        public string AccessorToString(ParameterInfo accessor) {
-            return accessor.Name;
-        }
-
         public Type GetDataType(ParameterInfo accessor) {
             return GetDataType(accessor.Name!);
         }

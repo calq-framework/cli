@@ -188,13 +188,5 @@ namespace CalqFramework.DataAccess {
         public TAccessor GetAccessor(TKey key) {
             return PrimaryStore.GetAccessor(key) ?? SecondaryStore.GetAccessor(key); ;
         }
-
-        public string AccessorToString(TAccessor accessor) {
-            if (PrimaryStore.ContainsAccessor(accessor)) {
-                return PrimaryStore.AccessorToString(accessor);
-            } else {
-                return SecondaryStore.AccessorToString(accessor);
-            }
-        }
     }
 }
