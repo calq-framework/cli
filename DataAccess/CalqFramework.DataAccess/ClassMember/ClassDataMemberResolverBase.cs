@@ -15,19 +15,13 @@ namespace CalqFramework.DataAccess.ClassMember {
         }
 
         public bool ContainsKey(TKey key) {
-            var result = GetClassMember(key);
-            return result != null;
+            return TryGetAccessor(key, out var _);
         }
 
-        public bool TryGetAccessor(TKey key, [MaybeNullWhen(false)] out MemberInfo result) {
-            result = GetClassMember(key);
-            return result != null;
-        }
+        public abstract bool TryGetAccessor(TKey key, [MaybeNullWhen(false)] out MemberInfo result);
 
         public MemberInfo GetAccessor(TKey key) {
-            return GetClassMember(key) ?? throw new MissingMemberException($"Missing {key} in {ParentType}.");
+            return TryGetAccessor(key, out var result) ? result : throw new MissingMemberException($"Missing {key} in {ParentType}.");
         }
-
-        protected abstract MemberInfo? GetClassMember(TKey key);
     }
 }
