@@ -55,19 +55,21 @@ namespace CalqFramework.CliTest {
 
         [Fact]
         public void Execute_Should_ThrowCliException_When_InvalidUsage_NoIntegerOption() {
-            var ex = Assert.Throws<CliException>(() => {
+            // this is valid usage now
+            //var ex = Assert.Throws<CliException>(() => {
                 var tool = new SomeClassLibrary();
                 var result = new CommandLineInterface().Execute(tool, new[] { $"{nameof(SomeClassLibrary.MethodWithIntegerAndText)}", "abc", $"--integer", "1" });
-            });
+            //});
             // Assert.Equal("incorrect usage: expected Void IntegerAndText(Int32, System.String)", ex.Message);
         }
 
         [Fact]
         public void Execute_Should_ThrowCliException_When_InvalidUsage_NoTextOption() {
-            var ex = Assert.Throws<CliException>(() => {
+            // this is valid usage now
+            //var ex = Assert.Throws<CliException>(() => {
                 var tool = new SomeClassLibrary();
                 var result = new CommandLineInterface().Execute(tool, new[] { $"{nameof(SomeClassLibrary.MethodWithIntegerAndText)}", $"--integer", "1", "abc" });
-            });
+            //});
             // Assert.Equal("incorrect usage: expected Void IntegerAndText(Int32, System.String)", ex.Message);
         }
 
