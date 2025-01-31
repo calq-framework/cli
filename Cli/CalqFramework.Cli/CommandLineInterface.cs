@@ -53,16 +53,6 @@ namespace CalqFramework.Cli {
         {
             var optionsReader = new OptionsReader(args, optionsAndParams);
 
-            var parameterIndex = 0;
-            // TODO move this logic to the store
-            void SetPositionalParameter(string option)
-            {
-                var parameterName = optionsAndParams.ActionParameters.GetKey(parameterIndex);
-                var parameterType = optionsAndParams.ActionParameters.GetType(parameterIndex);
-                optionsAndParams.ActionParameters.SetValue(parameterIndex, ValueParser.ParseValue(option, parameterType, parameterName));
-                ++parameterIndex;
-            }
-
             try
             {
                 foreach (var (option, value, optionAttr) in optionsReader.Read())
@@ -83,7 +73,7 @@ namespace CalqFramework.Cli {
 
                     if (optionAttr.HasFlag(OptionFlags.NotAnOption))
                     {
-                        SetPositionalParameter(option);
+                        optionsAndParams.ActionParameters.SetNextParameter(option);
                     }
                     else
                     {
@@ -93,7 +83,7 @@ namespace CalqFramework.Cli {
                     }
                 }
                 while (args.MoveNext()) {
-                    SetPositionalParameter(args.Current);
+                    optionsAndParams.ActionParameters.SetNextParameter(args.Current);
                 }
             }
             catch (Exception ex)
@@ -150,7 +140,7 @@ namespace CalqFramework.Cli {
             }
 
             var cliAction = methodResolver.GetMethod(optionOrAction);
-            var actionParams = new CliActionParametersStore(cliAction, MethodBindingAttr);
+            var actionParams = new CliActionParametersStore(cliAction);
             var optionsAndActionParams = new CliOptionsAndActionParametersStore(cliOptions, actionParams, targetObj);
             if (TryReadOptionsAndActionParams(en, optionsAndActionParams))
             {
