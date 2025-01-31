@@ -3,6 +3,7 @@ using CalqFramework.Cli.Serialization;
 using CalqFramework.DataAccess;
 using CalqFramework.DataAccess.ClassMember;
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess.ClassMember {
@@ -36,7 +37,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
         }
 
         // FIXME do not assign the first occurances - check for duplicates. if duplicate found then then return null
-        protected override MemberInfo? GetClassMember(string key) {
+        private MemberInfo? GetClassMember(string key) {
             if (key.Length == 1)
             {
                 foreach (var member in ParentType.GetFields(BindingAttr))
@@ -81,6 +82,11 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
             }
 
             return dataMember;
+        }
+
+        public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out MemberInfo result) {
+            result = GetClassMember(key);
+            return result != null;
         }
 
         public override bool ContainsAccessor(MemberInfo accessor) {
