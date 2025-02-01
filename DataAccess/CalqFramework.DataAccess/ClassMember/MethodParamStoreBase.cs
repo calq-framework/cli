@@ -24,7 +24,7 @@ namespace CalqFramework.DataAccess.ClassMember {
             }
         }
 
-        public override IEnumerable<ParameterInfo> Accessors => ParameterIndexByParameter.Keys;
+        public override IEnumerable<ParameterInfo> Accessors => Parameters.Where(ContainsAccessor);
 
         protected MethodInfo Method { get; }
         public ParameterInfo[] Parameters { get; }

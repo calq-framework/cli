@@ -21,7 +21,7 @@ namespace CalqFramework.Cli {
 
         public static void Deserialize(object obj, CliDeserializerOptions options, IEnumerable<string> args) {
             using var argsEnumerator = args.GetEnumerator();
-            var store = options.CliOptionsStoreFactory.CreateDataMemberStore(obj);
+            var store = options.CliOptionsStoreFactory.CreateOptonStore(obj);
             var reader = new OptionsReader(argsEnumerator, store);
 
             foreach (var (option, value, optionAttr) in reader.Read()) {
@@ -30,7 +30,7 @@ namespace CalqFramework.Cli {
                         if (options.SkipUnknown) {
                             continue;
                         }
-                        throw new CliException($"unknown value {option}");
+                        throw new CliException($"not an option: {option}");
                     }
                     if (optionAttr.HasFlag(OptionFlags.AmbigousValue)) {
                         throw new CliException($"ambiguous syntax around {option} (try using --)");

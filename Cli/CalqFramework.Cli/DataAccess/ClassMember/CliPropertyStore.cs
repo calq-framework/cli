@@ -5,11 +5,14 @@ using CalqFramework.Cli.Serialization;
 using CalqFramework.DataAccess.ClassMember;
 using CalqFramework.DataAccess;
 using System.Diagnostics.CodeAnalysis;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CalqFramework.Cli.DataAccess.ClassMember {
     // TODO unify with FieldStore
-    internal class CliPropertyStore : PropertyStoreBase<string>, ICliOptionsStore {
+    internal class CliPropertyStore : PropertyStoreBase<string>, ICliStore<string, object?, MemberInfo> {
         private ICliClassDataMemberSerializer CliSerializer { get; }
+        private ICliValidator CliValidator { get; }
 
         public override object? this[MemberInfo accessor] {
             get {
@@ -30,8 +33,9 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
             }
         }
 
-        public CliPropertyStore(object obj, BindingFlags bindingAttr, ICliClassDataMemberSerializer cliSerializer) : base(obj, bindingAttr) {
+        public CliPropertyStore(object obj, BindingFlags bindingAttr, ICliClassDataMemberSerializer cliSerializer, ICliValidator cliValidator) : base(obj, bindingAttr) {
             CliSerializer = cliSerializer;
+            CliValidator = cliValidator;
         }
 
         // FIXME do not assign the first occurances - check for duplicates. if duplicate found then then return null
@@ -39,7 +43,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
             if (key.Length == 1) {
                 foreach (var member in ParentType.GetProperties(BindingAttr)) {
                     var name = member.GetCustomAttribute<ShortNameAttribute>()?.Name;
-                    if (name != null && name == key[0]) {
+                    if (name != null && name == key[0] && ContainsAccessor(member)) {
                         return member;
                     }
                 }
@@ -47,7 +51,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
 
             foreach (var member in ParentType.GetProperties(BindingAttr)) {
                 var name = member.GetCustomAttribute<NameAttribute>()?.Name;
-                if (name != null && name == key) {
+                if (name != null && name == key && ContainsAccessor(member)) {
                     return member;
                 }
             }
@@ -57,19 +61,19 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
             if (dataMember == null && key.Length == 1) {
                 foreach (var member in ParentType.GetProperties(BindingAttr)) {
                     var name = member.GetCustomAttribute<NameAttribute>()?.Name[0];
-                    if (name != null && name == key[0]) {
+                    if (name != null && name == key[0] && ContainsAccessor(member)) {
                         return member;
                     }
                 }
 
                 foreach (var member in ParentType.GetProperties(BindingAttr)) {
-                    if (member.Name[0] == key[0]) {
+                    if (member.Name[0] == key[0] && ContainsAccessor(member)) {
                         return member;
                     }
                 }
             }
 
-            return dataMember;
+            return dataMember != null == ContainsAccessor(dataMember!) ? dataMember : null;
         }
 
         public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out MemberInfo result) {
@@ -78,15 +82,26 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
         }
 
         public override bool ContainsAccessor(MemberInfo accessor) {
-            return accessor is PropertyInfo && accessor.DeclaringType == ParentType;
+            return accessor is PropertyInfo && accessor.DeclaringType == ParentType && CliValidator.IsValid(accessor);
         }
 
-        public string GetCommandsString() {
-            return CliSerializer.GetCommandsString(Accessors, (x) => GetDataType(x), (x) => this[x], BindingAttr);
-        }
-
-        public string GetOptionsString() {
-            return CliSerializer.GetOptionsString(Accessors, (x) => GetDataType(x), (x) => this[x], BindingAttr);
+        // TODO two-pass, first pass find collisions and exclude them from second pass when building the dictionary
+        public IDictionary<MemberInfo, IEnumerable<string>> GetKeysByAccessors() {
+            var keys = new Dictionary<MemberInfo, IEnumerable<string>>();
+            foreach (var accessor in Accessors) {
+                var accesorKeys = new List<string>();
+                foreach (var atribute in accessor.GetCustomAttributes<NameAttribute>()) {
+                    accesorKeys.Add(atribute.Name);
+                }
+                if (accesorKeys.Count == 0) {
+                    accesorKeys.Add(accessor.Name);
+                }
+                if (accesorKeys.Select(x => x.Length == 1).Count() == 0) {
+                    accesorKeys.Add(accesorKeys[0][0].ToString());
+                }
+                keys[accessor] = accesorKeys;
+            }
+            return keys;
         }
     }
 }
