@@ -99,7 +99,7 @@ namespace CalqFramework.CliTest {
                 var obj = new SomeConfiguration();
                 CliOptionsDeserializer.Deserialize(obj, new string[] { $"--{nameof(SomeConfiguration.inner)}=0" });
             });
-            Assert.Equal($"option and value type mismatch: inner=0 (inner is Inner)", ex.Message);
+            Assert.Equal($"not an option: inner", ex.Message);
         }
 
         [Fact]

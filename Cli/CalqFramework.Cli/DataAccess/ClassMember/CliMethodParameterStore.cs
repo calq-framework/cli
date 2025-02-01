@@ -8,12 +8,12 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 
-namespace CalqFramework.Cli.DataAccess {
-    internal class CliActionParametersStore : MethodParamStoreBase<string> {
-        public List<string> PositionalParameters { get; }
+namespace CalqFramework.Cli.DataAccess.ClassMember {
+    internal class CliMethodParameterStore : MethodParamStoreBase<string>, ICliStore<string, object?, ParameterInfo> {
+        public List<string> ReceivedPositionalParameters { get; }
 
-        public CliActionParametersStore(MethodInfo method) : base(method) {
-            PositionalParameters = new List<string>();
+        public CliMethodParameterStore(MethodInfo method) : base(method) {
+            ReceivedPositionalParameters = new List<string>();
         }
 
         public override object? this[ParameterInfo accessor] {
@@ -23,9 +23,14 @@ namespace CalqFramework.Cli.DataAccess {
                 var isCollection = type.GetInterface(nameof(ICollection)) != null;
                 if (isCollection == false) {
                     result = base[accessor];
+                    if (result is DBNull && accessor.HasDefaultValue) {
+                        result = accessor.DefaultValue;
+                    }
                 } else {
                     var collection = (GetValueOrInitialize(accessor) as ICollection)!;
-                    result = new CollectionStore(collection)["0"]; // FIXME return whole collection instead just first element. this is used for reading default value so print whole collection
+                    if (collection.Count > 0) {
+                        result = new CollectionStore(collection)["0"]; // FIXME return whole collection instead just first element. this is used for reading default value so print whole collection
+                    }
                 }
                 return result;
             }
@@ -52,22 +57,6 @@ namespace CalqFramework.Cli.DataAccess {
             return ParameterIndexByParameter.Keys.Contains(accessor);
         }
 
-        // TODO inherit from interface
-        public string GetHelpString() {
-            var result = "";
-
-            result += "[DESCRIPTION]\n";
-            result += ToStringHelper.GetMemberSummary(Method);
-            result += "\n";
-
-            result += "[POSITIONAL PARAMETERS]\n";
-            foreach (var parameter in this.ParameterIndexByParameter.Keys) {
-                result += $"{ParameterToString(parameter)} # {ToStringHelper.GetTypeName(parameter.ParameterType)} {GetDefaultValue(parameter)}\n";
-            }
-
-            return result;
-        }
-
         public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out ParameterInfo result) {
             result = default;
             var success = false;
@@ -92,25 +81,43 @@ namespace CalqFramework.Cli.DataAccess {
         }
 
         internal object? Invoke(object parentObj) {
-            var positionalParametersIndex = 0;
+            var receivedPositionalParametersIndex = 0;
             for (var i = 0; i < ParameterValues.Length; ++i) {
                 if (ParameterValues[i] == DBNull.Value) {
-                    if (positionalParametersIndex < PositionalParameters.Count) {
-                        var value = ValueParser.ParseValue(PositionalParameters[positionalParametersIndex++], Parameters[i].ParameterType, Parameters[i].Name!);
+                    if (receivedPositionalParametersIndex < ReceivedPositionalParameters.Count) {
+                        var value = ValueParser.ParseValue(ReceivedPositionalParameters[receivedPositionalParametersIndex++], Parameters[i].ParameterType, Parameters[i].Name!);
                         ParameterValues[i] = value;
                     } else {
                         ParameterValues[i] = Parameters[i].HasDefaultValue ? Parameters[i].DefaultValue : throw new CliException($"unassigned parameter {ParameterToString(Parameters[i])}"); ;
                     }
                 }
             }
-            if (positionalParametersIndex < PositionalParameters.Count) {
-                throw new CliException($"unexpected positional parameter {PositionalParameters[positionalParametersIndex]}");
+            if (receivedPositionalParametersIndex < ReceivedPositionalParameters.Count) {
+                throw new CliException($"unexpected positional parameter {ReceivedPositionalParameters[receivedPositionalParametersIndex]}");
             }
-            return Method.Invoke(parentObj, this.ParameterValues);
+            return Method.Invoke(parentObj, ParameterValues);
         }
 
-        public void SetNextParameter(string parameterValue) {
-            PositionalParameters.Add(parameterValue);
+        public void AddPositionalParameter(string parameterValue) {
+            ReceivedPositionalParameters.Add(parameterValue);
+        }
+
+        public IDictionary<ParameterInfo, IEnumerable<string>> GetKeysByAccessors() {
+            var keys = new Dictionary<ParameterInfo, IEnumerable<string>>();
+            foreach (var accessor in Accessors) {
+                var accesorKeys = new List<string>();
+                //foreach (var atribute in accessor.GetCustomAttributes<NameAttribute>()) {
+                //    accesorKeys.Add(atribute.Name);
+                //}
+                if (accesorKeys.Count == 0) {
+                    accesorKeys.Add(accessor.Name);
+                }
+                if (accesorKeys.Select(x => x.Length == 1).Count() == 0) {
+                    accesorKeys.Add(accesorKeys[0][0].ToString());
+                }
+                keys[accessor] = accesorKeys;
+            }
+            return keys;
         }
     }
 }

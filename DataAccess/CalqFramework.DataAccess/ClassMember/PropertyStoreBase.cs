@@ -14,7 +14,7 @@ namespace CalqFramework.DataAccess.ClassMember {
             }
         }
 
-        public override IEnumerable<MemberInfo> Accessors => ParentType.GetProperties();
+        public override IEnumerable<MemberInfo> Accessors => ParentType.GetProperties().Where(ContainsAccessor);
 
         public override Type GetDataType(MemberInfo accessor) {
             return ((PropertyInfo)accessor).PropertyType;
