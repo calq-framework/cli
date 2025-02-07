@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace CalqFramework.Cli.DataAccess {
+namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
     public interface ICliOptionsStoreFactory {
         bool AccessFields { get; init; }
         bool AccessProperties { get; init; }

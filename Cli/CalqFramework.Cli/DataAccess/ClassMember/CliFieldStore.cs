@@ -1,5 +1,4 @@
-﻿using CalqFramework.Cli.Attributes;
-using CalqFramework.Cli.Serialization;
+﻿using CalqFramework.Cli.Serialization;
 using CalqFramework.DataAccess;
 using CalqFramework.DataAccess.ClassMember;
 using System.Collections;

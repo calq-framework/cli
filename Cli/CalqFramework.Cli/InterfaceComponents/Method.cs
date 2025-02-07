@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace CalqFramework.Cli.DataAccess {
+namespace CalqFramework.Cli.InterfaceComponents {
     public class Method {
         public IEnumerable<string> Keys { get; init; }
         public MethodInfo Methodinfo { get; init; }
