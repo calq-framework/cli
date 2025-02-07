@@ -1,4 +1,4 @@
-﻿using CalqFramework.Cli.Serialization.Parsing;
+﻿using CalqFramework.Cli.Parsing;
 using CalqFramework.Extensions.System.Reflection;
 using System.Reflection;
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace CalqFramework.Cli.DataAccess {
+namespace CalqFramework.Cli.InterfaceComponents {
     public class PositionalPram {
         public IEnumerable<string> Keys { get; init; }
         public ParameterInfo ParamInfo { get; init; }

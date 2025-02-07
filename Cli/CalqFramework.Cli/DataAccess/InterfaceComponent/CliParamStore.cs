@@ -1,9 +1,10 @@
-﻿using System;
+﻿using CalqFramework.Cli.InterfaceComponents;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace CalqFramework.Cli.DataAccess {
+namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
     internal class CliParamStore<TKey, TValue, TAccessor> : ICliParamStore<TKey, TValue, TAccessor> {
         ICliStore<TKey, TValue, TAccessor> Store { get; }
 

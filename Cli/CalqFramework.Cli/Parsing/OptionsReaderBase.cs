@@ -3,14 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
 
-namespace CalqFramework.Cli.Serialization.Parsing
-{
-    internal abstract class OptionsReaderBase
-    {
+namespace CalqFramework.Cli.Parsing {
+    internal abstract class OptionsReaderBase {
 
         [Flags]
-        internal enum OptionFlags
-        {
+        internal enum OptionFlags {
             None = 0,
             Short = 1,
             Plus = 2,
@@ -22,8 +19,7 @@ namespace CalqFramework.Cli.Serialization.Parsing
 
         public IEnumerator<string> ArgsEnumerator { get; }
 
-        protected OptionsReaderBase(IEnumerator<string> argsEnumerator)
-        {
+        protected OptionsReaderBase(IEnumerator<string> argsEnumerator) {
             ArgsEnumerator = argsEnumerator;
         }
 
@@ -32,15 +28,12 @@ namespace CalqFramework.Cli.Serialization.Parsing
         protected abstract Type GetOptionType(char option);
         protected abstract Type GetOptionType(string option);
 
-        public IEnumerable<(string option, string value, OptionFlags optionAttr)> Read()
-        {
-            bool IsNumber(string input)
-            {
+        public IEnumerable<(string option, string value, OptionFlags optionAttr)> Read() {
+            bool IsNumber(string input) {
                 return BigInteger.TryParse(input, out _);
             }
 
-            void TrySelfAssign(Type type, ref string value, ref OptionFlags optionAttr)
-            {
+            void TrySelfAssign(Type type, ref string value, ref OptionFlags optionAttr) {
                 var isCollection = type.GetInterface(nameof(ICollection)) != null;
                 if (isCollection) {
                     type = type.GetGenericArguments()[0];
@@ -51,63 +44,50 @@ namespace CalqFramework.Cli.Serialization.Parsing
                 }
             }
 
-            (string option, string value) ExtractOptionValuePair(string arg, OptionFlags optionAttr)
-            {
+            (string option, string value) ExtractOptionValuePair(string arg, OptionFlags optionAttr) {
                 var optionValueSplit = arg.Split('=', 2);
                 string value = optionValueSplit.Length == 1 ? "" : optionValueSplit[1];
 
                 string option;
-                if (optionAttr.HasFlag(OptionFlags.Short))
-                {
+                if (optionAttr.HasFlag(OptionFlags.Short)) {
                     option = optionValueSplit[0][1..];
-                }
-                else
-                {
+                } else {
                     option = optionValueSplit[0][2..];
                 }
 
                 return (option, value);
             }
 
-            IEnumerable<char> ReadShort(string stackedOptions)
-            {
-                for (var i = 0; i < stackedOptions.Length; ++i)
-                {
+            IEnumerable<char> ReadShort(string stackedOptions) {
+                for (var i = 0; i < stackedOptions.Length; ++i) {
                     var option = stackedOptions[i];
                     yield return option;
                 }
             }
 
             var moved = false;
-            while (moved || ArgsEnumerator.MoveNext())
-            {
+            while (moved || ArgsEnumerator.MoveNext()) {
                 moved = false;
                 var arg = ArgsEnumerator.Current;
 
-                if (arg.Length == 0)
-                {
+                if (arg.Length == 0) {
                     throw new ArgumentException("arg length is 0");
                 }
 
                 var optionAttr = OptionFlags.None;
-                switch (arg[0])
-                {
+                switch (arg[0]) {
                     case '-':
-                        if (arg[1] == '-')
-                        {
+                        if (arg[1] == '-') {
                             if (arg.Length == 2) {
                                 yield break;
                             }
-                        }
-                        else
-                        {
+                        } else {
                             optionAttr |= OptionFlags.Short;
                         }
                         break;
                     case '+':
                         optionAttr |= OptionFlags.Plus;
-                        if (arg[1] != '+')
-                        {
+                        if (arg[1] != '+') {
                             optionAttr |= OptionFlags.Short;
                         }
                         break;
@@ -132,10 +112,8 @@ namespace CalqFramework.Cli.Serialization.Parsing
                     }
                 }
 
-                if (optionAttr.HasFlag(OptionFlags.Short))
-                {
-                    foreach (var shortOption in ReadShort(option))
-                    {
+                if (optionAttr.HasFlag(OptionFlags.Short)) {
+                    foreach (var shortOption in ReadShort(option)) {
                         if (HasOption(shortOption)) {
                             if (optionAttr.HasFlag(OptionFlags.ValueUnassigned)) {
                                 TrySelfAssign(GetOptionType(shortOption), ref value, ref optionAttr);
@@ -145,9 +123,7 @@ namespace CalqFramework.Cli.Serialization.Parsing
                         }
                         yield return (shortOption.ToString(), value, optionAttr);
                     }
-                }
-                else
-                {
+                } else {
                     if (HasOption(option)) {
                         if (optionAttr.HasFlag(OptionFlags.ValueUnassigned)) {
                             TrySelfAssign(GetOptionType(option), ref value, ref optionAttr);

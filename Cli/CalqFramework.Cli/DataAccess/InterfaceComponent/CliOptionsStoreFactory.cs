@@ -3,7 +3,7 @@ using CalqFramework.Cli.DataAccess.ClassMember;
 using System.Reflection;
 using System;
 
-namespace CalqFramework.Cli.DataAccess {
+namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
     public class CliOptionsStoreFactory : ICliOptionsStoreFactory {
 
         internal ICliClassDataMemberSerializer CliClassDataMemberSerializer { get; }

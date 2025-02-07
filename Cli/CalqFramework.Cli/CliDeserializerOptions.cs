@@ -1,4 +1,4 @@
-﻿using CalqFramework.Cli.DataAccess;
+﻿using CalqFramework.Cli.DataAccess.InterfaceComponent;
 using CalqFramework.DataAccess.ClassMember;
 using System.Reflection;
 

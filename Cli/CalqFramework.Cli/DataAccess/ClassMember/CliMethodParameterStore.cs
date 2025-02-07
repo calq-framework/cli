@@ -1,4 +1,4 @@
-﻿using CalqFramework.Cli.Serialization.Parsing;
+﻿using CalqFramework.Cli.Parsing;
 using CalqFramework.DataAccess;
 using CalqFramework.DataAccess.ClassMember;
 using System;

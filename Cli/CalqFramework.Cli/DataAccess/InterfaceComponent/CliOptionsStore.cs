@@ -1,15 +1,16 @@
-﻿using System;
+﻿using CalqFramework.Cli.InterfaceComponents;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace CalqFramework.Cli.DataAccess {
-    internal class CliCommandStore<TKey, TValue, TAccessor> : ICliCommandStore<TKey, TValue, TAccessor> {
+namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
+    internal class CliOptionsStore<TKey, TValue, TAccessor> : ICliOptionsStore<TKey, TValue, TAccessor> {
         ICliStore<TKey, TValue, TAccessor> Store { get; }
 
         public TValue this[TKey key] { get => Store[key]; set => Store[key] = value; }
 
-        public CliCommandStore(ICliStore<TKey, TValue, TAccessor> store) {
+        public CliOptionsStore(ICliStore<TKey, TValue, TAccessor> store) {
             Store = store;
         }
 
@@ -25,14 +26,16 @@ namespace CalqFramework.Cli.DataAccess {
             return Store.GetValueOrInitialize(key);
         }
 
-        public IEnumerable<Command> GetCommandsString() {
-            var result = new List<Command>();
+        public IEnumerable<Option> GetOptionsString() {
+            var result = new List<Option>();
             var dict = Store.GetKeysByAccessors();
             foreach (var key in dict.Keys) {
-                result.Add(new Command() {
+                result.Add(new Option() {
                     // FIXME generics
+                    Type = GetDataType(dict[key].First()),
                     Keys = dict[key].Select(x => x.ToString()),
                     MemberInfo = key as MemberInfo,
+                    Value = this[dict[key].First()]?.ToString()
                 });
             }
             return result;

@@ -1,9 +1,9 @@
 ﻿using CalqFramework.Cli.DataAccess;
-using CalqFramework.Cli.Serialization.Parsing;
+using CalqFramework.Cli.Parsing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static CalqFramework.Cli.Serialization.Parsing.OptionsReaderBase;
+using static CalqFramework.Cli.Parsing.OptionsReaderBase;
 
 namespace CalqFramework.Cli {
     public class CliOptionsDeserializer {

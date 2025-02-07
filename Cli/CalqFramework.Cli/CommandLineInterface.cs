@@ -2,12 +2,14 @@
 using System;
 using System.Linq;
 using System.Reflection;
-using CalqFramework.Cli.Serialization.Parsing;
-using static CalqFramework.Cli.Serialization.Parsing.OptionsReaderBase;
+using static CalqFramework.Cli.Parsing.OptionsReaderBase;
 using System.Collections.Generic;
 using CalqFramework.Cli.Serialization;
 using CalqFramework.Cli.DataAccess.ClassMember;
 using System.ComponentModel.Design;
+using CalqFramework.Cli.InterfaceComponents;
+using CalqFramework.Cli.DataAccess.InterfaceComponent;
+using CalqFramework.Cli.Parsing;
 
 namespace CalqFramework.Cli {
     // TODO create separate class for help/version logic
