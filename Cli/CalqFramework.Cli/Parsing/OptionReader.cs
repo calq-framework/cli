@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Reflection;
 
 namespace CalqFramework.Cli.Parsing {
-    internal class OptionsReader : OptionsReaderBase {
-        private IKeyValueStore<string, object?> Store { get; }
+    internal class OptionReader : OptionReaderBase {
+        public IKeyValueStore<string, object?> Store { get; }
 
-        public OptionsReader(IEnumerator<string> argsEnumerator, IKeyValueStore<string, object?> dataStore) : base(argsEnumerator) {
+        public OptionReader(IEnumerator<string> argsEnumerator, IKeyValueStore<string, object?> dataStore) : base(argsEnumerator) {
             Store = dataStore;
         }
 

@@ -1,8 +1,7 @@
-﻿using CalqFramework.Cli.DataAccess;
-using System;
+﻿using System;
 using System.Linq;
 using System.Reflection;
-using static CalqFramework.Cli.Parsing.OptionsReaderBase;
+using static CalqFramework.Cli.Parsing.OptionReaderBase;
 using System.Collections.Generic;
 using CalqFramework.Cli.Serialization;
 using CalqFramework.Cli.DataAccess.ClassMember;
@@ -15,23 +14,16 @@ namespace CalqFramework.Cli {
     // TODO create separate class for help/version logic
     public class CommandLineInterface
     {
-        private BindingFlags? _methodBindingAttr = null;
-
-        public ICliComponentFactory CliOptionsStoreFactory { get; init; }
+        public ICliComponentStoreFactory CliOptionsStoreFactory { get; init; }
 
         private HelpGenerator HelpGenerator { get; init; } // TODO public
 
         public bool SkipUnknown { get; init; } = false;
 
-        public BindingFlags MethodBindingAttr {
-            get => _methodBindingAttr == null ? CliOptionsStoreFactory.BindingAttr : (BindingFlags)_methodBindingAttr;
-            init => _methodBindingAttr = value;
-        }
-
         public bool UseRevisionVersion { get; init; } = true;
 
         public CommandLineInterface() {
-            CliOptionsStoreFactory = new CliComponentFactory();
+            CliOptionsStoreFactory = new CliComponentStoreFactory();
             HelpGenerator = new HelpGenerator();
         }
 
@@ -66,7 +58,7 @@ namespace CalqFramework.Cli {
 
         private bool TryReadOptionsAndActionParams(IEnumerator<string> args, OptionAndParameterStore optionsAndParams, MethodInfo method)
         {
-            var optionsReader = new OptionsReader(args, optionsAndParams);
+            var optionsReader = new OptionReader(args, optionsAndParams);
 
             try
             {
@@ -144,7 +136,7 @@ namespace CalqFramework.Cli {
             } while (en.MoveNext());
             var cliOptions = CliOptionsStoreFactory.CreateOptionStore(targetObj);
 
-            var methodResolver = new MethodResolver(targetObj, MethodBindingAttr);
+            var methodResolver = CliOptionsStoreFactory.CreateMethodResolver(targetObj);
             if (optionOrAction == "--help" || optionOrAction == "-h")
             {
                 HandleInstanceHelp(cliOptions, cliCommands, methodResolver);
