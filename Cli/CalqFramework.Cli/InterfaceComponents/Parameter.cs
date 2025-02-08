@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Reflection;
 
 namespace CalqFramework.Cli.InterfaceComponents {
-    public class PositionalPram {
+    public class Parameter {
         public IEnumerable<string> Keys { get; init; }
-        public ParameterInfo ParamInfo { get; init; }
+        public ParameterInfo ParameterInfo { get; init; }
         public Type Type { get; init; }
         public string? Value { get; init; }
         public bool HasDefaultValue { get; init; }

@@ -1,16 +1,9 @@
-﻿using CalqFramework.Cli.Attributes;
-using CalqFramework.Cli.Serialization;
-using CalqFramework.Cli.Serialization.Parsing;
-using CalqFramework.DataAccess.ClassMember;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using static System.Formats.Asn1.AsnWriter;
 
-namespace CalqFramework.Cli.DataAccess
-{
+namespace CalqFramework.Cli.DataAccess {
     internal class MethodResolver
     {
         public object Obj { get; }
@@ -34,11 +27,6 @@ namespace CalqFramework.Cli.DataAccess
             } else {
                 throw new CliException($"invalid command");
             }
-        }
-
-        public string MethodToString(MethodInfo method) {
-            var name = BindingAttr.HasFlag(BindingFlags.IgnoreCase) ? method.Name!.ToLower() : method.Name;
-            return $"{name}({string.Join(", ", method.GetParameters().Select(x => $"{ToStringHelper.GetTypeName(x.ParameterType)} {x.Name}{(x.HasDefaultValue ? $" = {x.DefaultValue?.ToString()!.ToLower()}" : "")}"))})";
         }
     }
 }

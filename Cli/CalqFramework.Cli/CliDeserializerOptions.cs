@@ -4,11 +4,11 @@ using System.Reflection;
 
 namespace CalqFramework.Cli {
     public class CliDeserializerOptions {
-        public ICliOptionsStoreFactory CliOptionsStoreFactory { get; init; }
+        public ICliComponentFactory CliOptionsStoreFactory { get; init; }
         public bool SkipUnknown { get; init; } = false;
 
         public CliDeserializerOptions() {
-            CliOptionsStoreFactory = new CliOptionsStoreFactory();
+            CliOptionsStoreFactory = new CliComponentFactory();
         }
     }
 }

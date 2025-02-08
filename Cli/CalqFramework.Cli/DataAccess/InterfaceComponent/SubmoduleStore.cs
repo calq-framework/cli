@@ -5,12 +5,12 @@ using System.Linq;
 using System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
-    internal class CliParamStore<TKey, TValue, TAccessor> : ICliParamStore<TKey, TValue, TAccessor> {
+    internal class SubmoduleStore<TKey, TValue, TAccessor> : ISubmoduleStore<TKey, TValue, TAccessor> {
         ICliStore<TKey, TValue, TAccessor> Store { get; }
 
         public TValue this[TKey key] { get => Store[key]; set => Store[key] = value; }
 
-        public CliParamStore(ICliStore<TKey, TValue, TAccessor> store) {
+        public SubmoduleStore(ICliStore<TKey, TValue, TAccessor> store) {
             Store = store;
         }
 
@@ -26,17 +26,14 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
             return Store.GetValueOrInitialize(key);
         }
 
-        public IEnumerable<PositionalPram> GetParamsString() {
-            var result = new List<PositionalPram>();
+        public IEnumerable<Submodule> GetCommands() {
+            var result = new List<Submodule>();
             var dict = Store.GetKeysByAccessors();
             foreach (var key in dict.Keys) {
-                result.Add(new PositionalPram() {
+                result.Add(new Submodule() {
                     // FIXME generics
-                    Type = GetDataType(dict[key].First()),
                     Keys = dict[key].Select(x => x.ToString()),
-                    ParamInfo = key as ParameterInfo,
-                    Value = this[dict[key].First()]?.ToString(),
-                    HasDefaultValue = (key as ParameterInfo).HasDefaultValue
+                    MemberInfo = key as MemberInfo,
                 });
             }
             return result;

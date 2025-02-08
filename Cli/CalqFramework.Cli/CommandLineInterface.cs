@@ -17,7 +17,7 @@ namespace CalqFramework.Cli {
     {
         private BindingFlags? _methodBindingAttr = null;
 
-        public ICliOptionsStoreFactory CliOptionsStoreFactory { get; init; }
+        public ICliComponentFactory CliOptionsStoreFactory { get; init; }
 
         private HelpGenerator HelpGenerator { get; init; } // TODO public
 
@@ -31,40 +31,40 @@ namespace CalqFramework.Cli {
         public bool UseRevisionVersion { get; init; } = true;
 
         public CommandLineInterface() {
-            CliOptionsStoreFactory = new CliOptionsStoreFactory();
+            CliOptionsStoreFactory = new CliComponentFactory();
             HelpGenerator = new HelpGenerator();
         }
 
         // TODO separate data and printing
-        private void HandleMethodHelp(CliOptionsAndActionParametersStore optionsAndParams, MethodInfo methodInfo)
+        private void HandleMethodHelp(OptionAndParameterStore optionsAndParams, MethodInfo methodInfo)
         {
-            var method = new Method() {
+            var method = new Subcommand() {
                 // FIXME generics
                 ReturnType = methodInfo.ReturnType,
                 Keys = new[] { methodInfo.Name },
-                Methodinfo = methodInfo,
-                PositionalParameters = new CliParamStore<string, object?, ParameterInfo>(new CliMethodParameterStore(methodInfo)).GetParamsString()
+                MethodInfo = methodInfo,
+                Parameters = new ParameterStore<string, object?, ParameterInfo>(new CliMethodParameterStore(methodInfo)).GetParameters()
             };
-            Console.Write(HelpGenerator.GetHelp(optionsAndParams.Options.GetOptionsString(), method));
+            Console.Write(HelpGenerator.GetHelp(optionsAndParams.Options.GetOptions(), method));
         }
 
         // TODO separate data and printing
-        private void HandleInstanceHelp(ICliOptionsStore<string, object?, MemberInfo> options, ICliCommandStore<string, object?, MemberInfo> commands, MethodResolver methodResolver)
+        private void HandleInstanceHelp(IOptionStore<string, object?, MemberInfo> options, ISubmoduleStore<string, object?, MemberInfo> commands, MethodResolver methodResolver)
         {
-            var methods = new List<Method>();
+            var methods = new List<Subcommand>();
             foreach (var methodInfo in methodResolver.Methods) {
-                methods.Add(new Method() {
+                methods.Add(new Subcommand() {
                     // FIXME generics
                     ReturnType = methodInfo.ReturnType,
                     Keys = new[] { methodInfo.Name },
-                    Methodinfo = methodInfo,
-                    PositionalParameters = new CliParamStore<string, object?, ParameterInfo>(new CliMethodParameterStore(methodInfo)).GetParamsString()
+                    MethodInfo = methodInfo,
+                    Parameters = new ParameterStore<string, object?, ParameterInfo>(new CliMethodParameterStore(methodInfo)).GetParameters()
                 });
             }
-            Console.Write(HelpGenerator.GetHelp(options.GetOptionsString(), commands.GetCommandsString(), methods));
+            Console.Write(HelpGenerator.GetHelp(options.GetOptions(), commands.GetCommands(), methods));
         }
 
-        private bool TryReadOptionsAndActionParams(IEnumerator<string> args, CliOptionsAndActionParametersStore optionsAndParams, MethodInfo method)
+        private bool TryReadOptionsAndActionParams(IEnumerator<string> args, OptionAndParameterStore optionsAndParams, MethodInfo method)
         {
             var optionsReader = new OptionsReader(args, optionsAndParams);
 
@@ -88,7 +88,7 @@ namespace CalqFramework.Cli {
 
                     if (optionAttr.HasFlag(OptionFlags.NotAnOption))
                     {
-                        optionsAndParams._actionParameters.AddPositionalParameter(option);
+                        optionsAndParams._parameters.AddPositionalParameter(option);
                     }
                     else
                     {
@@ -98,7 +98,7 @@ namespace CalqFramework.Cli {
                     }
                 }
                 while (args.MoveNext()) {
-                    optionsAndParams._actionParameters.AddPositionalParameter(args.Current);
+                    optionsAndParams._parameters.AddPositionalParameter(args.Current);
                 }
             }
             catch (Exception ex)
@@ -126,12 +126,12 @@ namespace CalqFramework.Cli {
             string optionOrAction;
 
             var targetObj = obj;
-            ICliCommandStore<string, object?, MemberInfo> cliCommands;
+            ISubmoduleStore<string, object?, MemberInfo> cliCommands;
 
             // explore object tree until optionOrAction definitely cannot be an action (object not found by name)
             do {
                 optionOrAction = en.Current;
-                cliCommands = CliOptionsStoreFactory.CreateCommandStore(targetObj);
+                cliCommands = CliOptionsStoreFactory.CreateSubmoduleStore(targetObj);
                 if (cliCommands.ContainsKey(optionOrAction)) {
                     var type = cliCommands.GetDataType(optionOrAction);
                     if (ValueParser.IsParseable(type)) {
@@ -142,7 +142,7 @@ namespace CalqFramework.Cli {
                     break;
                 }
             } while (en.MoveNext());
-            var cliOptions = CliOptionsStoreFactory.CreateOptonStore(targetObj);
+            var cliOptions = CliOptionsStoreFactory.CreateOptionStore(targetObj);
 
             var methodResolver = new MethodResolver(targetObj, MethodBindingAttr);
             if (optionOrAction == "--help" || optionOrAction == "-h")
@@ -157,7 +157,7 @@ namespace CalqFramework.Cli {
 
             var cliAction = methodResolver.GetMethod(optionOrAction);
             var actionParams = new CliMethodParameterStore(cliAction);
-            var optionsAndActionParams = new CliOptionsAndActionParametersStore(cliOptions, actionParams, targetObj);
+            var optionsAndActionParams = new OptionAndParameterStore(cliOptions, actionParams, targetObj);
             if (TryReadOptionsAndActionParams(en, optionsAndActionParams, cliAction))
             {
                 return optionsAndActionParams.Invoke();
