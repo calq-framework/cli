@@ -1,6 +1,6 @@
 ﻿#pragma warning disable CS0649
 
-using CalqFramework.Cli.Attributes;
+using CalqFramework.Cli.Serialization;
 using System.Collections.Generic;
 
 namespace CalqFramework.CliTest {
@@ -13,13 +13,13 @@ namespace CalqFramework.CliTest {
         public bool boolean;
         public bool xtrueBoolean = true;
         public string text;
-        [Name("customname")]
+        [CliName("customname")]
         public bool longOption;
-        [Name("shadowedfield")]
+        [CliName("shadowedfield")]
         public bool usableOption;
         public bool shadowedfield;
-        [Name("differentname")]
-        [ShortName('y')]
+        [CliName("differentname")]
+        [CliName("y")]
         public bool shortOption;
         public List<bool> initializedBoolList = new List<bool>() { true, false };
     }
