@@ -37,42 +37,28 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
             CliValidator = cliValidator;
         }
 
-        // FIXME do not assign the first occurances - check for duplicates. if duplicate found then then return null
+        // FIXME align with GetKeysByAccessors
         private MemberInfo? GetClassMember(string key) {
-            if (key.Length == 1) {
-                foreach (var member in ParentType.GetProperties(BindingAttr)) {
-                    var name = member.GetCustomAttribute<ShortNameAttribute>()?.Name;
-                    if (name != null && name == key[0] && ContainsAccessor(member)) {
+            foreach (var member in Accessors) {
+                foreach (var atribute in member.GetCustomAttributes<CliNameAttribute>()) {
+                    if (atribute.Name == key) {
                         return member;
                     }
                 }
-            }
-
-            foreach (var member in ParentType.GetProperties(BindingAttr)) {
-                var name = member.GetCustomAttribute<NameAttribute>()?.Name;
-                if (name != null && name == key && ContainsAccessor(member)) {
+                foreach (var atribute in member.GetCustomAttributes<CliNameAttribute>()) {
+                    if (atribute.Name[0].ToString() == key) {
+                        return member;
+                    }
+                }
+                if (member.Name == key) {
+                    return member;
+                }
+                if (member.Name[0].ToString() == key) {
                     return member;
                 }
             }
 
-            var dataMember = ParentType.GetProperty(key, BindingAttr);
-
-            if (dataMember == null && key.Length == 1) {
-                foreach (var member in ParentType.GetProperties(BindingAttr)) {
-                    var name = member.GetCustomAttribute<NameAttribute>()?.Name[0];
-                    if (name != null && name == key[0] && ContainsAccessor(member)) {
-                        return member;
-                    }
-                }
-
-                foreach (var member in ParentType.GetProperties(BindingAttr)) {
-                    if (member.Name[0] == key[0] && ContainsAccessor(member)) {
-                        return member;
-                    }
-                }
-            }
-
-            return dataMember != null == ContainsAccessor(dataMember!) ? dataMember : null;
+            return null;
         }
 
         public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out MemberInfo result) {
@@ -89,7 +75,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
             var keys = new Dictionary<MemberInfo, IEnumerable<string>>();
             foreach (var accessor in Accessors) {
                 var accesorKeys = new List<string>();
-                foreach (var atribute in accessor.GetCustomAttributes<NameAttribute>()) {
+                foreach (var atribute in accessor.GetCustomAttributes<CliNameAttribute>()) {
                     accesorKeys.Add(atribute.Name);
                 }
                 if (accesorKeys.Count == 0) {

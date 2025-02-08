@@ -1,10 +1,10 @@
-﻿using CalqFramework.Cli.Attributes;
+﻿using CalqFramework.Cli.Serialization;
 
 public class Classlib {
-    [ShortName('x')] // default 'e'
+    [CliName("x")] // default 'e'
     public bool Enable { get; set; }
 
-    [Name("verbose")] // default "VerboseMode"
+    [CliName("verbose")] // default "VerboseMode"
     public bool VerboseMode { get; set; }
 
     public Nested Nested { get; } = new();
