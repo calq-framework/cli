@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
-    public interface ICliParamStore<TKey, TValue, TAccessor> : IKeyValueStore<TKey, TValue> {
-        IEnumerable<PositionalPram> GetParamsString();
+    public interface ISubmoduleStore<TKey, TValue, TAccessor> : IKeyValueStore<TKey, TValue> {
+        IEnumerable<Submodule> GetCommands();
     }
 }

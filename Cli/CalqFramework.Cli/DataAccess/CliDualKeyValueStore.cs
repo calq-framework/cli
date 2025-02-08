@@ -11,13 +11,13 @@ namespace CalqFramework.Cli.DataAccess {
         private ICliStore<string, object?, MemberInfo> _secondarStore;
 
         private BindingFlags BindingAttr { get; }
-        private ICliClassDataMemberSerializer CliSerializer { get; }
+        private IClassMemberSerializer CliSerializer { get; }
 
         public override IKeyValueStore<string, object?> PrimaryAccessor => _primaryStore;
 
         public override IKeyValueStore<string, object?> SecondaryAccessor => _secondarStore;
 
-        public CliDualKeyValueStore(ICliStore<string, object?, MemberInfo> primaryStore, ICliStore<string, object?, MemberInfo> secondaryStore, BindingFlags bindingAttr, ICliClassDataMemberSerializer cliSerializer) {
+        public CliDualKeyValueStore(ICliStore<string, object?, MemberInfo> primaryStore, ICliStore<string, object?, MemberInfo> secondaryStore, BindingFlags bindingAttr, IClassMemberSerializer cliSerializer) {
             _primaryStore = primaryStore;
             _secondarStore = secondaryStore;
             BindingAttr = bindingAttr;

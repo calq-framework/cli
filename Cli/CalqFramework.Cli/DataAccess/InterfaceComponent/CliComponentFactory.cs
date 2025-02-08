@@ -4,9 +4,9 @@ using System.Reflection;
 using System;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
-    public class CliOptionsStoreFactory : ICliOptionsStoreFactory {
+    public class CliComponentFactory : ICliComponentFactory {
 
-        internal ICliClassDataMemberSerializer CliClassDataMemberSerializer { get; }
+        internal IClassMemberSerializer CliClassDataMemberSerializer { get; }
 
         public const BindingFlags DefaultLookup = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public;
 
@@ -15,14 +15,14 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
 
         public BindingFlags BindingAttr { get; init; } = DefaultLookup;
 
-        public CliOptionsStoreFactory() {
+        public CliComponentFactory() {
             AccessFields = true;
             BindingAttr = DefaultLookup | BindingFlags.IgnoreCase;
-            CliClassDataMemberSerializer = new CliClassDataMemberSerializer();
+            CliClassDataMemberSerializer = new ClassMemberSerializer();
         }
 
-        public ICliOptionsStore<string, object?, MemberInfo> CreateOptonStore(object obj) {
-            var cliValidator = new CliOptionValidator();
+        public IOptionStore<string, object?, MemberInfo> CreateOptionStore(object obj) {
+            var cliValidator = new OptionAccessorValidator();
             ICliStore<string, object?, MemberInfo> store;
             if (AccessFields && AccessProperties) {
                 store = CreateFieldAndPropertyStore(obj, cliValidator);
@@ -33,11 +33,11 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
             } else {
                 throw new ArgumentException("Neither AccessFields nor AccessProperties is set.");
             }
-            return new CliOptionsStore<string, object?, MemberInfo>(store);
+            return new OptionStore<string, object?, MemberInfo>(store);
         }
 
-        public ICliCommandStore<string, object?, MemberInfo> CreateCommandStore(object obj) {
-            var cliValidator = new CliCommandValidator();
+        public ISubmoduleStore<string, object?, MemberInfo> CreateSubmoduleStore(object obj) {
+            var cliValidator = new SubmoduleAccessorValidator();
             ICliStore<string, object?, MemberInfo> store;
             if (AccessFields && AccessProperties) {
                 store = CreateFieldAndPropertyStore(obj, cliValidator);
@@ -48,18 +48,18 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
             } else {
                 throw new ArgumentException("Neither AccessFields nor AccessProperties is set.");
             }
-            return new CliCommandStore<string, object?, MemberInfo>(store);
+            return new SubmoduleStore<string, object?, MemberInfo>(store);
         }
 
-        protected ICliStore<string, object?, MemberInfo> CreateFieldAndPropertyStore(object obj, ICliValidator cliValidator) {
+        protected ICliStore<string, object?, MemberInfo> CreateFieldAndPropertyStore(object obj, IAccessorValidator cliValidator) {
             return new CliDualKeyValueStore(CreateFieldStore(obj, cliValidator), CreatePropertyStore(obj, cliValidator), BindingAttr, CliClassDataMemberSerializer);
         }
 
-        protected ICliStore<string, object?, MemberInfo> CreateFieldStore(object obj, ICliValidator cliValidator) {
+        protected ICliStore<string, object?, MemberInfo> CreateFieldStore(object obj, IAccessorValidator cliValidator) {
             return new CliFieldStore(obj, BindingAttr, CliClassDataMemberSerializer, cliValidator);
         }
 
-        protected ICliStore<string, object?, MemberInfo> CreatePropertyStore(object obj, ICliValidator cliValidator) {
+        protected ICliStore<string, object?, MemberInfo> CreatePropertyStore(object obj, IAccessorValidator cliValidator) {
             return new CliPropertyStore(obj, BindingAttr, CliClassDataMemberSerializer, cliValidator);
         }
     }

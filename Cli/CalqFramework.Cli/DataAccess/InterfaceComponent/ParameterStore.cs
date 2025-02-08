@@ -5,12 +5,12 @@ using System.Linq;
 using System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
-    internal class CliOptionsStore<TKey, TValue, TAccessor> : ICliOptionsStore<TKey, TValue, TAccessor> {
+    internal class ParameterStore<TKey, TValue, TAccessor> : IParameterStore<TKey, TValue, TAccessor> {
         ICliStore<TKey, TValue, TAccessor> Store { get; }
 
         public TValue this[TKey key] { get => Store[key]; set => Store[key] = value; }
 
-        public CliOptionsStore(ICliStore<TKey, TValue, TAccessor> store) {
+        public ParameterStore(ICliStore<TKey, TValue, TAccessor> store) {
             Store = store;
         }
 
@@ -26,16 +26,17 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
             return Store.GetValueOrInitialize(key);
         }
 
-        public IEnumerable<Option> GetOptionsString() {
-            var result = new List<Option>();
+        public IEnumerable<Parameter> GetParameters() {
+            var result = new List<Parameter>();
             var dict = Store.GetKeysByAccessors();
             foreach (var key in dict.Keys) {
-                result.Add(new Option() {
+                result.Add(new Parameter() {
                     // FIXME generics
                     Type = GetDataType(dict[key].First()),
                     Keys = dict[key].Select(x => x.ToString()),
-                    MemberInfo = key as MemberInfo,
-                    Value = this[dict[key].First()]?.ToString()
+                    ParameterInfo = key as ParameterInfo,
+                    Value = this[dict[key].First()]?.ToString(),
+                    HasDefaultValue = (key as ParameterInfo).HasDefaultValue
                 });
             }
             return result;

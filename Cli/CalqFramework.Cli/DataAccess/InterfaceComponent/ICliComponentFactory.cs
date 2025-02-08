@@ -1,12 +1,12 @@
 ﻿using System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
-    public interface ICliOptionsStoreFactory {
+    public interface ICliComponentFactory {
         bool AccessFields { get; init; }
         bool AccessProperties { get; init; }
         BindingFlags BindingAttr { get; init; }
 
-        ICliCommandStore<string, object?, MemberInfo> CreateCommandStore(object obj);
-        ICliOptionsStore<string, object?, MemberInfo> CreateOptonStore(object obj);
+        ISubmoduleStore<string, object?, MemberInfo> CreateSubmoduleStore(object obj);
+        IOptionStore<string, object?, MemberInfo> CreateOptionStore(object obj);
     }
 }

@@ -1,5 +1,5 @@
 ﻿namespace CalqFramework.Cli.DataAccess.ClassMember {
-    public interface ICliValidator {
+    public interface IAccessorValidator {
         bool IsValid(System.Reflection.MemberInfo accessor);
     }
 }

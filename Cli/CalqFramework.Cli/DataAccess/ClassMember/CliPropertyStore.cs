@@ -10,8 +10,8 @@ using System.Linq;
 namespace CalqFramework.Cli.DataAccess.ClassMember {
     // TODO unify with FieldStore
     internal class CliPropertyStore : PropertyStoreBase<string>, ICliStore<string, object?, MemberInfo> {
-        private ICliClassDataMemberSerializer CliSerializer { get; }
-        private ICliValidator CliValidator { get; }
+        private IClassMemberSerializer CliSerializer { get; }
+        private IAccessorValidator CliValidator { get; }
 
         public override object? this[MemberInfo accessor] {
             get {
@@ -32,7 +32,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
             }
         }
 
-        public CliPropertyStore(object obj, BindingFlags bindingAttr, ICliClassDataMemberSerializer cliSerializer, ICliValidator cliValidator) : base(obj, bindingAttr) {
+        public CliPropertyStore(object obj, BindingFlags bindingAttr, IClassMemberSerializer cliSerializer, IAccessorValidator cliValidator) : base(obj, bindingAttr) {
             CliSerializer = cliSerializer;
             CliValidator = cliValidator;
         }
