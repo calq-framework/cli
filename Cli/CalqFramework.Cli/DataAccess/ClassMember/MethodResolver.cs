@@ -3,15 +3,13 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
-namespace CalqFramework.Cli.DataAccess {
-    internal class MethodResolver
-    {
+namespace CalqFramework.Cli.DataAccess.ClassMember {
+    public class MethodResolver {
         public object Obj { get; }
         public BindingFlags BindingAttr { get; }
         public IEnumerable<MethodInfo> Methods { get => Obj.GetType().GetMethods(BindingAttr).Where(x => !IsDotnetSpecific(x)); }
 
-        public MethodResolver(object obj, BindingFlags methodBindingAttr)
-        {
+        public MethodResolver(object obj, BindingFlags methodBindingAttr) {
             Obj = obj;
             BindingAttr = methodBindingAttr;
         }

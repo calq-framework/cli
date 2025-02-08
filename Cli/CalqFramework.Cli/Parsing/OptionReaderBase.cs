@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Numerics;
 
 namespace CalqFramework.Cli.Parsing {
-    internal abstract class OptionsReaderBase {
+    internal abstract class OptionReaderBase {
 
         [Flags]
         internal enum OptionFlags {
@@ -19,7 +19,7 @@ namespace CalqFramework.Cli.Parsing {
 
         public IEnumerator<string> ArgsEnumerator { get; }
 
-        protected OptionsReaderBase(IEnumerator<string> argsEnumerator) {
+        protected OptionReaderBase(IEnumerator<string> argsEnumerator) {
             ArgsEnumerator = argsEnumerator;
         }
 

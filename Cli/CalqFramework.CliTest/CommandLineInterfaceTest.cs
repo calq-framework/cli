@@ -122,7 +122,7 @@ namespace CalqFramework.CliTest {
             var ex = Assert.Throws<CliException>(() => {
                 var tool = new SomeClassLibrary();
                 new CommandLineInterface() {
-                    CliOptionsStoreFactory = new CliComponentFactory { BindingAttr = CliComponentFactory.DefaultLookup }
+                    CliOptionsStoreFactory = new CliComponentStoreFactory { BindingAttr = CliComponentStoreFactory.DefaultLookup }
                 }.Execute(tool,
                     new[] { $"{nameof(SomeClassLibrary.Method).ToLower()}" }
                 );

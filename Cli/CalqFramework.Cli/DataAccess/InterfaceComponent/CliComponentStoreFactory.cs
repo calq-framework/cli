@@ -4,7 +4,8 @@ using System.Reflection;
 using System;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
-    public class CliComponentFactory : ICliComponentFactory {
+    public class CliComponentStoreFactory : ICliComponentStoreFactory {
+        private BindingFlags? _methodBindingAttr = null;
 
         internal IClassMemberSerializer CliClassDataMemberSerializer { get; }
 
@@ -13,9 +14,14 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
         public bool AccessFields { get; init; } = false;
         public bool AccessProperties { get; init; } = true;
 
+        public BindingFlags MethodBindingAttr {
+            get => _methodBindingAttr == null ? BindingAttr : (BindingFlags)_methodBindingAttr;
+            init => _methodBindingAttr = value;
+        }
+
         public BindingFlags BindingAttr { get; init; } = DefaultLookup;
 
-        public CliComponentFactory() {
+        public CliComponentStoreFactory() {
             AccessFields = true;
             BindingAttr = DefaultLookup | BindingFlags.IgnoreCase;
             CliClassDataMemberSerializer = new ClassMemberSerializer();
@@ -61,6 +67,10 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
 
         protected ICliStore<string, object?, MemberInfo> CreatePropertyStore(object obj, IAccessorValidator cliValidator) {
             return new CliPropertyStore(obj, BindingAttr, CliClassDataMemberSerializer, cliValidator);
+        }
+
+        public MethodResolver CreateMethodResolver(object targetObj) {
+            return new MethodResolver(targetObj, MethodBindingAttr);
         }
     }
 }
