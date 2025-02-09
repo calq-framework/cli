@@ -19,11 +19,11 @@ namespace CalqFramework.Cli {
             Deserialize(store, args, options);
         }
 
-        public static void Deserialize(IKeyValueStore<string, object?> store, OptionDeserializerConfiguration? options = null) {
+        public static void Deserialize(IKeyValueStore<string, string> store, OptionDeserializerConfiguration? options = null) {
             Deserialize(store, Environment.GetCommandLineArgs().Skip(1), options);
         }
 
-        public static void Deserialize(IKeyValueStore<string, object?> store, IEnumerable<string> args, OptionDeserializerConfiguration? options = null) {
+        public static void Deserialize(IKeyValueStore<string, string> store, IEnumerable<string> args, OptionDeserializerConfiguration? options = null) {
             using var argsEnumerator = args.GetEnumerator();
             var reader = new OptionReader(argsEnumerator, store);
             Deserialize(reader, options);
@@ -47,10 +47,7 @@ namespace CalqFramework.Cli {
                     throw new CliException($"unexpected value {option}");
                 }
 
-                var type = store.GetDataType(option);
-                var valueObj = ValueParser.ParseValue(value, type, option);
-
-                store[option] = valueObj;
+                store[option] = value;
             }
         }
     }

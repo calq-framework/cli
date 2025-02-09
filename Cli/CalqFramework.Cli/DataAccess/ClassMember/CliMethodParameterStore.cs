@@ -9,7 +9,7 @@ using System.Linq;
 using System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess.ClassMember {
-    internal class CliMethodParameterStore : MethodParamStoreBase<string>, ICliStore<string, object?, ParameterInfo> {
+    internal class CliMethodParameterStore : MethodParamStoreBase<string, string?>, ICliStore<string, string?, ParameterInfo> {
         public List<string> ReceivedPositionalParameters { get; }
 
         public CliMethodParameterStore(MethodInfo method) : base(method) {
@@ -118,6 +118,14 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
                 keys[accessor] = accesorKeys;
             }
             return keys;
+        }
+
+        protected override string? ConvertFromInternalValue(ParameterInfo accessor, object? value) {
+            return value?.ToString()?.ToLower();
+        }
+
+        protected override object? ConvertToInternalValue(ParameterInfo accessor, string? value) {
+            return ValueParser.ParseValue(value, GetDataType(accessor));
         }
     }
 }

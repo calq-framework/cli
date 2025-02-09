@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
-    public interface IOptionStore<TKey, TValue, TAccessor> : IKeyValueStore<TKey, TValue> {
+    public interface IOptionStore : IKeyValueStore<string, string?> {
         IEnumerable<Option> GetOptions();
     }
 }

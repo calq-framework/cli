@@ -2,7 +2,7 @@
 using System.Reflection;
 
 namespace CalqFramework.DataAccess.ClassMember;
-public abstract class ClassDataMemberStoreFactoryBase<TKey, TValue> : IClassDataMemberStoreFactory<TKey, TValue> {
+public abstract class ClassDataMemberStoreFactoryBase : IClassDataMemberStoreFactory {
 
     public const BindingFlags DefaultLookup = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public;
 
@@ -11,7 +11,7 @@ public abstract class ClassDataMemberStoreFactoryBase<TKey, TValue> : IClassData
 
     public BindingFlags BindingAttr { get; init; } = DefaultLookup;
 
-    public virtual IKeyValueStore<TKey, TValue, MemberInfo> CreateDataMemberStore(object obj) {
+    public virtual IKeyValueStore<string, object?, MemberInfo> CreateDataMemberStore(object obj) {
         if (AccessFields && AccessProperties) {
             return CreateFieldAndPropertyStore(obj);
         } else if (AccessFields) {
@@ -23,9 +23,9 @@ public abstract class ClassDataMemberStoreFactoryBase<TKey, TValue> : IClassData
         }
     }
 
-    protected virtual IKeyValueStore<TKey, TValue, MemberInfo> CreateFieldAndPropertyStore(object obj) {
-        return new DualKeyValueStore<TKey, TValue, MemberInfo>(CreateFieldStore(obj), CreatePropertyStore(obj));
+    protected virtual IKeyValueStore<string, object?, MemberInfo> CreateFieldAndPropertyStore(object obj) {
+        return new DualKeyValueStore<string, object?, MemberInfo>(CreateFieldStore(obj), CreatePropertyStore(obj));
     }
-    protected abstract IKeyValueStore<TKey, TValue, MemberInfo> CreateFieldStore(object obj);
-    protected abstract IKeyValueStore<TKey, TValue, MemberInfo> CreatePropertyStore(object obj);
+    protected abstract IKeyValueStore<string, object?, MemberInfo> CreateFieldStore(object obj);
+    protected abstract IKeyValueStore<string, object?, MemberInfo> CreatePropertyStore(object obj);
 }

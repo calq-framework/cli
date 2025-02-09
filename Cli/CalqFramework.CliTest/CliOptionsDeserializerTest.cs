@@ -108,7 +108,7 @@ namespace CalqFramework.CliTest {
                 var obj = new SomeConfiguration();
                 OptionDeserializer.Deserialize(obj, new string[] { $"--{nameof(SomeConfiguration.integer)}=a" });
             });
-            Assert.Equal($"option and value type mismatch: integer=a (integer is Int32)", ex.Message);
+            Assert.Equal($"value type mismatch: expected Int32 got a", ex.Message);
         }
 
         [Fact]
@@ -117,7 +117,7 @@ namespace CalqFramework.CliTest {
                 var obj = new SomeConfiguration();
                 OptionDeserializer.Deserialize(obj, new string[] { $"--{nameof(SomeConfiguration.integer)}=0.1" });
             });
-            Assert.Equal($"option and value type mismatch: integer=0.1 (integer is Int32)", ex.Message);
+            Assert.Equal($"value type mismatch: expected Int32 got 0.1", ex.Message);
         }
 
         [Fact]
@@ -126,7 +126,7 @@ namespace CalqFramework.CliTest {
                 var obj = new SomeConfiguration();
                 OptionDeserializer.Deserialize(obj, new string[] { $"--{nameof(SomeConfiguration.aByteNumber)}=256" });
             });
-            Assert.Equal($"option value is out of range: aByteNumber=256 (0-255)", ex.Message);
+            Assert.Equal($"value is out of range: 256 (0-255)", ex.Message);
         }
 
         [Fact]
@@ -204,7 +204,7 @@ namespace CalqFramework.CliTest {
                     }
                 );
             });
-            Assert.Equal($"option value is out of range: port=2147483647 (0-65535)", ex.Message);
+            Assert.Equal($"value is out of range: 2147483647 (0-65535)", ex.Message);
         }
 
         [Fact]

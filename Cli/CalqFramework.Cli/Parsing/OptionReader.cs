@@ -5,10 +5,10 @@ using System.Reflection;
 
 namespace CalqFramework.Cli.Parsing {
     internal class OptionReader : OptionReaderBase {
-        public IKeyValueStore<string, object?> Store { get; }
+        public IKeyValueStore<string, string?> Store { get; }
 
-        public OptionReader(IEnumerator<string> argsEnumerator, IKeyValueStore<string, object?> dataStore) : base(argsEnumerator) {
-            Store = dataStore;
+        public OptionReader(IEnumerator<string> argsEnumerator, IKeyValueStore<string, string?> store) : base(argsEnumerator) {
+            Store = store;
         }
 
         protected override bool HasOption(char option) {

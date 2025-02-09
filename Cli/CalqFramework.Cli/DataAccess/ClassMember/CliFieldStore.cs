@@ -1,4 +1,5 @@
-﻿using CalqFramework.Cli.Serialization;
+﻿using CalqFramework.Cli.Parsing;
+using CalqFramework.Cli.Serialization;
 using CalqFramework.DataAccess;
 using CalqFramework.DataAccess.ClassMember;
 using System.Collections;
@@ -10,9 +11,10 @@ using System.Xml.Linq;
 
 namespace CalqFramework.Cli.DataAccess.ClassMember {
     // TODO unify with PropertyStore
-    internal class CliFieldStore : FieldStoreBase<string>, ICliStore<string, object?, MemberInfo> {
+    internal class CliFieldStore<TValue> : FieldStoreBase<string, TValue>, ICliStore<string, TValue, MemberInfo> {
         private IClassMemberSerializer CliSerializer { get; }
         private IAccessorValidator CliValidator { get; }
+        private IValueConverter<TValue> ValueConverter { get; }
 
         public override object? this[MemberInfo accessor] {
             get {
@@ -33,10 +35,11 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
             }
         }
 
-        public CliFieldStore(object obj, BindingFlags bindingAttr, IClassMemberSerializer cliSerializer, IAccessorValidator cliValidator) : base(obj, bindingAttr)
+        public CliFieldStore(object obj, BindingFlags bindingAttr, IClassMemberSerializer cliSerializer, IAccessorValidator cliValidator, IValueConverter<TValue> valueConverter) : base(obj, bindingAttr)
         {
             CliSerializer = cliSerializer;
             CliValidator = cliValidator;
+            ValueConverter = valueConverter;
         }
 
         // FIXME align with GetKeysByAccessors
@@ -90,6 +93,14 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
                 keys[accessor] = accesorKeys;
             }
             return keys;
+        }
+
+        protected override TValue ConvertFromInternalValue(MemberInfo accessor, object? value) {
+            return ValueConverter.ConvertFromInternalValue(value, GetDataType(accessor));
+        }
+
+        protected override object? ConvertToInternalValue(MemberInfo accessor, TValue value) {
+            return ValueConverter.ConvertToInternalValue(value, GetDataType(accessor));
         }
     }
 }
