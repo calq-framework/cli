@@ -35,13 +35,13 @@ namespace CalqFramework.Cli {
                 ReturnType = methodInfo.ReturnType,
                 Keys = new[] { methodInfo.Name },
                 MethodInfo = methodInfo,
-                Parameters = new ParameterStore<string, object?, ParameterInfo>(new CliMethodParameterStore(methodInfo)).GetParameters()
+                Parameters = new ParameterStore(new CliMethodParameterStore(methodInfo)).GetParameters()
             };
             Console.Write(HelpGenerator.GetHelp(optionsAndParams.Options.GetOptions(), method));
         }
 
         // TODO separate data and printing
-        private void HandleInstanceHelp(IOptionStore<string, object?, MemberInfo> options, ISubmoduleStore<string, object?, MemberInfo> commands, MethodResolver methodResolver)
+        private void HandleInstanceHelp(IOptionStore options, ISubmoduleStore commands, MethodResolver methodResolver)
         {
             var methods = new List<Subcommand>();
             foreach (var methodInfo in methodResolver.Methods) {
@@ -50,10 +50,10 @@ namespace CalqFramework.Cli {
                     ReturnType = methodInfo.ReturnType,
                     Keys = new[] { methodInfo.Name },
                     MethodInfo = methodInfo,
-                    Parameters = new ParameterStore<string, object?, ParameterInfo>(new CliMethodParameterStore(methodInfo)).GetParameters()
+                    Parameters = new ParameterStore(new CliMethodParameterStore(methodInfo)).GetParameters()
                 });
             }
-            Console.Write(HelpGenerator.GetHelp(options.GetOptions(), commands.GetCommands(), methods));
+            Console.Write(HelpGenerator.GetHelp(options.GetOptions(), commands.GetSubmodules(), methods));
         }
 
         private bool TryReadOptionsAndActionParams(IEnumerator<string> args, OptionAndParameterStore optionsAndParams, MethodInfo method)
@@ -84,9 +84,7 @@ namespace CalqFramework.Cli {
                     }
                     else
                     {
-                        var type = optionsAndParams.GetDataType(option);
-                        var valueObj = ValueParser.ParseValue(value, type, option);
-                        optionsAndParams[option] = valueObj;
+                        optionsAndParams[option] = value;
                     }
                 }
                 while (args.MoveNext()) {
@@ -118,7 +116,7 @@ namespace CalqFramework.Cli {
             string optionOrAction;
 
             var targetObj = obj;
-            ISubmoduleStore<string, object?, MemberInfo> cliCommands;
+            ISubmoduleStore cliCommands;
 
             // explore object tree until optionOrAction definitely cannot be an action (object not found by name)
             do {

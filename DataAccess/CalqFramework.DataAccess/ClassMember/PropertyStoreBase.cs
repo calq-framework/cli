@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 
 namespace CalqFramework.DataAccess.ClassMember {
-    public abstract class PropertyStoreBase<TKey> : ClassDataMemberStoreBase<TKey, object?> {
+    public abstract class PropertyStoreBase<TKey, TValue> : ClassDataMemberStoreBase<TKey, TValue, MemberInfo, object?> {
         public PropertyStoreBase(object obj, BindingFlags bindingAttr) : base(obj, bindingAttr) {
         }
 

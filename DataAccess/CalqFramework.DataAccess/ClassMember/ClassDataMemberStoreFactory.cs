@@ -3,13 +3,13 @@ using CalqFramework.DataAccess.ClassMember;
 using System.Reflection;
 
 namespace CalqFramework.DataAccess.ClassMember;
-sealed public class ClassDataMemberStoreFactory : ClassDataMemberStoreFactoryBase<string, object?> {
+sealed public class ClassDataMemberStoreFactory : ClassDataMemberStoreFactoryBase {
 
     protected override IKeyValueStore<string, object?, MemberInfo> CreateFieldStore(object obj) {
-        return AccessProperties == true ? new FieldStore(obj, BindingAttr) : new FieldStoreNoValidation(obj, BindingAttr);
+        return new FieldStore(obj, BindingAttr);
     }
 
     protected override IKeyValueStore<string, object?, MemberInfo> CreatePropertyStore(object obj) {
-        return AccessFields == true ? new PropertyStore(obj, BindingAttr) : new PropertyStoreNoValidation(obj, BindingAttr);
+        return new PropertyStore(obj, BindingAttr);
     }
 }

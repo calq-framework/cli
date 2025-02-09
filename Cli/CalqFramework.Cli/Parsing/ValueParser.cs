@@ -9,6 +9,24 @@ public static class ValueParser {
         return CalqFramework.DataAccess.Text.ValueParser.IsParseable(type) || type.GetInterface(nameof(ICollection)) != null;
     }
 
+    internal static object ParseValue(string value, Type type) {
+        try {
+            var isCollection = type.GetInterface(nameof(ICollection)) != null;
+            if (isCollection) {
+                type = type.GetGenericArguments()[0];
+            }
+
+            var newValue = CalqFramework.DataAccess.Text.ValueParser.ParseValue(value, type);
+            return newValue;
+        } catch (OverflowException ex) {
+            throw new CliException($"value is out of range: {ex.Message}", ex);
+        } catch (FormatException ex) {
+            throw new CliException($"value type mismatch: expected {type.Name} got {value}", ex);
+        } catch (ArgumentException ex) {
+            throw new CliException($"value type mismatch: expected {type.Name} got {value})", ex);
+        }
+    }
+
     internal static object ParseValue(string value, Type type, string option) {
         try {
             var isCollection = type.GetInterface(nameof(ICollection)) != null;

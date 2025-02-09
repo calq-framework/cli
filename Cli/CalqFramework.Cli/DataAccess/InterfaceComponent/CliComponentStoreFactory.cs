@@ -27,46 +27,48 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
             CliClassDataMemberSerializer = new ClassMemberSerializer();
         }
 
-        public IOptionStore<string, object?, MemberInfo> CreateOptionStore(object obj) {
+        public IOptionStore CreateOptionStore(object obj) {
             var cliValidator = new OptionAccessorValidator();
-            ICliStore<string, object?, MemberInfo> store;
+            var converter = new OptionCnverter();
+            ICliStore<string, string?, MemberInfo> store;
             if (AccessFields && AccessProperties) {
-                store = CreateFieldAndPropertyStore(obj, cliValidator);
+                store = CreateFieldAndPropertyStore(obj, cliValidator, converter);
             } else if (AccessFields) {
-                store = CreateFieldStore(obj, cliValidator);
+                store = CreateFieldStore(obj, cliValidator, converter);
             } else if (AccessProperties) {
-                store = CreatePropertyStore(obj, cliValidator);
+                store = CreatePropertyStore(obj, cliValidator, converter);
             } else {
                 throw new ArgumentException("Neither AccessFields nor AccessProperties is set.");
             }
-            return new OptionStore<string, object?, MemberInfo>(store);
+            return new OptionStore(store);
         }
 
-        public ISubmoduleStore<string, object?, MemberInfo> CreateSubmoduleStore(object obj) {
+        public ISubmoduleStore CreateSubmoduleStore(object obj) {
             var cliValidator = new SubmoduleAccessorValidator();
+            var converter = new SubmoduleCnverter();
             ICliStore<string, object?, MemberInfo> store;
             if (AccessFields && AccessProperties) {
-                store = CreateFieldAndPropertyStore(obj, cliValidator);
+                store = CreateFieldAndPropertyStore(obj, cliValidator, converter);
             } else if (AccessFields) {
-                store = CreateFieldStore(obj, cliValidator);
+                store = CreateFieldStore(obj, cliValidator, converter);
             } else if (AccessProperties) {
-                store = CreatePropertyStore(obj, cliValidator);
+                store = CreatePropertyStore(obj, cliValidator, converter);
             } else {
                 throw new ArgumentException("Neither AccessFields nor AccessProperties is set.");
             }
-            return new SubmoduleStore<string, object?, MemberInfo>(store);
+            return new SubmoduleStore(store);
         }
 
-        protected ICliStore<string, object?, MemberInfo> CreateFieldAndPropertyStore(object obj, IAccessorValidator cliValidator) {
-            return new CliDualKeyValueStore(CreateFieldStore(obj, cliValidator), CreatePropertyStore(obj, cliValidator), BindingAttr, CliClassDataMemberSerializer);
+        private ICliStore<string, TValue, MemberInfo> CreateFieldAndPropertyStore<TValue>(object obj, IAccessorValidator cliValidator, IValueConverter<TValue> converter) {
+            return new CliDualKeyValueStore<TValue>(CreateFieldStore(obj, cliValidator, converter), CreatePropertyStore(obj, cliValidator, converter), BindingAttr, CliClassDataMemberSerializer);
         }
 
-        protected ICliStore<string, object?, MemberInfo> CreateFieldStore(object obj, IAccessorValidator cliValidator) {
-            return new CliFieldStore(obj, BindingAttr, CliClassDataMemberSerializer, cliValidator);
+        private ICliStore<string, TValue, MemberInfo> CreateFieldStore<TValue>(object obj, IAccessorValidator cliValidator, IValueConverter<TValue> converter) {
+            return new CliFieldStore<TValue>(obj, BindingAttr, CliClassDataMemberSerializer, cliValidator, converter);
         }
 
-        protected ICliStore<string, object?, MemberInfo> CreatePropertyStore(object obj, IAccessorValidator cliValidator) {
-            return new CliPropertyStore(obj, BindingAttr, CliClassDataMemberSerializer, cliValidator);
+        private ICliStore<string, TValue, MemberInfo> CreatePropertyStore<TValue>(object obj, IAccessorValidator cliValidator, IValueConverter<TValue> converter) {
+            return new CliPropertyStore<TValue>(obj, BindingAttr, CliClassDataMemberSerializer, cliValidator, converter);
         }
 
         public MethodResolver CreateMethodResolver(object targetObj) {

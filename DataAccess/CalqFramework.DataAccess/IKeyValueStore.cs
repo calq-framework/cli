@@ -10,7 +10,9 @@
         TValue GetValueOrInitialize(TKey key);
     }
 
-    public interface IKeyValueStore<TKey, TValue, TAccessor> : IKeyAccessorResolver<TKey, TAccessor>, IKeyValueStore<TKey, TValue>, IMediatedKeyValueStore<TAccessor, TValue> {
-        internal protected bool ContainsAccessor(TAccessor accessor);
+    public interface IKeyValueStore<TKey, TValue, TAccessor> : IKeyValueStore<TKey, TValue, TAccessor, TValue> {
+    }
+
+    public interface IKeyValueStore<TKey, TValue, TAccessor, TInternalValue> : IKeyAccessorResolver<TKey, TAccessor>, IKeyValueStore<TKey, TValue>, IMediatedKeyValueStore<TAccessor, TInternalValue> {
     }
 }

@@ -6,12 +6,14 @@ using CalqFramework.DataAccess;
 using System.Diagnostics.CodeAnalysis;
 using System.Collections.Generic;
 using System.Linq;
+using CalqFramework.Cli.Parsing;
 
 namespace CalqFramework.Cli.DataAccess.ClassMember {
     // TODO unify with FieldStore
-    internal class CliPropertyStore : PropertyStoreBase<string>, ICliStore<string, object?, MemberInfo> {
+    internal class CliPropertyStore<TValue> : PropertyStoreBase<string, TValue>, ICliStore<string, TValue, MemberInfo> {
         private IClassMemberSerializer CliSerializer { get; }
         private IAccessorValidator CliValidator { get; }
+        private IValueConverter<TValue> ValueConverter { get; }
 
         public override object? this[MemberInfo accessor] {
             get {
@@ -32,9 +34,10 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
             }
         }
 
-        public CliPropertyStore(object obj, BindingFlags bindingAttr, IClassMemberSerializer cliSerializer, IAccessorValidator cliValidator) : base(obj, bindingAttr) {
+        public CliPropertyStore(object obj, BindingFlags bindingAttr, IClassMemberSerializer cliSerializer, IAccessorValidator cliValidator, IValueConverter<TValue> valueConverter) : base(obj, bindingAttr) {
             CliSerializer = cliSerializer;
             CliValidator = cliValidator;
+            ValueConverter = valueConverter;
         }
 
         // FIXME align with GetKeysByAccessors
@@ -87,6 +90,14 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
                 keys[accessor] = accesorKeys;
             }
             return keys;
+        }
+
+        protected override TValue ConvertFromInternalValue(MemberInfo accessor, object? value) {
+            return ValueConverter.ConvertFromInternalValue(value, GetDataType(accessor)); // value?.ToString()?.ToLower();
+        }
+
+        protected override object? ConvertToInternalValue(MemberInfo accessor, TValue value) {
+            return ValueConverter.ConvertToInternalValue(value, GetDataType(accessor)); // ValueParser.ParseValue(value, GetDataType(accessor));
         }
     }
 }
