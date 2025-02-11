@@ -3,7 +3,7 @@ using CalqFramework.Cli.Parsing;
 using System;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
-    internal class SubmoduleCnverter : IValueConverter<object?> {
+    internal class SubmoduleConverter : IValueConverter<object?> {
         public object? ConvertFromInternalValue(object? value, Type internalType) {
             return value;
         }
