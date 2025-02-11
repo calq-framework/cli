@@ -11,7 +11,7 @@ using System.Xml.Linq;
 
 namespace CalqFramework.Cli.DataAccess.ClassMember {
     // TODO unify with PropertyStore
-    internal class CliFieldStore<TValue> : FieldStoreBase<string, TValue>, ICliStore<string, TValue, MemberInfo> {
+    internal class FieldStore<TValue> : FieldStoreBase<string, TValue>, IClassMemberStore<string, TValue, MemberInfo> {
         private IClassMemberSerializer CliSerializer { get; }
         private IAccessorValidator CliValidator { get; }
         private IValueConverter<TValue> ValueConverter { get; }
@@ -35,7 +35,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
             }
         }
 
-        public CliFieldStore(object obj, BindingFlags bindingAttr, IClassMemberSerializer cliSerializer, IAccessorValidator cliValidator, IValueConverter<TValue> valueConverter) : base(obj, bindingAttr)
+        public FieldStore(object obj, BindingFlags bindingAttr, IClassMemberSerializer cliSerializer, IAccessorValidator cliValidator, IValueConverter<TValue> valueConverter) : base(obj, bindingAttr)
         {
             CliSerializer = cliSerializer;
             CliValidator = cliValidator;

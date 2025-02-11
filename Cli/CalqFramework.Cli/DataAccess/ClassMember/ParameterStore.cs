@@ -9,10 +9,10 @@ using System.Linq;
 using System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess.ClassMember {
-    internal class CliMethodParameterStore : MethodParamStoreBase<string, string?>, ICliStore<string, string?, ParameterInfo> {
+    internal class ParameterStore : ParameterStoreBase<string, string?>, IClassMemberStore<string, string?, ParameterInfo> {
         public List<string> ReceivedPositionalParameters { get; }
 
-        public CliMethodParameterStore(MethodInfo method) : base(method) {
+        public ParameterStore(MethodInfo method) : base(method) {
             ReceivedPositionalParameters = new List<string>();
         }
 
