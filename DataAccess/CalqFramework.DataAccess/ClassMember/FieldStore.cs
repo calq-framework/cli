@@ -15,11 +15,11 @@ namespace CalqFramework.DataAccess.ClassMember {
             return result != null;
         }
 
-        protected override object? ConvertFromInternalValue(MemberInfo accessor, object? value) {
+        protected override object? ConvertFromInternalValue(object? value, MemberInfo accessor) {
             return value;
         }
 
-        protected override object? ConvertToInternalValue(MemberInfo accessor, object? value) {
+        protected override object? ConvertToInternalValue(object? value, MemberInfo accessor) {
             return value;
         }
     }
