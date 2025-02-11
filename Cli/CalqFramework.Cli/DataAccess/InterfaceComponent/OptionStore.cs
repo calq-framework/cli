@@ -1,4 +1,5 @@
-﻿using CalqFramework.Cli.InterfaceComponents;
+﻿using CalqFramework.Cli.DataAccess.ClassMember;
+using CalqFramework.Cli.InterfaceComponents;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,11 +7,11 @@ using System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
     internal class OptionStore : IOptionStore {
-        ICliStore<string, string?, MemberInfo> Store { get; }
+        IClassMemberStore<string, string?, MemberInfo> Store { get; }
 
         public string? this[string key] { get => Store[key]; set => Store[key] = value; }
 
-        public OptionStore(ICliStore<string, string?, MemberInfo> store) {
+        public OptionStore(IClassMemberStore<string, string?, MemberInfo> store) {
             Store = store;
         }
 

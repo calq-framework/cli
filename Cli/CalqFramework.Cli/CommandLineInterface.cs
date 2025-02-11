@@ -35,7 +35,7 @@ namespace CalqFramework.Cli {
                 ReturnType = methodInfo.ReturnType,
                 Keys = new[] { methodInfo.Name },
                 MethodInfo = methodInfo,
-                Parameters = new ParameterStore(new CliMethodParameterStore(methodInfo)).GetParameters()
+                Parameters = new DataAccess.InterfaceComponent.ParameterStore(new DataAccess.ClassMember.ParameterStore(methodInfo)).GetParameters()
             };
             Console.Write(HelpGenerator.GetHelp(optionsAndParams.Options.GetOptions(), method));
         }
@@ -50,7 +50,7 @@ namespace CalqFramework.Cli {
                     ReturnType = methodInfo.ReturnType,
                     Keys = new[] { methodInfo.Name },
                     MethodInfo = methodInfo,
-                    Parameters = new ParameterStore(new CliMethodParameterStore(methodInfo)).GetParameters()
+                    Parameters = new DataAccess.InterfaceComponent.ParameterStore(new DataAccess.ClassMember.ParameterStore(methodInfo)).GetParameters()
                 });
             }
             Console.Write(HelpGenerator.GetHelp(options.GetOptions(), commands.GetSubmodules(), methods));
@@ -146,7 +146,7 @@ namespace CalqFramework.Cli {
             }
 
             var cliAction = methodResolver.GetMethod(optionOrAction);
-            var actionParams = new CliMethodParameterStore(cliAction);
+            var actionParams = new DataAccess.ClassMember.ParameterStore(cliAction);
             var optionsAndActionParams = new OptionAndParameterStore(cliOptions, actionParams, targetObj);
             if (TryReadOptionsAndActionParams(en, optionsAndActionParams, cliAction))
             {

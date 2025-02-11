@@ -2,8 +2,8 @@
 using System.Reflection;
 
 namespace CalqFramework.DataAccess.ClassMember {
-    public class MethodParamStore : MethodParamStoreBase<string, object?>, IKeyValueStore<string, object?, ParameterInfo> {
-        public MethodParamStore(MethodInfo method) : base(method) {
+    public class ParameterStore : ParameterStoreBase<string, object?>, IKeyValueStore<string, object?, ParameterInfo> {
+        public ParameterStore(MethodInfo method) : base(method) {
         }
 
         public override bool ContainsAccessor(ParameterInfo accessor) {

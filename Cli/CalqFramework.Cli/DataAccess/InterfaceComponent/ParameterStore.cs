@@ -1,4 +1,5 @@
-﻿using CalqFramework.Cli.InterfaceComponents;
+﻿using CalqFramework.Cli.DataAccess.ClassMember;
+using CalqFramework.Cli.InterfaceComponents;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,11 +7,11 @@ using System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
     internal class ParameterStore : IParameterStore {
-        ICliStore<string, string?, ParameterInfo> Store { get; }
+        IClassMemberStore<string, string?, ParameterInfo> Store { get; }
 
         public string? this[string key] { get => Store[key]; set => Store[key] = value; }
 
-        public ParameterStore(ICliStore<string, string?, ParameterInfo> store) {
+        public ParameterStore(IClassMemberStore<string, string?, ParameterInfo> store) {
             Store = store;
         }
 

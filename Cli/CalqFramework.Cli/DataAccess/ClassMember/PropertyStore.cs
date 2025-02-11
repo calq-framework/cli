@@ -10,7 +10,7 @@ using CalqFramework.Cli.Parsing;
 
 namespace CalqFramework.Cli.DataAccess.ClassMember {
     // TODO unify with FieldStore
-    internal class CliPropertyStore<TValue> : PropertyStoreBase<string, TValue>, ICliStore<string, TValue, MemberInfo> {
+    internal class PropertyStore<TValue> : PropertyStoreBase<string, TValue>, IClassMemberStore<string, TValue, MemberInfo> {
         private IClassMemberSerializer CliSerializer { get; }
         private IAccessorValidator CliValidator { get; }
         private IValueConverter<TValue> ValueConverter { get; }
@@ -34,7 +34,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
             }
         }
 
-        public CliPropertyStore(object obj, BindingFlags bindingAttr, IClassMemberSerializer cliSerializer, IAccessorValidator cliValidator, IValueConverter<TValue> valueConverter) : base(obj, bindingAttr) {
+        public PropertyStore(object obj, BindingFlags bindingAttr, IClassMemberSerializer cliSerializer, IAccessorValidator cliValidator, IValueConverter<TValue> valueConverter) : base(obj, bindingAttr) {
             CliSerializer = cliSerializer;
             CliValidator = cliValidator;
             ValueConverter = valueConverter;

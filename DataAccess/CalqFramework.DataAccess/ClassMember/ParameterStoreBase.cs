@@ -3,8 +3,8 @@ using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices;
 
 namespace CalqFramework.DataAccess.ClassMember {
-    public abstract class MethodParamStoreBase<TKey, TValue> : KeyValueStoreBase<TKey, TValue, ParameterInfo, object?> {
-        public MethodParamStoreBase(MethodInfo method) {
+    public abstract class ParameterStoreBase<TKey, TValue> : KeyValueStoreBase<TKey, TValue, ParameterInfo, object?> {
+        public ParameterStoreBase(MethodInfo method) {
             Method = method;
             var i = 0;
             Parameters = Method.GetParameters();
