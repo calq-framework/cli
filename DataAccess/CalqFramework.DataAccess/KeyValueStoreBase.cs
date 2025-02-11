@@ -1,10 +1,10 @@
 ﻿namespace CalqFramework.DataAccess {
     public abstract class KeyValueStoreBase<TKey, TValue, TAccessor> : KeyValueStoreBase<TKey, TValue, TAccessor, TValue>, IKeyValueStore<TKey, TValue, TAccessor> {
-        protected override TValue ConvertFromInternalValue(TAccessor accessor, TValue value) {
+        protected override TValue ConvertFromInternalValue(TValue value, TAccessor accessor) {
             return value;
         }
 
-        protected override TValue ConvertToInternalValue(TAccessor accessor, TValue value) {
+        protected override TValue ConvertToInternalValue(TValue value, TAccessor accessor) {
             return value;
         }
     }
@@ -13,11 +13,11 @@
         public TValue this[TKey key] {
             get {
                 var accessor = GetAccessor(key);
-                return ConvertFromInternalValue(accessor, this[accessor]);
+                return ConvertFromInternalValue(this[accessor], accessor);
             }
             set {
                 var accessor = GetAccessor(key);
-                this[accessor] = ConvertToInternalValue(accessor, value);
+                this[accessor] = ConvertToInternalValue(value, accessor);
             }
         }
         public abstract TInternalValue this[TAccessor accessor] { get; set; }
@@ -35,7 +35,7 @@
 
         public TValue GetValueOrInitialize(TKey key) {
             var accessor = GetAccessor(key);
-            return ConvertFromInternalValue(accessor, GetValueOrInitialize(accessor));
+            return ConvertFromInternalValue(GetValueOrInitialize(accessor), accessor);
         }
 
         public abstract bool ContainsAccessor(TAccessor accessor);
@@ -44,8 +44,8 @@
 
         public abstract TInternalValue GetValueOrInitialize(TAccessor accessor);
 
-        protected abstract TValue ConvertFromInternalValue(TAccessor accessor, TInternalValue value);
+        protected abstract TValue ConvertFromInternalValue(TInternalValue value, TAccessor accessor);
 
-        protected abstract TInternalValue ConvertToInternalValue(TAccessor accessor, TValue value);
+        protected abstract TInternalValue ConvertToInternalValue(TValue value, TAccessor accessor);
     }
 }

@@ -2,7 +2,7 @@
     public interface IMediatedKeyValueStore<TAccessor, TValue> {
         protected internal TValue this[TAccessor accessor] { get; set; }
 
-        internal protected bool ContainsAccessor(TAccessor accessor);
+        protected internal bool ContainsAccessor(TAccessor accessor);
 
         protected internal IEnumerable<TAccessor> Accessors { get; }
 

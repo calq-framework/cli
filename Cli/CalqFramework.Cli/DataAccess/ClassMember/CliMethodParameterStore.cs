@@ -120,11 +120,11 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
             return keys;
         }
 
-        protected override string? ConvertFromInternalValue(ParameterInfo accessor, object? value) {
+        protected override string? ConvertFromInternalValue(object? value, ParameterInfo accessor) {
             return value?.ToString()?.ToLower();
         }
 
-        protected override object? ConvertToInternalValue(ParameterInfo accessor, string? value) {
+        protected override object? ConvertToInternalValue(string? value, ParameterInfo accessor) {
             return ValueParser.ParseValue(value, GetDataType(accessor));
         }
     }

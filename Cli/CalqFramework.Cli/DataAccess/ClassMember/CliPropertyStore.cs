@@ -92,11 +92,11 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
             return keys;
         }
 
-        protected override TValue ConvertFromInternalValue(MemberInfo accessor, object? value) {
+        protected override TValue ConvertFromInternalValue(object? value, MemberInfo accessor) {
             return ValueConverter.ConvertFromInternalValue(value, GetDataType(accessor)); // value?.ToString()?.ToLower();
         }
 
-        protected override object? ConvertToInternalValue(MemberInfo accessor, TValue value) {
+        protected override object? ConvertToInternalValue(TValue value, MemberInfo accessor) {
             return ValueConverter.ConvertToInternalValue(value, GetDataType(accessor)); // ValueParser.ParseValue(value, GetDataType(accessor));
         }
     }
