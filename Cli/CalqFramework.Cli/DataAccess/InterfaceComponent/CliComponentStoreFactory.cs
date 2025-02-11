@@ -29,7 +29,7 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
 
         public IOptionStore CreateOptionStore(object obj) {
             var cliValidator = new OptionAccessorValidator();
-            var converter = new OptionCnverter();
+            var converter = new OptionConverter();
             ICliStore<string, string?, MemberInfo> store;
             if (AccessFields && AccessProperties) {
                 store = CreateFieldAndPropertyStore(obj, cliValidator, converter);
@@ -45,7 +45,7 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
 
         public ISubmoduleStore CreateSubmoduleStore(object obj) {
             var cliValidator = new SubmoduleAccessorValidator();
-            var converter = new SubmoduleCnverter();
+            var converter = new SubmoduleConverter();
             ICliStore<string, object?, MemberInfo> store;
             if (AccessFields && AccessProperties) {
                 store = CreateFieldAndPropertyStore(obj, cliValidator, converter);
