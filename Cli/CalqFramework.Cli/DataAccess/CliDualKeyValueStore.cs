@@ -13,9 +13,9 @@ namespace CalqFramework.Cli.DataAccess {
         private BindingFlags BindingAttr { get; }
         private IClassMemberSerializer CliSerializer { get; }
 
-        public override IKeyValueStore<string, TValue> PrimaryAccessor => _primaryStore;
+        public override IKeyValueStore<string, TValue> PrimaryStore => _primaryStore;
 
-        public override IKeyValueStore<string, TValue> SecondaryAccessor => _secondarStore;
+        public override IKeyValueStore<string, TValue> SecondaryStore => _secondarStore;
 
         public CliDualKeyValueStore(ICliStore<string, TValue, MemberInfo> primaryStore, ICliStore<string, TValue, MemberInfo> secondaryStore, BindingFlags bindingAttr, IClassMemberSerializer cliSerializer) {
             _primaryStore = primaryStore;
