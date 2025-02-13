@@ -71,8 +71,12 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
             return new PropertyStore<TValue>(obj, BindingAttr, CliClassDataMemberSerializer, cliValidator, converter);
         }
 
-        public MethodResolver CreateMethodResolver(object targetObj) {
-            return new MethodResolver(targetObj, MethodBindingAttr);
+        public ISubcommandStore CreateSubcommandStore(object obj) {
+            return new SubcommandStore(new MethodInfoStore(obj, MethodBindingAttr));
+        }
+
+        public IParameterStore CreateParameterStore(MethodInfo methodInfo) {
+            return new ParameterStore(new ClassMember.ParameterStore(methodInfo));
         }
     }
 }

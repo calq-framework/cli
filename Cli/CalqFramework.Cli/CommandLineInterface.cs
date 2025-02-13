@@ -41,19 +41,13 @@ namespace CalqFramework.Cli {
         }
 
         // TODO separate data and printing
-        private void HandleInstanceHelp(IOptionStore options, ISubmoduleStore commands, MethodResolver methodResolver)
+        private void HandleInstanceHelp(IOptionStore options, ISubmoduleStore commands, ISubcommandStore methodResolver)
         {
-            var methods = new List<Subcommand>();
-            foreach (var methodInfo in methodResolver.Methods) {
-                methods.Add(new Subcommand() {
-                    // FIXME generics
-                    ReturnType = methodInfo.ReturnType,
-                    Keys = new[] { methodInfo.Name },
-                    MethodInfo = methodInfo,
-                    Parameters = new DataAccess.InterfaceComponent.ParameterStore(new DataAccess.ClassMember.ParameterStore(methodInfo)).GetParameters()
-                });
+            var subcommands = methodResolver.GetSubcommands();
+            foreach (var item in subcommands) {
+                item.Parameters = CliOptionsStoreFactory.CreateParameterStore(item.MethodInfo).GetParameters();
             }
-            Console.Write(HelpGenerator.GetHelp(options.GetOptions(), commands.GetSubmodules(), methods));
+            Console.Write(HelpGenerator.GetHelp(options.GetOptions(), commands.GetSubmodules(), subcommands));
         }
 
         private bool TryReadOptionsAndActionParams(IEnumerator<string> args, OptionAndParameterStore optionsAndParams, MethodInfo method)
@@ -134,7 +128,7 @@ namespace CalqFramework.Cli {
             } while (en.MoveNext());
             var cliOptions = CliOptionsStoreFactory.CreateOptionStore(targetObj);
 
-            var methodResolver = CliOptionsStoreFactory.CreateMethodResolver(targetObj);
+            var methodResolver = CliOptionsStoreFactory.CreateSubcommandStore(targetObj);
             if (optionOrAction == "--help" || optionOrAction == "-h")
             {
                 HandleInstanceHelp(cliOptions, cliCommands, methodResolver);
@@ -145,7 +139,7 @@ namespace CalqFramework.Cli {
                 return null;
             }
 
-            var cliAction = methodResolver.GetMethod(optionOrAction);
+            var cliAction = methodResolver[optionOrAction];
             var actionParams = new DataAccess.ClassMember.ParameterStore(cliAction);
             var optionsAndActionParams = new OptionAndParameterStore(cliOptions, actionParams, targetObj);
             if (TryReadOptionsAndActionParams(en, optionsAndActionParams, cliAction))
