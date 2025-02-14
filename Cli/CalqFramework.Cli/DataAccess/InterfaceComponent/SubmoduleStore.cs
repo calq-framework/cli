@@ -1,5 +1,4 @@
-﻿using CalqFramework.Cli.DataAccess.ClassMember;
-using CalqFramework.Cli.InterfaceComponents;
+﻿using CalqFramework.Cli.InterfaceComponents;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,11 +6,11 @@ using System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
     internal class SubmoduleStore : ISubmoduleStore {
-        IClassMemberStore<string, object?, MemberInfo> Store { get; }
+        ICliKeyValueStore<string, object?, MemberInfo> Store { get; }
 
         public object? this[string key] { get => Store[key]; set => Store[key] = value; }
 
-        public SubmoduleStore(IClassMemberStore<string, object?, MemberInfo> store) {
+        public SubmoduleStore(ICliKeyValueStore<string, object?, MemberInfo> store) {
             Store = store;
         }
 

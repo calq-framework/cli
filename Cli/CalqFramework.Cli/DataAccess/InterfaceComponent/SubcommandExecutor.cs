@@ -1,5 +1,4 @@
-﻿using CalqFramework.Cli.DataAccess.ClassMember;
-using CalqFramework.Cli.InterfaceComponents;
+﻿using CalqFramework.Cli.InterfaceComponents;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,11 +6,11 @@ using System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
     internal class SubcommandExecutor : ISubcommandExecutor {
-        IMyFunctionExecutor<string, string?, ParameterInfo> Executor { get; }
+        ICliFunctionExecutor<string, string?, ParameterInfo> Executor { get; }
 
         public string? this[string key] { get => Executor[key]; set => Executor[key] = value; }
 
-        public SubcommandExecutor(IMyFunctionExecutor<string, string?, ParameterInfo> store) {
+        public SubcommandExecutor(ICliFunctionExecutor<string, string?, ParameterInfo> store) {
             Executor = store;
         }
 

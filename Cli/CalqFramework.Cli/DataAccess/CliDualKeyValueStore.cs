@@ -4,17 +4,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace CalqFramework.Cli.DataAccess.ClassMember {
-    internal class DualClassMemberStore<TValue> : DualKeyValueStoreBase<string, TValue>, IClassMemberStore<string, TValue, MemberInfo> {
+namespace CalqFramework.Cli.DataAccess {
+    internal class CliDualKeyValueStore<TValue> : DualKeyValueStoreBase<string, TValue>, ICliKeyValueStore<string, TValue, MemberInfo> {
 
-        private IClassMemberStore<string, TValue, MemberInfo> _primaryStore;
-        private IClassMemberStore<string, TValue, MemberInfo> _secondarStore;
+        private ICliKeyValueStore<string, TValue, MemberInfo> _primaryStore;
+        private ICliKeyValueStore<string, TValue, MemberInfo> _secondarStore;
 
         protected override IKeyValueStore<string, TValue> PrimaryStore => _primaryStore;
 
         protected override IKeyValueStore<string, TValue> SecondaryStore => _secondarStore;
 
-        public DualClassMemberStore(IClassMemberStore<string, TValue, MemberInfo> primaryStore, IClassMemberStore<string, TValue, MemberInfo> secondaryStore) {
+        public CliDualKeyValueStore(ICliKeyValueStore<string, TValue, MemberInfo> primaryStore, ICliKeyValueStore<string, TValue, MemberInfo> secondaryStore) {
             _primaryStore = primaryStore;
             _secondarStore = secondaryStore;
         }

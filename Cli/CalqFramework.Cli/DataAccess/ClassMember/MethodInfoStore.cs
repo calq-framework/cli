@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 
 namespace CalqFramework.Cli.DataAccess.ClassMember {
-    internal class MethodInfoStore : IReadOnlyKeyValueStore<string, MethodInfo?>, IReadOnlyClassMemberStore<string, MethodInfo?, MethodInfo> {
+    internal class MethodInfoStore : IReadOnlyKeyValueStore<string, MethodInfo?>, ICliReadOnlyKeyValueStore<string, MethodInfo?, MethodInfo> {
         public MethodInfoStore(object obj, BindingFlags bindingAttr) {
             ParentObject = obj;
             BindingAttr = bindingAttr;
