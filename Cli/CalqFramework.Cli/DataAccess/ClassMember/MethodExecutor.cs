@@ -9,7 +9,7 @@ using System.Linq;
 using CalqFramework.Cli.Parsing;
 
 namespace CalqFramework.Cli.DataAccess.ClassMember {
-    public class MethodExecutor : MethodExecutorBase<string, string?>, IMyFunctionExecutor<string, string?, ParameterInfo> {
+    public class MethodExecutor : MethodExecutorBase<string, string?>, ICliFunctionExecutor<string, string?, ParameterInfo> {
         public MethodExecutor(MethodInfo method, object obj) : base(method, obj) {
             ReceivedPositionalParameters = new List<string?>();
         }

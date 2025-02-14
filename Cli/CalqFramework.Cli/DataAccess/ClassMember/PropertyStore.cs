@@ -10,7 +10,7 @@ using CalqFramework.Cli.Parsing;
 
 namespace CalqFramework.Cli.DataAccess.ClassMember {
     // TODO unify with FieldStore
-    internal class PropertyStore<TValue> : PropertyStoreBase<string, TValue>, IClassMemberStore<string, TValue, MemberInfo> {
+    internal class PropertyStore<TValue> : PropertyStoreBase<string, TValue>, ICliKeyValueStore<string, TValue, MemberInfo> {
         private IClassMemberSerializer CliSerializer { get; }
         private IAccessorValidator CliValidator { get; }
         private IValueConverter<TValue> ValueConverter { get; }

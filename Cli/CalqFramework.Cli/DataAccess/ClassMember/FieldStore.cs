@@ -11,7 +11,7 @@ using System.Xml.Linq;
 
 namespace CalqFramework.Cli.DataAccess.ClassMember {
     // TODO unify with PropertyStore
-    internal class FieldStore<TValue> : FieldStoreBase<string, TValue>, IClassMemberStore<string, TValue, MemberInfo> {
+    internal class FieldStore<TValue> : FieldStoreBase<string, TValue>, ICliKeyValueStore<string, TValue, MemberInfo> {
         private IClassMemberSerializer CliSerializer { get; }
         private IAccessorValidator CliValidator { get; }
         private IValueConverter<TValue> ValueConverter { get; }
