@@ -8,6 +8,7 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
         IOptionStore CreateOptionStore(object obj);
         ISubmoduleStore CreateSubmoduleStore(object obj);
         ISubcommandStore CreateSubcommandStore(object obj);
+        ISubcommandExecutor CreateSubcommandExecutor(MethodInfo cliAction, object? obj);
         ISubcommandExecutorWithOptions CreateSubcommandExecutorWithOptions(MethodInfo cliAction, object obj);
     }
 }

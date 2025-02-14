@@ -22,14 +22,15 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
             return Store.GetDataType(key);
         }
 
-        public IEnumerable<Subcommand> GetSubcommands() {
+        public IEnumerable<Subcommand> GetSubcommands(Func<MethodInfo, object?, ISubcommandExecutor> createSubcommandExecutor) {
             var result = new List<Subcommand>();
             var dict = Store.GetKeysByAccessors();
             foreach (var key in dict.Keys) {
                 result.Add(new Subcommand() {
                     ReturnType = GetDataType(dict[key].First()),
                     Keys = dict[key],
-                    MethodInfo = key
+                    MethodInfo = key,
+                    Parameters = createSubcommandExecutor(key, null).GetParameters()
                 });
             }
             return result;
