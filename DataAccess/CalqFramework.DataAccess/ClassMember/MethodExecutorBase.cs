@@ -11,8 +11,6 @@ namespace CalqFramework.DataAccess.ClassMember {
 
         public abstract void AddParameter(TParameterValue value);
 
-        public object? Invoke() {
-            return Method.Invoke(ParentObject, ParameterValues);
-        }
+        public abstract object? Invoke();
     }
 }

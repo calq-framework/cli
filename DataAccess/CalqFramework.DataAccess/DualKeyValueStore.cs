@@ -10,9 +10,9 @@ namespace CalqFramework.DataAccess {
             _secondaryStore = secondaryStore;
         }
 
-        public override IKeyValueStore<TKey, TValue> PrimaryStore => _primaryStore;
+        protected override IKeyValueStore<TKey, TValue> PrimaryStore => _primaryStore;
 
-        public override IKeyValueStore<TKey, TValue> SecondaryStore => _secondaryStore;
+        protected override IKeyValueStore<TKey, TValue> SecondaryStore => _secondaryStore;
     }
 
     public class DualKeyValueStore<TKey, TValue, TAccessor, TInternalValue> : DualKeyValueStoreBase<TKey, TValue, TAccessor, TInternalValue> {
@@ -24,9 +24,9 @@ namespace CalqFramework.DataAccess {
             _secondaryStore = secondaryStore;
         }
 
-        public override IKeyValueStore<TKey, TValue, TAccessor, TInternalValue> PrimaryStore => _primaryStore;
+        protected override IKeyValueStore<TKey, TValue, TAccessor, TInternalValue> PrimaryStore => _primaryStore;
 
-        public override IKeyValueStore<TKey, TValue, TAccessor, TInternalValue> SecondaryStore => _secondaryStore;
+        protected override IKeyValueStore<TKey, TValue, TAccessor, TInternalValue> SecondaryStore => _secondaryStore;
     }
 
     public class DualKeyValueStore<TKey, TValue, TAccessor> : DualKeyValueStore<TKey, TValue, TAccessor, TValue>, IKeyValueStore<TKey, TValue, TAccessor> {

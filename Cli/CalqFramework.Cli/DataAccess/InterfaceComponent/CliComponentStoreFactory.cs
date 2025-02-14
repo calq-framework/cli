@@ -75,8 +75,12 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
             return new SubcommandStore(new MethodInfoStore(obj, MethodBindingAttr));
         }
 
-        public IParameterStore CreateParameterStore(MethodInfo methodInfo) {
-            return new ParameterStore(new ClassMember.ParameterStore(methodInfo));
+        public ISubcommandExecutor CreateSubcommandExecutor(MethodInfo methodInfo, object obj) {
+            return new SubcommandExecutor(new MethodExecutor(methodInfo, obj));
+        }
+
+        public ISubcommandExecutorWithOptions CreateSubcommandExecutorWithOptions(MethodInfo cliAction, object obj) {
+            return new SubcommandExecutorWithOptions(CreateSubcommandExecutor(cliAction, obj), CreateOptionStore(obj));
         }
     }
 }

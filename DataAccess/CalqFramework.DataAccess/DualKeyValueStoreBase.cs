@@ -2,8 +2,8 @@
 
 namespace CalqFramework.DataAccess {
     public abstract class DualKeyValueStoreBase<TKey, TValue> : IKeyValueStore<TKey, TValue> {
-        public abstract IKeyValueStore<TKey, TValue> PrimaryStore { get; }
-        public abstract IKeyValueStore<TKey, TValue> SecondaryStore { get; }
+        protected abstract IKeyValueStore<TKey, TValue> PrimaryStore { get; }
+        protected abstract IKeyValueStore<TKey, TValue> SecondaryStore { get; }
 
         public TValue this[TKey key] {
             get {
@@ -64,8 +64,8 @@ namespace CalqFramework.DataAccess {
     }
 
     public abstract class DualKeyValueStoreBase<TKey, TValue, TAccessor, TInternalValue> : IKeyValueStore<TKey, TValue, TAccessor, TInternalValue> {
-        public abstract IKeyValueStore<TKey, TValue, TAccessor, TInternalValue> PrimaryStore { get; }
-        public abstract IKeyValueStore<TKey, TValue, TAccessor, TInternalValue> SecondaryStore { get; }
+        protected abstract IKeyValueStore<TKey, TValue, TAccessor, TInternalValue> PrimaryStore { get; }
+        protected abstract IKeyValueStore<TKey, TValue, TAccessor, TInternalValue> SecondaryStore { get; }
 
         public IEnumerable<TAccessor> Accessors => PrimaryStore.Accessors.Concat(SecondaryStore.Accessors);
 

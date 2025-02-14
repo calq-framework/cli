@@ -10,9 +10,9 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
         private IClassMemberStore<string, TValue, MemberInfo> _primaryStore;
         private IClassMemberStore<string, TValue, MemberInfo> _secondarStore;
 
-        public override IKeyValueStore<string, TValue> PrimaryStore => _primaryStore;
+        protected override IKeyValueStore<string, TValue> PrimaryStore => _primaryStore;
 
-        public override IKeyValueStore<string, TValue> SecondaryStore => _secondarStore;
+        protected override IKeyValueStore<string, TValue> SecondaryStore => _secondarStore;
 
         public DualClassMemberStore(IClassMemberStore<string, TValue, MemberInfo> primaryStore, IClassMemberStore<string, TValue, MemberInfo> secondaryStore) {
             _primaryStore = primaryStore;
