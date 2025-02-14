@@ -17,6 +17,10 @@ namespace CalqFramework.DataAccess.ClassMember {
             return accessor.Member == Method;
         }
 
+        public override object? Invoke() {
+            return Method.Invoke(ParentObject, ParameterValues);
+        }
+
         public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out ParameterInfo result) {
             result = Parameters.FirstOrDefault(x => x.Name == key);
             return result != null;

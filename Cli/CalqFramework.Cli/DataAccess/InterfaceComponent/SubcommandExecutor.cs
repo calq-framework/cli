@@ -6,30 +6,30 @@ using System.Linq;
 using System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
-    internal class ParameterStore : IParameterStore {
-        IClassMemberStore<string, string?, ParameterInfo> Store { get; }
+    internal class SubcommandExecutor : ISubcommandExecutor {
+        IMyFunctionExecutor<string, string?, ParameterInfo> Executor { get; }
 
-        public string? this[string key] { get => Store[key]; set => Store[key] = value; }
+        public string? this[string key] { get => Executor[key]; set => Executor[key] = value; }
 
-        public ParameterStore(IClassMemberStore<string, string?, ParameterInfo> store) {
-            Store = store;
+        public SubcommandExecutor(IMyFunctionExecutor<string, string?, ParameterInfo> store) {
+            Executor = store;
         }
 
         public bool ContainsKey(string key) {
-            return Store.ContainsKey(key);
+            return Executor.ContainsKey(key);
         }
 
         public Type GetDataType(string key) {
-            return Store.GetDataType(key);
+            return Executor.GetDataType(key);
         }
 
         public string? GetValueOrInitialize(string key) {
-            return Store.GetValueOrInitialize(key);
+            return Executor.GetValueOrInitialize(key);
         }
 
         public IEnumerable<Parameter> GetParameters() {
             var result = new List<Parameter>();
-            var dict = Store.GetKeysByAccessors();
+            var dict = Executor.GetKeysByAccessors();
             foreach (var key in dict.Keys) {
                 result.Add(new Parameter() {
                     Type = GetDataType(dict[key].First()),
@@ -40,6 +40,14 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
                 });
             }
             return result;
+        }
+
+        public void AddParameter(string? value) {
+            Executor.AddParameter(value);
+        }
+
+        public object? Invoke() {
+            return Executor.Invoke();
         }
     }
 }
