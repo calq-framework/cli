@@ -7,6 +7,6 @@ namespace CalqFramework.Cli.InterfaceComponents {
         public IEnumerable<string> Keys { get; init; }
         public MethodInfo MethodInfo { get; init; }
         public Type ReturnType { get; init; }
-        public IEnumerable<Parameter> Parameters { get; set; }
+        public IEnumerable<Parameter> Parameters { get; init; }
     }
 }

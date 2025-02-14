@@ -9,6 +9,7 @@ using System.ComponentModel.Design;
 using CalqFramework.Cli.InterfaceComponents;
 using CalqFramework.Cli.DataAccess.InterfaceComponent;
 using CalqFramework.Cli.Parsing;
+using System.Windows.Input;
 
 namespace CalqFramework.Cli {
     // TODO create separate class for help/version logic
@@ -27,26 +28,6 @@ namespace CalqFramework.Cli {
             HelpGenerator = new HelpGenerator();
         }
 
-        // TODO separate data and printing
-        private void HandleMethodHelp(ISubcommandExecutorWithOptions optionsAndParams, MethodInfo methodInfo, ISubcommandStore subcommandsStore)
-        {
-            var subcommands = subcommandsStore.GetSubcommands().Where(x => x.MethodInfo == methodInfo);
-            foreach (var item in subcommands) {
-                item.Parameters = optionsAndParams.GetParameters();
-            }
-            Console.Write(HelpGenerator.GetHelp(optionsAndParams.GetOptions(), subcommands.First()));
-        }
-
-        // TODO separate data and printing
-        private void HandleInstanceHelp(IOptionStore options, ISubmoduleStore commands, ISubcommandStore methodResolver, object obj)
-        {
-            var subcommands = methodResolver.GetSubcommands();
-            foreach (var item in subcommands) {
-                item.Parameters = CliOptionsStoreFactory.CreateSubcommandExecutorWithOptions(item.MethodInfo, obj).GetParameters();
-            }
-            Console.Write(HelpGenerator.GetHelp(options.GetOptions(), commands.GetSubmodules(), subcommands));
-        }
-
         private bool TryReadOptionsAndActionParams(IEnumerator<string> args, ISubcommandExecutorWithOptions optionsAndParams, MethodInfo method, ISubcommandStore subcommands)
         {
             var optionsReader = new OptionReader(args, optionsAndParams);
@@ -57,7 +38,7 @@ namespace CalqFramework.Cli {
                 {
                     if ((option == "help" || option == "h") && !optionAttr.HasFlag(OptionFlags.NotAnOption))
                     {
-                        HandleMethodHelp(optionsAndParams, method, subcommands);
+                        Console.Write(HelpGenerator.GetHelp(optionsAndParams.GetOptions(), subcommands.GetSubcommands(CliOptionsStoreFactory.CreateSubcommandExecutor).Where(x => x.MethodInfo == method).First()));
                         return false;
                     }
 
@@ -128,7 +109,7 @@ namespace CalqFramework.Cli {
             var methodResolver = CliOptionsStoreFactory.CreateSubcommandStore(targetObj);
             if (optionOrAction == "--help" || optionOrAction == "-h")
             {
-                HandleInstanceHelp(cliOptions, cliCommands, methodResolver, targetObj);
+                Console.Write(HelpGenerator.GetHelp(cliOptions.GetOptions(), cliCommands.GetSubmodules(), methodResolver.GetSubcommands(CliOptionsStoreFactory.CreateSubcommandExecutor)));
                 return null;
             }
             if (optionOrAction == "--version" || optionOrAction == "-v") {
