@@ -1,11 +1,11 @@
 ﻿using System.Reflection;
 
 namespace CalqFramework.DataAccess.ClassMember {
-    public abstract class FieldStoreBase<TKey, TValue> : ClassDataMemberStoreBase<TKey, TValue, MemberInfo, object?> {
+    public abstract class FieldStoreBase<TKey, TValue> : ClassDataMemberStoreBase<TKey, TValue, FieldInfo, object?> {
         public FieldStoreBase(object obj, BindingFlags bindingAttr) : base(obj, bindingAttr) {
         }
 
-        public override object? this[MemberInfo accessor] {
+        public override object? this[FieldInfo accessor] {
             get {
                 return ((FieldInfo)accessor).GetValue(ParentObject);
             }
@@ -14,13 +14,13 @@ namespace CalqFramework.DataAccess.ClassMember {
             }
         }
 
-        public override IEnumerable<MemberInfo> Accessors => ParentType.GetFields().Where(ContainsAccessor);
+        public override IEnumerable<FieldInfo> Accessors => ParentType.GetFields().Where(ContainsAccessor);
 
-        public override Type GetDataType(MemberInfo accessor) {
+        public override Type GetDataType(FieldInfo accessor) {
             return ((FieldInfo)accessor).FieldType;
         }
 
-        public override object? GetValueOrInitialize(MemberInfo accessor) {
+        public override object? GetValueOrInitialize(FieldInfo accessor) {
             var value = ((FieldInfo)accessor).GetValue(ParentObject) ??
                    Activator.CreateInstance(((FieldInfo)accessor).FieldType) ??
                    Activator.CreateInstance(Nullable.GetUnderlyingType(((FieldInfo)accessor).FieldType)!)!;

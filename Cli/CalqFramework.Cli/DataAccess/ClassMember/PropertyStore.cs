@@ -15,7 +15,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
         private IAccessorValidator CliValidator { get; }
         private IValueConverter<TValue> ValueConverter { get; }
 
-        public override object? this[MemberInfo accessor] {
+        public override object? this[PropertyInfo accessor] {
             get {
                 object? result = null;
                 if (base[accessor] is not ICollection collection) {
@@ -41,7 +41,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
         }
 
         // FIXME align with GetKeysByAccessors
-        private MemberInfo? GetClassMember(string key) {
+        private PropertyInfo? GetClassMember(string key) {
             foreach (var member in Accessors) {
                 foreach (var atribute in member.GetCustomAttributes<CliNameAttribute>()) {
                     if (atribute.Name == key) {
@@ -64,12 +64,12 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
             return null;
         }
 
-        public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out MemberInfo result) {
+        public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out PropertyInfo result) {
             result = GetClassMember(key);
             return result != null;
         }
 
-        public override bool ContainsAccessor(MemberInfo accessor) {
+        public override bool ContainsAccessor(PropertyInfo accessor) {
             return accessor is PropertyInfo && accessor.DeclaringType == ParentType && CliValidator.IsValid(accessor);
         }
 
@@ -92,11 +92,11 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
             return keys;
         }
 
-        protected override TValue ConvertFromInternalValue(object? value, MemberInfo accessor) {
+        protected override TValue ConvertFromInternalValue(object? value, PropertyInfo accessor) {
             return ValueConverter.ConvertFromInternalValue(value, GetDataType(accessor)); // value?.ToString()?.ToLower();
         }
 
-        protected override object? ConvertToInternalValue(TValue value, MemberInfo accessor) {
+        protected override object? ConvertToInternalValue(TValue value, PropertyInfo accessor) {
             return ValueConverter.ConvertToInternalValue(value, GetDataType(accessor)); // ValueParser.ParseValue(value, GetDataType(accessor));
         }
     }
