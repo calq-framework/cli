@@ -51,7 +51,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
         }
 
         public override bool ContainsAccessor(ParameterInfo accessor) {
-            return accessor.Member == Method;
+            return accessor.Member == ParentMethod;
         }
 
         public IDictionary<ParameterInfo, IEnumerable<string>> GetKeysByAccessors() {
@@ -87,7 +87,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
             if (receivedPositionalParametersIndex < ReceivedPositionalParameters.Count) {
                 throw new CliException($"unexpected positional parameter {ReceivedPositionalParameters[receivedPositionalParametersIndex]}");
             }
-            return Method.Invoke(ParentObject, ParameterValues);
+            return ParentMethod.Invoke(ParentObject, ParameterValues);
         }
 
         public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out ParameterInfo result) {
