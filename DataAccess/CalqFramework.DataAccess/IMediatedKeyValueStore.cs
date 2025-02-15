@@ -1,6 +1,10 @@
-﻿namespace CalqFramework.DataAccess {
-    public interface IMediatedKeyValueStore<TAccessor, TValue> {
-        protected internal TValue this[TAccessor accessor] { get; set; }
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace CalqFramework.DataAccess {
+    public interface IMediatedKeyValueStore<TKey, TAccessor, TInternalValue> {
+        protected internal bool TryGetAccessor(TKey key, [MaybeNullWhen(false)] out TAccessor result);
+        protected internal TAccessor GetAccessor(TKey key);
+        protected internal TInternalValue this[TAccessor accessor] { get; set; }
 
         protected internal bool ContainsAccessor(TAccessor accessor);
 
@@ -8,6 +12,6 @@
 
         protected internal Type GetDataType(TAccessor accessor);
 
-        protected internal TValue GetValueOrInitialize(TAccessor accessor);
+        protected internal TInternalValue GetValueOrInitialize(TAccessor accessor);
     }
 }

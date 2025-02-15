@@ -1,4 +1,6 @@
-﻿namespace CalqFramework.DataAccess {
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace CalqFramework.DataAccess {
     public abstract class KeyValueStoreBase<TKey, TValue, TAccessor> : KeyValueStoreBase<TKey, TValue, TAccessor, TValue>, IKeyValueStore<TKey, TValue, TAccessor> {
         protected override TValue ConvertFromInternalValue(TValue value, TAccessor accessor) {
             return value;
@@ -9,7 +11,14 @@
         }
     }
 
-    public abstract class KeyValueStoreBase<TKey, TValue, TAccessor, TInternalValue> : KeyAccessorResolverBase<TKey, TAccessor>, IKeyValueStore<TKey, TValue, TAccessor, TInternalValue> {
+    public abstract class KeyValueStoreBase<TKey, TValue, TAccessor, TInternalValue> : IKeyValueStore<TKey, TValue, TAccessor, TInternalValue> {
+        public TAccessor GetAccessor(TKey key) {
+            return TryGetAccessor(key, out var result) ? result : throw CreateMissingMemberException(key);
+        }
+
+        public abstract bool TryGetAccessor(TKey key, [MaybeNullWhen(false)] out TAccessor result);
+
+        protected abstract MissingMemberException CreateMissingMemberException(TKey key);
         public TValue this[TKey key] {
             get {
                 var accessor = GetAccessor(key);

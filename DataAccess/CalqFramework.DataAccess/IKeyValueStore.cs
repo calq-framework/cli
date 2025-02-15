@@ -6,7 +6,7 @@
         TValue GetValueOrInitialize(TKey key);
     }
 
-    public interface IKeyValueStore<TKey, TValue, TAccessor, TInternalValue> : IKeyAccessorResolver<TKey, TAccessor>, IKeyValueStore<TKey, TValue>, IMediatedKeyValueStore<TAccessor, TInternalValue> {
+    public interface IKeyValueStore<TKey, TValue, TAccessor, TInternalValue> : IKeyValueStore<TKey, TValue>, IMediatedKeyValueStore<TKey, TAccessor, TInternalValue> {
     }
 
     public interface IKeyValueStore<TKey, TValue, TAccessor> : IKeyValueStore<TKey, TValue, TAccessor, TValue> {
