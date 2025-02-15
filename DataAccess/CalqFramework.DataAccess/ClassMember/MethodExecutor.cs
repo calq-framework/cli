@@ -14,11 +14,11 @@ namespace CalqFramework.DataAccess.ClassMember {
         }
 
         public override bool ContainsAccessor(ParameterInfo accessor) {
-            return accessor.Member == Method;
+            return accessor.Member == ParentMethod;
         }
 
         public override object? Invoke() {
-            return Method.Invoke(ParentObject, ParameterValues);
+            return ParentMethod.Invoke(ParentObject, ParameterValues);
         }
 
         public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out ParameterInfo result) {

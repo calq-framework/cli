@@ -5,9 +5,9 @@ using System.Runtime.InteropServices;
 namespace CalqFramework.DataAccess.ClassMember {
     public abstract class ParameterStoreBase<TKey, TValue> : KeyValueStoreBase<TKey, TValue, ParameterInfo, object?> {
         public ParameterStoreBase(MethodInfo method) {
-            Method = method;
+            ParentMethod = method;
             var i = 0;
-            Parameters = Method.GetParameters();
+            Parameters = ParentMethod.GetParameters();
             ParameterIndexByParameter = Parameters.ToDictionary(x => x, x => i++);
             ParameterValues = new object?[ParameterIndexByParameter.Count];
             for (var j = 0; j < ParameterIndexByParameter.Count; j++) {
@@ -26,8 +26,8 @@ namespace CalqFramework.DataAccess.ClassMember {
 
         public override IEnumerable<ParameterInfo> Accessors => Parameters.Where(ContainsAccessor);
 
-        protected MethodInfo Method { get; }
-        public ParameterInfo[] Parameters { get; }
+        protected MethodInfo ParentMethod { get; }
+        protected ParameterInfo[] Parameters { get; }
         protected Dictionary<ParameterInfo, int> ParameterIndexByParameter { get; }
         protected object?[] ParameterValues { get; }
 
@@ -46,7 +46,7 @@ namespace CalqFramework.DataAccess.ClassMember {
         }
 
         protected override MissingMemberException CreateMissingMemberException(TKey key) {
-            return new MissingMemberException($"Missing {key} in {Method}.");
+            return new MissingMemberException($"Missing {key} in {ParentMethod}.");
         }
     }
 }

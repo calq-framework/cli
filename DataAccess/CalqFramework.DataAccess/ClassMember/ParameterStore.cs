@@ -7,7 +7,7 @@ namespace CalqFramework.DataAccess.ClassMember {
         }
 
         public override bool ContainsAccessor(ParameterInfo accessor) {
-            return accessor.Member == Method;
+            return accessor.Member == ParentMethod;
         }
 
         public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out ParameterInfo result) {
