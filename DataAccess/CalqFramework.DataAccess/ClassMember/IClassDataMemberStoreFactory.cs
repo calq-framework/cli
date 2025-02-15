@@ -2,6 +2,6 @@
 
 namespace CalqFramework.DataAccess.ClassMember {
     public interface IClassDataMemberStoreFactory {
-        IKeyValueStore<string, object?, MemberInfo> CreateDataMemberStore(object obj);
+        IKeyValueStore<string, object?> CreateDataMemberStore(object obj);
     }
 }

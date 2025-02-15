@@ -11,7 +11,7 @@ public abstract class ClassDataMemberStoreFactoryBase : IClassDataMemberStoreFac
 
     public BindingFlags BindingAttr { get; init; } = DefaultLookup;
 
-    public virtual IKeyValueStore<string, object?, MemberInfo> CreateDataMemberStore(object obj) {
+    public virtual IKeyValueStore<string, object?> CreateDataMemberStore(object obj) {
         if (AccessFields && AccessProperties) {
             return CreateFieldAndPropertyStore(obj);
         } else if (AccessFields) {
@@ -23,9 +23,9 @@ public abstract class ClassDataMemberStoreFactoryBase : IClassDataMemberStoreFac
         }
     }
 
-    protected virtual IKeyValueStore<string, object?, MemberInfo> CreateFieldAndPropertyStore(object obj) {
-        return new DualKeyValueStore<string, object?, MemberInfo>(CreateFieldStore(obj), CreatePropertyStore(obj));
+    protected virtual IKeyValueStore<string, object?> CreateFieldAndPropertyStore(object obj) {
+        return new DualKeyValueStore<string, object?>(CreateFieldStore(obj), CreatePropertyStore(obj));
     }
-    protected abstract IKeyValueStore<string, object?, MemberInfo> CreateFieldStore(object obj);
-    protected abstract IKeyValueStore<string, object?, MemberInfo> CreatePropertyStore(object obj);
+    protected abstract IKeyValueStore<string, object?> CreateFieldStore(object obj);
+    protected abstract IKeyValueStore<string, object?> CreatePropertyStore(object obj);
 }
