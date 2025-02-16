@@ -2,7 +2,9 @@
 using System.Reflection;
 
 namespace CalqFramework.DataAccess.ClassMember {
-    sealed public class FieldStore : FieldStoreBase<string, object?>, IKeyValueStore<string, object?, FieldInfo> {
+
+    public sealed class FieldStore : FieldStoreBase<string, object?>, IKeyValueStore<string, object?, FieldInfo> {
+
         public FieldStore(object obj, BindingFlags bindingAttr) : base(obj, bindingAttr) {
         }
 

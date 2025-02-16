@@ -1,9 +1,13 @@
 ﻿using System.Reflection;
 
 namespace CalqFramework.DataAccess.ClassMember {
+
     public abstract class PropertyStoreBase<TKey, TValue> : ClassDataMemberStoreBase<TKey, TValue, PropertyInfo, object?> {
+
         public PropertyStoreBase(object obj, BindingFlags bindingAttr) : base(obj, bindingAttr) {
         }
+
+        public override IEnumerable<PropertyInfo> Accessors => ParentType.GetProperties().Where(ContainsAccessor);
 
         public override object? this[PropertyInfo accessor] {
             get {
@@ -13,8 +17,6 @@ namespace CalqFramework.DataAccess.ClassMember {
                 ((PropertyInfo)accessor).SetValue(ParentObject, value);
             }
         }
-
-        public override IEnumerable<PropertyInfo> Accessors => ParentType.GetProperties().Where(ContainsAccessor);
 
         public override Type GetDataType(PropertyInfo accessor) {
             return ((PropertyInfo)accessor).PropertyType;

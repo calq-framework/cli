@@ -5,59 +5,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Xml.Linq;
 
 namespace CalqFramework.Cli.DataAccess.ClassMember {
+
     internal class MethodInfoStore : IReadOnlyKeyValueStore<string, MethodInfo?>, ICliReadOnlyKeyValueStore<string, MethodInfo?, MethodInfo> {
+
         public MethodInfoStore(object obj, BindingFlags bindingAttr) {
             ParentObject = obj;
             BindingAttr = bindingAttr;
             ParentType = obj.GetType();
         }
 
+        public IEnumerable<MethodInfo> Accessors => ParentType.GetMethods(BindingAttr).Where(ContainsAccessor);
+        protected BindingFlags BindingAttr { get; }
         protected object ParentObject { get; }
         protected Type ParentType { get; }
-        protected BindingFlags BindingAttr { get; }
-        public IEnumerable<MethodInfo> Accessors => ParentType.GetMethods(BindingAttr).Where(ContainsAccessor);
-
-        private bool ContainsAccessor(MethodInfo accessor) {
-            return accessor is MethodInfo && accessor.DeclaringType == ParentType && !IsDotnetSpecific(accessor);
-        }
-
-        private static bool IsDotnetSpecific(MethodInfo methodInfo) {
-            return methodInfo.DeclaringType == typeof(object) || methodInfo.GetCustomAttributes<CompilerGeneratedAttribute>().Any();
-        }
 
         public MethodInfo? this[string key] {
             get {
                 var result = GetClassMember(key) ?? throw new CliException($"invalid command"); // throw new MissingMemberException($"Missing {key} in {ParentType}."); ;
                 return result;
             }
-        }
-
-        // FIXME align with GetKeysByAccessors
-        private MethodInfo? GetClassMember(string key) {
-            var stringComparison = BindingAttr.HasFlag(BindingFlags.IgnoreCase) ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
-            foreach (var member in Accessors) {
-                foreach (var atribute in member.GetCustomAttributes<CliNameAttribute>()) {
-                    if (string.Equals(atribute.Name, key, stringComparison)) {
-                        return member;
-                    }
-                }
-                foreach (var atribute in member.GetCustomAttributes<CliNameAttribute>()) {
-                    if (string.Equals(atribute.Name[0].ToString(), key, stringComparison)) {
-                        return member;
-                    }
-                }
-                if (string.Equals(member.Name, key, stringComparison)) {
-                    return member;
-                }
-                if (string.Equals(member.Name[0].ToString(), key, stringComparison)) {
-                    return member;
-                }
-            }
-
-            return null;
         }
 
         public bool ContainsKey(string key) {
@@ -86,6 +54,39 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
                 keys[accessor] = accesorKeys;
             }
             return keys;
+        }
+
+        private static bool IsDotnetSpecific(MethodInfo methodInfo) {
+            return methodInfo.DeclaringType == typeof(object) || methodInfo.GetCustomAttributes<CompilerGeneratedAttribute>().Any();
+        }
+
+        private bool ContainsAccessor(MethodInfo accessor) {
+            return accessor is MethodInfo && accessor.DeclaringType == ParentType && !IsDotnetSpecific(accessor);
+        }
+
+        // FIXME align with GetKeysByAccessors
+        private MethodInfo? GetClassMember(string key) {
+            var stringComparison = BindingAttr.HasFlag(BindingFlags.IgnoreCase) ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+            foreach (var member in Accessors) {
+                foreach (var atribute in member.GetCustomAttributes<CliNameAttribute>()) {
+                    if (string.Equals(atribute.Name, key, stringComparison)) {
+                        return member;
+                    }
+                }
+                foreach (var atribute in member.GetCustomAttributes<CliNameAttribute>()) {
+                    if (string.Equals(atribute.Name[0].ToString(), key, stringComparison)) {
+                        return member;
+                    }
+                }
+                if (string.Equals(member.Name, key, stringComparison)) {
+                    return member;
+                }
+                if (string.Equals(member.Name[0].ToString(), key, stringComparison)) {
+                    return member;
+                }
+            }
+
+            return null;
         }
     }
 }

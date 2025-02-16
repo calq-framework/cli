@@ -4,7 +4,12 @@ using System.Collections.Generic;
 using System.Numerics;
 
 namespace CalqFramework.Cli.Parsing {
+
     internal abstract class OptionReaderBase {
+
+        protected OptionReaderBase(IEnumerator<string> argsEnumerator) {
+            ArgsEnumerator = argsEnumerator;
+        }
 
         [Flags]
         internal enum OptionFlags {
@@ -18,15 +23,6 @@ namespace CalqFramework.Cli.Parsing {
         }
 
         public IEnumerator<string> ArgsEnumerator { get; }
-
-        protected OptionReaderBase(IEnumerator<string> argsEnumerator) {
-            ArgsEnumerator = argsEnumerator;
-        }
-
-        protected abstract bool HasOption(char option);
-        protected abstract bool HasOption(string option);
-        protected abstract Type GetOptionType(char option);
-        protected abstract Type GetOptionType(string option);
 
         public IEnumerable<(string option, string value, OptionFlags optionAttr)> Read() {
             bool IsNumber(string input) {
@@ -85,12 +81,14 @@ namespace CalqFramework.Cli.Parsing {
                             optionAttr |= OptionFlags.Short;
                         }
                         break;
+
                     case '+':
                         optionAttr |= OptionFlags.Plus;
                         if (arg[1] != '+') {
                             optionAttr |= OptionFlags.Short;
                         }
                         break;
+
                     default:
                         optionAttr |= OptionFlags.NotAnOption;
                         yield return (arg, "", optionAttr);
@@ -135,5 +133,13 @@ namespace CalqFramework.Cli.Parsing {
                 }
             }
         }
+
+        protected abstract Type GetOptionType(char option);
+
+        protected abstract Type GetOptionType(string option);
+
+        protected abstract bool HasOption(char option);
+
+        protected abstract bool HasOption(string option);
     }
 }

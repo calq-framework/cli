@@ -4,7 +4,9 @@ using CalqFramework.Cli.Serialization;
 using System.Collections.Generic;
 
 namespace CalqFramework.CliTest {
-    class SomeConfiguration {
+
+    internal class SomeConfiguration {
+
         public class Inner { }
 
         public Inner inner;
@@ -13,14 +15,19 @@ namespace CalqFramework.CliTest {
         public bool boolean;
         public bool xtrueBoolean = true;
         public string text;
+
         [CliName("customname")]
         public bool longOption;
+
         [CliName("shadowedfield")]
         public bool usableOption;
+
         public bool shadowedfield;
+
         [CliName("differentname")]
         [CliName("y")]
         public bool shortOption;
+
         public List<bool> initializedBoolList = new List<bool>() { true, false };
     }
 }

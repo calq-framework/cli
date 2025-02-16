@@ -2,8 +2,10 @@
 using System.Runtime.Serialization;
 
 namespace CalqFramework.Cli {
+
     [Serializable]
     public class CliException : Exception {
+
         public CliException() {
         }
 

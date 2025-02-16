@@ -1,31 +1,30 @@
-﻿using CalqFramework.Cli.Serialization;
-using CalqFramework.Cli.DataAccess.ClassMember;
-using System.Reflection;
+﻿using CalqFramework.Cli.DataAccess.ClassMember;
+using CalqFramework.Cli.Serialization;
 using System;
+using System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
+
     public class CliComponentStoreFactory : ICliComponentStoreFactory {
-        private BindingFlags? _methodBindingAttr = null;
-
-        internal IClassMemberSerializer CliClassDataMemberSerializer { get; }
-
         public const BindingFlags DefaultLookup = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public;
-
-        public bool AccessFields { get; init; } = false;
-        public bool AccessProperties { get; init; } = true;
-
-        public BindingFlags MethodBindingAttr {
-            get => _methodBindingAttr == null ? BindingAttr : (BindingFlags)_methodBindingAttr;
-            init => _methodBindingAttr = value;
-        }
-
-        public BindingFlags BindingAttr { get; init; } = DefaultLookup;
+        private BindingFlags? _methodBindingAttr = null;
 
         public CliComponentStoreFactory() {
             AccessFields = true;
             BindingAttr = DefaultLookup | BindingFlags.IgnoreCase;
             CliClassDataMemberSerializer = new ClassMemberSerializer();
         }
+
+        public bool AccessFields { get; init; } = false;
+        public bool AccessProperties { get; init; } = true;
+        public BindingFlags BindingAttr { get; init; } = DefaultLookup;
+
+        public BindingFlags MethodBindingAttr {
+            get => _methodBindingAttr == null ? BindingAttr : (BindingFlags)_methodBindingAttr;
+            init => _methodBindingAttr = value;
+        }
+
+        internal IClassMemberSerializer CliClassDataMemberSerializer { get; }
 
         public IOptionStore CreateOptionStore(object obj) {
             var cliValidator = new OptionAccessorValidator();
@@ -41,6 +40,18 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
                 throw new ArgumentException("Neither AccessFields nor AccessProperties is set.");
             }
             return new OptionStore(store);
+        }
+
+        public ISubcommandExecutor CreateSubcommandExecutor(MethodInfo methodInfo, object? obj) {
+            return new SubcommandExecutor(new MethodExecutor(methodInfo, obj));
+        }
+
+        public ISubcommandExecutorWithOptions CreateSubcommandExecutorWithOptions(MethodInfo cliAction, object obj) {
+            return new SubcommandExecutorWithOptions(CreateSubcommandExecutor(cliAction, obj), CreateOptionStore(obj));
+        }
+
+        public ISubcommandStore CreateSubcommandStore(object obj) {
+            return new SubcommandStore(new MethodInfoStore(obj, MethodBindingAttr));
         }
 
         public ISubmoduleStore CreateSubmoduleStore(object obj) {
@@ -69,18 +80,6 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
 
         private ICliKeyValueStore<string, TValue, MemberInfo> CreatePropertyStore<TValue>(object obj, IAccessorValidator cliValidator, IValueConverter<TValue> converter) {
             return new PropertyStore<TValue>(obj, BindingAttr, CliClassDataMemberSerializer, cliValidator, converter);
-        }
-
-        public ISubcommandStore CreateSubcommandStore(object obj) {
-            return new SubcommandStore(new MethodInfoStore(obj, MethodBindingAttr));
-        }
-
-        public ISubcommandExecutor CreateSubcommandExecutor(MethodInfo methodInfo, object? obj ) {
-            return new SubcommandExecutor(new MethodExecutor(methodInfo, obj));
-        }
-
-        public ISubcommandExecutorWithOptions CreateSubcommandExecutorWithOptions(MethodInfo cliAction, object obj) {
-            return new SubcommandExecutorWithOptions(CreateSubcommandExecutor(cliAction, obj), CreateOptionStore(obj));
         }
     }
 }

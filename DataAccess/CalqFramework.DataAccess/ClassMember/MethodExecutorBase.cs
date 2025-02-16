@@ -2,7 +2,9 @@
 using System.Reflection;
 
 namespace CalqFramework.DataAccess.ClassMember {
+
     public abstract class MethodExecutorBase<TParameterKey, TParameterValue> : ParameterStoreBase<TParameterKey, TParameterValue>, IFunctionExecutor<TParameterKey, TParameterValue> {
+
         protected MethodExecutorBase(MethodInfo method, object? obj = null) : base(method) {
             ParentObject = obj;
         }

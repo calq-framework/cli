@@ -2,7 +2,9 @@
 using System.Reflection;
 
 namespace CalqFramework.DataAccess.ClassMember {
+
     public class ParameterStore : ParameterStoreBase<string, object?>, IKeyValueStore<string, object?, ParameterInfo> {
+
         public ParameterStore(MethodInfo method) : base(method) {
         }
 
@@ -11,7 +13,7 @@ namespace CalqFramework.DataAccess.ClassMember {
         }
 
         public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out ParameterInfo result) {
-            result = Parameters.FirstOrDefault(x => x.Name== key);
+            result = Parameters.FirstOrDefault(x => x.Name == key);
             return result != null;
         }
 

@@ -3,9 +3,10 @@ using CalqFramework.DataAccess;
 using System.Collections.Generic;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
+
     internal class SubcommandExecutorWithOptions : DualKeyValueStoreBase<string, string?>, ISubcommandExecutorWithOptions {
-        private ISubcommandExecutor _subcommandExeutor;
         private IOptionStore _optionStore;
+        private ISubcommandExecutor _subcommandExeutor;
 
         public SubcommandExecutorWithOptions(ISubcommandExecutor subcommandExecutor, IOptionStore optionStore) {
             _subcommandExeutor = subcommandExecutor;
