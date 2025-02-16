@@ -1,7 +1,7 @@
 ﻿#pragma warning disable CS0649
 
-using CalqFramework.Cli.Serialization;
 using System.Collections.Generic;
+using CalqFramework.Cli.Serialization;
 
 namespace CalqFramework.CliTest {
 
@@ -28,6 +28,6 @@ namespace CalqFramework.CliTest {
         [CliName("y")]
         public bool shortOption;
 
-        public List<bool> initializedBoolList = new List<bool>() { true, false };
+        public List<bool> initializedBoolList = new() { true, false };
     }
 }

@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
-using System;
 
 namespace CalqFramework.Cli.InterfaceComponents {
     public class Submodule {

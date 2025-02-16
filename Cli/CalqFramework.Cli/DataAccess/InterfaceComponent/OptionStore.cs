@@ -1,8 +1,8 @@
-﻿using CalqFramework.Cli.InterfaceComponents;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using CalqFramework.Cli.InterfaceComponents;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
 
@@ -26,8 +26,8 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
 
         public IEnumerable<Option> GetOptions() {
             var result = new List<Option>();
-            var dict = Store.GetKeysByAccessors();
-            foreach (var key in dict.Keys) {
+            IDictionary<MemberInfo, IEnumerable<string>> dict = Store.GetKeysByAccessors();
+            foreach (MemberInfo key in dict.Keys) {
                 result.Add(new Option() {
                     Type = GetDataType(dict[key].First()),
                     Keys = dict[key],

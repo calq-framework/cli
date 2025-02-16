@@ -1,7 +1,7 @@
-﻿using CalqFramework.Cli.InterfaceComponents;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using CalqFramework.Cli.InterfaceComponents;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
 
@@ -25,8 +25,8 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
 
         public IEnumerable<Submodule> GetSubmodules() {
             var result = new List<Submodule>();
-            var dict = Store.GetKeysByAccessors();
-            foreach (var key in dict.Keys) {
+            IDictionary<MemberInfo, IEnumerable<string>> dict = Store.GetKeysByAccessors();
+            foreach (MemberInfo key in dict.Keys) {
                 result.Add(new Submodule() {
                     Keys = dict[key],
                     MemberInfo = key,

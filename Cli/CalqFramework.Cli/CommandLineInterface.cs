@@ -1,10 +1,10 @@
-﻿using CalqFramework.Cli.DataAccess.InterfaceComponent;
-using CalqFramework.Cli.Parsing;
-using CalqFramework.Cli.Serialization;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using CalqFramework.Cli.DataAccess.InterfaceComponent;
+using CalqFramework.Cli.Parsing;
+using CalqFramework.Cli.Serialization;
 using static CalqFramework.Cli.Parsing.OptionReaderBase;
 
 namespace CalqFramework.Cli {
@@ -28,13 +28,13 @@ namespace CalqFramework.Cli {
         }
 
         public object? Execute(object obj, IEnumerable<string> args) {
-            using var en = args.GetEnumerator();
+            using IEnumerator<string> en = args.GetEnumerator();
             if (!en.MoveNext()) {
                 return null;
             }
             string optionOrAction;
 
-            var targetObj = obj;
+            object targetObj = obj;
             ISubmoduleStore cliCommands;
 
             // explore object tree until optionOrAction definitely cannot be an action (object not found by name)
@@ -42,7 +42,7 @@ namespace CalqFramework.Cli {
                 optionOrAction = en.Current;
                 cliCommands = CliOptionsStoreFactory.CreateSubmoduleStore(targetObj);
                 if (cliCommands.ContainsKey(optionOrAction)) {
-                    var type = cliCommands.GetDataType(optionOrAction);
+                    Type type = cliCommands.GetDataType(optionOrAction);
                     if (ValueParser.IsParseable(type)) {
                         break;
                     }
@@ -51,9 +51,9 @@ namespace CalqFramework.Cli {
                     break;
                 }
             } while (en.MoveNext());
-            var cliOptions = CliOptionsStoreFactory.CreateOptionStore(targetObj);
+            IOptionStore cliOptions = CliOptionsStoreFactory.CreateOptionStore(targetObj);
 
-            var methodResolver = CliOptionsStoreFactory.CreateSubcommandStore(targetObj);
+            ISubcommandStore methodResolver = CliOptionsStoreFactory.CreateSubcommandStore(targetObj);
             if (optionOrAction == "--help" || optionOrAction == "-h") {
                 Console.Write(HelpGenerator.GetHelp(cliOptions.GetOptions(), cliCommands.GetSubmodules(), methodResolver.GetSubcommands(CliOptionsStoreFactory.CreateSubcommandExecutor)));
                 return null;
@@ -63,8 +63,8 @@ namespace CalqFramework.Cli {
                 return null;
             }
 
-            var cliAction = methodResolver[optionOrAction];
-            var optionsAndActionParams = CliOptionsStoreFactory.CreateSubcommandExecutorWithOptions(cliAction, targetObj);
+            MethodInfo? cliAction = methodResolver[optionOrAction];
+            ISubcommandExecutorWithOptions optionsAndActionParams = CliOptionsStoreFactory.CreateSubcommandExecutorWithOptions(cliAction, targetObj);
             if (TryReadOptionsAndActionParams(en, optionsAndActionParams, cliAction, methodResolver)) {
                 return optionsAndActionParams.Invoke();
             } else {
@@ -78,7 +78,7 @@ namespace CalqFramework.Cli {
             var optionsReader = new OptionReader(args, optionsAndParams);
 
             try {
-                foreach (var (option, value, optionAttr) in optionsReader.Read()) {
+                foreach ((string option, string value, OptionFlags optionAttr) in optionsReader.Read()) {
                     if ((option == "help" || option == "h") && !optionAttr.HasFlag(OptionFlags.NotAnOption)) {
                         Console.Write(HelpGenerator.GetHelp(optionsAndParams.GetOptions(), subcommands.GetSubcommands(CliOptionsStoreFactory.CreateSubcommandExecutor).Where(x => x.MethodInfo == method).First()));
                         return false;

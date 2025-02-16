@@ -18,11 +18,11 @@ namespace CalqFramework.DataAccess {
 
         public TValue this[TKey key] {
             get {
-                var accessor = GetAccessor(key);
+                TAccessor? accessor = GetAccessor(key);
                 return ConvertFromInternalValue(this[accessor], accessor);
             }
             set {
-                var accessor = GetAccessor(key);
+                TAccessor? accessor = GetAccessor(key);
                 this[accessor] = ConvertToInternalValue(value, accessor);
             }
         }
@@ -32,22 +32,22 @@ namespace CalqFramework.DataAccess {
         public abstract bool ContainsAccessor(TAccessor accessor);
 
         public bool ContainsKey(TKey key) {
-            return TryGetAccessor(key, out var _);
+            return TryGetAccessor(key, out TAccessor? _);
         }
 
         public TAccessor GetAccessor(TKey key) {
-            return TryGetAccessor(key, out var result) ? result : throw CreateMissingMemberException(key);
+            return TryGetAccessor(key, out TAccessor? result) ? result : throw CreateMissingMemberException(key);
         }
 
         public Type GetDataType(TKey key) {
-            var accessor = GetAccessor(key);
+            TAccessor? accessor = GetAccessor(key);
             return GetDataType(accessor);
         }
 
         public abstract Type GetDataType(TAccessor accessor);
 
         public TValue GetValueOrInitialize(TKey key) {
-            var accessor = GetAccessor(key);
+            TAccessor? accessor = GetAccessor(key);
             return ConvertFromInternalValue(GetValueOrInitialize(accessor), accessor);
         }
 

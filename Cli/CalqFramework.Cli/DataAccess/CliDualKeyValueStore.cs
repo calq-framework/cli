@@ -1,13 +1,13 @@
-﻿using CalqFramework.DataAccess;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using CalqFramework.DataAccess;
 
 namespace CalqFramework.Cli.DataAccess {
 
     internal class CliDualKeyValueStore<TValue> : DualKeyValueStoreBase<string, TValue>, ICliKeyValueStore<string, TValue, MemberInfo> {
-        private ICliKeyValueStore<string, TValue, MemberInfo> _primaryStore;
-        private ICliKeyValueStore<string, TValue, MemberInfo> _secondarStore;
+        private readonly ICliKeyValueStore<string, TValue, MemberInfo> _primaryStore;
+        private readonly ICliKeyValueStore<string, TValue, MemberInfo> _secondarStore;
 
         public CliDualKeyValueStore(ICliKeyValueStore<string, TValue, MemberInfo> primaryStore, ICliKeyValueStore<string, TValue, MemberInfo> secondaryStore) {
             _primaryStore = primaryStore;

@@ -12,12 +12,12 @@ public static class ValueParser {
 
     internal static object ParseValue(string value, Type type) {
         try {
-            var isCollection = type.GetInterface(nameof(ICollection)) != null;
+            bool isCollection = type.GetInterface(nameof(ICollection)) != null;
             if (isCollection) {
                 type = type.GetGenericArguments()[0];
             }
 
-            var newValue = CalqFramework.DataAccess.Text.ValueParser.ParseValue(value, type);
+            object newValue = CalqFramework.DataAccess.Text.ValueParser.ParseValue(value, type);
             return newValue;
         } catch (OverflowException ex) {
             throw new CliException($"value is out of range: {ex.Message}", ex);
@@ -30,12 +30,12 @@ public static class ValueParser {
 
     internal static object ParseValue(string value, Type type, string option) {
         try {
-            var isCollection = type.GetInterface(nameof(ICollection)) != null;
+            bool isCollection = type.GetInterface(nameof(ICollection)) != null;
             if (isCollection) {
                 type = type.GetGenericArguments()[0];
             }
 
-            var newValue = CalqFramework.DataAccess.Text.ValueParser.ParseValue(value, type);
+            object newValue = CalqFramework.DataAccess.Text.ValueParser.ParseValue(value, type);
             return newValue;
         } catch (OverflowException ex) {
             throw new CliException($"option value is out of range: {option}={ex.Message}", ex);

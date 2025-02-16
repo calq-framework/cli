@@ -1,6 +1,6 @@
-﻿using CalqFramework.Cli.DataAccess.ClassMember;
+﻿using System;
+using CalqFramework.Cli.DataAccess.ClassMember;
 using CalqFramework.Cli.Parsing;
-using System;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
 

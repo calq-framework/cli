@@ -11,7 +11,7 @@ namespace CalqFramework.CliTest {
 
         public class Nested {
 
-            public void NestedMethod() {
+            public static void NestedMethod() {
             }
         }
 
@@ -20,48 +20,48 @@ namespace CalqFramework.CliTest {
         public bool booleanField;
         public bool booleanConflict;
 
-        public Nested objectField = new Nested();
+        public Nested objectField = new();
         public Nested nullObjectField;
 
-        public List<bool> initializedBoolList = new List<bool>() { true, false };
+        public List<bool> initializedBoolList = new() { true, false };
 
         /// <summary>
         /// Does nothing.
         /// </summary>
-        public void Method() { }
+        public static void Method() { }
 
-        public void MethodWithOptionalParam(bool optional = true) {
+        public static void MethodWithOptionalParam(bool optional = true) {
         }
 
-        public List<bool> MethodWithList(List<bool> paramList) {
+        public static List<bool> MethodWithList(List<bool> paramList) {
             return paramList;
         }
 
-        public string MethodWithText(string text) {
+        public static string MethodWithText(string text) {
             return text;
         }
 
-        public int MethodWithInteger(int integer) {
+        public static int MethodWithInteger(int integer) {
             return integer;
         }
 
         public void MethodWithTextAndInteger(string text, int integer) {
-            this.textField = text;
-            this.integerField = integer;
+            textField = text;
+            integerField = integer;
         }
 
         public void MethodWithIntegerAndText(int integer, string text) {
-            this.integerField = integer;
-            this.textField = text;
+            integerField = integer;
+            textField = text;
         }
 
         public void MethodWithTextAndBoolean(string text, bool boolean = false) {
-            this.textField = text;
-            this.booleanField = boolean;
+            textField = text;
+            booleanField = boolean;
         }
 
         public void MethodWithTextAndBooleanError(string text, bool booleanConflict = false) {
-            this.textField = text;
+            textField = text;
             this.booleanConflict = booleanConflict;
         }
     }

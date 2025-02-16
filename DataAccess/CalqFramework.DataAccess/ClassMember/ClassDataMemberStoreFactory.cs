@@ -1,9 +1,9 @@
-﻿using CalqFramework.DataAccess;
+﻿using System.Reflection;
+using CalqFramework.DataAccess;
 using CalqFramework.DataAccess.ClassMember;
-using System.Reflection;
 
 namespace CalqFramework.DataAccess.ClassMember;
-sealed public class ClassDataMemberStoreFactory : ClassDataMemberStoreFactoryBase {
+public sealed class ClassDataMemberStoreFactory : ClassDataMemberStoreFactoryBase {
 
     protected override IKeyValueStore<string, object?> CreateFieldStore(object obj) {
         return new FieldStore(obj, BindingAttr);

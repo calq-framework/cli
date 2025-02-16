@@ -1,5 +1,5 @@
-﻿using CalqFramework.DataAccess;
-using System.Reflection;
+﻿using System.Reflection;
+using CalqFramework.DataAccess;
 
 namespace CalqFramework.DataAccess.ClassMember;
 public abstract class ClassDataMemberStoreFactoryBase : IClassDataMemberStoreFactory {

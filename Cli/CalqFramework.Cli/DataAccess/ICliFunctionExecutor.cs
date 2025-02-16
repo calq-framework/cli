@@ -1,5 +1,5 @@
-﻿using CalqFramework.DataAccess;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using CalqFramework.DataAccess;
 
 namespace CalqFramework.Cli.DataAccess {
 

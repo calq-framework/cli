@@ -23,7 +23,7 @@ namespace CalqFramework.DataAccess.ClassMember {
         }
 
         public override object? GetValueOrInitialize(FieldInfo accessor) {
-            var value = ((FieldInfo)accessor).GetValue(ParentObject) ??
+            object value = ((FieldInfo)accessor).GetValue(ParentObject) ??
                    Activator.CreateInstance(((FieldInfo)accessor).FieldType) ??
                    Activator.CreateInstance(Nullable.GetUnderlyingType(((FieldInfo)accessor).FieldType)!)!;
             ((FieldInfo)accessor).SetValue(ParentObject, value);

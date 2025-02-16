@@ -30,7 +30,7 @@ namespace CalqFramework.Cli.Parsing {
             }
 
             void TrySelfAssign(Type type, ref string value, ref OptionFlags optionAttr) {
-                var isCollection = type.GetInterface(nameof(ICollection)) != null;
+                bool isCollection = type.GetInterface(nameof(ICollection)) != null;
                 if (isCollection) {
                     type = type.GetGenericArguments()[0];
                 }
@@ -41,7 +41,7 @@ namespace CalqFramework.Cli.Parsing {
             }
 
             (string option, string value) ExtractOptionValuePair(string arg, OptionFlags optionAttr) {
-                var optionValueSplit = arg.Split('=', 2);
+                string[] optionValueSplit = arg.Split('=', 2);
                 string value = optionValueSplit.Length == 1 ? "" : optionValueSplit[1];
 
                 string option;
@@ -55,22 +55,22 @@ namespace CalqFramework.Cli.Parsing {
             }
 
             IEnumerable<char> ReadShort(string stackedOptions) {
-                for (var i = 0; i < stackedOptions.Length; ++i) {
-                    var option = stackedOptions[i];
+                for (int i = 0; i < stackedOptions.Length; ++i) {
+                    char option = stackedOptions[i];
                     yield return option;
                 }
             }
 
-            var moved = false;
+            bool moved = false;
             while (moved || ArgsEnumerator.MoveNext()) {
                 moved = false;
-                var arg = ArgsEnumerator.Current;
+                string arg = ArgsEnumerator.Current;
 
                 if (arg.Length == 0) {
                     throw new ArgumentException("arg length is 0");
                 }
 
-                var optionAttr = OptionFlags.None;
+                OptionFlags optionAttr = OptionFlags.None;
                 switch (arg[0]) {
                     case '-':
                         if (arg[1] == '-') {
@@ -95,7 +95,7 @@ namespace CalqFramework.Cli.Parsing {
                         continue;
                 }
 
-                var (option, value) = ExtractOptionValuePair(arg, optionAttr);
+                (string option, string value) = ExtractOptionValuePair(arg, optionAttr);
                 if (value == "") {
                     moved = ArgsEnumerator.MoveNext();
                     if (moved) {
@@ -111,7 +111,7 @@ namespace CalqFramework.Cli.Parsing {
                 }
 
                 if (optionAttr.HasFlag(OptionFlags.Short)) {
-                    foreach (var shortOption in ReadShort(option)) {
+                    foreach (char shortOption in ReadShort(option)) {
                         if (HasOption(shortOption)) {
                             if (optionAttr.HasFlag(OptionFlags.ValueUnassigned)) {
                                 TrySelfAssign(GetOptionType(shortOption), ref value, ref optionAttr);

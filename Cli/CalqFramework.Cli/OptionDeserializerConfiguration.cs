@@ -1,7 +1,7 @@
-﻿using CalqFramework.Cli.DataAccess.InterfaceComponent;
+﻿using System.Reflection;
+using CalqFramework.Cli.DataAccess.InterfaceComponent;
 using CalqFramework.DataAccess;
 using CalqFramework.DataAccess.ClassMember;
-using System.Reflection;
 
 namespace CalqFramework.Cli {
     public class OptionDeserializerConfiguration {
