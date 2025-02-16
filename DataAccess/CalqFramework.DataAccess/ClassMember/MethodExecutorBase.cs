@@ -1,18 +1,44 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace CalqFramework.DataAccess.ClassMember {
 
     public abstract class MethodExecutorBase<TParameterKey, TParameterValue> : ParameterStoreBase<TParameterKey, TParameterValue>, IFunctionExecutor<TParameterKey, TParameterValue> {
 
-        protected MethodExecutorBase(MethodInfo method, object? obj = null) : base(method) {
+        protected MethodExecutorBase(MethodInfo method, object? obj) : base(method) {
             ParentObject = obj;
+            Arguments = new List<TParameterValue>();
+            for (int j = 0; j < ParameterIndexByParameter.Count; j++) {
+                ParameterValues[j] = DBNull.Value;
+            }
         }
 
         public object? ParentObject { get; }
+        protected List<TParameterValue> Arguments { get; }
 
-        public abstract void AddParameter(TParameterValue value);
+        public void AddArgument(TParameterValue value) {
+            Arguments.Add(value);
+        }
 
-        public abstract object? Invoke();
+        public object? Invoke() {
+            bool IsAssigned(int i) {
+                return ParameterValues[i] == DBNull.Value;
+            }
+
+            int argumentIndex = 0;
+            for (int parameterIndex = 0; parameterIndex < ParameterValues.Length; ++parameterIndex) {
+                if (IsAssigned(parameterIndex)) {
+                    if (argumentIndex < Arguments.Count) {
+                        object? value = ConvertToInternalValue(Arguments[argumentIndex++], ParameterInfos[parameterIndex]);
+                        ParameterValues[parameterIndex] = value;
+                    } else {
+                        ParameterValues[parameterIndex] = ParameterInfos[parameterIndex].HasDefaultValue ? ParameterInfos[parameterIndex].DefaultValue : throw new ArgumentException($"unassigned parameter {ParameterInfos[parameterIndex].Name}"); ;
+                    }
+                }
+            }
+            if (argumentIndex < Arguments.Count) {
+                throw new ArgumentException($"unexpected argument {Arguments[argumentIndex]}");
+            }
+            return ParentMethod.Invoke(ParentObject, ParameterValues);
+        }
     }
 }

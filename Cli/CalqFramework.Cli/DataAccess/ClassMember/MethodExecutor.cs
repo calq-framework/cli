@@ -14,12 +14,10 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
     public class MethodExecutor : MethodExecutorBase<string, string?>, ICliFunctionExecutor<string, string?, ParameterInfo> {
 
         public MethodExecutor(MethodInfo method, object? obj, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier) : base(method, obj) {
-            PositionalArguments = new List<string?>();
             BindingFlags = bindingFlags;
             ClassMemberStringifier = classMemberStringifier;
         }
 
-        protected List<string?> PositionalArguments { get; }
         protected BindingFlags BindingFlags { get; }
         protected IClassMemberStringifier ClassMemberStringifier { get; }
 
@@ -53,10 +51,6 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
             }
         }
 
-        public override void AddParameter(string? value) {
-            PositionalArguments.Add(value);
-        }
-
         public override bool ContainsAccessor(ParameterInfo accessor) {
             return accessor.Member == ParentMethod;
         }
@@ -67,24 +61,6 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
                 keys[accessor] = ClassMemberStringifier.GetNames(accessor);
             }
             return keys;
-        }
-
-        public override object? Invoke() {
-            int receivedPositionalParametersIndex = 0;
-            for (int i = 0; i < ParameterValues.Length; ++i) {
-                if (ParameterValues[i] == DBNull.Value) {
-                    if (receivedPositionalParametersIndex < PositionalArguments.Count) {
-                        object value = ValueParser.ParseValue(PositionalArguments[receivedPositionalParametersIndex++], ParameterInfos[i].ParameterType, ParameterInfos[i].Name!);
-                        ParameterValues[i] = value;
-                    } else {
-                        ParameterValues[i] = ParameterInfos[i].HasDefaultValue ? ParameterInfos[i].DefaultValue : throw new CliException($"unassigned parameter {ParameterInfos[i].Name}"); ;
-                    }
-                }
-            }
-            if (receivedPositionalParametersIndex < PositionalArguments.Count) {
-                throw new CliException($"unexpected positional parameter {PositionalArguments[receivedPositionalParametersIndex]}");
-            }
-            return ParentMethod.Invoke(ParentObject, ParameterValues);
         }
 
         public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out ParameterInfo result) {

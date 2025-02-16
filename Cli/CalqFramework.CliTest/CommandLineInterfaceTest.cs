@@ -182,7 +182,7 @@ namespace CalqFramework.CliTest {
 
         [Fact]
         public void Execute_Should_ThrowCliException_When_MethodCommandWithArgumentProvided() {
-            CliException ex = Assert.Throws<CliException>(() => {
+            var ex = Assert.Throws<ArgumentException>(() => {
                 var tool = new SomeClassLibrary();
                 new CommandLineInterface().Execute(tool, new[] { $"{nameof(SomeClassLibrary.Method)}", "abc" });
             });
@@ -191,7 +191,7 @@ namespace CalqFramework.CliTest {
 
         [Fact]
         public void Execute_Should_ThrowCliException_When_UnassignedOptionProvided() {
-            CliException ex = Assert.Throws<CliException>(() => {
+            var ex = Assert.Throws<ArgumentException>(() => {
                 var tool = new SomeClassLibrary();
                 new CommandLineInterface().Execute(tool, new[] { $"{nameof(SomeClassLibrary.MethodWithText)}" });
             });

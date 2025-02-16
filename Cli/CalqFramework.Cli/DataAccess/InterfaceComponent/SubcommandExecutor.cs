@@ -16,8 +16,8 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
 
         public string? this[string key] { get => Executor[key]; set => Executor[key] = value; }
 
-        public void AddParameter(string? value) {
-            Executor.AddParameter(value);
+        public void AddArgument(string? value) {
+            Executor.AddArgument(value);
         }
 
         public bool ContainsKey(string key) {

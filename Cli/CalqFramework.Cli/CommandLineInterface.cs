@@ -92,13 +92,13 @@ namespace CalqFramework.Cli {
                     }
 
                     if (optionAttr.HasFlag(OptionFlags.NotAnOption)) {
-                        optionsAndParams.AddParameter(option);
+                        optionsAndParams.AddArgument(option);
                     } else {
                         optionsAndParams[option] = value;
                     }
                 }
                 while (args.MoveNext()) {
-                    optionsAndParams.AddParameter(args.Current);
+                    optionsAndParams.AddArgument(args.Current);
                 }
             } catch (Exception ex) { // TODO rename the exception in CalqFramework.DataAccess
                 if (ex.Message == "collision") {

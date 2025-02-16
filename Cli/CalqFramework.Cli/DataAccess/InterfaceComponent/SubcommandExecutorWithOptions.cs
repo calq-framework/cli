@@ -17,8 +17,8 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
 
         protected override IKeyValueStore<string, string?> SecondaryStore => _optionStore;
 
-        public void AddParameter(string? value) {
-            _subcommandExeutor.AddParameter(value);
+        public void AddArgument(string? value) {
+            _subcommandExeutor.AddArgument(value);
         }
 
         public IEnumerable<Option> GetOptions() {
