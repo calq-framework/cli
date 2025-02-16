@@ -8,18 +8,8 @@ namespace CalqFramework.DataAccess.ClassMember {
         public MethodExecutor(MethodInfo method, object obj) : base(method, obj) {
         }
 
-        private int ParameterValuesSize { get; set; }
-
-        public override void AddParameter(object? value) {
-            ParameterValues[ParameterValuesSize++] = value;
-        }
-
         public override bool ContainsAccessor(ParameterInfo accessor) {
             return accessor.Member == ParentMethod;
-        }
-
-        public override object? Invoke() {
-            return ParentMethod.Invoke(ParentObject, ParameterValues);
         }
 
         public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out ParameterInfo result) {

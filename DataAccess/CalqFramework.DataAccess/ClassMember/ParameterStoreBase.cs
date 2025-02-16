@@ -10,9 +10,6 @@ namespace CalqFramework.DataAccess.ClassMember {
             ParameterInfos = ParentMethod.GetParameters();
             ParameterIndexByParameter = ParameterInfos.ToDictionary(x => x, x => i++);
             ParameterValues = new object?[ParameterIndexByParameter.Count];
-            for (int j = 0; j < ParameterIndexByParameter.Count; j++) {
-                ParameterValues[j] = DBNull.Value;
-            }
         }
 
         public override IEnumerable<ParameterInfo> Accessors => ParameterInfos.Where(ContainsAccessor);
