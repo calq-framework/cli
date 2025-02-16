@@ -12,7 +12,7 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
         public CliComponentStoreFactory() {
             AccessFields = true;
             BindingAttr = DefaultLookup | BindingFlags.IgnoreCase;
-            CliClassDataMemberSerializer = new ClassMemberSerializer();
+            ClassMemberStringifier = new ClassMemberStringifier();
         }
 
         public bool AccessFields { get; init; } = false;
@@ -24,7 +24,7 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
             init => _methodBindingAttr = value;
         }
 
-        internal IClassMemberSerializer CliClassDataMemberSerializer { get; }
+        public IClassMemberStringifier ClassMemberStringifier { get; }
 
         public IOptionStore CreateOptionStore(object obj) {
             var cliValidator = new OptionAccessorValidator();
@@ -43,7 +43,7 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
         }
 
         public ISubcommandExecutor CreateSubcommandExecutor(MethodInfo methodInfo, object? obj) {
-            return new SubcommandExecutor(new MethodExecutor(methodInfo, obj));
+            return new SubcommandExecutor(new MethodExecutor(methodInfo, obj, BindingAttr, ClassMemberStringifier));
         }
 
         public ISubcommandExecutorWithOptions CreateSubcommandExecutorWithOptions(MethodInfo cliAction, object obj) {
@@ -51,7 +51,7 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
         }
 
         public ISubcommandStore CreateSubcommandStore(object obj) {
-            return new SubcommandStore(new MethodInfoStore(obj, MethodBindingAttr));
+            return new SubcommandStore(new MethodInfoStore(obj, MethodBindingAttr, ClassMemberStringifier));
         }
 
         public ISubmoduleStore CreateSubmoduleStore(object obj) {
@@ -75,11 +75,11 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
         }
 
         private ICliKeyValueStore<string, TValue, MemberInfo> CreateFieldStore<TValue>(object obj, IAccessorValidator cliValidator, IValueConverter<TValue> converter) {
-            return new FieldStore<TValue>(obj, BindingAttr, CliClassDataMemberSerializer, cliValidator, converter);
+            return new FieldStore<TValue>(obj, BindingAttr, ClassMemberStringifier, cliValidator, converter);
         }
 
         private ICliKeyValueStore<string, TValue, MemberInfo> CreatePropertyStore<TValue>(object obj, IAccessorValidator cliValidator, IValueConverter<TValue> converter) {
-            return new PropertyStore<TValue>(obj, BindingAttr, CliClassDataMemberSerializer, cliValidator, converter);
+            return new PropertyStore<TValue>(obj, BindingAttr, ClassMemberStringifier, cliValidator, converter);
         }
     }
 }

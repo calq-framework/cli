@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -12,13 +13,13 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
     // TODO unify with FieldStore
     internal class PropertyStore<TValue> : PropertyStoreBase<string, TValue>, ICliKeyValueStore<string, TValue, MemberInfo> {
 
-        public PropertyStore(object obj, BindingFlags bindingAttr, IClassMemberSerializer cliSerializer, IAccessorValidator cliValidator, IValueConverter<TValue> valueConverter) : base(obj, bindingAttr) {
-            CliSerializer = cliSerializer;
+        public PropertyStore(object obj, BindingFlags bindingAttr, IClassMemberStringifier classMemberStringifier, IAccessorValidator cliValidator, IValueConverter<TValue> valueConverter) : base(obj, bindingAttr) {
+            ClassMemberStringifier = classMemberStringifier;
             CliValidator = cliValidator;
             ValueConverter = valueConverter;
         }
 
-        private IClassMemberSerializer CliSerializer { get; }
+        protected IClassMemberStringifier ClassMemberStringifier { get; }
         private IAccessorValidator CliValidator { get; }
         private IValueConverter<TValue> ValueConverter { get; }
 
@@ -49,17 +50,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
         public IDictionary<MemberInfo, IEnumerable<string>> GetKeysByAccessors() {
             var keys = new Dictionary<MemberInfo, IEnumerable<string>>();
             foreach (PropertyInfo accessor in Accessors) {
-                var accesorKeys = new List<string>();
-                foreach (CliNameAttribute atribute in accessor.GetCustomAttributes<CliNameAttribute>()) {
-                    accesorKeys.Add(atribute.Name);
-                }
-                if (accesorKeys.Count == 0) {
-                    accesorKeys.Add(accessor.Name);
-                }
-                if (!accesorKeys.Select(x => x.Length == 1).Any()) {
-                    accesorKeys.Add(accesorKeys[0][0].ToString());
-                }
-                keys[accessor] = accesorKeys;
+                keys[accessor] = ClassMemberStringifier.GetNames(accessor);
             }
             return keys;
         }
@@ -79,21 +70,9 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
 
         // FIXME align with GetKeysByAccessors
         private PropertyInfo? GetClassMember(string key) {
+            StringComparison stringComparison = BindingAttr.HasFlag(BindingFlags.IgnoreCase) ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
             foreach (PropertyInfo member in Accessors) {
-                foreach (CliNameAttribute atribute in member.GetCustomAttributes<CliNameAttribute>()) {
-                    if (atribute.Name == key) {
-                        return member;
-                    }
-                }
-                foreach (CliNameAttribute atribute in member.GetCustomAttributes<CliNameAttribute>()) {
-                    if (atribute.Name[0].ToString() == key) {
-                        return member;
-                    }
-                }
-                if (member.Name == key) {
-                    return member;
-                }
-                if (member.Name[0].ToString() == key) {
+                if (ClassMemberStringifier.GetNames(member).Where(x => string.Equals(x, key, stringComparison)).Any()) {
                     return member;
                 }
             }
