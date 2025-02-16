@@ -13,14 +13,14 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
 
     public class MethodExecutor : MethodExecutorBase<string, string?>, ICliFunctionExecutor<string, string?, ParameterInfo> {
 
-        public MethodExecutor(MethodInfo method, object? obj, BindingFlags bindingAttr, IClassMemberStringifier classMemberStringifier) : base(method, obj) {
-            ReceivedPositionalParameters = new List<string?>();
-            BindingAttr = bindingAttr;
+        public MethodExecutor(MethodInfo method, object? obj, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier) : base(method, obj) {
+            PositionalArguments = new List<string?>();
+            BindingFlags = bindingFlags;
             ClassMemberStringifier = classMemberStringifier;
         }
 
-        public List<string?> ReceivedPositionalParameters { get; }
-        protected BindingFlags BindingAttr { get; }
+        protected List<string?> PositionalArguments { get; }
+        protected BindingFlags BindingFlags { get; }
         protected IClassMemberStringifier ClassMemberStringifier { get; }
 
         public override object? this[ParameterInfo accessor] {
@@ -54,7 +54,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
         }
 
         public override void AddParameter(string? value) {
-            ReceivedPositionalParameters.Add(value);
+            PositionalArguments.Add(value);
         }
 
         public override bool ContainsAccessor(ParameterInfo accessor) {
@@ -73,16 +73,16 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
             int receivedPositionalParametersIndex = 0;
             for (int i = 0; i < ParameterValues.Length; ++i) {
                 if (ParameterValues[i] == DBNull.Value) {
-                    if (receivedPositionalParametersIndex < ReceivedPositionalParameters.Count) {
-                        object value = ValueParser.ParseValue(ReceivedPositionalParameters[receivedPositionalParametersIndex++], Parameters[i].ParameterType, Parameters[i].Name!);
+                    if (receivedPositionalParametersIndex < PositionalArguments.Count) {
+                        object value = ValueParser.ParseValue(PositionalArguments[receivedPositionalParametersIndex++], ParameterInfos[i].ParameterType, ParameterInfos[i].Name!);
                         ParameterValues[i] = value;
                     } else {
-                        ParameterValues[i] = Parameters[i].HasDefaultValue ? Parameters[i].DefaultValue : throw new CliException($"unassigned parameter {Parameters[i].Name}"); ;
+                        ParameterValues[i] = ParameterInfos[i].HasDefaultValue ? ParameterInfos[i].DefaultValue : throw new CliException($"unassigned parameter {ParameterInfos[i].Name}"); ;
                     }
                 }
             }
-            if (receivedPositionalParametersIndex < ReceivedPositionalParameters.Count) {
-                throw new CliException($"unexpected positional parameter {ReceivedPositionalParameters[receivedPositionalParametersIndex]}");
+            if (receivedPositionalParametersIndex < PositionalArguments.Count) {
+                throw new CliException($"unexpected positional parameter {PositionalArguments[receivedPositionalParametersIndex]}");
             }
             return ParentMethod.Invoke(ParentObject, ParameterValues);
         }
@@ -91,7 +91,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
             result = default;
             bool success = false;
 
-            StringComparison stringComparison = BindingAttr.HasFlag(BindingFlags.IgnoreCase) ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+            StringComparison stringComparison = BindingFlags.HasFlag(BindingFlags.IgnoreCase) ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
             foreach (ParameterInfo parameter in ParameterIndexByParameter.Keys) {
                 if (ClassMemberStringifier.GetNames(parameter).Where(x => string.Equals(x, key, stringComparison)).Any()) {
                     result = parameter;

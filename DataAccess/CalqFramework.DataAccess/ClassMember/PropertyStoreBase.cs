@@ -4,7 +4,7 @@ namespace CalqFramework.DataAccess.ClassMember {
 
     public abstract class PropertyStoreBase<TKey, TValue> : ClassDataMemberStoreBase<TKey, TValue, PropertyInfo, object?> {
 
-        public PropertyStoreBase(object obj, BindingFlags bindingAttr) : base(obj, bindingAttr) {
+        public PropertyStoreBase(object obj, BindingFlags bindingFlags) : base(obj, bindingFlags) {
         }
 
         public override IEnumerable<PropertyInfo> Accessors => ParentType.GetProperties().Where(ContainsAccessor);

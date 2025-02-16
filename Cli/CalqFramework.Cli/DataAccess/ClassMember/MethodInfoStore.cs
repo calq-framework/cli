@@ -10,15 +10,15 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
 
     internal class MethodInfoStore : IReadOnlyKeyValueStore<string, MethodInfo?>, ICliReadOnlyKeyValueStore<string, MethodInfo?, MethodInfo> {
 
-        public MethodInfoStore(object obj, BindingFlags bindingAttr, IClassMemberStringifier classMemberStringifier) {
+        public MethodInfoStore(object obj, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier) {
             ParentObject = obj;
-            BindingAttr = bindingAttr;
+            BindingFlags = bindingFlags;
             ClassMemberStringifier = classMemberStringifier;
             ParentType = obj.GetType();
         }
 
-        public IEnumerable<MethodInfo> Accessors => ParentType.GetMethods(BindingAttr).Where(ContainsAccessor);
-        protected BindingFlags BindingAttr { get; }
+        public IEnumerable<MethodInfo> Accessors => ParentType.GetMethods(BindingFlags).Where(ContainsAccessor);
+        protected BindingFlags BindingFlags { get; }
         protected IClassMemberStringifier ClassMemberStringifier { get; }
         protected object ParentObject { get; }
         protected Type ParentType { get; }
@@ -58,7 +58,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
 
         // FIXME align with GetKeysByAccessors
         private MethodInfo? GetClassMember(string key) {
-            StringComparison stringComparison = BindingAttr.HasFlag(BindingFlags.IgnoreCase) ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+            StringComparison stringComparison = BindingFlags.HasFlag(BindingFlags.IgnoreCase) ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
             foreach (MethodInfo member in Accessors) {
                 if (ClassMemberStringifier.GetNames(member).Where(x => string.Equals(x, key, stringComparison)).Any()) {
                     return member;

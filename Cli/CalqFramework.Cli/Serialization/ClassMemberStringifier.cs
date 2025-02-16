@@ -30,10 +30,9 @@ namespace CalqFramework.Cli.Serialization {
             if (!keys.Where(x => x.Length > 1).Any()) {
                 keys.Add(name);
             }
-            // TODO auto-add single letters after conflict resolution is implemented
-            //if (!keys.Where(x => x.Length == 1).Any()) {
-            //    keys.Add(keys[0][0].ToString());
-            //}
+            if (!keys.Where(x => x.Length == 1).Any()) {
+                keys.Add(keys[0][0].ToString());
+            }
             return keys;
         }
     }

@@ -4,7 +4,7 @@ namespace CalqFramework.DataAccess.ClassMember {
 
     public abstract class FieldStoreBase<TKey, TValue> : ClassDataMemberStoreBase<TKey, TValue, FieldInfo, object?> {
 
-        public FieldStoreBase(object obj, BindingFlags bindingAttr) : base(obj, bindingAttr) {
+        public FieldStoreBase(object obj, BindingFlags bindingFlags) : base(obj, bindingFlags) {
         }
 
         public override IEnumerable<FieldInfo> Accessors => ParentType.GetFields().Where(ContainsAccessor);

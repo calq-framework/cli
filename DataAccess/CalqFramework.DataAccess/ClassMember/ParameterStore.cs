@@ -13,7 +13,7 @@ namespace CalqFramework.DataAccess.ClassMember {
         }
 
         public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out ParameterInfo result) {
-            result = Parameters.FirstOrDefault(x => x.Name == key);
+            result = ParameterInfos.FirstOrDefault(x => x.Name == key);
             return result != null;
         }
 

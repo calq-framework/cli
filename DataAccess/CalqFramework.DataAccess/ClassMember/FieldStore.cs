@@ -5,7 +5,7 @@ namespace CalqFramework.DataAccess.ClassMember {
 
     public sealed class FieldStore : FieldStoreBase<string, object?>, IKeyValueStore<string, object?, FieldInfo> {
 
-        public FieldStore(object obj, BindingFlags bindingAttr) : base(obj, bindingAttr) {
+        public FieldStore(object obj, BindingFlags bindingFlags) : base(obj, bindingFlags) {
         }
 
         public override bool ContainsAccessor(FieldInfo accessor) {
@@ -13,7 +13,7 @@ namespace CalqFramework.DataAccess.ClassMember {
         }
 
         public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out FieldInfo result) {
-            result = ParentType.GetField(key, BindingAttr);
+            result = ParentType.GetField(key, BindingFlags);
             return result != null;
         }
 

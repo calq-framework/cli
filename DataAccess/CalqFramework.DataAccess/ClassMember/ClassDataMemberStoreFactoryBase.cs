@@ -9,7 +9,7 @@ public abstract class ClassDataMemberStoreFactoryBase : IClassDataMemberStoreFac
     public bool AccessFields { get; init; } = false;
     public bool AccessProperties { get; init; } = true;
 
-    public BindingFlags BindingAttr { get; init; } = DefaultLookup;
+    public BindingFlags BindingFlags { get; init; } = DefaultLookup;
 
     public virtual IKeyValueStore<string, object?> CreateDataMemberStore(object obj) {
         if (AccessFields && AccessProperties) {

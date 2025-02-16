@@ -4,13 +4,13 @@ namespace CalqFramework.DataAccess.ClassMember {
 
     public abstract class ClassDataMemberStoreBase<TKey, TValue, TAccessor, TInternalValue> : KeyValueStoreBase<TKey, TValue, TAccessor, TInternalValue> {
 
-        public ClassDataMemberStoreBase(object obj, BindingFlags bindingAttr) {
+        protected ClassDataMemberStoreBase(object obj, BindingFlags bindingFlags) {
             ParentObject = obj;
-            BindingAttr = bindingAttr;
+            BindingFlags = bindingFlags;
             ParentType = obj.GetType();
         }
 
-        protected BindingFlags BindingAttr { get; }
+        protected BindingFlags BindingFlags { get; }
         protected object ParentObject { get; }
         protected Type ParentType { get; }
 

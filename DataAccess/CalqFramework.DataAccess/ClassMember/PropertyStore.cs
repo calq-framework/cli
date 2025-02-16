@@ -5,7 +5,7 @@ namespace CalqFramework.DataAccess.ClassMember {
 
     public sealed class PropertyStore : PropertyStoreBase<string, object?>, IKeyValueStore<string, object?, PropertyInfo> {
 
-        public PropertyStore(object obj, BindingFlags bindingAttr) : base(obj, bindingAttr) {
+        public PropertyStore(object obj, BindingFlags bindingFlags) : base(obj, bindingFlags) {
         }
 
         public override bool ContainsAccessor(PropertyInfo accessor) {
@@ -13,7 +13,7 @@ namespace CalqFramework.DataAccess.ClassMember {
         }
 
         public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out PropertyInfo result) {
-            result = ParentType.GetProperty(key, BindingAttr);
+            result = ParentType.GetProperty(key, BindingFlags);
             return result != null;
         }
 

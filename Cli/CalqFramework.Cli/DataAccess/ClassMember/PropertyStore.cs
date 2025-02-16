@@ -13,7 +13,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
     // TODO unify with FieldStore
     internal class PropertyStore<TValue> : PropertyStoreBase<string, TValue>, ICliKeyValueStore<string, TValue, MemberInfo> {
 
-        public PropertyStore(object obj, BindingFlags bindingAttr, IClassMemberStringifier classMemberStringifier, IAccessorValidator cliValidator, IValueConverter<TValue> valueConverter) : base(obj, bindingAttr) {
+        public PropertyStore(object obj, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier, IAccessorValidator cliValidator, IValueConverter<TValue> valueConverter) : base(obj, bindingFlags) {
             ClassMemberStringifier = classMemberStringifier;
             CliValidator = cliValidator;
             ValueConverter = valueConverter;
@@ -70,7 +70,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
 
         // FIXME align with GetKeysByAccessors
         private PropertyInfo? GetClassMember(string key) {
-            StringComparison stringComparison = BindingAttr.HasFlag(BindingFlags.IgnoreCase) ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+            StringComparison stringComparison = BindingFlags.HasFlag(BindingFlags.IgnoreCase) ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
             foreach (PropertyInfo member in Accessors) {
                 if (ClassMemberStringifier.GetNames(member).Where(x => string.Equals(x, key, stringComparison)).Any()) {
                     return member;

@@ -7,21 +7,21 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
 
     public class CliComponentStoreFactory : ICliComponentStoreFactory {
         public const BindingFlags DefaultLookup = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public;
-        private BindingFlags? _methodBindingAttr = null;
+        private BindingFlags? _methodBindingFlags = null;
 
         public CliComponentStoreFactory() {
             AccessFields = true;
-            BindingAttr = DefaultLookup | BindingFlags.IgnoreCase;
+            BindingFlags = DefaultLookup | BindingFlags.IgnoreCase;
             ClassMemberStringifier = new ClassMemberStringifier();
         }
 
         public bool AccessFields { get; init; } = false;
         public bool AccessProperties { get; init; } = true;
-        public BindingFlags BindingAttr { get; init; } = DefaultLookup;
+        public BindingFlags BindingFlags { get; init; } = DefaultLookup;
 
-        public BindingFlags MethodBindingAttr {
-            get => _methodBindingAttr == null ? BindingAttr : (BindingFlags)_methodBindingAttr;
-            init => _methodBindingAttr = value;
+        public BindingFlags MethodBindingFlags {
+            get => _methodBindingFlags == null ? BindingFlags : (BindingFlags)_methodBindingFlags;
+            init => _methodBindingFlags = value;
         }
 
         public IClassMemberStringifier ClassMemberStringifier { get; }
@@ -43,7 +43,7 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
         }
 
         public ISubcommandExecutor CreateSubcommandExecutor(MethodInfo methodInfo, object? obj) {
-            return new SubcommandExecutor(new MethodExecutor(methodInfo, obj, BindingAttr, ClassMemberStringifier));
+            return new SubcommandExecutor(new MethodExecutor(methodInfo, obj, BindingFlags, ClassMemberStringifier));
         }
 
         public ISubcommandExecutorWithOptions CreateSubcommandExecutorWithOptions(MethodInfo cliAction, object obj) {
@@ -51,7 +51,7 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
         }
 
         public ISubcommandStore CreateSubcommandStore(object obj) {
-            return new SubcommandStore(new MethodInfoStore(obj, MethodBindingAttr, ClassMemberStringifier));
+            return new SubcommandStore(new MethodInfoStore(obj, MethodBindingFlags, ClassMemberStringifier));
         }
 
         public ISubmoduleStore CreateSubmoduleStore(object obj) {
@@ -75,11 +75,11 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
         }
 
         private ICliKeyValueStore<string, TValue, MemberInfo> CreateFieldStore<TValue>(object obj, IAccessorValidator cliValidator, IValueConverter<TValue> converter) {
-            return new FieldStore<TValue>(obj, BindingAttr, ClassMemberStringifier, cliValidator, converter);
+            return new FieldStore<TValue>(obj, BindingFlags, ClassMemberStringifier, cliValidator, converter);
         }
 
         private ICliKeyValueStore<string, TValue, MemberInfo> CreatePropertyStore<TValue>(object obj, IAccessorValidator cliValidator, IValueConverter<TValue> converter) {
-            return new PropertyStore<TValue>(obj, BindingAttr, ClassMemberStringifier, cliValidator, converter);
+            return new PropertyStore<TValue>(obj, BindingFlags, ClassMemberStringifier, cliValidator, converter);
         }
     }
 }
