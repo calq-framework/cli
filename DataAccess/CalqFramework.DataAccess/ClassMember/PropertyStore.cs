@@ -2,7 +2,9 @@
 using System.Reflection;
 
 namespace CalqFramework.DataAccess.ClassMember {
-    sealed public class PropertyStore : PropertyStoreBase<string, object?>, IKeyValueStore<string, object?, PropertyInfo> {
+
+    public sealed class PropertyStore : PropertyStoreBase<string, object?>, IKeyValueStore<string, object?, PropertyInfo> {
+
         public PropertyStore(object obj, BindingFlags bindingAttr) : base(obj, bindingAttr) {
         }
 

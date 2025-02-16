@@ -2,6 +2,7 @@
 using System.Reflection;
 
 namespace CalqFramework.DataAccess.ClassMember {
+
     public class MethodExecutor : MethodExecutorBase<string, object?>, IKeyValueStore<string, object?, ParameterInfo> {
 
         public MethodExecutor(MethodInfo method, object obj) : base(method, obj) {

@@ -7,10 +7,8 @@ using System.Reflection;
 using System.Xml.Linq;
 
 namespace CalqFramework.Cli.Serialization {
+
     public class HelpGenerator {
-        protected string GetOptionKey(string key) {
-            return key.Length > 1 ? $"--{key}" : $"-{key}";
-        }
 
         public string GetHelp(IEnumerable<Option> options, IEnumerable<Submodule> commands, IEnumerable<Subcommand> methods) {
             var result = "";
@@ -25,10 +23,9 @@ namespace CalqFramework.Cli.Serialization {
             }
             result += "\n";
 
-
             result += "[ACTION COMMANDS]";
             foreach (var method in methods) {
-                result += $"{method.Keys.First()}({string.Join(", ", method.Parameters.Select(x => $"{GetTypeName(x.Type)} {x.Keys.First()}{(x.HasDefaultValue ? $" = {x.Value ?.ToString()!.ToLower()}" : "")}"))})";
+                result += $"{method.Keys.First()}({string.Join(", ", method.Parameters.Select(x => $"{GetTypeName(x.Type)} {x.Keys.First()}{(x.HasDefaultValue ? $" = {x.Value?.ToString()!.ToLower()}" : "")}"))})";
                 result += "\n";
             }
             result += "\n";
@@ -47,6 +44,7 @@ namespace CalqFramework.Cli.Serialization {
 
             return result;
         }
+
         public string GetHelp(IEnumerable<Option> options, Subcommand method) {
             var result = "";
 
@@ -62,12 +60,8 @@ namespace CalqFramework.Cli.Serialization {
             return result;
         }
 
-        private string GetTypeName(Type type) {
-            if (type.IsGenericType) {
-                string genericArguments = string.Join(", ", type.GetGenericArguments().Select(x => x.Name.ToLower()).ToList());
-                return $"{type.Name.ToLower().Substring(0, type.Name.ToLower().IndexOf("`"))}<{genericArguments}>";
-            }
-            return type.Name.ToLower();
+        protected string GetOptionKey(string key) {
+            return key.Length > 1 ? $"--{key}" : $"-{key}";
         }
 
         // TODO option to turn on and off
@@ -84,12 +78,15 @@ namespace CalqFramework.Cli.Serialization {
                         memberName += $"({string.Join(",", parameters.Select(p => p.ParameterType.FullName))})";
                     }
                     break;
+
                 case PropertyInfo property:
                     memberName = $"P:{property.DeclaringType?.FullName}.{property.Name}";
                     break;
+
                 case FieldInfo field:
                     memberName = $"F:{field.DeclaringType?.FullName}.{field.Name}";
                     break;
+
                 default:
                     throw new Exception("Unsupported member type.");
             }
@@ -100,6 +97,14 @@ namespace CalqFramework.Cli.Serialization {
                 .Element("summary")?.Value;
 
             return $"{summary?.Trim()}\n" ?? "\n";
+        }
+
+        private string GetTypeName(Type type) {
+            if (type.IsGenericType) {
+                string genericArguments = string.Join(", ", type.GetGenericArguments().Select(x => x.Name.ToLower()).ToList());
+                return $"{type.Name.ToLower().Substring(0, type.Name.ToLower().IndexOf("`"))}<{genericArguments}>";
+            }
+            return type.Name.ToLower();
         }
     }
 }

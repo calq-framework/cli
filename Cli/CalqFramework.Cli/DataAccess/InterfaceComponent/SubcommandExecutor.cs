@@ -5,13 +5,19 @@ using System.Linq;
 using System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
-    internal class SubcommandExecutor : ISubcommandExecutor {
-        ICliFunctionExecutor<string, string?, ParameterInfo> Executor { get; }
 
-        public string? this[string key] { get => Executor[key]; set => Executor[key] = value; }
+    internal class SubcommandExecutor : ISubcommandExecutor {
 
         public SubcommandExecutor(ICliFunctionExecutor<string, string?, ParameterInfo> store) {
             Executor = store;
+        }
+
+        private ICliFunctionExecutor<string, string?, ParameterInfo> Executor { get; }
+
+        public string? this[string key] { get => Executor[key]; set => Executor[key] = value; }
+
+        public void AddParameter(string? value) {
+            Executor.AddParameter(value);
         }
 
         public bool ContainsKey(string key) {
@@ -20,10 +26,6 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
 
         public Type GetDataType(string key) {
             return Executor.GetDataType(key);
-        }
-
-        public string? GetValueOrInitialize(string key) {
-            return Executor.GetValueOrInitialize(key);
         }
 
         public IEnumerable<Parameter> GetParameters() {
@@ -41,8 +43,8 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
             return result;
         }
 
-        public void AddParameter(string? value) {
-            Executor.AddParameter(value);
+        public string? GetValueOrInitialize(string key) {
+            return Executor.GetValueOrInitialize(key);
         }
 
         public object? Invoke() {

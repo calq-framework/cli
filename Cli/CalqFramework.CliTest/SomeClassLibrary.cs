@@ -7,10 +7,12 @@ namespace CalqFramework.CliTest {
     /// <summary>
     /// Some summary.
     /// </summary>
-    class SomeClassLibrary {
+    internal class SomeClassLibrary {
 
         public class Nested {
-            public void NestedMethod() { }
+
+            public void NestedMethod() {
+            }
         }
 
         public string textField;
@@ -28,7 +30,8 @@ namespace CalqFramework.CliTest {
         /// </summary>
         public void Method() { }
 
-        public void MethodWithOptionalParam(bool optional = true) { }
+        public void MethodWithOptionalParam(bool optional = true) {
+        }
 
         public List<bool> MethodWithList(List<bool> paramList) {
             return paramList;

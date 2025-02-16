@@ -1,18 +1,22 @@
-﻿using CalqFramework.DataAccess;
+﻿using CalqFramework.Cli.Parsing;
+using CalqFramework.DataAccess;
 using CalqFramework.DataAccess.ClassMember;
-using System.Collections;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using System.Linq;
-using CalqFramework.Cli.Parsing;
+using System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess.ClassMember {
+
     public class MethodExecutor : MethodExecutorBase<string, string?>, ICliFunctionExecutor<string, string?, ParameterInfo> {
+
         public MethodExecutor(MethodInfo method, object? obj = null) : base(method, obj) {
             ReceivedPositionalParameters = new List<string?>();
         }
+
+        public List<string?> ReceivedPositionalParameters { get; }
 
         public override object? this[ParameterInfo accessor] {
             get {
@@ -43,8 +47,6 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
                 }
             }
         }
-
-        public List<string?> ReceivedPositionalParameters { get; }
 
         public override void AddParameter(string? value) {
             ReceivedPositionalParameters.Add(value);

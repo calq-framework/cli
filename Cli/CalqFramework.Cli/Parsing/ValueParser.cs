@@ -5,6 +5,7 @@ namespace CalqFramework.Cli.Parsing;
 
 // TODO convert to a regular class
 public static class ValueParser {
+
     public static bool IsParseable(Type type) {
         return CalqFramework.DataAccess.Text.ValueParser.IsParseable(type) || type.GetInterface(nameof(ICollection)) != null;
     }

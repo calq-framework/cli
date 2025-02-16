@@ -5,14 +5,16 @@ using System.Linq;
 using System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
-    internal class OptionStore : IOptionStore {
-        ICliKeyValueStore<string, string?, MemberInfo> Store { get; }
 
-        public string? this[string key] { get => Store[key]; set => Store[key] = value; }
+    internal class OptionStore : IOptionStore {
 
         public OptionStore(ICliKeyValueStore<string, string?, MemberInfo> store) {
             Store = store;
         }
+
+        private ICliKeyValueStore<string, string?, MemberInfo> Store { get; }
+
+        public string? this[string key] { get => Store[key]; set => Store[key] = value; }
 
         public bool ContainsKey(string key) {
             return Store.ContainsKey(key);
@@ -20,10 +22,6 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
 
         public Type GetDataType(string key) {
             return Store.GetDataType(key);
-        }
-
-        public string? GetValueOrInitialize(string key) {
-            return Store.GetValueOrInitialize(key);
         }
 
         public IEnumerable<Option> GetOptions() {
@@ -38,6 +36,10 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
                 });
             }
             return result;
+        }
+
+        public string? GetValueOrInitialize(string key) {
+            return Store.GetValueOrInitialize(key);
         }
     }
 }

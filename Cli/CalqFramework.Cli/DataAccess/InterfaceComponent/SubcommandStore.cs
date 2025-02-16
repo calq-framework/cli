@@ -5,14 +5,16 @@ using System.Linq;
 using System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
-    internal class SubcommandStore : ISubcommandStore {
-        ICliReadOnlyKeyValueStore<string, MethodInfo?, MethodInfo> Store { get; }
 
-        public MethodInfo? this[string key] { get => Store[key]; }
+    internal class SubcommandStore : ISubcommandStore {
 
         public SubcommandStore(ICliReadOnlyKeyValueStore<string, MethodInfo?, MethodInfo> store) {
             Store = store;
         }
+
+        private ICliReadOnlyKeyValueStore<string, MethodInfo?, MethodInfo> Store { get; }
+
+        public MethodInfo? this[string key] { get => Store[key]; }
 
         public bool ContainsKey(string key) {
             return Store.ContainsKey(key);

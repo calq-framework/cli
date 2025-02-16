@@ -1,6 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿namespace CalqFramework.DataAccess {
 
-namespace CalqFramework.DataAccess {
     public abstract class DualKeyValueStoreBase<TKey, TValue> : IKeyValueStore<TKey, TValue> {
         protected abstract IKeyValueStore<TKey, TValue> PrimaryStore { get; }
         protected abstract IKeyValueStore<TKey, TValue> SecondaryStore { get; }
@@ -26,9 +25,13 @@ namespace CalqFramework.DataAccess {
             }
         }
 
-        private void AssertNoCollision(TKey key) {
-            if (PrimaryStore.ContainsKey(key) && SecondaryStore.ContainsKey(key)) {
-                throw new Exception("collision");
+        public bool ContainsKey(TKey key) {
+            AssertNoCollision(key);
+
+            if (PrimaryStore.ContainsKey(key)) {
+                return PrimaryStore.ContainsKey(key);
+            } else {
+                return SecondaryStore.ContainsKey(key);
             }
         }
 
@@ -52,13 +55,9 @@ namespace CalqFramework.DataAccess {
             }
         }
 
-        public bool ContainsKey(TKey key) {
-            AssertNoCollision(key);
-
-            if (PrimaryStore.ContainsKey(key)) {
-                return PrimaryStore.ContainsKey(key);
-            } else {
-                return SecondaryStore.ContainsKey(key);
+        private void AssertNoCollision(TKey key) {
+            if (PrimaryStore.ContainsKey(key) && SecondaryStore.ContainsKey(key)) {
+                throw new Exception("collision");
             }
         }
     }

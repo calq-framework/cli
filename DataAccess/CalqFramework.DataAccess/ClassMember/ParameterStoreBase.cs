@@ -1,9 +1,9 @@
 ﻿using System.Reflection;
-using System.Reflection.Metadata.Ecma335;
-using System.Runtime.InteropServices;
 
 namespace CalqFramework.DataAccess.ClassMember {
+
     public abstract class ParameterStoreBase<TKey, TValue> : KeyValueStoreBase<TKey, TValue, ParameterInfo, object?> {
+
         public ParameterStoreBase(MethodInfo method) {
             ParentMethod = method;
             var i = 0;
@@ -15,6 +15,16 @@ namespace CalqFramework.DataAccess.ClassMember {
             }
         }
 
+        public override IEnumerable<ParameterInfo> Accessors => Parameters.Where(ContainsAccessor);
+
+        protected Dictionary<ParameterInfo, int> ParameterIndexByParameter { get; }
+
+        protected ParameterInfo[] Parameters { get; }
+
+        protected object?[] ParameterValues { get; }
+
+        protected MethodInfo ParentMethod { get; }
+
         public override object? this[ParameterInfo accessor] {
             get {
                 return ParameterValues[ParameterIndexByParameter[accessor]];
@@ -23,13 +33,6 @@ namespace CalqFramework.DataAccess.ClassMember {
                 ParameterValues[ParameterIndexByParameter[accessor]] = value;
             }
         }
-
-        public override IEnumerable<ParameterInfo> Accessors => Parameters.Where(ContainsAccessor);
-
-        protected MethodInfo ParentMethod { get; }
-        protected ParameterInfo[] Parameters { get; }
-        protected Dictionary<ParameterInfo, int> ParameterIndexByParameter { get; }
-        protected object?[] ParameterValues { get; }
 
         public override Type GetDataType(ParameterInfo accessor) {
             return accessor.ParameterType;

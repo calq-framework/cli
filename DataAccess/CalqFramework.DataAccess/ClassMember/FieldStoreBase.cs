@@ -1,9 +1,13 @@
 ﻿using System.Reflection;
 
 namespace CalqFramework.DataAccess.ClassMember {
+
     public abstract class FieldStoreBase<TKey, TValue> : ClassDataMemberStoreBase<TKey, TValue, FieldInfo, object?> {
+
         public FieldStoreBase(object obj, BindingFlags bindingAttr) : base(obj, bindingAttr) {
         }
+
+        public override IEnumerable<FieldInfo> Accessors => ParentType.GetFields().Where(ContainsAccessor);
 
         public override object? this[FieldInfo accessor] {
             get {
@@ -13,8 +17,6 @@ namespace CalqFramework.DataAccess.ClassMember {
                 ((FieldInfo)accessor).SetValue(ParentObject, value);
             }
         }
-
-        public override IEnumerable<FieldInfo> Accessors => ParentType.GetFields().Where(ContainsAccessor);
 
         public override Type GetDataType(FieldInfo accessor) {
             return ((FieldInfo)accessor).FieldType;
