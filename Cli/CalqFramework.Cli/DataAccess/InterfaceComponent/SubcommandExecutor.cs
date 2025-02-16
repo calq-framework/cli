@@ -1,8 +1,8 @@
-﻿using CalqFramework.Cli.InterfaceComponents;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using CalqFramework.Cli.InterfaceComponents;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
 
@@ -30,8 +30,8 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
 
         public IEnumerable<Parameter> GetParameters() {
             var result = new List<Parameter>();
-            var dict = Executor.GetKeysByAccessors();
-            foreach (var key in dict.Keys) {
+            IDictionary<ParameterInfo, IEnumerable<string>> dict = Executor.GetKeysByAccessors();
+            foreach (ParameterInfo key in dict.Keys) {
                 result.Add(new Parameter() {
                     Type = GetDataType(dict[key].First()),
                     Keys = dict[key],

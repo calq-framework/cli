@@ -1,12 +1,12 @@
-﻿using CalqFramework.Cli.InterfaceComponents;
+﻿using System.Collections.Generic;
+using CalqFramework.Cli.InterfaceComponents;
 using CalqFramework.DataAccess;
-using System.Collections.Generic;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
 
     internal class SubcommandExecutorWithOptions : DualKeyValueStoreBase<string, string?>, ISubcommandExecutorWithOptions {
-        private IOptionStore _optionStore;
-        private ISubcommandExecutor _subcommandExeutor;
+        private readonly IOptionStore _optionStore;
+        private readonly ISubcommandExecutor _subcommandExeutor;
 
         public SubcommandExecutorWithOptions(ISubcommandExecutor subcommandExecutor, IOptionStore optionStore) {
             _subcommandExeutor = subcommandExecutor;

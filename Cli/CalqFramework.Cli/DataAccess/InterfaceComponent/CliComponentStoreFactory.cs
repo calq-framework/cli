@@ -1,7 +1,7 @@
-﻿using CalqFramework.Cli.DataAccess.ClassMember;
-using CalqFramework.Cli.Serialization;
-using System;
+﻿using System;
 using System.Reflection;
+using CalqFramework.Cli.DataAccess.ClassMember;
+using CalqFramework.Cli.Serialization;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
 

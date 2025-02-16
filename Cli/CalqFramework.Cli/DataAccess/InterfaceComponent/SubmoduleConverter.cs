@@ -1,5 +1,5 @@
-﻿using CalqFramework.Cli.DataAccess.ClassMember;
-using System;
+﻿using System;
+using CalqFramework.Cli.DataAccess.ClassMember;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
 

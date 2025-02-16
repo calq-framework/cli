@@ -2,8 +2,8 @@
 
 namespace CalqFramework.DataAccess {
     public class DualKeyValueStore<TKey, TValue> : DualKeyValueStoreBase<TKey, TValue> {
-        private IKeyValueStore<TKey, TValue> _primaryStore;
-        private IKeyValueStore<TKey, TValue> _secondaryStore;
+        private readonly IKeyValueStore<TKey, TValue> _primaryStore;
+        private readonly IKeyValueStore<TKey, TValue> _secondaryStore;
 
         public DualKeyValueStore(IKeyValueStore<TKey, TValue> primaryStore, IKeyValueStore<TKey, TValue> secondaryStore) {
             _primaryStore = primaryStore;

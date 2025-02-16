@@ -1,5 +1,5 @@
-﻿using CalqFramework.DataAccess.Text;
-using System.Collections;
+﻿using System.Collections;
+using CalqFramework.DataAccess.Text;
 
 namespace CalqFramework.DataAccess;
 
@@ -58,7 +58,7 @@ public class CollectionStore : IKeyValueStore<string, object?> {
     public object AddValue() {
         switch (ParentCollection) {
             case IList list:
-                var value = Activator.CreateInstance(ParentCollection.GetType().GetGenericArguments()[0]) ??
+                object value = Activator.CreateInstance(ParentCollection.GetType().GetGenericArguments()[0]) ??
                    Activator.CreateInstance(Nullable.GetUnderlyingType(ParentCollection.GetType().GetGenericArguments()[0])!)!;
                 list.Add(value);
                 return value;
@@ -80,7 +80,7 @@ public class CollectionStore : IKeyValueStore<string, object?> {
     public object? GetValueOrInitialize(string key) {
         switch (ParentCollection) {
             case Array array:
-                var arrayElement = array.GetValue(int.Parse(key));
+                object? arrayElement = array.GetValue(int.Parse(key));
                 if (arrayElement == null) {
                     arrayElement = Activator.CreateInstance(ParentCollection.GetType().GetElementType()!) ??
                         Activator.CreateInstance(Nullable.GetUnderlyingType(ParentCollection.GetType().GetGenericArguments()[0])!)!;
@@ -89,7 +89,7 @@ public class CollectionStore : IKeyValueStore<string, object?> {
                 return arrayElement;
 
             case IList list:
-                var listElement = list[int.Parse(key)];
+                object? listElement = list[int.Parse(key)];
                 if (listElement == null) {
                     listElement = Activator.CreateInstance(ParentCollection.GetType().GetGenericArguments()[0]!) ??
                         Activator.CreateInstance(Nullable.GetUnderlyingType(ParentCollection.GetType().GetGenericArguments()[0])!)!;
@@ -98,7 +98,7 @@ public class CollectionStore : IKeyValueStore<string, object?> {
                 return listElement;
 
             case IDictionary dictionary:
-                var dictionaryElement = dictionary[ValueParser.ParseValue(key, dictionary.GetType().GetGenericArguments()[0])];
+                object? dictionaryElement = dictionary[ValueParser.ParseValue(key, dictionary.GetType().GetGenericArguments()[0])];
                 if (dictionaryElement == null) {
                     dictionaryElement = Activator.CreateInstance(ParentCollection.GetType().GetGenericArguments()[1]!) ??
                         Activator.CreateInstance(Nullable.GetUnderlyingType(ParentCollection.GetType().GetGenericArguments()[0])!)!;

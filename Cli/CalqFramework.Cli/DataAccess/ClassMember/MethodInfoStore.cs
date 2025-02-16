@@ -1,10 +1,10 @@
-﻿using CalqFramework.Cli.Serialization;
-using CalqFramework.DataAccess;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using CalqFramework.Cli.Serialization;
+using CalqFramework.DataAccess;
 
 namespace CalqFramework.Cli.DataAccess.ClassMember {
 
@@ -23,13 +23,13 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
 
         public MethodInfo? this[string key] {
             get {
-                var result = GetClassMember(key) ?? throw new CliException($"invalid command"); // throw new MissingMemberException($"Missing {key} in {ParentType}."); ;
+                MethodInfo result = GetClassMember(key) ?? throw new CliException($"invalid command"); // throw new MissingMemberException($"Missing {key} in {ParentType}."); ;
                 return result;
             }
         }
 
         public bool ContainsKey(string key) {
-            var result = GetClassMember(key);
+            MethodInfo? result = GetClassMember(key);
             return result != null;
         }
 
@@ -40,15 +40,15 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
         // TODO two-pass, first pass find collisions and exclude them from second pass when building the dictionary
         public IDictionary<MethodInfo, IEnumerable<string>> GetKeysByAccessors() {
             var keys = new Dictionary<MethodInfo, IEnumerable<string>>();
-            foreach (var accessor in Accessors) {
+            foreach (MethodInfo accessor in Accessors) {
                 var accesorKeys = new List<string>();
-                foreach (var atribute in accessor.GetCustomAttributes<CliNameAttribute>()) {
+                foreach (CliNameAttribute atribute in accessor.GetCustomAttributes<CliNameAttribute>()) {
                     accesorKeys.Add(atribute.Name);
                 }
                 if (accesorKeys.Count == 0) {
                     accesorKeys.Add(accessor.Name);
                 }
-                if (accesorKeys.Select(x => x.Length == 1).Count() == 0) {
+                if (!accesorKeys.Select(x => x.Length == 1).Any()) {
                     accesorKeys.Add(accesorKeys[0][0].ToString());
                 }
                 keys[accessor] = accesorKeys;
@@ -61,19 +61,19 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
         }
 
         private bool ContainsAccessor(MethodInfo accessor) {
-            return accessor is MethodInfo && accessor.DeclaringType == ParentType && !IsDotnetSpecific(accessor);
+            return accessor is not null && accessor.DeclaringType == ParentType && !IsDotnetSpecific(accessor);
         }
 
         // FIXME align with GetKeysByAccessors
         private MethodInfo? GetClassMember(string key) {
-            var stringComparison = BindingAttr.HasFlag(BindingFlags.IgnoreCase) ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
-            foreach (var member in Accessors) {
-                foreach (var atribute in member.GetCustomAttributes<CliNameAttribute>()) {
+            StringComparison stringComparison = BindingAttr.HasFlag(BindingFlags.IgnoreCase) ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+            foreach (MethodInfo member in Accessors) {
+                foreach (CliNameAttribute atribute in member.GetCustomAttributes<CliNameAttribute>()) {
                     if (string.Equals(atribute.Name, key, stringComparison)) {
                         return member;
                     }
                 }
-                foreach (var atribute in member.GetCustomAttributes<CliNameAttribute>()) {
+                foreach (CliNameAttribute atribute in member.GetCustomAttributes<CliNameAttribute>()) {
                     if (string.Equals(atribute.Name[0].ToString(), key, stringComparison)) {
                         return member;
                     }

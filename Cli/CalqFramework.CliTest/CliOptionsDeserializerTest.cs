@@ -1,5 +1,5 @@
+﻿using System;
 using CalqFramework.Cli;
-using System;
 using Xunit;
 
 namespace CalqFramework.CliTest {
@@ -186,7 +186,7 @@ namespace CalqFramework.CliTest {
         public void Should_ThrowCliException_When_DeserializeWithXUnitCommandLineArgs() {
             Assert.NotEmpty(Environment.GetCommandLineArgs());
             var obj = new ConfigurationWithXUnitCommandLineArgs();
-            var ex = Assert.Throws<CliException>(() => {
+            CliException ex = Assert.Throws<CliException>(() => {
                 OptionDeserializer.Deserialize(obj);
             });
             // Assert.Contains("option doesn't exist", ex.Message); // TODO check assert message
@@ -203,7 +203,7 @@ namespace CalqFramework.CliTest {
 
         [Fact]
         public void Should_ThrowCliException_When_OptionRequiresValue() {
-            var ex = Assert.Throws<CliException>(() => {
+            CliException ex = Assert.Throws<CliException>(() => {
                 var obj = new SomeConfiguration();
                 OptionDeserializer.Deserialize(obj, new string[] { "-ib" });
             });
@@ -212,7 +212,7 @@ namespace CalqFramework.CliTest {
 
         [Fact]
         public void Should_ThrowCliException_When_OptionRequiresValueButNotProvided() {
-            var ex = Assert.Throws<CliException>(() => {
+            CliException ex = Assert.Throws<CliException>(() => {
                 var obj = new SomeConfiguration();
                 OptionDeserializer.Deserialize(obj, new string[] { $"--{nameof(SomeConfiguration.integer)}" });
             });
@@ -229,7 +229,7 @@ namespace CalqFramework.CliTest {
 
         [Fact]
         public void Should_ThrowCliException_When_SettingInnerPropertyWithStringValue() {
-            var ex = Assert.Throws<CliException>(() => {
+            CliException ex = Assert.Throws<CliException>(() => {
                 var obj = new SomeConfiguration();
                 OptionDeserializer.Deserialize(obj, new string[] { $"--{nameof(SomeConfiguration.inner)}=0" });
             });
@@ -238,7 +238,7 @@ namespace CalqFramework.CliTest {
 
         [Fact]
         public void Should_ThrowCliException_When_SettingIntegerPropertyWithDoubleValue() {
-            var ex = Assert.Throws<CliException>(() => {
+            CliException ex = Assert.Throws<CliException>(() => {
                 var obj = new SomeConfiguration();
                 OptionDeserializer.Deserialize(obj, new string[] { $"--{nameof(SomeConfiguration.integer)}=0.1" });
             });
@@ -247,7 +247,7 @@ namespace CalqFramework.CliTest {
 
         [Fact]
         public void Should_ThrowCliException_When_SettingIntegerPropertyWithStringValue() {
-            var ex = Assert.Throws<CliException>(() => {
+            CliException ex = Assert.Throws<CliException>(() => {
                 var obj = new SomeConfiguration();
                 OptionDeserializer.Deserialize(obj, new string[] { $"--{nameof(SomeConfiguration.integer)}=a" });
             });
@@ -256,7 +256,7 @@ namespace CalqFramework.CliTest {
 
         [Fact]
         public void Should_ThrowCliException_When_SettingNonexistentShortOption() {
-            var ex = Assert.Throws<CliException>(() => {
+            CliException ex = Assert.Throws<CliException>(() => {
                 var obj = new SomeConfiguration();
                 OptionDeserializer.Deserialize(obj, new string[] { "-m" });
             });
@@ -265,7 +265,7 @@ namespace CalqFramework.CliTest {
 
         [Fact]
         public void Should_ThrowCliException_When_SettingOutOfRangeByteProperty() {
-            var ex = Assert.Throws<CliException>(() => {
+            CliException ex = Assert.Throws<CliException>(() => {
                 var obj = new SomeConfiguration();
                 OptionDeserializer.Deserialize(obj, new string[] { $"--{nameof(SomeConfiguration.aByteNumber)}=256" });
             });
@@ -275,7 +275,7 @@ namespace CalqFramework.CliTest {
         [Fact]
         public void Should_ThrowCliException_When_SettingOutOfRangePortValue() {
             var obj = new ConfigurationWithXUnitCommandLineArgs();
-            var ex = Assert.Throws<CliException>(() => {
+            CliException ex = Assert.Throws<CliException>(() => {
                 OptionDeserializer.Deserialize(
                     obj,
                     new string[] { $"--{nameof(ConfigurationWithXUnitCommandLineArgs.port)}", int.MaxValue.ToString() },
@@ -289,7 +289,7 @@ namespace CalqFramework.CliTest {
 
         [Fact]
         public void Should_ThrowCliException_When_SettingUnknownOption() {
-            var ex = Assert.Throws<CliException>(() => {
+            CliException ex = Assert.Throws<CliException>(() => {
                 var obj = new SomeConfiguration();
                 OptionDeserializer.Deserialize(obj, new string[] { "--unknown=0" });
             });
@@ -298,7 +298,7 @@ namespace CalqFramework.CliTest {
 
         [Fact]
         public void Should_ThrowCliException_When_StackedOptionsAreNotAllBoolean() {
-            var ex = Assert.Throws<CliException>(() => {
+            CliException ex = Assert.Throws<CliException>(() => {
                 var obj = new SomeConfiguration();
                 OptionDeserializer.Deserialize(obj, new string[] { "-bi" });
             });
@@ -307,7 +307,7 @@ namespace CalqFramework.CliTest {
 
         [Fact]
         public void Should_ThrowCliException_When_StackedOptionsAreNotAllBooleanWithProvidedValue() {
-            var ex = Assert.Throws<CliException>(() => {
+            CliException ex = Assert.Throws<CliException>(() => {
                 var obj = new SomeConfiguration();
                 OptionDeserializer.Deserialize(obj, new string[] { "-ib", "0" });
             });
@@ -317,7 +317,7 @@ namespace CalqFramework.CliTest {
         [Fact]
         public void Should_ThrowCliException_When_UsingUnknownOptionWithoutPrefix() {
             var obj = new SomeConfiguration();
-            var ex = Assert.Throws<CliException>(() => {
+            CliException ex = Assert.Throws<CliException>(() => {
                 OptionDeserializer.Deserialize(
                     obj,
                     new string[] { "unknown", $"--{nameof(SomeConfiguration.text)}=abc" },

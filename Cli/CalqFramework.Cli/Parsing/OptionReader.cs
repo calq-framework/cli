@@ -1,6 +1,6 @@
-﻿using CalqFramework.DataAccess;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using CalqFramework.DataAccess;
 
 namespace CalqFramework.Cli.Parsing {
 

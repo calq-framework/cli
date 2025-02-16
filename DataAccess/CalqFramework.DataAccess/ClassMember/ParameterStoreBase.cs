@@ -6,11 +6,11 @@ namespace CalqFramework.DataAccess.ClassMember {
 
         public ParameterStoreBase(MethodInfo method) {
             ParentMethod = method;
-            var i = 0;
+            int i = 0;
             Parameters = ParentMethod.GetParameters();
             ParameterIndexByParameter = Parameters.ToDictionary(x => x, x => i++);
             ParameterValues = new object?[ParameterIndexByParameter.Count];
-            for (var j = 0; j < ParameterIndexByParameter.Count; j++) {
+            for (int j = 0; j < ParameterIndexByParameter.Count; j++) {
                 ParameterValues[j] = DBNull.Value;
             }
         }
@@ -39,10 +39,9 @@ namespace CalqFramework.DataAccess.ClassMember {
         }
 
         public override object? GetValueOrInitialize(ParameterInfo accessor) {
-            var value = ParameterValues[ParameterIndexByParameter[accessor]];
+            object? value = ParameterValues[ParameterIndexByParameter[accessor]];
             value = value != DBNull.Value ? value : null;
-            value = value ??
-                   Activator.CreateInstance(accessor.ParameterType) ??
+            value ??= Activator.CreateInstance(accessor.ParameterType) ??
                    Activator.CreateInstance(Nullable.GetUnderlyingType(accessor.ParameterType)!)!;
             ParameterValues[ParameterIndexByParameter[accessor]] = value;
             return value;
