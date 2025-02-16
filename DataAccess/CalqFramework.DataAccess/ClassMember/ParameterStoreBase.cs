@@ -4,22 +4,22 @@ namespace CalqFramework.DataAccess.ClassMember {
 
     public abstract class ParameterStoreBase<TKey, TValue> : KeyValueStoreBase<TKey, TValue, ParameterInfo, object?> {
 
-        public ParameterStoreBase(MethodInfo method) {
+        protected ParameterStoreBase(MethodInfo method) {
             ParentMethod = method;
             int i = 0;
-            Parameters = ParentMethod.GetParameters();
-            ParameterIndexByParameter = Parameters.ToDictionary(x => x, x => i++);
+            ParameterInfos = ParentMethod.GetParameters();
+            ParameterIndexByParameter = ParameterInfos.ToDictionary(x => x, x => i++);
             ParameterValues = new object?[ParameterIndexByParameter.Count];
             for (int j = 0; j < ParameterIndexByParameter.Count; j++) {
                 ParameterValues[j] = DBNull.Value;
             }
         }
 
-        public override IEnumerable<ParameterInfo> Accessors => Parameters.Where(ContainsAccessor);
+        public override IEnumerable<ParameterInfo> Accessors => ParameterInfos.Where(ContainsAccessor);
 
         protected Dictionary<ParameterInfo, int> ParameterIndexByParameter { get; }
 
-        protected ParameterInfo[] Parameters { get; }
+        protected ParameterInfo[] ParameterInfos { get; }
 
         protected object?[] ParameterValues { get; }
 
