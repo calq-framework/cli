@@ -5,6 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using CalqFramework.Cli.Parsing;
+using CalqFramework.Cli.Serialization;
 using CalqFramework.DataAccess;
 using CalqFramework.DataAccess.ClassMember;
 
@@ -12,11 +13,15 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
 
     public class MethodExecutor : MethodExecutorBase<string, string?>, ICliFunctionExecutor<string, string?, ParameterInfo> {
 
-        public MethodExecutor(MethodInfo method, object? obj = null) : base(method, obj) {
+        public MethodExecutor(MethodInfo method, object? obj, BindingFlags bindingAttr, IClassMemberStringifier classMemberStringifier) : base(method, obj) {
             ReceivedPositionalParameters = new List<string?>();
+            BindingAttr = bindingAttr;
+            ClassMemberStringifier = classMemberStringifier;
         }
 
         public List<string?> ReceivedPositionalParameters { get; }
+        protected BindingFlags BindingAttr { get; }
+        protected IClassMemberStringifier ClassMemberStringifier { get; }
 
         public override object? this[ParameterInfo accessor] {
             get {
@@ -59,17 +64,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
         public IDictionary<ParameterInfo, IEnumerable<string>> GetKeysByAccessors() {
             var keys = new Dictionary<ParameterInfo, IEnumerable<string>>();
             foreach (ParameterInfo accessor in Accessors) {
-                var accesorKeys = new List<string>();
-                //foreach (var atribute in accessor.GetCustomAttributes<NameAttribute>()) {
-                //    accesorKeys.Add(atribute.Name);
-                //}
-                if (accesorKeys.Count == 0) {
-                    accesorKeys.Add(accessor.Name);
-                }
-                if (!accesorKeys.Select(x => x.Length == 1).Any()) {
-                    accesorKeys.Add(accesorKeys[0][0].ToString());
-                }
-                keys[accessor] = accesorKeys;
+                keys[accessor] = ClassMemberStringifier.GetNames(accessor);
             }
             return keys;
         }
@@ -96,19 +91,11 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
             result = default;
             bool success = false;
 
-            if (key.Length == 1) {
-                foreach (ParameterInfo parameter in ParameterIndexByParameter.Keys) {
-                    if (parameter.Name[0] == key[0]) {
-                        result = parameter;
-                        success = true;
-                    }
-                }
-            } else {
-                foreach (ParameterInfo parameter in ParameterIndexByParameter.Keys) {
-                    if (parameter.Name == key) {
-                        result = parameter;
-                        success = true;
-                    }
+            StringComparison stringComparison = BindingAttr.HasFlag(BindingFlags.IgnoreCase) ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+            foreach (ParameterInfo parameter in ParameterIndexByParameter.Keys) {
+                if (ClassMemberStringifier.GetNames(parameter).Where(x => string.Equals(x, key, stringComparison)).Any()) {
+                    result = parameter;
+                    success = true;
                 }
             }
 

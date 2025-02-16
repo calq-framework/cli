@@ -10,14 +10,16 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
 
     internal class MethodInfoStore : IReadOnlyKeyValueStore<string, MethodInfo?>, ICliReadOnlyKeyValueStore<string, MethodInfo?, MethodInfo> {
 
-        public MethodInfoStore(object obj, BindingFlags bindingAttr) {
+        public MethodInfoStore(object obj, BindingFlags bindingAttr, IClassMemberStringifier classMemberStringifier) {
             ParentObject = obj;
             BindingAttr = bindingAttr;
+            ClassMemberStringifier = classMemberStringifier;
             ParentType = obj.GetType();
         }
 
         public IEnumerable<MethodInfo> Accessors => ParentType.GetMethods(BindingAttr).Where(ContainsAccessor);
         protected BindingFlags BindingAttr { get; }
+        protected IClassMemberStringifier ClassMemberStringifier { get; }
         protected object ParentObject { get; }
         protected Type ParentType { get; }
 
@@ -41,17 +43,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
         public IDictionary<MethodInfo, IEnumerable<string>> GetKeysByAccessors() {
             var keys = new Dictionary<MethodInfo, IEnumerable<string>>();
             foreach (MethodInfo accessor in Accessors) {
-                var accesorKeys = new List<string>();
-                foreach (CliNameAttribute atribute in accessor.GetCustomAttributes<CliNameAttribute>()) {
-                    accesorKeys.Add(atribute.Name);
-                }
-                if (accesorKeys.Count == 0) {
-                    accesorKeys.Add(accessor.Name);
-                }
-                if (!accesorKeys.Select(x => x.Length == 1).Any()) {
-                    accesorKeys.Add(accesorKeys[0][0].ToString());
-                }
-                keys[accessor] = accesorKeys;
+                keys[accessor] = ClassMemberStringifier.GetNames(accessor);
             }
             return keys;
         }
@@ -68,20 +60,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
         private MethodInfo? GetClassMember(string key) {
             StringComparison stringComparison = BindingAttr.HasFlag(BindingFlags.IgnoreCase) ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
             foreach (MethodInfo member in Accessors) {
-                foreach (CliNameAttribute atribute in member.GetCustomAttributes<CliNameAttribute>()) {
-                    if (string.Equals(atribute.Name, key, stringComparison)) {
-                        return member;
-                    }
-                }
-                foreach (CliNameAttribute atribute in member.GetCustomAttributes<CliNameAttribute>()) {
-                    if (string.Equals(atribute.Name[0].ToString(), key, stringComparison)) {
-                        return member;
-                    }
-                }
-                if (string.Equals(member.Name, key, stringComparison)) {
-                    return member;
-                }
-                if (string.Equals(member.Name[0].ToString(), key, stringComparison)) {
+                if (ClassMemberStringifier.GetNames(member).Where(x => string.Equals(x, key, stringComparison)).Any()) {
                     return member;
                 }
             }
