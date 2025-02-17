@@ -11,7 +11,7 @@ namespace CalqFramework.CliTest {
             var obj = new SomeConfiguration();
             OptionDeserializer.Deserialize(
                 obj,
-                new string[] { $"--{nameof(SomeConfiguration.integer)}=10", $"--", $"--{nameof(SomeConfiguration.text)}=abc xyz" },
+                $"--{nameof(SomeConfiguration.integer)}=10 -- --{nameof(SomeConfiguration.text)}=abc xyz".Split(' '),
                 new OptionDeserializerConfiguration() { SkipUnknown = true }
             );
             Assert.Equal(10, obj.integer);
@@ -29,7 +29,7 @@ namespace CalqFramework.CliTest {
         [Fact]
         public void Deserialize_CombinedBooleanShortFlags_SetsAllBooleanPropertiesTrue() {
             var obj = new SomeConfiguration();
-            OptionDeserializer.Deserialize(obj, new string[] { "-bx" });
+            OptionDeserializer.Deserialize(obj, "-bx".Split(' '));
             Assert.True(obj.boolean);
             Assert.True(obj.xtrueBoolean);
         }
@@ -37,35 +37,35 @@ namespace CalqFramework.CliTest {
         [Fact]
         public void Deserialize_LongBooleanFlagWithoutValue_SetsBooleanPropertyTrue() {
             var obj = new SomeConfiguration();
-            OptionDeserializer.Deserialize(obj, new string[] { $"--{nameof(SomeConfiguration.boolean)}" });
+            OptionDeserializer.Deserialize(obj, $"--{nameof(SomeConfiguration.boolean)}".Split(' '));
             Assert.True(obj.boolean);
         }
 
         [Fact]
         public void Deserialize_SingleBooleanShortFlag_SetsBooleanPropertyTrue() {
             var obj = new SomeConfiguration();
-            OptionDeserializer.Deserialize(obj, new string[] { "-b" });
+            OptionDeserializer.Deserialize(obj, "-b".Split(' '));
             Assert.True(obj.boolean);
         }
 
         [Fact]
         public void Deserialize_PlusPlusPrefixOnXTrueBoolean_SetFalse() {
             var obj = new SomeConfiguration();
-            OptionDeserializer.Deserialize(obj, new string[] { "++xtrueBoolean" });
+            OptionDeserializer.Deserialize(obj, "++xtrueBoolean".Split(' '));
             Assert.False(obj.xtrueBoolean);
         }
 
         [Fact]
         public void Deserialize_PlusPrefixShortFlag_SetFalse() {
             var obj = new SomeConfiguration();
-            OptionDeserializer.Deserialize(obj, new string[] { "+x" });
+            OptionDeserializer.Deserialize(obj, "+x".Split(' '));
             Assert.False(obj.xtrueBoolean);
         }
 
         [Fact]
         public void Deserialize_MultipleBoolListValues_AppendsValuesToList() {
             var obj = new SomeConfiguration();
-            OptionDeserializer.Deserialize(obj, new string[] { $"--{nameof(SomeConfiguration.initializedBoolList)}", "false", $"--{nameof(SomeConfiguration.initializedBoolList)}", "true" });
+            OptionDeserializer.Deserialize(obj, $"--{nameof(SomeConfiguration.initializedBoolList)} false --{nameof(SomeConfiguration.initializedBoolList)} true".Split(' '));
             Assert.False(obj.initializedBoolList[2]);
             Assert.True(obj.initializedBoolList[3]);
         }
@@ -73,7 +73,7 @@ namespace CalqFramework.CliTest {
         [Fact]
         public void Deserialize_ValidArgumentsWithoutDelimiters_SetsAllPropertiesCorrectly() {
             var obj = new SomeConfiguration();
-            OptionDeserializer.Deserialize(obj, new string[] { $"--{nameof(SomeConfiguration.integer)}=10", $"--{nameof(SomeConfiguration.text)}=abc xyz" });
+            OptionDeserializer.Deserialize(obj, $"--{nameof(SomeConfiguration.integer)}=10\t--{nameof(SomeConfiguration.text)}=abc xyz".Split('\t')); // tab is used so that "abc xyz" is not split
             Assert.Equal(10, obj.integer);
             Assert.Equal("abc xyz", obj.text);
         }
@@ -81,21 +81,21 @@ namespace CalqFramework.CliTest {
         [Fact]
         public void Deserialize_CustomLongOptionName_SetsLongOptionPropertyTrue() {
             var obj = new SomeConfiguration();
-            OptionDeserializer.Deserialize(obj, new string[] { $"--customname" });
+            OptionDeserializer.Deserialize(obj, "--customname".Split(' '));
             Assert.True(obj.longOption);
         }
 
         [Fact]
         public void Deserialize_CustomShortOptionName_SetsLongOptionPropertyTrue() {
             var obj = new SomeConfiguration();
-            OptionDeserializer.Deserialize(obj, new string[] { "-c" });
+            OptionDeserializer.Deserialize(obj, "-c".Split(' '));
             Assert.True(obj.longOption);
         }
 
         [Fact]
         public void Deserialize_MultipleBooleanFlags_SetsAllPropertiesTrue() {
             var obj = new SomeConfiguration();
-            OptionDeserializer.Deserialize(obj, new string[] { "-b", "-x" });
+            OptionDeserializer.Deserialize(obj, "-b -x".Split(' '));
             Assert.True(obj.boolean);
             Assert.True(obj.xtrueBoolean);
         }
@@ -103,7 +103,7 @@ namespace CalqFramework.CliTest {
         [Fact]
         public void Deserialize_ShortOptionForShadowedField_SetsUsableOptionProperty() {
             var obj = new SomeConfiguration();
-            OptionDeserializer.Deserialize(obj, new string[] { "-y" });
+            OptionDeserializer.Deserialize(obj, "-y".Split(' '));
             Assert.True(obj.shortOption);
         }
 
@@ -112,7 +112,7 @@ namespace CalqFramework.CliTest {
             var obj = new SomeConfiguration();
             OptionDeserializer.Deserialize(
                 obj,
-                new string[] { $"--unknown", $"--{nameof(SomeConfiguration.text)}=abc" },
+                $"--unknown --{nameof(SomeConfiguration.text)}=abc".Split(' '),
                 new OptionDeserializerConfiguration() { SkipUnknown = true }
             );
             Assert.Equal("abc", obj.text);
@@ -123,7 +123,7 @@ namespace CalqFramework.CliTest {
             var obj = new SomeConfiguration();
             OptionDeserializer.Deserialize(
                 obj,
-                new string[] { $"--unknown", "value", $"--{nameof(SomeConfiguration.text)}=abc" },
+                $"--unknown value --{nameof(SomeConfiguration.text)}=abc".Split(' '),
                 new OptionDeserializerConfiguration() { SkipUnknown = true }
             );
             Assert.Equal("abc", obj.text);
@@ -134,7 +134,7 @@ namespace CalqFramework.CliTest {
             var obj = new SomeConfiguration();
             OptionDeserializer.Deserialize(
                 obj,
-                new string[] { $"--unknown", "-b", $"--{nameof(SomeConfiguration.text)}=abc" },
+                $"--unknown -b --{nameof(SomeConfiguration.text)}=abc".Split(' '),
                 new OptionDeserializerConfiguration() { SkipUnknown = true }
             );
             Assert.Equal("abc", obj.text);
@@ -146,7 +146,7 @@ namespace CalqFramework.CliTest {
             var obj = new SomeConfiguration();
             OptionDeserializer.Deserialize(
                 obj,
-                new string[] { $"--unknown=-b", $"--{nameof(SomeConfiguration.text)}=abc" },
+                $"--unknown=-b --{nameof(SomeConfiguration.text)}=abc".Split(' '),
                 new OptionDeserializerConfiguration() { SkipUnknown = true }
             );
             Assert.Equal("abc", obj.text);
@@ -156,7 +156,7 @@ namespace CalqFramework.CliTest {
         [Fact]
         public void Deserialize_ShadowedFieldOption_SetsUsableOptionNotOriginalField() {
             var obj = new SomeConfiguration();
-            OptionDeserializer.Deserialize(obj, new string[] { $"--{nameof(SomeConfiguration.shadowedfield)}" });
+            OptionDeserializer.Deserialize(obj, $"--{nameof(SomeConfiguration.shadowedfield)}".Split(' '));
             Assert.True(obj.usableOption);
             Assert.False(obj.shadowedfield);
         }
@@ -175,7 +175,7 @@ namespace CalqFramework.CliTest {
         public void Deserialize_InvalidOptionInArguments_ThrowsCliException() {
             var obj = new SomeConfiguration();
             Assert.Throws<CliException>(() => {
-                OptionDeserializer.Deserialize(obj, new string[] { $"--{nameof(SomeConfiguration.integer)}=10", "notanoption", $"--{nameof(SomeConfiguration.text)}=abc xyz" });
+                OptionDeserializer.Deserialize(obj, $"--{nameof(SomeConfiguration.integer)}=10 notanoption --{nameof(SomeConfiguration.text)}=abc xyz".Split(' '));
             });
         }
 
@@ -183,7 +183,7 @@ namespace CalqFramework.CliTest {
         public void Deserialize_StackedNonBooleanShortOptions_ThrowsCliException() {
             CliException ex = Assert.Throws<CliException>(() => {
                 var obj = new SomeConfiguration();
-                OptionDeserializer.Deserialize(obj, new string[] { "-ib" });
+                OptionDeserializer.Deserialize(obj, "-ib".Split(' '));
             });
         }
 
@@ -191,7 +191,7 @@ namespace CalqFramework.CliTest {
         public void Deserialize_LongOptionWithoutValue_ThrowsCliException() {
             CliException ex = Assert.Throws<CliException>(() => {
                 var obj = new SomeConfiguration();
-                OptionDeserializer.Deserialize(obj, new string[] { $"--{nameof(SomeConfiguration.integer)}" });
+                OptionDeserializer.Deserialize(obj, $"--{nameof(SomeConfiguration.integer)}".Split(' '));
             });
         }
 
@@ -199,7 +199,7 @@ namespace CalqFramework.CliTest {
         public void Deserialize_UnexpectedPositionalValue_ThrowsCliException() {
             var obj = new SomeConfiguration();
             Assert.Throws<CliException>(() => {
-                OptionDeserializer.Deserialize(obj, new string[] { $"--{nameof(SomeConfiguration.integer)}", "10", "notanoption", $"--{nameof(SomeConfiguration.text)}=abc xyz" });
+                OptionDeserializer.Deserialize(obj, $"--{nameof(SomeConfiguration.integer)} 10 notanoption --{nameof(SomeConfiguration.text)}=abc xyz".Split(' '));
             });
         }
 
@@ -207,7 +207,7 @@ namespace CalqFramework.CliTest {
         public void Deserialize_NonOptionProperty_ThrowsCliException() {
             CliException ex = Assert.Throws<CliException>(() => {
                 var obj = new SomeConfiguration();
-                OptionDeserializer.Deserialize(obj, new string[] { $"--{nameof(SomeConfiguration.inner)}=0" });
+                OptionDeserializer.Deserialize(obj, $"--{nameof(SomeConfiguration.inner)}=0".Split(' '));
             });
             Assert.Equal($"not an option: inner", ex.Message);
         }
@@ -216,7 +216,7 @@ namespace CalqFramework.CliTest {
         public void Deserialize_InvalidDecimalFormatForInteger_ThrowsTypeMismatchException() {
             CliException ex = Assert.Throws<CliException>(() => {
                 var obj = new SomeConfiguration();
-                OptionDeserializer.Deserialize(obj, new string[] { $"--{nameof(SomeConfiguration.integer)}=0.1" });
+                OptionDeserializer.Deserialize(obj, $"--{nameof(SomeConfiguration.integer)}=0.1".Split(' '));
             });
             Assert.Equal($"value type mismatch: expected Int32 got 0.1", ex.Message);
         }
@@ -225,7 +225,7 @@ namespace CalqFramework.CliTest {
         public void Deserialize_InvalidNonNumericValueForInteger_ThrowsTypeMismatchException() {
             CliException ex = Assert.Throws<CliException>(() => {
                 var obj = new SomeConfiguration();
-                OptionDeserializer.Deserialize(obj, new string[] { $"--{nameof(SomeConfiguration.integer)}=a" });
+                OptionDeserializer.Deserialize(obj, $"--{nameof(SomeConfiguration.integer)}=a".Split(' '));
             });
             Assert.Equal($"value type mismatch: expected Int32 got a", ex.Message);
         }
@@ -234,7 +234,7 @@ namespace CalqFramework.CliTest {
         public void Deserialize_UnknownShortOption_ThrowsCliException() {
             CliException ex = Assert.Throws<CliException>(() => {
                 var obj = new SomeConfiguration();
-                OptionDeserializer.Deserialize(obj, new string[] { "-m" });
+                OptionDeserializer.Deserialize(obj, "-m".Split(' '));
             });
         }
 
@@ -242,7 +242,7 @@ namespace CalqFramework.CliTest {
         public void Deserialize_ByteValueExceedsMaximum_ThrowsOutOfRangeException() {
             CliException ex = Assert.Throws<CliException>(() => {
                 var obj = new SomeConfiguration();
-                OptionDeserializer.Deserialize(obj, new string[] { $"--{nameof(SomeConfiguration.aByteNumber)}=256" });
+                OptionDeserializer.Deserialize(obj, $"--{nameof(SomeConfiguration.aByteNumber)}=256".Split(' '));
             });
             Assert.Equal($"value is out of range: 256 (0-255)", ex.Message);
         }
@@ -253,7 +253,7 @@ namespace CalqFramework.CliTest {
             CliException ex = Assert.Throws<CliException>(() => {
                 OptionDeserializer.Deserialize(
                     obj,
-                    new string[] { $"--{nameof(ConfigurationWithXUnitCommandLineArgs.port)}", int.MaxValue.ToString() },
+                    $"--{nameof(ConfigurationWithXUnitCommandLineArgs.port)} {int.MaxValue}".Split(' '),
                     new OptionDeserializerConfiguration() { SkipUnknown = true }
                 );
             });
@@ -264,7 +264,7 @@ namespace CalqFramework.CliTest {
         public void Deserialize_UnknownLongOptionWithValue_ThrowsCliException() {
             CliException ex = Assert.Throws<CliException>(() => {
                 var obj = new SomeConfiguration();
-                OptionDeserializer.Deserialize(obj, new string[] { "--unknown=0" });
+                OptionDeserializer.Deserialize(obj, "--unknown=0".Split(' '));
             });
         }
 
@@ -272,7 +272,7 @@ namespace CalqFramework.CliTest {
         public void Deserialize_StackedOptionsWithNonBooleanInMiddle_ThrowsCliException() {
             CliException ex = Assert.Throws<CliException>(() => {
                 var obj = new SomeConfiguration();
-                OptionDeserializer.Deserialize(obj, new string[] { "-bi" });
+                OptionDeserializer.Deserialize(obj, "-bi".Split(' '));
             });
         }
 
@@ -280,7 +280,7 @@ namespace CalqFramework.CliTest {
         public void Deserialize_StackedOptionsStartingWithNonBoolean_ThrowsCliException() {
             CliException ex = Assert.Throws<CliException>(() => {
                 var obj = new SomeConfiguration();
-                OptionDeserializer.Deserialize(obj, new string[] { "-ib", "0" });
+                OptionDeserializer.Deserialize(obj, "-ib 0".Split(' '));
             });
         }
 
@@ -290,7 +290,7 @@ namespace CalqFramework.CliTest {
             CliException ex = Assert.Throws<CliException>(() => {
                 OptionDeserializer.Deserialize(
                     obj,
-                    new string[] { "unknown", $"--{nameof(SomeConfiguration.text)}=abc" },
+                    $"unknown --{nameof(SomeConfiguration.text)}=abc".Split(' '),
                     new OptionDeserializerConfiguration() { SkipUnknown = true }
                 );
             });
