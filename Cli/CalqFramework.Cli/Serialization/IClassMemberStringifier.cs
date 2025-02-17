@@ -3,9 +3,13 @@ using System.Reflection;
 
 namespace CalqFramework.Cli.Serialization {
     public interface IClassMemberStringifier {
-        IEnumerable<string> GetNames(FieldInfo info);
-        IEnumerable<string> GetNames(MethodInfo info);
-        IEnumerable<string> GetNames(ParameterInfo info);
-        IEnumerable<string> GetNames(PropertyInfo info);
+        IEnumerable<string> GetAlternativeNames(FieldInfo info);
+        IEnumerable<string> GetAlternativeNames(MethodInfo info);
+        IEnumerable<string> GetAlternativeNames(ParameterInfo info);
+        IEnumerable<string> GetAlternativeNames(PropertyInfo info);
+        IEnumerable<string> GetRequiredNames(FieldInfo info);
+        IEnumerable<string> GetRequiredNames(MethodInfo info);
+        IEnumerable<string> GetRequiredNames(PropertyInfo info);
+        IEnumerable<string> GetRequiredNames(ParameterInfo info);
     }
 }
