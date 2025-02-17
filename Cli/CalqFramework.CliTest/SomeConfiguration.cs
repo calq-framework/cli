@@ -22,6 +22,7 @@ namespace CalqFramework.CliTest {
         [CliName("shadowedfield")]
         public bool usableOption;
 
+        [CliName("s")]
         public bool shadowedfield;
 
         [CliName("differentname")]

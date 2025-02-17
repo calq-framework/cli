@@ -16,11 +16,12 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
         public MethodExecutor(MethodInfo method, object? obj, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier) : base(method, obj) {
             BindingFlags = bindingFlags;
             ClassMemberStringifier = classMemberStringifier;
+            AccessorsByNames = GetAccessorsByNames();
         }
 
         protected BindingFlags BindingFlags { get; }
         protected IClassMemberStringifier ClassMemberStringifier { get; }
-
+        private IDictionary<string, ParameterInfo> AccessorsByNames { get; }
         public override object? this[ParameterInfo accessor] {
             get {
                 object? result = null;
@@ -56,26 +57,17 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
         }
 
         public IDictionary<ParameterInfo, IEnumerable<string>> GetKeysByAccessors() {
-            var keys = new Dictionary<ParameterInfo, IEnumerable<string>>();
-            foreach (ParameterInfo accessor in Accessors) {
-                keys[accessor] = ClassMemberStringifier.GetNames(accessor);
-            }
-            return keys;
+            var result = AccessorsByNames
+                .GroupBy(kv => kv.Value)
+                .ToDictionary(
+                    group => (ParameterInfo)group.Key,
+                    group => group.Select(kv => kv.Key)
+                );
+            return result;
         }
 
         public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out ParameterInfo result) {
-            result = default;
-            bool success = false;
-
-            StringComparison stringComparison = BindingFlags.HasFlag(BindingFlags.IgnoreCase) ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
-            foreach (ParameterInfo parameter in ParameterIndexByParameter.Keys) {
-                if (ClassMemberStringifier.GetNames(parameter).Where(x => string.Equals(x, key, stringComparison)).Any()) {
-                    result = parameter;
-                    success = true;
-                }
-            }
-
-            return success;
+            return AccessorsByNames.TryGetValue(key, out result);
         }
 
         protected override string? ConvertFromInternalValue(object? value, ParameterInfo accessor) {
@@ -84,6 +76,42 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
 
         protected override object? ConvertToInternalValue(string? value, ParameterInfo accessor) {
             return ValueParser.ParseValue(value, GetDataType(accessor));
+        }
+
+        private IDictionary<string, ParameterInfo> GetAccessorsByNames() {
+            var stringComparer = BindingFlags.HasFlag(BindingFlags.IgnoreCase) ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
+
+            var accessorsByRequiredNames = new Dictionary<string, ParameterInfo>(stringComparer);
+            foreach (var accessor in Accessors) {
+                foreach (var name in ClassMemberStringifier.GetRequiredNames(accessor)) {
+                    if (!accessorsByRequiredNames.TryAdd(name, accessor)) {
+                        throw new CliException($"cli name of {accessor.Name} collides with {accessorsByRequiredNames[name].Name}");
+                    }
+
+                }
+            }
+
+            var accessorsByAlternativeNames = new Dictionary<string, ParameterInfo>(stringComparer);
+            var collidingAlternativeNames = new HashSet<string>();
+            foreach (var accessor in Accessors) {
+                foreach (var name in ClassMemberStringifier.GetAlternativeNames(accessor)) {
+                    if (!accessorsByAlternativeNames.TryAdd(name, accessor)) {
+                        collidingAlternativeNames.Add(name);
+                    }
+
+                }
+            }
+
+            foreach (var name in collidingAlternativeNames) {
+                accessorsByAlternativeNames.Remove(name);
+            }
+
+            var accessorsByNames = accessorsByRequiredNames;
+            foreach (var name in accessorsByAlternativeNames.Keys) {
+                accessorsByNames.TryAdd(name, accessorsByAlternativeNames[name]);
+            }
+
+            return accessorsByNames;
         }
     }
 }

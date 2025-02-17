@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -15,6 +16,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
             BindingFlags = bindingFlags;
             ClassMemberStringifier = classMemberStringifier;
             ParentType = obj.GetType();
+            AccessorsByNames = GetAccessorsByNames();
         }
 
         public IEnumerable<MethodInfo> Accessors => ParentType.GetMethods(BindingFlags).Where(ContainsAccessor);
@@ -22,30 +24,36 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
         protected IClassMemberStringifier ClassMemberStringifier { get; }
         protected object ParentObject { get; }
         protected Type ParentType { get; }
-
+        private IDictionary<string, MethodInfo> AccessorsByNames { get; }
         public MethodInfo? this[string key] {
             get {
-                MethodInfo result = GetClassMember(key) ?? throw new CliException($"invalid command"); // throw new MissingMemberException($"Missing {key} in {ParentType}."); ;
+                if (!TryGetAccessor(key, out var result)) {
+                    throw new CliException($"invalid command"); // throw new MissingMemberException($"Missing {key} in {ParentType}."); ;
+                }
                 return result;
             }
         }
 
         public bool ContainsKey(string key) {
-            MethodInfo? result = GetClassMember(key);
-            return result != null;
+            return TryGetAccessor(key, out _);
         }
 
         public Type GetDataType(string key) {
             return this[key]!.ReturnType;
         }
 
-        // TODO two-pass, first pass find collisions and exclude them from second pass when building the dictionary
         public IDictionary<MethodInfo, IEnumerable<string>> GetKeysByAccessors() {
-            var keys = new Dictionary<MethodInfo, IEnumerable<string>>();
-            foreach (MethodInfo accessor in Accessors) {
-                keys[accessor] = ClassMemberStringifier.GetNames(accessor);
-            }
-            return keys;
+            var result = AccessorsByNames
+                .GroupBy(kv => kv.Value)
+                .ToDictionary(
+                    group => (MethodInfo)group.Key,
+                    group => group.Select(kv => kv.Key)
+                );
+            return result;
+        }
+
+        public bool TryGetAccessor(string key, [MaybeNullWhen(false)] out MethodInfo result) {
+            return AccessorsByNames.TryGetValue(key, out result);
         }
 
         private static bool IsDotnetSpecific(MethodInfo methodInfo) {
@@ -56,16 +64,40 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
             return accessor is not null && accessor.DeclaringType == ParentType && !IsDotnetSpecific(accessor);
         }
 
-        // FIXME align with GetKeysByAccessors
-        private MethodInfo? GetClassMember(string key) {
-            StringComparison stringComparison = BindingFlags.HasFlag(BindingFlags.IgnoreCase) ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
-            foreach (MethodInfo member in Accessors) {
-                if (ClassMemberStringifier.GetNames(member).Where(x => string.Equals(x, key, stringComparison)).Any()) {
-                    return member;
+        private IDictionary<string, MethodInfo> GetAccessorsByNames() {
+            var stringComparer = BindingFlags.HasFlag(BindingFlags.IgnoreCase) ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
+
+            var accessorsByRequiredNames = new Dictionary<string, MethodInfo>(stringComparer);
+            foreach (var accessor in Accessors) {
+                foreach (var name in ClassMemberStringifier.GetRequiredNames(accessor)) {
+                    if (!accessorsByRequiredNames.TryAdd(name, accessor)) {
+                        throw new CliException($"cli name of {accessor.Name} collides with {accessorsByRequiredNames[name].Name}");
+                    }
+
                 }
             }
 
-            return null;
+            var accessorsByAlternativeNames = new Dictionary<string, MethodInfo>(stringComparer);
+            var collidingAlternativeNames = new HashSet<string>();
+            foreach (var accessor in Accessors) {
+                foreach (var name in ClassMemberStringifier.GetAlternativeNames(accessor)) {
+                    if (!accessorsByAlternativeNames.TryAdd(name, accessor)) {
+                        collidingAlternativeNames.Add(name);
+                    }
+
+                }
+            }
+
+            foreach (var name in collidingAlternativeNames) {
+                accessorsByAlternativeNames.Remove(name);
+            }
+
+            var accessorsByNames = accessorsByRequiredNames;
+            foreach (var name in accessorsByAlternativeNames.Keys) {
+                accessorsByNames.TryAdd(name, accessorsByAlternativeNames[name]);
+            }
+
+            return accessorsByNames;
         }
     }
 }

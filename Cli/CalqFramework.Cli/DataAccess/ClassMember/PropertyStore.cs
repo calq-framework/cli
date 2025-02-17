@@ -10,16 +10,17 @@ using CalqFramework.DataAccess.ClassMember;
 
 namespace CalqFramework.Cli.DataAccess.ClassMember {
 
-    // TODO unify with FieldStore
     internal class PropertyStore<TValue> : PropertyStoreBase<string, TValue>, ICliKeyValueStore<string, TValue, MemberInfo> {
 
         public PropertyStore(object obj, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier, IAccessorValidator cliValidator, IValueConverter<TValue> valueConverter) : base(obj, bindingFlags) {
             ClassMemberStringifier = classMemberStringifier;
             CliValidator = cliValidator;
             ValueConverter = valueConverter;
+            AccessorsByNames = GetAccessorsByNames();
         }
 
         protected IClassMemberStringifier ClassMemberStringifier { get; }
+        private IDictionary<string, PropertyInfo> AccessorsByNames { get; }
         private IAccessorValidator CliValidator { get; }
         private IValueConverter<TValue> ValueConverter { get; }
 
@@ -46,18 +47,18 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
             return accessor is not null && accessor.DeclaringType == ParentType && CliValidator.IsValid(accessor);
         }
 
-        // TODO two-pass, first pass find collisions and exclude them from second pass when building the dictionary
         public IDictionary<MemberInfo, IEnumerable<string>> GetKeysByAccessors() {
-            var keys = new Dictionary<MemberInfo, IEnumerable<string>>();
-            foreach (PropertyInfo accessor in Accessors) {
-                keys[accessor] = ClassMemberStringifier.GetNames(accessor);
-            }
-            return keys;
+            var result = AccessorsByNames
+                .GroupBy(kv => kv.Value)
+                .ToDictionary(
+                    group => (MemberInfo)group.Key,
+                    group => group.Select(kv => kv.Key)
+                );
+            return result;
         }
 
         public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out PropertyInfo result) {
-            result = GetClassMember(key);
-            return result != null;
+            return AccessorsByNames.TryGetValue(key, out result);
         }
 
         protected override TValue ConvertFromInternalValue(object? value, PropertyInfo accessor) {
@@ -68,16 +69,40 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
             return ValueConverter.ConvertToInternalValue(value, GetDataType(accessor)); // ValueParser.ParseValue(value, GetDataType(accessor));
         }
 
-        // FIXME align with GetKeysByAccessors
-        private PropertyInfo? GetClassMember(string key) {
-            StringComparison stringComparison = BindingFlags.HasFlag(BindingFlags.IgnoreCase) ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
-            foreach (PropertyInfo member in Accessors) {
-                if (ClassMemberStringifier.GetNames(member).Where(x => string.Equals(x, key, stringComparison)).Any()) {
-                    return member;
+        private IDictionary<string, PropertyInfo> GetAccessorsByNames() {
+            var stringComparer = BindingFlags.HasFlag(BindingFlags.IgnoreCase) ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
+
+            var accessorsByRequiredNames = new Dictionary<string, PropertyInfo>(stringComparer);
+            foreach (var accessor in Accessors) {
+                foreach (var name in ClassMemberStringifier.GetRequiredNames(accessor)) {
+                    if (!accessorsByRequiredNames.TryAdd(name, accessor)) {
+                        throw new CliException($"cli name of {accessor.Name} collides with {accessorsByRequiredNames[name].Name}");
+                    }
+
                 }
             }
 
-            return null;
+            var accessorsByAlternativeNames = new Dictionary<string, PropertyInfo>(stringComparer);
+            var collidingAlternativeNames = new HashSet<string>();
+            foreach (var accessor in Accessors) {
+                foreach (var name in ClassMemberStringifier.GetAlternativeNames(accessor)) {
+                    if (!accessorsByAlternativeNames.TryAdd(name, accessor)) {
+                        collidingAlternativeNames.Add(name);
+                    }
+
+                }
+            }
+
+            foreach (var name in collidingAlternativeNames) {
+                accessorsByAlternativeNames.Remove(name);
+            }
+
+            var accessorsByNames = accessorsByRequiredNames;
+            foreach (var name in accessorsByAlternativeNames.Keys) {
+                accessorsByNames.TryAdd(name, accessorsByAlternativeNames[name]);
+            }
+
+            return accessorsByNames;
         }
     }
 }
