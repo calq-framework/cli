@@ -9,7 +9,6 @@ using static CalqFramework.Cli.Parsing.OptionReaderBase;
 
 namespace CalqFramework.Cli {
 
-    // TODO create separate class for help/version logic
     public class CommandLineInterface {
 
         public CommandLineInterface() {
@@ -47,39 +46,48 @@ namespace CalqFramework.Cli {
                 }
             } while (en.MoveNext());
 
-            if (arg == "--version" || arg == "-v") {
-                Console.WriteLine(Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3));
-                return null;
+            var subcommandName = arg;
+
+            if (subcommandName == "--version" || subcommandName == "-v") {
+                return Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3);
             }
 
             ISubcommandStore subcommandStore = CliOptionsStoreFactory.CreateSubcommandStore(submodule);
 
-            if (arg == "--help" || arg == "-h") {
+            if (subcommandName == "--help" || subcommandName == "-h") {
                 IOptionStore optionSore = CliOptionsStoreFactory.CreateOptionStore(submodule);
-                Console.Write(HelpGenerator.GetHelp(optionSore.GetOptions(), submoduleStore.GetSubmodules(), subcommandStore.GetSubcommands(CliOptionsStoreFactory.CreateSubcommandExecutor)));
-                return null;
+                return HelpGenerator.GetHelp(optionSore.GetOptions(), submoduleStore.GetSubmodules(), subcommandStore.GetSubcommands(CliOptionsStoreFactory.CreateSubcommandExecutor));
             }
 
-            MethodInfo subcommand = subcommandStore[arg];
+            MethodInfo subcommand = subcommandStore[subcommandName];
             var subcommandExecutorWithOptions = CliOptionsStoreFactory.CreateSubcommandExecutorWithOptions(subcommand, submodule);
-            if (TryReadOptionsAndActionParams(en, subcommandExecutorWithOptions, subcommand, subcommandStore)) {
-                return subcommandExecutorWithOptions.Invoke();
-            } else {
-                return null;
+
+            var hasArguments = en.MoveNext();
+            if (hasArguments) {
+                var firstArg = en.Current;
+
+                if (firstArg == "--help" || firstArg == "-h") {
+                    return HelpGenerator.GetHelp(subcommandExecutorWithOptions.GetOptions(), subcommandStore.GetSubcommands(CliOptionsStoreFactory.CreateSubcommandExecutor).Where(x => x.MethodInfo == subcommand).First());
+                }
+
+                var skippedEn = GetSkippedEnumerator(en).GetEnumerator();
+                ReadParametersAndOptions(skippedEn, subcommandExecutorWithOptions, subcommand, subcommandStore);
             }
 
-            throw new CliException($"no command specified");
+            return subcommandExecutorWithOptions.Invoke();
         }
 
-        private bool TryReadOptionsAndActionParams(IEnumerator<string> args, ISubcommandExecutorWithOptions subcommandExecutorWithOptions, MethodInfo subcommand, ISubcommandStore subcommandStore) {
+        // TODO move as extension method or convert enumerator to enumerable
+        private IEnumerable<string> GetSkippedEnumerator(IEnumerator<string> en) {
+            do {
+                yield return en.Current;
+            } while (en.MoveNext());
+        }
+
+        private void ReadParametersAndOptions(IEnumerator<string> args, ISubcommandExecutorWithOptions subcommandExecutorWithOptions, MethodInfo subcommand, ISubcommandStore subcommandStore) {
             var optionReader = new OptionReader(args, subcommandExecutorWithOptions);
 
             foreach ((string option, string value, OptionFlags optionAttr) in optionReader.Read()) {
-                if ((option == "help" || option == "h") && !optionAttr.HasFlag(OptionFlags.NotAnOption)) {
-                    Console.Write(HelpGenerator.GetHelp(subcommandExecutorWithOptions.GetOptions(), subcommandStore.GetSubcommands(CliOptionsStoreFactory.CreateSubcommandExecutor).Where(x => x.MethodInfo == subcommand).First()));
-                    return false;
-                }
-
                 if (optionAttr.HasFlag(OptionFlags.ValueUnassigned) && !optionAttr.HasFlag(OptionFlags.NotAnOption)) {
                     if (SkipUnknown) {
                         continue;
@@ -97,8 +105,6 @@ namespace CalqFramework.Cli {
             while (args.MoveNext()) {
                 subcommandExecutorWithOptions.AddArgument(args.Current);
             }
-
-            return true;
         }
     }
 }
