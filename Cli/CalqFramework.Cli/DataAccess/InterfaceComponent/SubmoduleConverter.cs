@@ -9,8 +9,6 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
             return value;
         }
 
-        public object? ConvertToInternalValue(object? value, Type internalType) {
-            return value;
-        }
+        public object? ConvertToInternalValue(object? value, Type internalType, object? currentValue) => throw new NotSupportedException();
     }
 }

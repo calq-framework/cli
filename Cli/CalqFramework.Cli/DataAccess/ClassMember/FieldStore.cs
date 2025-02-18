@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using CalqFramework.Cli.Serialization;
-using CalqFramework.DataAccess;
 using CalqFramework.DataAccess.ClassMember;
 
 namespace CalqFramework.Cli.DataAccess.ClassMember {
@@ -23,24 +21,6 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
         private IClassMemberStringifier ClassMemberStringifier { get; }
         private IAccessorValidator CliValidator { get; }
         private IValueConverter<TValue> ValueConverter { get; }
-        public override object? this[FieldInfo accessor] {
-            get {
-                object? result;
-                if (base[accessor] is not ICollection collection) {
-                    result = base[accessor];
-                } else {
-                    result = collection;
-                }
-                return result;
-            }
-            set {
-                if (base[accessor] is not ICollection collection) {
-                    base[accessor] = value;
-                } else {
-                    new CollectionStore(collection).AddValue(value);
-                }
-            }
-        }
 
         public override bool ContainsAccessor(FieldInfo accessor) {
             return accessor is not null && accessor.DeclaringType == ParentType && CliValidator.IsValid(accessor);
@@ -65,7 +45,13 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
         }
 
         protected override object? ConvertToInternalValue(TValue value, FieldInfo accessor) {
-            return ValueConverter.ConvertToInternalValue(value, GetDataType(accessor));
+            object? currentValue;
+            try {
+                currentValue = GetValueOrInitialize(accessor);
+            } catch (MissingMethodException) {
+                currentValue = null;
+            }
+            return ValueConverter.ConvertToInternalValue(value, GetDataType(accessor), currentValue);
         }
 
         private IDictionary<string, FieldInfo> GetAccessorsByNames() {
