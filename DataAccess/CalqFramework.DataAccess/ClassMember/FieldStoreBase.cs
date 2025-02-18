@@ -7,7 +7,7 @@ namespace CalqFramework.DataAccess.ClassMember {
         public FieldStoreBase(object obj, BindingFlags bindingFlags) : base(obj, bindingFlags) {
         }
 
-        public override IEnumerable<FieldInfo> Accessors => ParentType.GetFields().Where(ContainsAccessor);
+        public override IEnumerable<FieldInfo> Accessors => ParentType.GetFields(BindingFlags).Where(ContainsAccessor);
 
         public override object? this[FieldInfo accessor] {
             get {

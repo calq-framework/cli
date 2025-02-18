@@ -7,7 +7,7 @@ namespace CalqFramework.DataAccess.ClassMember {
         public PropertyStoreBase(object obj, BindingFlags bindingFlags) : base(obj, bindingFlags) {
         }
 
-        public override IEnumerable<PropertyInfo> Accessors => ParentType.GetProperties().Where(ContainsAccessor);
+        public override IEnumerable<PropertyInfo> Accessors => ParentType.GetProperties(BindingFlags).Where(ContainsAccessor);
 
         public override object? this[PropertyInfo accessor] {
             get {
