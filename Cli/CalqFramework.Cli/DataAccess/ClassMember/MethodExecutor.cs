@@ -35,7 +35,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
                 } else {
                     ICollection collection = (GetValueOrInitialize(accessor) as ICollection)!;
                     if (collection.Count > 0) {
-                        result = new CollectionStore(collection)["0"]; // FIXME return whole collection instead just first element. this is used for reading default value so print whole collection
+                        result = collection;
                     }
                 }
                 return result;
