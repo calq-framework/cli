@@ -29,7 +29,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
                 if (base[accessor] is not ICollection collection) {
                     result = base[accessor];
                 } else {
-                    result = new CollectionStore(collection)["0"]; // FIXME return whole collection instead just first element. this is used for reading default value so print whole collection
+                    result = collection;
                 }
                 return result;
             }
