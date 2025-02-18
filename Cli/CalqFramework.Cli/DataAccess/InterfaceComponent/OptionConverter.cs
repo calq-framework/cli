@@ -3,6 +3,7 @@ using System.Collections;
 using System.Linq;
 using CalqFramework.Cli.DataAccess.ClassMember;
 using CalqFramework.Cli.Parsing;
+using CalqFramework.DataAccess;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
 
@@ -22,8 +23,20 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
             }
         }
 
-        public object? ConvertToInternalValue(string? value, Type internalType) {
-            return ValueParser.ParseValue(value, internalType);
+        public object? ConvertToInternalValue(string? value, Type internalType, object? currentValue) {
+            if (value == null) {
+                return value;
+            }
+
+            bool isCollection = internalType.GetInterface(nameof(ICollection)) != null;
+            if (isCollection == false) {
+                return ValueParser.ParseValue(value, internalType);
+            } else {
+                var collection = (currentValue as ICollection)!;
+                var item = ValueParser.ParseValue(value, internalType.GetGenericArguments()[0]);
+                new CollectionStore(collection).AddValue(item);
+                return currentValue;
+            }
         }
     }
 }
