@@ -13,14 +13,14 @@ namespace CalqFramework.Cli {
 
         public CommandLineInterface() {
             CliOptionsStoreFactory = new CliComponentStoreFactory();
-            HelpGenerator = new HelpGenerator();
+            HelpGenerator = new HelpPrinter();
         }
 
         public ICliComponentStoreFactory CliOptionsStoreFactory { get; init; }
 
         public bool SkipUnknown { get; init; } = false;
         public bool UseRevisionVersion { get; init; } = true;
-        private HelpGenerator HelpGenerator { get; init; } // TODO public
+        public IHelpPrinter HelpGenerator { get; init; }
 
         public object? Execute(object obj) {
             return Execute(obj, Environment.GetCommandLineArgs().Skip(1));
@@ -33,11 +33,15 @@ namespace CalqFramework.Cli {
             }
 
             // enumerate args until en.Current is not a submodule
-            ISubmoduleStore submoduleStore;
+            ISubmoduleStore? previousSubmoduleStore;
+            ISubmoduleStore? submoduleStore = null;
             object submodule = obj;
-            string arg;
+            string? previousArg;
+            string? arg = null;
             do {
+                previousSubmoduleStore = submoduleStore;
                 submoduleStore = CliOptionsStoreFactory.CreateSubmoduleStore(submodule);
+                previousArg = arg;
                 arg = en.Current;
                 if (submoduleStore.ContainsKey(arg)) {
                     submodule = submoduleStore[arg]!;
@@ -46,7 +50,7 @@ namespace CalqFramework.Cli {
                 }
             } while (en.MoveNext());
 
-            var subcommandName = arg;
+            string subcommandName = arg;
 
             if (subcommandName == "--version" || subcommandName == "-v") {
                 return Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3);
@@ -56,35 +60,41 @@ namespace CalqFramework.Cli {
 
             if (subcommandName == "--help" || subcommandName == "-h") {
                 IOptionStore optionSore = CliOptionsStoreFactory.CreateOptionStore(submodule);
-                return HelpGenerator.GetHelp(optionSore.GetOptions(), submoduleStore.GetSubmodules(), subcommandStore.GetSubcommands(CliOptionsStoreFactory.CreateSubcommandExecutor));
+                bool isRoot = submodule == obj;
+                if (isRoot) {
+                    return HelpGenerator.PrintHelp(obj.GetType(), submoduleStore.GetSubmodules(), subcommandStore.GetSubcommands(CliOptionsStoreFactory.CreateSubcommandExecutor), optionSore.GetOptions());
+                } else {
+                    var submoduleComponent = previousSubmoduleStore!.GetSubmodules().Where(x => previousSubmoduleStore.ContainsKey(previousArg!)).First(); // use the store to check for the key to comply with case sensitivity
+                    return HelpGenerator.PrintHelp(obj.GetType(), submoduleComponent, submoduleStore.GetSubmodules(), subcommandStore.GetSubcommands(CliOptionsStoreFactory.CreateSubcommandExecutor), optionSore.GetOptions());
+                }
             }
 
             MethodInfo subcommand = subcommandStore[subcommandName];
-            var subcommandExecutorWithOptions = CliOptionsStoreFactory.CreateSubcommandExecutorWithOptions(subcommand, submodule);
+            ISubcommandExecutorWithOptions subcommandExecutorWithOptions = CliOptionsStoreFactory.CreateSubcommandExecutorWithOptions(subcommand, submodule);
 
-            var hasArguments = en.MoveNext();
+            bool hasArguments = en.MoveNext();
             if (hasArguments) {
-                var firstArg = en.Current;
+                string firstArg = en.Current;
 
                 if (firstArg == "--help" || firstArg == "-h") {
-                    return HelpGenerator.GetHelp(subcommandExecutorWithOptions.GetOptions(), subcommandStore.GetSubcommands(CliOptionsStoreFactory.CreateSubcommandExecutor).Where(x => x.MethodInfo == subcommand).First());
+                    return HelpGenerator.PrintSubcommandHelp(obj.GetType(), subcommandStore.GetSubcommands(CliOptionsStoreFactory.CreateSubcommandExecutor).Where(x => x.MethodInfo == subcommand).First(), subcommandExecutorWithOptions.GetOptions());
                 }
 
-                var skippedEn = GetSkippedEnumerator(en).GetEnumerator();
-                ReadParametersAndOptions(skippedEn, subcommandExecutorWithOptions, subcommand, subcommandStore);
+                IEnumerator<string> skippedEn = GetSkippedEnumerator(en).GetEnumerator();
+                ReadParametersAndOptions(skippedEn, subcommandExecutorWithOptions);
             }
 
             return subcommandExecutorWithOptions.Invoke();
         }
 
         // TODO move as extension method or convert enumerator to enumerable
-        private IEnumerable<string> GetSkippedEnumerator(IEnumerator<string> en) {
+        private static IEnumerable<string> GetSkippedEnumerator(IEnumerator<string> en) {
             do {
                 yield return en.Current;
             } while (en.MoveNext());
         }
 
-        private void ReadParametersAndOptions(IEnumerator<string> args, ISubcommandExecutorWithOptions subcommandExecutorWithOptions, MethodInfo subcommand, ISubcommandStore subcommandStore) {
+        private void ReadParametersAndOptions(IEnumerator<string> args, ISubcommandExecutorWithOptions subcommandExecutorWithOptions) {
             var optionReader = new OptionReader(args, subcommandExecutorWithOptions);
 
             foreach ((string option, string value, OptionFlags optionAttr) in optionReader.Read()) {

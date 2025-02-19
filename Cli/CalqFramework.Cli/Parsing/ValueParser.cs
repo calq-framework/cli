@@ -4,6 +4,7 @@ using System.Collections;
 namespace CalqFramework.Cli.Parsing;
 
 // TODO convert to a regular class
+// TODO DRY
 public static class ValueParser {
 
     public static bool IsParseable(Type type) {
