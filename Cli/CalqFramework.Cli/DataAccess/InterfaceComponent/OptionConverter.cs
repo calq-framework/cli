@@ -18,8 +18,8 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
             if (isCollection == false) {
                 return value.ToString();
             } else {
-                var collection = (value as ICollection)!;
-                return string.Join(", ", collection.Cast<object?>().Select(x => x?.ToString() ?? "NULL").Cast<string?>());
+                ICollection collection = (value as ICollection)!;
+                return "[" + string.Join(", ", collection.Cast<object?>().Select(x => x?.ToString() ?? "NULL").Cast<string?>()) + "]";
             }
         }
 
@@ -32,8 +32,8 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
             if (isCollection == false) {
                 return ValueParser.ParseValue(value, internalType);
             } else {
-                var collection = (currentValue as ICollection)!;
-                var item = ValueParser.ParseValue(value, internalType.GetGenericArguments()[0]);
+                ICollection collection = (currentValue as ICollection)!;
+                object item = ValueParser.ParseValue(value, internalType.GetGenericArguments()[0]);
                 new CollectionStore(collection).AddValue(item);
                 return currentValue;
             }
