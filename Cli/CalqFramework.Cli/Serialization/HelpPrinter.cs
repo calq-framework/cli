@@ -102,7 +102,9 @@ namespace CalqFramework.Cli.Serialization {
                 string? summary = doc.Descendants("member")
                     .FirstOrDefault(m => m.Attribute("name")?.Value == memberName)?
                     .Element("summary")?.Value;
-
+                if (summary != null) {
+                    summary = string.Join('\n', summary.Split('\n').Select(x => x.Trim()));
+                }
                 return summary?.Trim() ?? (underlyingType != null ? GetSummary(underlyingType) : "");
             } catch (FileNotFoundException) {
                 throw new Exception($"Please add <GenerateDocumentationFile>true</GenerateDocumentationFile> to the csproj/fsproj file.");
@@ -133,6 +135,9 @@ namespace CalqFramework.Cli.Serialization {
                     .Elements("param")
                     .FirstOrDefault(p => p.Attribute("name")?.Value == parameterInfo.Name)?
                     .Value;
+                if (summary != null) {
+                    summary = string.Join('\n', summary.Split('\n').Select(x => x.Trim()));
+                }
                 return summary?.Trim() ?? GetSummary(parameterInfo.ParameterType);
             } catch (FileNotFoundException) {
                 throw new Exception("Please add <GenerateDocumentationFile>true</GenerateDocumentationFile> to the csproj/fsproj file.");
@@ -162,6 +167,9 @@ namespace CalqFramework.Cli.Serialization {
                     .FirstOrDefault(m => m.Attribute("name")?.Value == memberName)?
                     .Element("returns")?
                     .Value;
+                if (summary != null) {
+                    summary = string.Join('\n', summary.Split('\n').Select(x => x.Trim()));
+                }
                 return summary?.Trim() ?? "";
             } catch (FileNotFoundException) {
                 throw new Exception("Please add <GenerateDocumentationFile>true</GenerateDocumentationFile> to the csproj/fsproj file.");
@@ -177,6 +185,9 @@ namespace CalqFramework.Cli.Serialization {
                 string? summary = doc.Descendants("member")
                     .FirstOrDefault(m => m.Attribute("name")?.Value == memberName)?
                     .Element("summary")?.Value;
+                if (summary != null) {
+                    summary = string.Join('\n', summary.Split('\n').Select(x => x.Trim()));
+                }
                 return summary?.Trim() ?? "";
             } catch (FileNotFoundException) {
                 // throw new Exception("Please add <GenerateDocumentationFile>true</GenerateDocumentationFile> to the csproj/fsproj file.");
@@ -277,7 +288,7 @@ namespace CalqFramework.Cli.Serialization {
                     }
                 }
             }
-            return maxLengths;
+            return GetMaxKeyLengths(sections);
         }
 
         private void PrintHelp(IEnumerable<Submodule> submodules, IEnumerable<Subcommand> subcommands, IEnumerable<Option> options) {
