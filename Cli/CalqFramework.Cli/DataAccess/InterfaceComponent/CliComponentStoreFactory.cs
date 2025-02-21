@@ -23,7 +23,7 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
         public bool AccessProperties { get; init; } = true;
         public BindingFlags BindingFlags { get; init; } = DefaultLookup;
 
-        public IClassMemberStringifier ClassMemberStringifier { get; }
+        public IClassMemberStringifier ClassMemberStringifier { get; init; }
 
         public BindingFlags MethodBindingFlags {
             get => _methodBindingFlags == null ? BindingFlags : (BindingFlags)_methodBindingFlags;
