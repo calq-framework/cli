@@ -1,7 +1,11 @@
 ﻿using CalqFramework.Cli;
 using System.Text.Json;
 
-var result = new CommandLineInterface().Execute(new Classlib());
+var result = new CommandLineInterface().Execute(new CloudProviderCLI.RootModule());
 if (result != null) {
-    Console.WriteLine(JsonSerializer.Serialize(result));
+    if (result is string) {
+        Console.WriteLine(result);
+    } else {
+        Console.WriteLine(JsonSerializer.Serialize(result));
+    }
 }
