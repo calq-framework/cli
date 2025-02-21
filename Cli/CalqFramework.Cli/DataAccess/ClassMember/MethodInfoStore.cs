@@ -61,7 +61,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
         }
 
         private bool ContainsAccessor(MethodInfo accessor) {
-            return accessor is not null && accessor.DeclaringType == ParentType && !IsDotnetSpecific(accessor);
+            return accessor.ReflectedType == ParentType && !IsDotnetSpecific(accessor);
         }
 
         private IDictionary<string, MethodInfo> GetAccessorsByNames() {

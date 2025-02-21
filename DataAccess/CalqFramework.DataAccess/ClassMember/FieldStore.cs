@@ -9,7 +9,7 @@ namespace CalqFramework.DataAccess.ClassMember {
         }
 
         public override bool ContainsAccessor(FieldInfo accessor) {
-            return accessor is not null && accessor.DeclaringType == ParentType;
+            return accessor.ReflectedType == ParentType;
         }
 
         public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out FieldInfo result) {
