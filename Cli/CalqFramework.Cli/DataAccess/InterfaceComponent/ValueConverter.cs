@@ -7,7 +7,7 @@ using CalqFramework.DataAccess;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
 
-    internal class OptionConverter : IValueConverter<string?> {
+    public class ValueConverter : IValueConverter<string?> {
 
         public string? ConvertFromInternalValue(object? value, Type internalType) {
             if (value == null) {
