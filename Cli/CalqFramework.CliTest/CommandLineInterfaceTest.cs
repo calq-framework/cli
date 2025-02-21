@@ -146,7 +146,7 @@ namespace CalqFramework.CliTest {
             CliException ex = Assert.Throws<CliException>(() => {
                 var tool = new SomeClassLibrary();
                 new CommandLineInterface() {
-                    CliOptionsStoreFactory = new CliComponentStoreFactory { BindingFlags = CliComponentStoreFactory.DefaultLookup }
+                    CliComponentStoreFactory = new CliComponentStoreFactory { BindingFlags = CliComponentStoreFactory.DefaultLookup }
                 }.Execute(tool, $"{StringHelper.GetKebabCase(nameof(SomeClassLibrary.Method)).ToUpper()}".Split(' '));
             });
             Assert.Equal("invalid command", ex.Message);
