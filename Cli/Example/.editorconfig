@@ -1,0 +1,7 @@
+# editorconfig.org
+
+# .NET runtime .editorconfig settings
+# https://github.com/dotnet/runtime/blob/main/.editorconfig
+
+# top-most EditorConfig file
+root = true
