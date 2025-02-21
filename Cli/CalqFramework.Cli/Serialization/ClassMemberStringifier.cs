@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace CalqFramework.Cli.Serialization {
 
@@ -13,9 +14,10 @@ namespace CalqFramework.Cli.Serialization {
                 }
             }
             if (!cliNameAttributes.Any()) {
-                keys.Add(name);
-                if (name.Length != 1) {
-                    keys.Add(name[0].ToString());
+                var kebabName = GetKebabCase(name);
+                keys.Add(kebabName);
+                if (kebabName.Length != 1) {
+                    keys.Add(kebabName[0].ToString());
                 }
             }
             return keys;
@@ -27,9 +29,18 @@ namespace CalqFramework.Cli.Serialization {
                 keys.Add(cliNameAttribute.Name);
             }
             if (!keys.Any()) {
-                keys.Add(name);
+                keys.Add(GetKebabCase(name));
             }
+
             return keys;
+        }
+
+        protected string GetKebabCase(string value) {
+            value = Regex.Replace(value, "([a-z0-9])([A-Z])", "$1-$2");
+            value = Regex.Replace(value, "([a-zA-Z0-9])([A-Z][a-z])", "$1-$2");
+            value = Regex.Replace(value, "[. ]", "-");
+            value = value.ToLower();
+            return value;
         }
     }
 }
