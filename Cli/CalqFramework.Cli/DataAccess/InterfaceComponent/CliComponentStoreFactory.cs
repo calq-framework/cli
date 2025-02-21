@@ -13,41 +13,42 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
             AccessFields = true;
             BindingFlags = DefaultLookup | BindingFlags.IgnoreCase;
             ClassMemberStringifier = new ClassMemberStringifier();
+            ValueConverter = new ValueConverter();
         }
 
         public bool AccessFields { get; init; } = false;
         public bool AccessProperties { get; init; } = true;
         public BindingFlags BindingFlags { get; init; } = DefaultLookup;
 
+        public IClassMemberStringifier ClassMemberStringifier { get; }
+
         public BindingFlags MethodBindingFlags {
             get => _methodBindingFlags == null ? BindingFlags : (BindingFlags)_methodBindingFlags;
             init => _methodBindingFlags = value;
         }
-
-        public IClassMemberStringifier ClassMemberStringifier { get; }
+        public IValueConverter<string?> ValueConverter { get; init; }
 
         public IOptionStore CreateOptionStore(object obj) {
             var cliValidator = new OptionAccessorValidator();
-            var converter = new OptionConverter();
             ICliKeyValueStore<string, string?, MemberInfo> store;
             if (AccessFields && AccessProperties) {
-                store = CreateFieldAndPropertyStore(obj, cliValidator, converter);
+                store = CreateFieldAndPropertyStore(obj, cliValidator, ValueConverter);
             } else if (AccessFields) {
-                store = CreateFieldStore(obj, cliValidator, converter);
+                store = CreateFieldStore(obj, cliValidator, ValueConverter);
             } else if (AccessProperties) {
-                store = CreatePropertyStore(obj, cliValidator, converter);
+                store = CreatePropertyStore(obj, cliValidator, ValueConverter);
             } else {
                 throw new ArgumentException("Neither AccessFields nor AccessProperties is set.");
             }
             return new OptionStore(store);
         }
 
-        public ISubcommandExecutor CreateSubcommandExecutor(MethodInfo methodInfo, object? obj) {
-            return new SubcommandExecutor(new MethodExecutor(methodInfo, obj, BindingFlags, ClassMemberStringifier));
+        public ISubcommandExecutor CreateSubcommandExecutor(MethodInfo method, object? obj) {
+            return new SubcommandExecutor(new MethodExecutor<string?>(method, obj, BindingFlags, ClassMemberStringifier, ValueConverter));
         }
 
-        public ISubcommandExecutorWithOptions CreateSubcommandExecutorWithOptions(MethodInfo cliAction, object obj) {
-            return new SubcommandExecutorWithOptions(CreateSubcommandExecutor(cliAction, obj), CreateOptionStore(obj));
+        public ISubcommandExecutorWithOptions CreateSubcommandExecutorWithOptions(MethodInfo method, object obj) {
+            return new SubcommandExecutorWithOptions(CreateSubcommandExecutor(method, obj), CreateOptionStore(obj));
         }
 
         public ISubcommandStore CreateSubcommandStore(object obj) {
@@ -56,7 +57,7 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
 
         public ISubmoduleStore CreateSubmoduleStore(object obj) {
             var cliValidator = new SubmoduleAccessorValidator();
-            var converter = new SubmoduleConverter();
+            var converter = new ReadOnlyPassThroughConverter();
             ICliKeyValueStore<string, object?, MemberInfo> store;
             if (AccessFields && AccessProperties) {
                 store = CreateFieldAndPropertyStore(obj, cliValidator, converter);

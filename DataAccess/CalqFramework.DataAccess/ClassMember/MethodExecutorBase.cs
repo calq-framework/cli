@@ -11,10 +11,26 @@ namespace CalqFramework.DataAccess.ClassMember {
                 ParameterValues[j] = DBNull.Value;
             }
         }
-
         public object? ParentObject { get; }
+
         protected List<TParameterValue> Arguments { get; }
 
+        public override object? this[ParameterInfo accessor] {
+            get {
+                var result = base[accessor];
+                if (result != null && result is DBNull) {
+                    if (accessor.HasDefaultValue) {
+                        result = accessor.DefaultValue;
+                    } else {
+                        result = null;
+                    }
+                }
+                return result;
+            }
+            set {
+                base[accessor] = value;
+            }
+        }
         public void AddArgument(TParameterValue value) {
             Arguments.Add(value);
         }
