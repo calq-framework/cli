@@ -23,7 +23,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
         private IValueConverter<TValue> ValueConverter { get; }
 
         public override bool ContainsAccessor(FieldInfo accessor) {
-            return accessor is not null && accessor.DeclaringType == ParentType && CliValidator.IsValid(accessor);
+            return accessor.ReflectedType == ParentType && CliValidator.IsValid(accessor);
         }
 
         public IDictionary<MemberInfo, IEnumerable<string>> GetKeysByAccessors() {
