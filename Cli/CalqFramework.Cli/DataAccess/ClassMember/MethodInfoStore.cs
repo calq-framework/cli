@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using CalqFramework.Cli.Serialization;
 using CalqFramework.DataAccess;
 
@@ -11,15 +10,17 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
 
     internal class MethodInfoStore : IReadOnlyKeyValueStore<string, MethodInfo?>, ICliReadOnlyKeyValueStore<string, MethodInfo?, MethodInfo> {
 
-        public MethodInfoStore(object obj, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier) {
+        public MethodInfoStore(object obj, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier, IAccessorValidator accessorValidator) {
             ParentObject = obj;
             BindingFlags = bindingFlags;
             ClassMemberStringifier = classMemberStringifier;
+            AubcommandAccessorValidator = accessorValidator;
             ParentType = obj.GetType();
             AccessorsByNames = GetAccessorsByNames();
         }
 
         public IEnumerable<MethodInfo> Accessors => ParentType.GetMethods(BindingFlags).Where(ContainsAccessor);
+        public IAccessorValidator AubcommandAccessorValidator { get; }
         protected BindingFlags BindingFlags { get; }
         protected IClassMemberStringifier ClassMemberStringifier { get; }
         protected object ParentObject { get; }
@@ -56,12 +57,8 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
             return AccessorsByNames.TryGetValue(key, out result);
         }
 
-        private static bool IsDotnetSpecific(MethodInfo methodInfo) {
-            return methodInfo.DeclaringType == typeof(object) || methodInfo.GetCustomAttributes<CompilerGeneratedAttribute>().Any();
-        }
-
         private bool ContainsAccessor(MethodInfo accessor) {
-            return accessor.ReflectedType == ParentType && !IsDotnetSpecific(accessor);
+            return accessor.ReflectedType == ParentType && AubcommandAccessorValidator.IsValid(accessor);
         }
 
         private IDictionary<string, MethodInfo> GetAccessorsByNames() {
