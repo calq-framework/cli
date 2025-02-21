@@ -14,6 +14,9 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
             BindingFlags = DefaultLookup | BindingFlags.IgnoreCase;
             ClassMemberStringifier = new ClassMemberStringifier();
             ValueConverter = new ValueConverter();
+            OptionAccessorValidator = new OptionAccessorValidator();
+            SubmoduleAccessorValidator = new SubmoduleAccessorValidator();
+            SubcommandAccessorValidator = new SubcommandAccessorValidator();
         }
 
         public bool AccessFields { get; init; } = false;
@@ -26,17 +29,18 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
             get => _methodBindingFlags == null ? BindingFlags : (BindingFlags)_methodBindingFlags;
             init => _methodBindingFlags = value;
         }
+        public IAccessorValidator OptionAccessorValidator { get; init; }
+        public IAccessorValidator SubcommandAccessorValidator { get; init; }
+        public IAccessorValidator SubmoduleAccessorValidator { get; init; }
         public IValueConverter<string?> ValueConverter { get; init; }
-
         public IOptionStore CreateOptionStore(object obj) {
-            var cliValidator = new OptionAccessorValidator();
             ICliKeyValueStore<string, string?, MemberInfo> store;
             if (AccessFields && AccessProperties) {
-                store = CreateFieldAndPropertyStore(obj, cliValidator, ValueConverter);
+                store = CreateFieldAndPropertyStore(obj, OptionAccessorValidator, ValueConverter);
             } else if (AccessFields) {
-                store = CreateFieldStore(obj, cliValidator, ValueConverter);
+                store = CreateFieldStore(obj, OptionAccessorValidator, ValueConverter);
             } else if (AccessProperties) {
-                store = CreatePropertyStore(obj, cliValidator, ValueConverter);
+                store = CreatePropertyStore(obj, OptionAccessorValidator, ValueConverter);
             } else {
                 throw new ArgumentException("Neither AccessFields nor AccessProperties is set.");
             }
@@ -52,19 +56,18 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
         }
 
         public ISubcommandStore CreateSubcommandStore(object obj) {
-            return new SubcommandStore(new MethodInfoStore(obj, MethodBindingFlags, ClassMemberStringifier));
+            return new SubcommandStore(new MethodInfoStore(obj, MethodBindingFlags, ClassMemberStringifier, SubcommandAccessorValidator));
         }
 
         public ISubmoduleStore CreateSubmoduleStore(object obj) {
-            var cliValidator = new SubmoduleAccessorValidator();
             var converter = new ReadOnlyPassThroughConverter();
             ICliKeyValueStore<string, object?, MemberInfo> store;
             if (AccessFields && AccessProperties) {
-                store = CreateFieldAndPropertyStore(obj, cliValidator, converter);
+                store = CreateFieldAndPropertyStore(obj, SubmoduleAccessorValidator, converter);
             } else if (AccessFields) {
-                store = CreateFieldStore(obj, cliValidator, converter);
+                store = CreateFieldStore(obj, SubmoduleAccessorValidator, converter);
             } else if (AccessProperties) {
-                store = CreatePropertyStore(obj, cliValidator, converter);
+                store = CreatePropertyStore(obj, SubmoduleAccessorValidator, converter);
             } else {
                 throw new ArgumentException("Neither AccessFields nor AccessProperties is set.");
             }

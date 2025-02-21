@@ -21,35 +21,6 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
         protected IClassMemberStringifier ClassMemberStringifier { get; }
         private IDictionary<string, ParameterInfo> AccessorsByNames { get; }
         private IValueConverter<TValue> ValueConverter { get; }
-        //public override object? this[ParameterInfo accessor] {
-        //    get {
-        //        object? result = null;
-        //        Type type = GetDataType(accessor);
-        //        bool isCollection = type.GetInterface(nameof(ICollection)) != null;
-        //        if (isCollection == false) {
-        //            result = base[accessor];
-        //            if (result is DBNull && accessor.HasDefaultValue) {
-        //                result = accessor.DefaultValue;
-        //            }
-        //        } else {
-        //            ICollection collection = (GetValueOrInitialize(accessor) as ICollection)!;
-        //            if (collection.Count > 0) {
-        //                result = collection;
-        //            }
-        //        }
-        //        return result;
-        //    }
-        //    set {
-        //        Type type = GetDataType(accessor);
-        //        bool isCollection = type.GetInterface(nameof(ICollection)) != null;
-        //        if (isCollection == false) {
-        //            base[accessor] = value;
-        //        } else {
-        //            ICollection collection = (GetValueOrInitialize(accessor) as ICollection)!;
-        //            new CollectionStore(collection).AddValue(value);
-        //        }
-        //    }
-        //}
 
         public override bool ContainsAccessor(ParameterInfo accessor) {
             return accessor.Member == ParentMethod;
