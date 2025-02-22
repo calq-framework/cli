@@ -1,5 +1,4 @@
 using System;
-using CalqFramework.Cli.Serialization; // for CliName
 
 namespace CloudProviderCLI {
     // Compute-specific result records
@@ -26,20 +25,17 @@ namespace CloudProviderCLI {
     /// <summary>Base class for all CLI submodules.</summary>
     public abstract class SubmoduleBase {
         /// <summary>API Key used to auth the command.</summary>
-        public string? ApiKey { get; set; } = System.IO.File.Exists(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "EXAMPLE_CLOUD_PROVIDER_API_KEY.txt"))
-            ? System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "EXAMPLE_CLOUD_PROVIDER_API_KEY.txt"))
+        public string? ApiKey { get; set; } = System.IO.File.Exists(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "calq.cli.example.txt"))
+            ? System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "calq.cli.example.txt"))
             : null;
     }
 
     /// <summary>Everything should just work even if any class or its contents are refactored.</summary>
     public class RootModule : SubmoduleBase {
-        /// <summary>Permanently saves api key into EXAMPLE_CLOUD_PROVIDER_API_KEY.txt in the user dir.</summary>
-        [CliName("SetApiKey")]
-        [CliName("a")]
-        public void SetApiKey(string apiKey) => System.IO.File.WriteAllText(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "EXAMPLE_CLOUD_PROVIDER_API_KEY.txt"), apiKey);
-        /// <summary>Removes EXAMPLE_CLOUD_PROVIDER_API_KEY.txt</summary>
-        public void RemoveApiKey() => System.IO.File.Delete(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "EXAMPLE_CLOUD_PROVIDER_API_KEY.txt"));
-
+        /// <summary>Permanently saves api key into calq.cli.example.txt in the user dir.</summary>
+        public void Add(string key) => System.IO.File.WriteAllText(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "calq.cli.example.txt"), key);
+        /// <summary>Removes calq.cli.example.txt</summary>
+        public void Remove() => System.IO.File.Delete(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "calq.cli.example.txt"));
         /// <summary>Compute submodule.</summary>
         public ComputeModule Compute { get; set; } = new ComputeModule();
         /// <summary>Storage submodule.</summary>
