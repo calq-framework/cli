@@ -1,176 +1,72 @@
 # CalqFramework.Cli
-CalqFramework.Cli helps to convert libraries into command-line tools compliant with GNU (and POSIX) [conventions](https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html). CalqFramework.Cli exposes class data members and methods as commands, enabling users to interact with class instances via auto-generated CLI.
+CalqFramework.Cli helps convert .NET libraries into command-line tools. It interprets CLI commands, making it possible to operate on any library directly from the command line with no programming required, through a fully customizable CLI.  
 
-## Features
-- **Method invocation**: Executes class methods with regular and optional parameters, both treated also as positional arguments.
-- **Parameter types**: Supports primitive types (integer, boolean, double, etc.), strings, and collections.
-- **GNU-style options**: Handles GNU-style options (e.g., ```--text```, ```--integer```) adhering to POSIX conventions for command-line arguments.
-- **Value validation**: Ensures the correctness of parameter values with validation based on parameter types.
-- **Help information**: Obtains help information based on reflection, providing available commands, their parameters, and global options. (TODO: extract help information from documentation)
+## Key Feature
+### No programming required.
+Cli should be able to interpret any classlib without any configuration.  
+The default configuration follows GNU (and POSIX) [conventions](https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html) and should work out of the box with few limitations.  
+Support for overloaded methods and any other missing features is under consideration.
+
+## Customization Features
+The following modules are easily customizable through configuration and/or interface implementation.
+### API Stringification
+The default stringifier uses kebab-case conversion, with support for multi-aliasing through CliNameAttribute.
+### Case-sensitive/insensitive API Access Validation
+Access can be configured through BindingFlags settings and MemberInfo validators.
+### Value Conversion/Validation
+Strings, primitive types, and IList types are supported by a single converter that validates all values.
+### Option Parsing
+In addition to short and long options, negative options are supported using '+' and '++'.
+### API Access
+The default accessors for fields, properties, and methods rely on all the modules mentioned above.
+### Help Menu
+Help printer interface receives all the context from accessors, making custom implementations failproof.  
+Descriptions for the help menu can be provided using XML documentation or custom IHelpPrinter.  
+Default CliDescriptionAttribute is under consideration.
 
 ## Usage
-
-### Example tool
+CliNameAttribute isn't necessary.  
+No specific coding convention is necessary.  
+  
+The following will interpret the command-line arguments, execute any underlying API, and return the result.
 ```csharp
-var result = CommandLineInterface.Execute(new Classlib());
-if (result != null) {
-    Console.WriteLine(JsonSerializer.Serialize(result));
-}
+var result = new CommandLineInterface.Execute(new Classlib());
 ```
-
-### Example class library
+It's also possible to simply populate any object.
 ```csharp
-public class Classlib {
-    [ShortName('x')] // default 'e'
-    public bool Enable { get; set; }
+var settings = new Settings();
+OptionDeserializer.Deserialize(settings)
+```
+To enable descriptions based on XML documentation, add the following to the project file.
+```
+<PropertyGroup>
+  <GenerateDocumentationFile>true</GenerateDocumentationFile>
+</PropertyGroup>
+```
+### Demo Example
+[https://github.com/calq-framework/cli/tree/main/Cli/Example](https://github.com/calq-framework/cli/tree/main/Cli/Example)
 
-    [Name("verbose")] // default "VerboseMode"
-    public bool VerboseMode { get; set; }
+### Quick Start
+```csharp
+using CalqFramework.Cli;
+using CalqFramework.Cli.Serialization;
+using System.Text.Json;
 
-    public Nested Nested { get; } = new();
+var result = new CommandLineInterface().Execute(new QuickStart());
+if (result != null)  Console.WriteLine(JsonSerializer.Serialize(result));
 
-    public void Option(string opt1, string opt2) {
-        Console.WriteLine($"Option with options: {opt1}, {opt2}");
-    }
-
-    public void Collection(List<int> numbers) {
-        Console.WriteLine($"Collection with numbers: {string.Join(", ", numbers)}");
-    }
-
-    public void Feature() {
-        Console.WriteLine($"Feature with Enable set to: {Enable}");
-    }
-
-    public void Verbose() {
-        Console.WriteLine($"Verbose with VerboseMode set to: {VerboseMode}");
-    }
-
-    /// <summary>
-    /// Method with optional parameters.
-    /// </summary>
-    public void Stacked(bool all = false, bool be = false, bool created = false) {
-        Console.WriteLine($"Stacked with options: {all}, {be}, {created}");
-    }
-
-    public object Return() {
-        return new {
-            enable = Enable
-        };
-    }
+/// <summary>Displayed in the help menu.</summary>
+class QuickStart {
+    /// <summary>Displayed in the help menu.</summary>
+    public SubStart Submodule { get; } = new SubStart();
+    public void QuickRun() {}
 }
-
-public class Nested {
-    public DoubleNested DoubleNested { get; } = new();
-
-    public void Command1(string text) {
-        Console.WriteLine($"Command1 with text: {text}");
-    }
-
-    public void Command2(int number) {
-        Console.WriteLine($"Command2 with number: {number}");
-    }
+class SubStart {
+    public string DefaultValue { get; set; } = "optional";
+    [CliName("sub-run")]
+    [CliName("r")]
+    public QuickResult SubRun(int requiredParameter, int optionalParameter = 1)
+        => new QuickResult(DefaultValue, requiredParameter, optionalParameter);
 }
-
-public class DoubleNested {
-    public void Command(string option) {
-        Console.WriteLine($"Command with option: {option}");
-    }
-}
-
+public record QuickResult(string s, int a, int b);
 ```
-
-### Example usage from command-line
-
-```
-dotnet Example.dll --help
-```
->[DESCRIPTION]<br/>
->Method with optional parameters.<br/>
-><br/>
->[CORE COMMANDS]<br/>
->nested<br/>
-><br/>
->[ACTION COMMANDS]<br/>
->option(string opt1, string opt2)<br/>
->collection(list\<int32\> numbers)<br/>
->feature()<br/>
->verbose()<br/>
->stacked(boolean all = false, boolean be = false, boolean created = false)<br/>
-><br/>
->[OPTIONS]<br/>
->-x, --enable # boolean (false)<br/>
->-v, --verbose # boolean (false)<br/>
-```
-dotnet Example.dll nested --help
-```
->[CORE COMMANDS]<br/>
->doublenested<br/>
-><br/>
->[ACTION COMMANDS]<br/>
->command1(string text)<br/>
->command2(int32 number)<br/>
-><br/>
->[OPTIONS]<br/>
-```
-dotnet Example.dll stacked --help
-```
->[POSITIONAL PARAMETERS]<br/>
->-a, --all # boolean (false)<br/>
->-b, --be # boolean (false)<br/>
->-c, --created # boolean (false)<br/>
-><br/>
->[OPTIONS]<br/>
->-x, --enable # boolean (false)<br/>
->-v, --verbose # boolean (false)<br/>
-```
-dotnet Example.dll nested command1 --text Hello
-```
->Command1 with text: Hello
-```
-dotnet Example.dll nested command2 --number 42
-```
->Command2 with number: 42
-```
-dotnet Example.dll nested doublenested command --option abc
-```
->Command with option: abc
-```
-dotnet Example.dll option --opt1 value1 --opt2 value2
-```
->Option with options: value1, value2
-```
-dotnet Example.dll option value1 value2
-```
->Option with options: value1, value2
-```
-dotnet Example.dll option -- --value1 -value2
-```
->Option with options: --value1, -value2
-```
-dotnet Example.dll collection --numbers 1 --numbers 2 --numbers 3
-```
->Collection with numbers: 1, 2, 3
-```
-dotnet Example.dll feature --enable
-```
->Feature with Enable set to: True
-```
-dotnet Example.dll feature -x
-```
->Feature with Enable set to: True
-```
-dotnet Example.dll verbose --verbose
-```
->Verbose with VerboseMode set to: True
-```
-dotnet Example.dll stacked -abc
-```
->Stacked with options: True, True, True
-```
-dotnet Example.dll stacked +abc
-```
->Stacked with options: False, False, False
-```
-dotnet Example.dll return -x
-```
->{"enable":true}
