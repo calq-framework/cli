@@ -19,7 +19,7 @@ namespace CalqFramework.Cli.Parsing {
             ValueUnassigned = 4,
             NotAnOption = 8 + ValueUnassigned,
             Unknown = 16 + ValueUnassigned,
-            AmbigousValue = 32 + ValueUnassigned // ambiguous value (starts with '-')
+            AmbigousValue = 32 + ValueUnassigned // ambiguous value (starts with '-' or '+')
         }
 
         public IEnumerator<string> ArgsEnumerator { get; }
@@ -36,13 +36,15 @@ namespace CalqFramework.Cli.Parsing {
                 }
                 if (type == typeof(bool)) {
                     value = optionAttr.HasFlag(OptionFlags.Plus) ? "false" : "true";
-                    optionAttr ^= OptionFlags.AmbigousValue; // assume OptionFlags.AmbigousValue is set, assume AmbigousValue = 32 + ValueUnassigned
+                    optionAttr |= OptionFlags.AmbigousValue;
+                    optionAttr ^= OptionFlags.AmbigousValue;
                 }
             }
 
-            (string option, string value) ExtractOptionValuePair(string arg, OptionFlags optionAttr) {
+            (string option, string value, bool assigned) ExtractOptionValuePair(string arg, OptionFlags optionAttr) {
                 string[] optionValueSplit = arg.Split('=', 2);
                 string value = optionValueSplit.Length == 1 ? "" : optionValueSplit[1];
+                bool assigned = optionValueSplit.Length != 1;
 
                 string option;
                 if (optionAttr.HasFlag(OptionFlags.Short)) {
@@ -51,7 +53,7 @@ namespace CalqFramework.Cli.Parsing {
                     option = optionValueSplit[0][2..];
                 }
 
-                return (option, value);
+                return (option, value, assigned);
             }
 
             IEnumerable<char> ReadShort(string stackedOptions) {
@@ -95,15 +97,15 @@ namespace CalqFramework.Cli.Parsing {
                         continue;
                 }
 
-                (string option, string value) = ExtractOptionValuePair(arg, optionAttr);
-                if (value == "") {
+                (string option, string value, bool assigned) = ExtractOptionValuePair(arg, optionAttr);
+                if (!assigned) {
                     moved = ArgsEnumerator.MoveNext();
                     if (moved) {
-                        if (ArgsEnumerator.Current[0] != '-' || IsNumber(ArgsEnumerator.Current)) {
+                        if (ArgsEnumerator.Current == "" || (ArgsEnumerator.Current[0] != '-' && ArgsEnumerator.Current[0] != '+') || IsNumber(ArgsEnumerator.Current)) {
                             value = ArgsEnumerator.Current;
                             moved = false;
                         } else {
-                            optionAttr |= OptionFlags.AmbigousValue; // fail if starts with '-' to prevent human error
+                            optionAttr |= OptionFlags.AmbigousValue;
                         }
                     } else {
                         optionAttr |= OptionFlags.ValueUnassigned;

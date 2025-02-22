@@ -225,8 +225,9 @@ namespace CalqFramework.Cli.Serialization {
             }
 
             if (hasDefaultValue) {
-                defaultValue = type == typeof(string) ? $"'{defaultValue}'" : defaultValue;
-                parts.Add($"(Default:  {defaultValue})");
+                defaultValue = type == typeof(string) && defaultValue != null ? $"'{defaultValue}'" : defaultValue;
+                defaultValue = defaultValue == null ? "NULL" : defaultValue;
+                parts.Add($"(Default: {defaultValue})");
             }
 
             if (!string.IsNullOrWhiteSpace(summary)) {

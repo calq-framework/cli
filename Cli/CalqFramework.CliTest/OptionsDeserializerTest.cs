@@ -4,7 +4,7 @@ using Xunit;
 
 namespace CalqFramework.CliTest {
 
-    public class CliOptionsDeserializerTest {
+    public class OptionsDeserializerTest {
 
         [Fact]
         public void Deserialize_ArgumentsWithDoubleDashDelimiter_IgnoresOptionsAfterDelimiter() {
