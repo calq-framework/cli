@@ -11,7 +11,7 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
 
         public string? ConvertFromInternalValue(object? value, Type internalType) {
             if (value == null) {
-                return "NULL";
+                return null;
             }
 
             bool isCollection = internalType.GetInterface(nameof(ICollection)) != null;
@@ -25,7 +25,7 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
 
         public object? ConvertToInternalValue(string? value, Type internalType, object? currentValue) {
             if (value == null) {
-                return value;
+                return null;
             }
 
             bool isCollection = internalType.GetInterface(nameof(ICollection)) != null;

@@ -60,7 +60,7 @@ namespace CalqFramework.Cli {
                     return HelpPrinter.PrintHelp(obj.GetType(), submoduleStore.GetSubmodules(), subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor), optionSore.GetOptions());
                 } else {
                     ISubmoduleStore parentSubmoduleStore = CliComponentStoreFactory.CreateSubmoduleStore(parentSubmodule!);
-                    var submoduleInfo = parentSubmoduleStore.GetSubmodules().Where(x => parentSubmoduleStore.ContainsKey(submoduleName!)).First(); // use the store to check for the key to comply with case sensitivity
+                    var submoduleInfo = parentSubmoduleStore.GetSubmodules().Where(x => parentSubmoduleStore[x.Keys.First()] == submodule).First(); // use the store to check for the key to comply with case sensitivity
                     return HelpPrinter.PrintHelp(obj.GetType(), submoduleInfo, submoduleStore.GetSubmodules(), subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor), optionSore.GetOptions());
                 }
             }
@@ -94,7 +94,13 @@ namespace CalqFramework.Cli {
             var optionReader = new OptionReader(args, subcommandExecutorWithOptions);
 
             foreach ((string option, string value, OptionFlags optionAttr) in optionReader.Read()) {
+                if (optionAttr.HasFlag(OptionFlags.AmbigousValue)) {
+                    throw new CliException($"Ambigious value {optionReader.ArgsEnumerator.Current} for {option}. Use option=value format for values starting with '-' or '+'.");
+                }
                 if (optionAttr.HasFlag(OptionFlags.ValueUnassigned) && !optionAttr.HasFlag(OptionFlags.NotAnOption)) {
+                    throw new CliException($"{option} requires a value");
+                }
+                if (optionAttr.HasFlag(OptionFlags.Unknown)) {
                     if (SkipUnknown) {
                         continue;
                     }
