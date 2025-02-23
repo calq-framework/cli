@@ -107,7 +107,8 @@ namespace CalqFramework.Cli.Serialization {
                 }
                 return summary?.Trim() ?? (underlyingType != null ? GetSummary(underlyingType) : "");
             } catch (FileNotFoundException) {
-                throw new Exception($"Please add <GenerateDocumentationFile>true</GenerateDocumentationFile> to the csproj/fsproj file.");
+                // throw new Exception($"Please add <GenerateDocumentationFile>true</GenerateDocumentationFile> to the csproj/fsproj file.");
+                return "";
             }
         }
         private static string GetSummary(ParameterInfo parameterInfo) {
@@ -140,7 +141,8 @@ namespace CalqFramework.Cli.Serialization {
                 }
                 return summary?.Trim() ?? GetSummary(parameterInfo.ParameterType);
             } catch (FileNotFoundException) {
-                throw new Exception("Please add <GenerateDocumentationFile>true</GenerateDocumentationFile> to the csproj/fsproj file.");
+                // throw new Exception("Please add <GenerateDocumentationFile>true</GenerateDocumentationFile> to the csproj/fsproj file.");
+                return "";
             }
         }
 
@@ -172,7 +174,8 @@ namespace CalqFramework.Cli.Serialization {
                 }
                 return summary?.Trim() ?? "";
             } catch (FileNotFoundException) {
-                throw new Exception("Please add <GenerateDocumentationFile>true</GenerateDocumentationFile> to the csproj/fsproj file.");
+                // throw new Exception("Please add <GenerateDocumentationFile>true</GenerateDocumentationFile> to the csproj/fsproj file.");
+                return "";
             }
         }
 
@@ -191,6 +194,7 @@ namespace CalqFramework.Cli.Serialization {
                 return summary?.Trim() ?? "";
             } catch (FileNotFoundException) {
                 // throw new Exception("Please add <GenerateDocumentationFile>true</GenerateDocumentationFile> to the csproj/fsproj file.");
+                return "";
             }
 
             return "";
