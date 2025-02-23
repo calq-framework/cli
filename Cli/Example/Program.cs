@@ -1,7 +1,7 @@
 ﻿using CalqFramework.Cli;
 using System.Text.Json;
 
-var result = new CommandLineInterface().Execute(new CloudProviderCLI.RootModule());
+var result = new CommandLineInterface() { UseRevision = true }.Execute(new CloudProviderCLI.RootModule());
 if (result != null) {
     if (result is string) {
         Console.WriteLine(result);

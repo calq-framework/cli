@@ -19,7 +19,7 @@ namespace CalqFramework.Cli {
         public ICliComponentStoreFactory CliComponentStoreFactory { get; init; }
 
         public bool SkipUnknown { get; init; } = false;
-        public bool UseRevisionVersion { get; init; } = true;
+        public bool UseRevisionVersion { get; init; } = false;
         public IHelpPrinter HelpPrinter { get; init; }
 
         public object? Execute(object obj) {
@@ -48,7 +48,7 @@ namespace CalqFramework.Cli {
             }
 
             if (subcommandName == "--version" || subcommandName == "-v") {
-                return Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3);
+                return Assembly.GetEntryAssembly()?.GetName().Version?.ToString(UseRevisionVersion ? 4 : 3);
             }
 
             ISubcommandStore subcommandStore = CliComponentStoreFactory.CreateSubcommandStore(submodule);
