@@ -10,29 +10,25 @@ namespace CalqFramework.Cli.Serialization {
 
     // TODO DRY
     public class HelpPrinter : IHelpPrinter {
-        public object? PrintHelp(Type rootType, Submodule submodule, IEnumerable<Submodule> submodules, IEnumerable<Subcommand> subcommands, IEnumerable<Option> options) {
+        public void PrintHelp(Type rootType, Submodule submodule, IEnumerable<Submodule> submodules, IEnumerable<Subcommand> subcommands, IEnumerable<Option> options) {
             string description = GetSummary(submodule.MemberInfo);
             if (!string.IsNullOrEmpty(description)) {
                 Console.WriteLine(description);
                 Console.WriteLine();
             }
             PrintHelp(submodules, subcommands, options);
-
-            return null;
         }
 
-        public object? PrintHelp(Type rootType, IEnumerable<Submodule> submodules, IEnumerable<Subcommand> subcommands, IEnumerable<Option> options) {
+        public void PrintHelp(Type rootType, IEnumerable<Submodule> submodules, IEnumerable<Subcommand> subcommands, IEnumerable<Option> options) {
             var rootDescription = GetSummary(rootType);
             if (!string.IsNullOrEmpty(rootDescription)) {
                 Console.WriteLine(rootDescription);
                 Console.WriteLine();
             }
             PrintHelp(submodules, subcommands, options);
-
-            return null;
         }
 
-        public object? PrintSubcommandHelp(Type rootType, Subcommand subcommand, IEnumerable<Option> options) {
+        public void PrintSubcommandHelp(Type rootType, Subcommand subcommand, IEnumerable<Option> options) {
             PrintSubcommandDescription(subcommand);
             var sections = new SectionInfo[] {
                 new() {
@@ -45,8 +41,6 @@ namespace CalqFramework.Cli.Serialization {
                 },
             };
             PrintSections(sections);
-
-            return null;
         }
 
         private void PrintSubcommandDescription(Subcommand subcommand) {
