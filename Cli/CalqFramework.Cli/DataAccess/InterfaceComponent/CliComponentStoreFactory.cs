@@ -16,9 +16,9 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
             ClassMemberStringifier = new ClassMemberStringifier();
             EnableShadowing = false;
             ValueConverter = new ValueConverter();
-            OptionAccessorValidator = new OptionAccessorValidator();
-            SubmoduleAccessorValidator = new SubmoduleAccessorValidator();
-            SubcommandAccessorValidator = new SubcommandAccessorValidator();
+            OptionAccessValidator = new OptionAccessValidator();
+            SubmoduleAccessValidator = new SubmoduleAccessValidator();
+            SubcommandAccessValidator = new SubcommandAccessValidator();
         }
 
         public bool AccessFields { get; init; }
@@ -30,18 +30,18 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
             get => _methodBindingFlags == null ? BindingFlags : (BindingFlags)_methodBindingFlags;
             init => _methodBindingFlags = value;
         }
-        public IAccessorValidator OptionAccessorValidator { get; init; }
-        public IAccessorValidator SubcommandAccessorValidator { get; init; }
-        public IAccessorValidator SubmoduleAccessorValidator { get; init; }
+        public IAccessValidator OptionAccessValidator { get; init; }
+        public IAccessValidator SubcommandAccessValidator { get; init; }
+        public IAccessValidator SubmoduleAccessValidator { get; init; }
         public IValueConverter<string?> ValueConverter { get; init; }
         public IOptionStore CreateOptionStore(object obj) {
             ICliKeyValueStore<string, string?, MemberInfo> store;
             if (AccessFields && AccessProperties) {
-                store = CreateFieldAndPropertyStore(obj, OptionAccessorValidator, ValueConverter);
+                store = CreateFieldAndPropertyStore(obj, OptionAccessValidator, ValueConverter);
             } else if (AccessFields) {
-                store = CreateFieldStore(obj, OptionAccessorValidator, ValueConverter);
+                store = CreateFieldStore(obj, OptionAccessValidator, ValueConverter);
             } else if (AccessProperties) {
-                store = CreatePropertyStore(obj, OptionAccessorValidator, ValueConverter);
+                store = CreatePropertyStore(obj, OptionAccessValidator, ValueConverter);
             } else {
                 throw new ArgumentException("Neither AccessFields nor AccessProperties is set.");
             }
@@ -57,33 +57,33 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
         }
 
         public ISubcommandStore CreateSubcommandStore(object obj) {
-            return new SubcommandStore(new MethodInfoStore(obj, MethodBindingFlags, ClassMemberStringifier, SubcommandAccessorValidator));
+            return new SubcommandStore(new MethodInfoStore(obj, MethodBindingFlags, ClassMemberStringifier, SubcommandAccessValidator));
         }
 
         public ISubmoduleStore CreateSubmoduleStore(object obj) {
             var converter = new ReadOnlyPassThroughConverter();
             ICliKeyValueStore<string, object?, MemberInfo> store;
             if (AccessFields && AccessProperties) {
-                store = CreateFieldAndPropertyStore(obj, SubmoduleAccessorValidator, converter);
+                store = CreateFieldAndPropertyStore(obj, SubmoduleAccessValidator, converter);
             } else if (AccessFields) {
-                store = CreateFieldStore(obj, SubmoduleAccessorValidator, converter);
+                store = CreateFieldStore(obj, SubmoduleAccessValidator, converter);
             } else if (AccessProperties) {
-                store = CreatePropertyStore(obj, SubmoduleAccessorValidator, converter);
+                store = CreatePropertyStore(obj, SubmoduleAccessValidator, converter);
             } else {
                 throw new ArgumentException("Neither AccessFields nor AccessProperties is set.");
             }
             return new SubmoduleStore(store);
         }
 
-        private ICliKeyValueStore<string, TValue, MemberInfo> CreateFieldAndPropertyStore<TValue>(object obj, IAccessorValidator cliValidator, IValueConverter<TValue> converter) {
+        private ICliKeyValueStore<string, TValue, MemberInfo> CreateFieldAndPropertyStore<TValue>(object obj, IAccessValidator cliValidator, IValueConverter<TValue> converter) {
             return new CliDualKeyValueStore<TValue>(CreateFieldStore(obj, cliValidator, converter), CreatePropertyStore(obj, cliValidator, converter));
         }
 
-        private ICliKeyValueStore<string, TValue, MemberInfo> CreateFieldStore<TValue>(object obj, IAccessorValidator cliValidator, IValueConverter<TValue> converter) {
+        private ICliKeyValueStore<string, TValue, MemberInfo> CreateFieldStore<TValue>(object obj, IAccessValidator cliValidator, IValueConverter<TValue> converter) {
             return new FieldStore<TValue>(obj, BindingFlags, ClassMemberStringifier, cliValidator, converter);
         }
 
-        private ICliKeyValueStore<string, TValue, MemberInfo> CreatePropertyStore<TValue>(object obj, IAccessorValidator cliValidator, IValueConverter<TValue> converter) {
+        private ICliKeyValueStore<string, TValue, MemberInfo> CreatePropertyStore<TValue>(object obj, IAccessValidator cliValidator, IValueConverter<TValue> converter) {
             return new PropertyStore<TValue>(obj, BindingFlags, ClassMemberStringifier, cliValidator, converter);
         }
     }

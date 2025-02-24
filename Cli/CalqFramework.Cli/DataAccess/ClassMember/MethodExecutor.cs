@@ -8,7 +8,7 @@ using CalqFramework.DataAccess.ClassMember;
 
 namespace CalqFramework.Cli.DataAccess.ClassMember {
 
-    public class MethodExecutor<TValue> : MethodExecutorBase<string, TValue>, ICliFunctionExecutor<string, TValue, ParameterInfo> {
+    internal class MethodExecutor<TValue> : MethodExecutorBase<string, TValue>, ICliFunctionExecutor<string, TValue, ParameterInfo> {
 
         public MethodExecutor(MethodInfo method, object? obj, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier, IValueConverter<TValue> valueConverter) : base(method, obj) {
             BindingFlags = bindingFlags;

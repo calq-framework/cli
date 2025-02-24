@@ -10,17 +10,17 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
 
     internal class MethodInfoStore : IReadOnlyKeyValueStore<string, MethodInfo?>, ICliReadOnlyKeyValueStore<string, MethodInfo?, MethodInfo> {
 
-        public MethodInfoStore(object obj, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier, IAccessorValidator accessorValidator) {
+        public MethodInfoStore(object obj, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier, IAccessValidator accessValidator) {
             ParentObject = obj;
             BindingFlags = bindingFlags;
             ClassMemberStringifier = classMemberStringifier;
-            AubcommandAccessorValidator = accessorValidator;
+            AubcommandAccessValidator = accessValidator;
             ParentType = obj.GetType();
             AccessorsByNames = GetAccessorsByNames();
         }
 
         public IEnumerable<MethodInfo> Accessors => ParentType.GetMethods(BindingFlags).Where(ContainsAccessor);
-        public IAccessorValidator AubcommandAccessorValidator { get; }
+        public IAccessValidator AubcommandAccessValidator { get; }
         protected BindingFlags BindingFlags { get; }
         protected IClassMemberStringifier ClassMemberStringifier { get; }
         protected object ParentObject { get; }
@@ -58,7 +58,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
         }
 
         private bool ContainsAccessor(MethodInfo accessor) {
-            return accessor.ReflectedType == ParentType && AubcommandAccessorValidator.IsValid(accessor);
+            return accessor.ReflectedType == ParentType && AubcommandAccessValidator.IsValid(accessor);
         }
 
         private IDictionary<string, MethodInfo> GetAccessorsByNames() {
