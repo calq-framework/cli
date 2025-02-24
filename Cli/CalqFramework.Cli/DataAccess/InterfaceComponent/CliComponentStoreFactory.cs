@@ -6,25 +6,26 @@ using CalqFramework.Cli.Serialization;
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
 
     public class CliComponentStoreFactory : ICliComponentStoreFactory {
-        public const BindingFlags DefaultLookup = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public;
+        public const BindingFlags DefaultLookup = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.IgnoreCase;
         private BindingFlags? _methodBindingFlags = null;
 
         public CliComponentStoreFactory() {
             AccessFields = true;
-            BindingFlags = DefaultLookup | BindingFlags.IgnoreCase;
+            AccessProperties = true;
+            BindingFlags = DefaultLookup;
             ClassMemberStringifier = new ClassMemberStringifier();
+            EnableShadowing = false;
             ValueConverter = new ValueConverter();
             OptionAccessorValidator = new OptionAccessorValidator();
             SubmoduleAccessorValidator = new SubmoduleAccessorValidator();
             SubcommandAccessorValidator = new SubcommandAccessorValidator();
         }
 
-        public bool AccessFields { get; init; } = false;
-        public bool AccessProperties { get; init; } = true;
-        public BindingFlags BindingFlags { get; init; } = DefaultLookup;
-
+        public bool AccessFields { get; init; }
+        public bool AccessProperties { get; init; }
+        public BindingFlags BindingFlags { get; init; }
         public IClassMemberStringifier ClassMemberStringifier { get; init; }
-
+        public bool EnableShadowing { get; init; }
         public BindingFlags MethodBindingFlags {
             get => _methodBindingFlags == null ? BindingFlags : (BindingFlags)_methodBindingFlags;
             init => _methodBindingFlags = value;
@@ -52,7 +53,7 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
         }
 
         public ISubcommandExecutorWithOptions CreateSubcommandExecutorWithOptions(MethodInfo method, object obj) {
-            return new SubcommandExecutorWithOptions(CreateSubcommandExecutor(method, obj), CreateOptionStore(obj));
+            return new SubcommandExecutorWithOptions(CreateSubcommandExecutor(method, obj), CreateOptionStore(obj)) { EnableShadowing = EnableShadowing };
         }
 
         public ISubcommandStore CreateSubcommandStore(object obj) {
