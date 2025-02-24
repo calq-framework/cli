@@ -40,7 +40,7 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
                     HasDefaultValue = key.HasDefaultValue
                 });
             }
-            return result;
+            return result.OrderBy(x => x.ParameterInfo.Position); // TODO consider IEnumerable<KeyValuePair<TAccessor, string[]>> for the whole project and ordering inside MethodExecutor
         }
 
         public string? GetValueOrInitialize(string key) {
