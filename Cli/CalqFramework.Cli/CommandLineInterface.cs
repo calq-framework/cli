@@ -18,10 +18,9 @@ namespace CalqFramework.Cli {
 
         public ICliComponentStoreFactory CliComponentStoreFactory { get; init; }
 
+        public IHelpPrinter HelpPrinter { get; init; }
         public bool SkipUnknown { get; init; } = false;
         public bool UseRevisionVersion { get; init; } = false;
-        public IHelpPrinter HelpPrinter { get; init; }
-
         public object? Execute(object obj) {
             return Execute(obj, Environment.GetCommandLineArgs().Skip(1));
         }
@@ -57,11 +56,13 @@ namespace CalqFramework.Cli {
                 IOptionStore optionSore = CliComponentStoreFactory.CreateOptionStore(submodule);
                 bool isRoot = submodule == obj;
                 if (isRoot) {
-                    return HelpPrinter.PrintHelp(obj.GetType(), submoduleStore.GetSubmodules(), subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor), optionSore.GetOptions());
+                    HelpPrinter.PrintHelp(obj.GetType(), submoduleStore.GetSubmodules(), subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor), optionSore.GetOptions());
+                    return ResultVoid.Value;
                 } else {
                     ISubmoduleStore parentSubmoduleStore = CliComponentStoreFactory.CreateSubmoduleStore(parentSubmodule!);
                     var submoduleInfo = parentSubmoduleStore.GetSubmodules().Where(x => parentSubmoduleStore[x.Keys.First()] == submodule).First(); // use the store to check for the key to comply with case sensitivity
-                    return HelpPrinter.PrintHelp(obj.GetType(), submoduleInfo, submoduleStore.GetSubmodules(), subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor), optionSore.GetOptions());
+                    HelpPrinter.PrintHelp(obj.GetType(), submoduleInfo, submoduleStore.GetSubmodules(), subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor), optionSore.GetOptions());
+                    return ResultVoid.Value;
                 }
             }
 
@@ -73,14 +74,20 @@ namespace CalqFramework.Cli {
                 string firstArg = en.Current;
 
                 if (firstArg == "--help" || firstArg == "-h") {
-                    return HelpPrinter.PrintSubcommandHelp(obj.GetType(), subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor).Where(x => x.MethodInfo == subcommand).First(), subcommandExecutorWithOptions.GetOptions());
+                    HelpPrinter.PrintSubcommandHelp(obj.GetType(), subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor).Where(x => x.MethodInfo == subcommand).First(), subcommandExecutorWithOptions.GetOptions());
+                    return ResultVoid.Value;
                 }
 
                 IEnumerator<string> skippedEn = GetSkippedEnumerator(en).GetEnumerator();
                 ReadParametersAndOptions(skippedEn, subcommandExecutorWithOptions);
             }
 
-            return subcommandExecutorWithOptions.Invoke();
+            var result = subcommandExecutorWithOptions.Invoke();
+            if (subcommand.ReturnType == typeof(void)) {
+                return ResultVoid.Value;
+            } else {
+                return result;
+            }
         }
 
         // TODO move as extension method or convert enumerator to enumerable

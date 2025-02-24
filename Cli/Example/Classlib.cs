@@ -33,7 +33,8 @@ namespace CloudProviderCLI {
     /// <summary>Everything should just work even if any class or its contents are refactored.</summary>
     public class RootModule : SubmoduleBase {
         /// <summary>Permanently saves api key into calq.cli.example.txt in the user dir.</summary>
-        public void Add(string key) => System.IO.File.WriteAllText(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "calq.cli.example.txt"), key);
+        /// <param name="ApiKey">Without shadowing enabled, throws error on use</param>
+        public void Add(string ApiKey) => System.IO.File.WriteAllText(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "calq.cli.example.txt"), ApiKey);
         /// <summary>Removes calq.cli.example.txt</summary>
         public void Remove() => System.IO.File.Delete(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "calq.cli.example.txt"));
         /// <summary>Compute submodule.</summary>

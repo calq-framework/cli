@@ -1,11 +1,21 @@
 ﻿using CalqFramework.Cli;
+using CalqFramework.Cli.DataAccess.InterfaceComponent;
+using System;
 using System.Text.Json;
 
-var result = new CommandLineInterface() { UseRevision = true }.Execute(new CloudProviderCLI.RootModule());
-if (result != null) {
-    if (result is string) {
-        Console.WriteLine(result);
-    } else {
-        Console.WriteLine(JsonSerializer.Serialize(result));
+var result = new CommandLineInterface() {
+    CliComponentStoreFactory = new CliComponentStoreFactory() {
+        EnableShadowing = true
     }
+}.Execute(new CloudProviderCLI.RootModule());
+
+switch (result) {
+    case ResultVoid:
+        break;
+    case string str:
+        Console.WriteLine(str);
+        break;
+    case object obj:
+        Console.WriteLine(JsonSerializer.Serialize(obj));
+        break;
 }
