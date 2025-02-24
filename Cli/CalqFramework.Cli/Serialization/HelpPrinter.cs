@@ -33,7 +33,7 @@ namespace CalqFramework.Cli.Serialization {
             var sections = new SectionInfo[] {
                 new() {
                     Title = "Parameters",
-                    ItemInfos = subcommand.Parameters.OrderBy(y => y.ParameterInfo.Position).Select(x => new ItemInfo() { Description = GetDescription(x), Keys = x.Keys.Select(x => GetOptionKey(x)).ToList() }).ToList()
+                    ItemInfos = subcommand.Parameters.Select(x => new ItemInfo() { Description = GetDescription(x), Keys = x.Keys.Select(x => GetOptionKey(x)).ToList() }).ToList()
                 },
                 new() {
                     Title = "Options",
