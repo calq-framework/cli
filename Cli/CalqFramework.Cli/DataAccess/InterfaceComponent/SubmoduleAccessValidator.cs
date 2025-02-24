@@ -5,7 +5,7 @@ using CalqFramework.Extensions.System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
 
-    public class SubmoduleAccessorValidator : IAccessorValidator {
+    public class SubmoduleAccessValidator : IAccessValidator {
 
         public bool IsValid(MemberInfo accessor) {
             return !ValueParser.IsParseable(accessor.GetUnderlyingType());

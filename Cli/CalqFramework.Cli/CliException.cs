@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.Serialization;
 
 namespace CalqFramework.Cli {
 
@@ -13,9 +12,6 @@ namespace CalqFramework.Cli {
         }
 
         public CliException(string? message, Exception? innerException) : base(message, innerException) {
-        }
-
-        protected CliException(SerializationInfo info, StreamingContext context) : base(info, context) {
         }
     }
 }

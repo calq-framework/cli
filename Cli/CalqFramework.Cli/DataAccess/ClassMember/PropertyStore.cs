@@ -10,20 +10,20 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
 
     internal class PropertyStore<TValue> : PropertyStoreBase<string, TValue>, ICliKeyValueStore<string, TValue, MemberInfo> {
 
-        public PropertyStore(object obj, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier, IAccessorValidator accessorValidator, IValueConverter<TValue> valueConverter) : base(obj, bindingFlags) {
+        public PropertyStore(object obj, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier, IAccessValidator accessValidator, IValueConverter<TValue> valueConverter) : base(obj, bindingFlags) {
             ClassMemberStringifier = classMemberStringifier;
-            AccessorValidator = accessorValidator;
+            AccessValidator = accessValidator;
             ValueConverter = valueConverter;
             AccessorsByNames = GetAccessorsByNames();
         }
 
         protected IClassMemberStringifier ClassMemberStringifier { get; }
         private IDictionary<string, PropertyInfo> AccessorsByNames { get; }
-        private IAccessorValidator AccessorValidator { get; }
+        private IAccessValidator AccessValidator { get; }
         private IValueConverter<TValue> ValueConverter { get; }
 
         public override bool ContainsAccessor(PropertyInfo accessor) {
-            return accessor.ReflectedType == ParentType && AccessorValidator.IsValid(accessor);
+            return accessor.ReflectedType == ParentType && AccessValidator.IsValid(accessor);
         }
 
         public IDictionary<MemberInfo, IEnumerable<string>> GetKeysByAccessors() {
