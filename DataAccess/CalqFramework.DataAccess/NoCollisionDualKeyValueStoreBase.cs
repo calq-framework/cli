@@ -1,10 +1,13 @@
 ﻿namespace CalqFramework.DataAccess {
 
-    public abstract class DualKeyValueStoreBase<TKey, TValue> : IKeyValueStore<TKey, TValue> {
+    public abstract class NoCollisionDualKeyValueStoreBase<TKey, TValue> : IKeyValueStore<TKey, TValue> {
+        public bool EnableShadowing { get; init; }
         protected abstract IKeyValueStore<TKey, TValue> PrimaryStore { get; }
         protected abstract IKeyValueStore<TKey, TValue> SecondaryStore { get; }
         public TValue this[TKey key] {
             get {
+                AssertNoCollision(key);
+
                 if (PrimaryStore.ContainsKey(key)) {
                     return PrimaryStore[key];
                 } else {
@@ -12,6 +15,8 @@
                 }
             }
             set {
+                AssertNoCollision(key);
+
                 if (PrimaryStore.ContainsKey(key)) {
                     PrimaryStore[key] = value;
                 } else {
@@ -21,6 +26,8 @@
         }
 
         public bool ContainsKey(TKey key) {
+            AssertNoCollision(key);
+
             if (PrimaryStore.ContainsKey(key)) {
                 return PrimaryStore.ContainsKey(key);
             } else {
@@ -29,6 +36,8 @@
         }
 
         public Type GetDataType(TKey key) {
+            AssertNoCollision(key);
+
             if (PrimaryStore.ContainsKey(key)) {
                 return PrimaryStore.GetDataType(key);
             } else {
@@ -37,10 +46,20 @@
         }
 
         public TValue GetValueOrInitialize(TKey key) {
+            AssertNoCollision(key);
+
             if (PrimaryStore.ContainsKey(key)) {
                 return PrimaryStore.GetValueOrInitialize(key);
             } else {
                 return SecondaryStore.GetValueOrInitialize(key);
+            }
+        }
+
+        private void AssertNoCollision(TKey key) {
+            if (!EnableShadowing) {
+                if (PrimaryStore.ContainsKey(key) && SecondaryStore.ContainsKey(key)) {
+                    throw new Exception($"Ambigious key {key}. Enable shadowing to ignore this error.");
+                }
             }
         }
     }
