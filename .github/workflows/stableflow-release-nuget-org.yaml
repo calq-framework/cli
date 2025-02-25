@@ -12,5 +12,5 @@ jobs:
   release:
     uses: calq-framework/stableflow/.github/workflows/stableflow.yaml@latest
     with:
-      command: release --repositories nuget.org
+      command: release --repositories nuget
     secrets: inherit
