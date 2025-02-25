@@ -302,13 +302,13 @@ namespace CalqFramework.Cli.Serialization {
             }
         }
         private class ItemInfo {
-            public string Description { get; set; } = null!;
-            public IList<string> Keys { get; set; } = null!;
+            public required string Description { get; set; }
+            public required IList<string> Keys { get; set; }
         }
 
         private class SectionInfo {
-            public IList<ItemInfo> ItemInfos { get; set; } = null!;
-            public string Title { get; set; } = null!;
+            public required IList<ItemInfo> ItemInfos { get; set; }
+            public required string Title { get; set; }
         }
     }
 }
