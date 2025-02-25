@@ -4,11 +4,10 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using CalqFramework.Cli.Serialization;
-using CalqFramework.DataAccess;
 
 namespace CalqFramework.Cli.DataAccess.ClassMember {
 
-    internal class MethodInfoStore : IReadOnlyKeyValueStore<string, MethodInfo?>, ICliReadOnlyKeyValueStore<string, MethodInfo?, MethodInfo> {
+    internal class MethodInfoStore : ICliReadOnlyKeyValueStore<string, MethodInfo, MethodInfo> {
 
         public MethodInfoStore(object obj, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier, IAccessValidator accessValidator) {
             ParentObject = obj;
@@ -26,7 +25,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMember {
         protected object ParentObject { get; }
         protected Type ParentType { get; }
         private IDictionary<string, MethodInfo> AccessorsByNames { get; }
-        public MethodInfo? this[string key] {
+        public MethodInfo this[string key] {
             get {
                 if (!TryGetAccessor(key, out var result)) {
                     throw new CliException($"invalid command"); // throw new MissingMemberException($"Missing {key} in {ParentType}."); ;

@@ -8,11 +8,11 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
 
     internal class SubcommandStore : ISubcommandStore {
 
-        public SubcommandStore(ICliReadOnlyKeyValueStore<string, MethodInfo?, MethodInfo> store) {
+        public SubcommandStore(ICliReadOnlyKeyValueStore<string, MethodInfo, MethodInfo> store) {
             Store = store;
         }
 
-        private ICliReadOnlyKeyValueStore<string, MethodInfo?, MethodInfo> Store { get; }
+        private ICliReadOnlyKeyValueStore<string, MethodInfo, MethodInfo> Store { get; }
 
         public MethodInfo? this[string key] { get => Store[key]; }
 
