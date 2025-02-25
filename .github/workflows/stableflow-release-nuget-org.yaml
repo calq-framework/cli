@@ -1,0 +1,16 @@
+name: release
+
+on:
+  workflow_dispatch:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    uses: calq-framework/stableflow/.github/workflows/stableflow.yaml@latest
+    with:
+      command: release --repositories nuget.org
+    secrets: inherit
