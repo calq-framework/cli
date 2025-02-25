@@ -8,7 +8,6 @@ using CalqFramework.Cli.InterfaceComponents;
 
 namespace CalqFramework.Cli.Serialization {
 
-    // TODO DRY
     public class HelpPrinter : IHelpPrinter {
         public void PrintHelp(Type rootType, Submodule submodule, IEnumerable<Submodule> submodules, IEnumerable<Subcommand> subcommands, IEnumerable<Option> options) {
             string description = GetSummary(submodule.MemberInfo);
@@ -43,20 +42,22 @@ namespace CalqFramework.Cli.Serialization {
             PrintSections(sections);
         }
 
-        private void PrintSubcommandDescription(Subcommand subcommand) {
-            var parts = new List<string>();
-            string summaryDescription = GetSummary(subcommand.MethodInfo);
-            if (!string.IsNullOrEmpty(summaryDescription)) {
-                parts.Add(summaryDescription);
-            }
-            string returnsDescription = GetReturn(subcommand.MethodInfo);
-            if (!string.IsNullOrEmpty(returnsDescription)) {
-                parts.Add(@returnsDescription);
-            }
-            string description = string.Join(Environment.NewLine, parts);
-            if (!string.IsNullOrEmpty(description)) {
-                Console.WriteLine(description);
-                Console.WriteLine();
+        private static string GetMemberXMLName(MemberInfo memberInfo) {
+            switch (memberInfo) {
+                case MethodBase methodBase:
+                    string methodName = methodBase is ConstructorInfo ? "#ctor" : methodBase.Name;
+                    string declaringType = methodBase.DeclaringType?.FullName!;
+                    var parameters = methodBase.GetParameters();
+                    string paramsPart = parameters.Length > 0
+                        ? $"({string.Join(",", parameters.Select(p => p.ParameterType.FullName))})"
+                        : "";
+                    return $"M:{declaringType}.{methodName}{paramsPart}";
+                case PropertyInfo prop:
+                    return $"P:{prop.DeclaringType?.FullName}.{prop.Name}";
+                case FieldInfo field:
+                    return $"F:{field.DeclaringType?.FullName}.{field.Name}";
+                default:
+                    throw new Exception("Unsupported member type.");
             }
         }
 
@@ -64,134 +65,75 @@ namespace CalqFramework.Cli.Serialization {
             return key.Length > 1 ? $"--{key}" : $"-{key}";
         }
 
-        private static string GetSummary(MemberInfo memberInfo) {
-            string xmlFilePath = Path.ChangeExtension(memberInfo.Module.Assembly.Location, "xml");
-
-            string memberName;
-            Type? underlyingType = null;
-            switch (memberInfo) {
-                case MethodInfo method:
-                    memberName = $"M:{method.DeclaringType?.FullName}.{method.Name}";
-                    ParameterInfo[] parameters = method.GetParameters();
-                    if (parameters.Length > 0) {
-                        memberName += $"({string.Join(",", parameters.Select(p => p.ParameterType.FullName))})";
-                    }
-                    break;
-
-                case PropertyInfo property:
-                    memberName = $"P:{property.DeclaringType?.FullName}.{property.Name}";
-                    underlyingType = property.PropertyType;
-                    break;
-
-                case FieldInfo field:
-                    memberName = $"F:{field.DeclaringType?.FullName}.{field.Name}";
-                    underlyingType = field.FieldType;
-                    break;
-
-                default:
-                    throw new Exception("Unsupported member type.");
-            }
-            try {
-                var doc = XDocument.Load(xmlFilePath);
-                string? summary = doc.Descendants("member")
-                    .FirstOrDefault(m => m.Attribute("name")?.Value == memberName)?
-                    .Element("summary")?.Value;
-                if (summary != null) {
-                    summary = string.Join('\n', summary.Split('\n').Select(x => x.Trim()));
-                }
-                return summary?.Trim() ?? (underlyingType != null ? GetSummary(underlyingType) : "");
-            } catch (FileNotFoundException) {
-                // throw new Exception($"Please add <GenerateDocumentationFile>true</GenerateDocumentationFile> to the csproj/fsproj file.");
-                return "";
-            }
+        private static string GetReturn(MemberInfo memberInfo) {
+            string xmlFilePath = GetXmlFilePath(memberInfo.Module.Assembly);
+            string memberName = GetMemberXMLName(memberInfo);
+            return GetXmlDocumentation(xmlFilePath, memberName, "returns");
         }
+
+        private static string GetSummary(MemberInfo memberInfo) {
+            string xmlFilePath = GetXmlFilePath(memberInfo.Module.Assembly);
+            string memberName = GetMemberXMLName(memberInfo);
+            Type? underlyingType = memberInfo switch {
+                PropertyInfo prop => prop.PropertyType,
+                FieldInfo field => field.FieldType,
+                _ => null
+            };
+
+            string summary = GetXmlDocumentation(xmlFilePath, memberName, "summary");
+            return !string.IsNullOrEmpty(summary)
+                ? summary
+                : (underlyingType != null ? GetSummary(underlyingType) : "");
+        }
+
         private static string GetSummary(ParameterInfo parameterInfo) {
             MemberInfo memberInfo = parameterInfo.Member;
-            string xmlFilePath = Path.ChangeExtension(memberInfo.Module.Assembly.Location, "xml");
+            string xmlFilePath = GetXmlFilePath(memberInfo.Module.Assembly);
+            string memberName = GetMemberXMLName(memberInfo);
 
-            string memberName;
-            if (memberInfo is MethodBase method) {
-                string methodName = method is ConstructorInfo ? "#ctor" : method.Name;
-                memberName = $"M:{method.DeclaringType?.FullName}.{methodName}";
-                ParameterInfo[] parameters = method.GetParameters();
-                if (parameters.Length > 0) {
-                    memberName += $"({string.Join(",", parameters.Select(p => p.ParameterType.FullName))})";
-                }
-            } else if (memberInfo is PropertyInfo property) {
-                memberName = $"P:{property.DeclaringType?.FullName}.{property.Name}";
-            } else {
-                throw new Exception("Unsupported member type for parameter.");
-            }
-
-            try {
-                var doc = XDocument.Load(xmlFilePath);
-                string? summary = doc.Descendants("member")
-                    .FirstOrDefault(m => m.Attribute("name")?.Value == memberName)?
-                    .Elements("param")
-                    .FirstOrDefault(p => p.Attribute("name")?.Value == parameterInfo.Name)?
-                    .Value;
-                if (summary != null) {
-                    summary = string.Join('\n', summary.Split('\n').Select(x => x.Trim()));
-                }
-                return summary?.Trim() ?? GetSummary(parameterInfo.ParameterType);
-            } catch (FileNotFoundException) {
-                // throw new Exception("Please add <GenerateDocumentationFile>true</GenerateDocumentationFile> to the csproj/fsproj file.");
-                return "";
-            }
-        }
-
-        private static string GetReturn(MemberInfo memberInfo) {
-            string xmlFilePath = Path.ChangeExtension(memberInfo.Module.Assembly.Location, "xml");
-
-            string memberName;
-            if (memberInfo is MethodBase method) {
-                string methodName = method is ConstructorInfo ? "#ctor" : method.Name;
-                memberName = $"M:{method.DeclaringType?.FullName}.{methodName}";
-                ParameterInfo[] parameters = method.GetParameters();
-                if (parameters.Length > 0) {
-                    memberName += $"({string.Join(",", parameters.Select(p => p.ParameterType.FullName))})";
-                }
-            } else if (memberInfo is PropertyInfo property) {
-                memberName = $"P:{property.DeclaringType?.FullName}.{property.Name}";
-            } else {
-                throw new Exception("Unsupported member type for parameter.");
-            }
-
-            try {
-                var doc = XDocument.Load(xmlFilePath);
-                string? summary = doc.Descendants("member")
-                    .FirstOrDefault(m => m.Attribute("name")?.Value == memberName)?
-                    .Element("returns")?
-                    .Value;
-                if (summary != null) {
-                    summary = string.Join('\n', summary.Split('\n').Select(x => x.Trim()));
-                }
-                return summary?.Trim() ?? "";
-            } catch (FileNotFoundException) {
-                // throw new Exception("Please add <GenerateDocumentationFile>true</GenerateDocumentationFile> to the csproj/fsproj file.");
-                return "";
-            }
+            string paramSummary = GetXmlDocumentation(xmlFilePath, memberName, "param", parameterInfo.Name);
+            return !string.IsNullOrEmpty(paramSummary)
+                ? paramSummary
+                : GetSummary(parameterInfo.ParameterType);
         }
 
         private static string GetSummary(Type type) {
-            string xmlFilePath = Path.ChangeExtension(type.Assembly.Location, "xml");
-            string memberName = $"T:{type.FullName}";
+            string xmlFilePath = GetXmlFilePath(type.Assembly);
+            string memberName = GetTypeMemberName(type);
+            return GetXmlDocumentation(xmlFilePath, memberName, "summary");
+        }
 
-            try {
-                var doc = XDocument.Load(xmlFilePath);
-                string? summary = doc.Descendants("member")
-                    .FirstOrDefault(m => m.Attribute("name")?.Value == memberName)?
-                    .Element("summary")?.Value;
-                if (summary != null) {
-                    summary = string.Join('\n', summary.Split('\n').Select(x => x.Trim()));
-                }
-                return summary?.Trim() ?? "";
-            } catch (FileNotFoundException) {
-                // throw new Exception("Please add <GenerateDocumentationFile>true</GenerateDocumentationFile> to the csproj/fsproj file.");
-                return "";
+        private static string GetTypeMemberName(Type type) {
+            return $"T:{type.FullName}";
+        }
+
+        private static string GetXmlDocumentation(string xmlFilePath, string memberName, string elementName, string? paramName = null) {
+            if (!File.Exists(xmlFilePath)) {
+                return string.Empty;
             }
 
-            return "";
+            var doc = XDocument.Load(xmlFilePath);
+            var memberElement = doc.Descendants("member")
+                .FirstOrDefault(m => m.Attribute("name")?.Value == memberName);
+            if (memberElement == null) return "";
+
+            XElement? targetElement = null;
+            if (paramName != null) {
+                targetElement = memberElement.Elements("param")
+                    .FirstOrDefault(p => p.Attribute("name")?.Value == paramName);
+            } else {
+                targetElement = memberElement.Element(elementName);
+            }
+
+            if (targetElement == null) return "";
+
+            string value = targetElement.Value;
+            value = string.Join(Environment.NewLine, value.Split(Environment.NewLine).Select(x => x.Trim()));
+            return value;
+        }
+
+        private static string GetXmlFilePath(Assembly assembly) {
+            return Path.ChangeExtension(assembly.Location, "xml");
         }
 
         private static void SetConsoleColor(int red, int green, int blue) {
@@ -253,6 +195,7 @@ namespace CalqFramework.Cli.Serialization {
             }
             return maxLengths;
         }
+
         private string GetTypeDescription(Type type) {
             if (type.IsGenericType &&
                 (typeof(IList<>).IsAssignableFrom(type.GetGenericTypeDefinition()) ||
@@ -307,6 +250,7 @@ namespace CalqFramework.Cli.Serialization {
             };
             PrintSections(sections);
         }
+
         private void PrintSections(IEnumerable<SectionInfo> sections) {
             IList<int> maxLengths = NormalizeKeyCounts(sections);
 
@@ -339,6 +283,23 @@ namespace CalqFramework.Cli.Serialization {
                 }
             }
             Console.ResetColor();
+        }
+
+        private void PrintSubcommandDescription(Subcommand subcommand) {
+            var parts = new List<string>();
+            string summaryDescription = GetSummary(subcommand.MethodInfo);
+            if (!string.IsNullOrEmpty(summaryDescription)) {
+                parts.Add(summaryDescription);
+            }
+            string returnsDescription = GetReturn(subcommand.MethodInfo);
+            if (!string.IsNullOrEmpty(returnsDescription)) {
+                parts.Add("Returns -> " + returnsDescription);
+            }
+            string description = string.Join(Environment.NewLine, parts);
+            if (!string.IsNullOrEmpty(description)) {
+                Console.WriteLine(description);
+                Console.WriteLine();
+            }
         }
         private class ItemInfo {
             public string Description { get; set; } = null!;
