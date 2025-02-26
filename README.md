@@ -1,28 +1,30 @@
+![NuGet Version](https://img.shields.io/nuget/v/CalqFramework.Cli?color=508cf0&link=https%3A%2F%2Fwww.nuget.org%2Fpackages%2FCalqFramework.Cli)
+![NuGet Downloads](https://img.shields.io/nuget/dt/CalqFramework.Cli?color=508cf0&link=https%3A%2F%2Fwww.nuget.org%2Fpackages%2FCalqFramework.Cli)
 # Calq CLI
-Calq CLI helps convert .NET libraries into command-line tools. It interprets CLI commands, making it possible to operate on any library directly from the command-line with no programming required, through a fully customizable CLI.  
+Calq CLI automates development of command-line tools. It interprets CLI commands, making it possible to operate on any classlib directly from the command-line without requiring any programming, through a fully customizable CLI.
 
 ## Key Feature
-### No programming required.
+### No programming required
 Calq CLI in its default configuration follows GNU (and POSIX) [conventions](https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html) and should be able to process any classlib out of the box with few limitations.
 Support for overloaded methods, generic methods, and any other missing features is under consideration.
 
 ## Customization Features
-The following modules are easily customizable through configuration and/or interface implementation.
-### API Stringification
+Every logical component is separated into a module that is part of the CLI configuration.
+- **API Stringification**  
 The default stringifier uses kebab-case conversion and CliNameAttribute for multi-aliasing.
-### Case-sensitive/insensitive API Access Validation
-Validation uses BindingFlags for simple configuration and MemberInfo context for complete access control.
-### Value Conversion/Validation
-Strings, primitive types, and IList types are supported by a single converter that validates all values.
-### Option Parsing
-In addition to short and long options, negative options are supported using '+' and '++'.
-### API Accessors
-Default accessors for fields, properties, and methods rely on all the modules mentioned above.
-### Help Menu
-Help printer interface receives all the context from accessors, making custom implementations failproof.  
+- **Case-sensitive/insensitive API Access Validation**  
+Access conditions are defined by BindingFlags and validators with MemberInfo context.
+- **Value Conversion/Validation**  
+Conversion is global for all values supporting strings, primitive types, and lists.
+- **Option Parsing**  
+The reader respects GNU conventions and extends them with negative options using '+' and '++'.
+- **API Accessors**  
+Default accessors for fields, properties, and methods integrate all related modules.
+- **Help Menu**  
+Help printer receives CLI components constructed by accessors with all metadata.  
 Descriptions for the help menu can be provided using XML documentation or custom IHelpPrinter.  
-Availability of CliDescriptionAttribute is yet to be decided.
-#### Custom Help Menu Quick Start
+The availability of CliDescriptionAttribute is yet to be decided.
+##### Custom Help Menu Quick Start
 <details>
   <summary>Click to show.</summary>
   
@@ -72,22 +74,29 @@ public class HelpPrinter : IHelpPrinter {
 </details>
 
 ## Usage
-CliNameAttribute isn't necessary.  
-No specific coding convention is necessary.  
+No specific coding convention is necessary and CliNameAttribute is optional.
   
 The following will interpret the command-line arguments, execute any underlying API, and return the result.
 ```csharp
 var result = new CommandLineInterface.Execute(new Classlib());
-```
-It's also possible to just populate any object with options.
-```csharp
-OptionDeserializer.Deserialize(settingsObject)
 ```
 To enable descriptions based on XML documentation, add the following to the project file.
 ```
 <PropertyGroup>
   <GenerateDocumentationFile>true</GenerateDocumentationFile>
 </PropertyGroup>
+```
+Method parameters can be enabled to shadow fields and properties as follows:
+```csharp
+var result = new CommandLineInterface() {
+    CliComponentStoreFactory = new CliComponentStoreFactory() {
+        EnableShadowing = true
+    }
+}.Execute(new Classlib());
+```
+To just populate any object with options use OptionDeserializer:
+```csharp
+OptionDeserializer.Deserialize(settingsObject)
 ```
 ### Demo Example
 [https://github.com/calq-framework/cli/tree/main/Cli/Example](https://github.com/calq-framework/cli/tree/main/Cli/Example)
@@ -99,6 +108,7 @@ To enable descriptions based on XML documentation, add the following to the proj
 ```csharp
 using CalqFramework.Cli;
 using CalqFramework.Cli.Serialization;
+using System;
 using System.Text.Json;
 
 var result = new CommandLineInterface().Execute(new QuickStart());
@@ -111,9 +121,9 @@ class QuickStart {
     public void QuickRun() {}
 }
 class SubStart {
-    public string DefaultValue { get; set; } = "optional";
-    [CliName("sub-run")]
-    [CliName("r")]
+    public string DefaultValue { get; set; } = "default";
+    [CliName("run")] // rename from 'sub-run' to 'run'
+    [CliName("r")] // add alias 'r'
     public QuickResult SubRun(int requiredParameter, int optionalParameter = 1)
         => new QuickResult(DefaultValue, requiredParameter, optionalParameter);
 }
