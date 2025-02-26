@@ -1,5 +1,5 @@
-![NuGet Version](https://img.shields.io/nuget/v/CalqFramework.Cli?color=508cf0&link=https%3A%2F%2Fwww.nuget.org%2Fpackages%2FCalqFramework.Cli)
-![NuGet Downloads](https://img.shields.io/nuget/dt/CalqFramework.Cli?color=508cf0&link=https%3A%2F%2Fwww.nuget.org%2Fpackages%2FCalqFramework.Cli)
+[![NuGet Version](https://img.shields.io/nuget/v/CalqFramework.Cli?color=508cf0)](https://www.nuget.org/packages/CalqFramework.Cli)
+[![NuGet Downloads](https://img.shields.io/nuget/dt/CalqFramework.Cli?color=508cf0)](https://www.nuget.org/packages/CalqFramework.Cli)
 # Calq CLI
 Calq CLI automates development of command-line tools. It interprets CLI commands, making it possible to operate on any classlib directly from the command-line without requiring any programming, through a fully customizable CLI.
 
