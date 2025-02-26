@@ -3,8 +3,7 @@
 # Calq CLI
 Calq CLI automates development of command-line tools. It interprets CLI commands, making it possible to operate on any classlib directly from the command-line without requiring any programming, through a fully customizable CLI.
 
-## Key Feature
-### No programming required
+## No programming required
 Calq CLI in its default configuration follows GNU (and POSIX) [conventions](https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html) and should be able to process any classlib out of the box with few limitations.
 Support for overloaded methods, generic methods, and any other missing features is under consideration.
 
