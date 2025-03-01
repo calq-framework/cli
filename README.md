@@ -130,5 +130,5 @@ public record QuickResult(string s, int a, int b);
 ```
 
 ## License
-Calq CLI is dual-licensed under the GNU AGPLv3 and a commercial license.
+Calq CLI is dual-licensed under the GNU AGPLv3 and a commercial license.  
 The commercial license will be available for purchase soon.
