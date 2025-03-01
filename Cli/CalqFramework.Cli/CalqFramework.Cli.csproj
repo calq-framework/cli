@@ -5,7 +5,9 @@
     <TargetFramework>net9.0</TargetFramework>
     <RootNamespace>CalqFramework.Cli</RootNamespace>
     <PackageId>CalqFramework.Cli</PackageId>
-    <Version>0.2.10</Version>
+    <Version>0.46.4</Version>
+    <PackageProjectUrl>https://github.com/calq-framework</PackageProjectUrl>
+    <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>

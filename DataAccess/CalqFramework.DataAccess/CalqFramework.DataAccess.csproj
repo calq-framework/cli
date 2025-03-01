@@ -6,6 +6,8 @@
     <RootNamespace>CalqFramework.DataAccess</RootNamespace>
     <PackageId>CalqFramework.DataAccess</PackageId>
     <Version>0.0.0</Version>
+    <PackageProjectUrl>https://github.com/calq-framework</PackageProjectUrl>
+    <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All"/>
