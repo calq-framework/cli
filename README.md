@@ -5,7 +5,7 @@ Calq CLI automates development of command-line tools. It interprets CLI commands
 
 ## No programming required
 Calq CLI in its default configuration follows GNU (and POSIX) [conventions](https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html) and should be able to process any classlib out of the box with few limitations.
-Support for overloaded methods, generic methods, and any other missing features is under consideration.
+Support for overloaded methods, generic methods, and any other features not available in conventional frameworks is under consideration.
 
 ## Customization Features
 Every logical component is separated into a module that is part of the CLI configuration.
@@ -14,7 +14,7 @@ The default stringifier uses kebab-case conversion and CliNameAttribute for mult
 - **Case-sensitive/insensitive API Access Validation**  
 Access conditions are defined by BindingFlags and validators with MemberInfo context.
 - **Value Conversion/Validation**  
-Conversion is global for all values supporting strings, primitive types, and lists.
+Conversion is global for all values, supporting strings, primitive types, and lists.
 - **Option Parsing**  
 The reader respects GNU conventions and extends them with negative options using '+' and '++'.
 - **API Accessors**  
@@ -131,7 +131,4 @@ public record QuickResult(string s, int a, int b);
 
 ## License
 Calq CLI is dual-licensed under the GNU AGPLv3 and a commercial license.
-### Individual License
-The availability will be confirmed at a later time.
-### Corporate License
-The availability will be confirmed at a later time.
+The commercial license will be available for purchase soon.
