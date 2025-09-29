@@ -11,7 +11,7 @@ Support for overloaded methods, generic methods, and any other features not avai
 Compared using [https://github.com/calq-framework/cli/tree/main/Cli/Example](https://github.com/calq-framework/cli/tree/main/Cli/Example)
 
 ### Calq CLI
-```
+```csharp
 ﻿using CalqFramework.Cli;
 using CalqFramework.Cli.DataAccess.InterfaceComponent;
 using System;
@@ -549,3 +549,4 @@ public record QuickResult(string s, int a, int b);
 
 ## License
 Calq CLI is dual-licensed under the GNU AGPLv3 and a commercial license.
+
