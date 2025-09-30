@@ -7,10 +7,12 @@ Calq CLI automates development of command-line tools. It interprets CLI commands
 Calq CLI in its default configuration follows GNU (and POSIX) [conventions](https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html) and should be able to process any classlib out of the box with few limitations.
 Support for overloaded methods, generic methods, and any other features not available in conventional frameworks is under consideration.
 
-## Why Use Calq CLI: Comparison with System.CommandLine
-Compared using [https://github.com/calq-framework/cli/tree/main/Cli/Example](https://github.com/calq-framework/cli/tree/main/Cli/Example)
+## Why Calq CLI: Comparison with System.CommandLine
+Both examples implement CLI for the classlib from:  
+[https://github.com/calq-framework/cli/tree/main/Cli/Example](https://github.com/calq-framework/cli/tree/main/Cli/Example)
 
 ### Calq CLI
+The following template is a complete implementation.
 ```csharp
 ﻿using CalqFramework.Cli;
 using CalqFramework.Cli.DataAccess.InterfaceComponent;
@@ -36,7 +38,7 @@ switch (result) {
 ```
 
 ### System.CommandLine
-The following code was generated with Gemini 2.5 Pro.  
+The following code was generated with AI using Gemini 2.5 Pro.  
 The build fails with 170 errors, compiled with Visual Studio 2022 using .NET 9.
 ```csharp
 using System.CommandLine;
@@ -659,5 +661,6 @@ public record QuickResult(string s, int a, int b);
 
 ## License
 Calq CLI is dual-licensed under the GNU AGPLv3 and a commercial license.
+
 
 
