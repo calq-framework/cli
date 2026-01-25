@@ -90,15 +90,23 @@ No specific coding convention is necessary and CliNameAttribute is optional.
   
 The following will interpret the command-line arguments, execute any underlying API, and return the result.
 ```csharp
-var result = new CommandLineInterface.Execute(new Classlib());
+var result = new CommandLineInterface().Execute(new Classlib());
 ```
-To enable descriptions based on XML documentation, add the following to the project file.
-```
+
+### Built-in Help and Version
+Help is automatically available with `--help` or `-h` at any level (root, submodule, or subcommand).
+Version is automatically available with `--version` or `-v`.
+
+To enable descriptions based on XML documentation, add the following to the project file:
+```xml
 <PropertyGroup>
   <GenerateDocumentationFile>true</GenerateDocumentationFile>
 </PropertyGroup>
 ```
-Method parameters can be enabled to shadow fields and properties as follows:
+
+### Configuration Options
+
+**Enable Shadowing** - Method parameters can shadow fields and properties:
 ```csharp
 var result = new CommandLineInterface() {
     CliComponentStoreFactory = new CliComponentStoreFactory() {
@@ -106,9 +114,51 @@ var result = new CommandLineInterface() {
     }
 }.Execute(new Classlib());
 ```
-To just populate any object with options use OptionDeserializer:
+
+**Skip Unknown Options** - Continue execution instead of throwing exceptions for unknown options:
 ```csharp
-OptionDeserializer.Deserialize(settingsObject)
+var result = new CommandLineInterface() {
+    SkipUnknown = true
+}.Execute(new Classlib());
+```
+
+**Custom Arguments** - Execute with custom arguments instead of environment args:
+```csharp
+var result = new CommandLineInterface().Execute(new Classlib(), new[] { "subcommand", "--option", "value" });
+```
+
+**Access Control** - Control which members are exposed:
+```csharp
+var result = new CommandLineInterface() {
+    CliComponentStoreFactory = new CliComponentStoreFactory() {
+        AccessFields = false,      // Only properties, no fields
+        AccessProperties = true
+    }
+}.Execute(new Classlib());
+```
+
+**Custom Binding Flags** - Control member visibility and case sensitivity:
+```csharp
+var result = new CommandLineInterface() {
+    CliComponentStoreFactory = new CliComponentStoreFactory() {
+        BindingFlags = BindingFlags.Instance | BindingFlags.Public,  // Case-sensitive
+        MethodBindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase
+    }
+}.Execute(new Classlib());
+```
+
+### OptionDeserializer
+To populate any object with options without full CLI execution:
+```csharp
+OptionDeserializer.Deserialize(settingsObject);
+
+// With custom arguments
+OptionDeserializer.Deserialize(settingsObject, new[] { "--option", "value" });
+
+// Skip unknown options
+OptionDeserializer.Deserialize(settingsObject, new OptionDeserializerConfiguration { 
+    SkipUnknown = true 
+});
 ```
 ### Demo Example
 [https://github.com/calq-framework/cli/tree/main/Cli/Example](https://github.com/calq-framework/cli/tree/main/Cli/Example)
@@ -117,6 +167,10 @@ OptionDeserializer.Deserialize(settingsObject)
 ![SubcommandHelpExample](https://github.com/calq-framework/cli/blob/main/Cli/Example/SubcommandHelpExample.png?raw=true)
 
 ### Quick Start
+```bash
+dotnet add package CalqFramework.Cli
+```
+
 ```csharp
 using CalqFramework.Cli;
 using CalqFramework.Cli.Serialization;
