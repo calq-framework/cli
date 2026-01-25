@@ -3,6 +3,9 @@ using System.Reflection;
 
 namespace CalqFramework.DataAccess.ClassMember {
 
+    /// <summary>
+    /// Provides key-value access to object fields by name.
+    /// </summary>
     public sealed class FieldStore : FieldStoreBase<string, object?>, IKeyValueStore<string, object?, FieldInfo> {
 
         public FieldStore(object obj, BindingFlags bindingFlags) : base(obj, bindingFlags) {

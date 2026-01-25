@@ -9,6 +9,9 @@ using static CalqFramework.Cli.Parsing.OptionReaderBase;
 
 namespace CalqFramework.Cli {
 
+    /// <summary>
+    /// Interprets CLI commands and executes methods on any classlib without requiring programming.
+    /// </summary>
     public class CommandLineInterface {
 
         public CommandLineInterface() {
@@ -16,15 +19,36 @@ namespace CalqFramework.Cli {
             HelpPrinter = new HelpPrinter();
         }
 
+        /// <summary>
+        /// Factory for creating CLI component stores (options, subcommands, submodules).
+        /// </summary>
         public ICliComponentStoreFactory CliComponentStoreFactory { get; init; }
 
+        /// <summary>
+        /// Help printer for displaying CLI help information.
+        /// </summary>
         public IHelpPrinter HelpPrinter { get; init; }
+        
+        /// <summary>
+        /// Skip unknown options instead of throwing an exception.
+        /// </summary>
         public bool SkipUnknown { get; init; } = false;
+        
+        /// <summary>
+        /// Include revision number in version output (4 digits instead of 3).
+        /// </summary>
         public bool UseRevisionVersion { get; init; } = false;
+        
+        /// <summary>
+        /// Executes a CLI command using command-line arguments from the environment.
+        /// </summary>
         public object? Execute(object obj) {
             return Execute(obj, Environment.GetCommandLineArgs().Skip(1));
         }
 
+        /// <summary>
+        /// Executes a CLI command using the provided arguments.
+        /// </summary>
         public object? Execute(object obj, IEnumerable<string> args) {
             using IEnumerator<string> en = args.GetEnumerator();
 

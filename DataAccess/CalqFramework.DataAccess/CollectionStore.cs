@@ -3,6 +3,9 @@ using CalqFramework.DataAccess.Text;
 
 namespace CalqFramework.DataAccess;
 
+/// <summary>
+/// Provides key-value access to collection elements (arrays, lists, dictionaries).
+/// </summary>
 // TODO consider CollectionStoreFactory and accessor per collection type
 public class CollectionStore : IKeyValueStore<string, object?> {
 

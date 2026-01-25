@@ -4,6 +4,9 @@ using CalqFramework.Cli.InterfaceComponents;
 using CalqFramework.DataAccess;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
+    /// <summary>
+    /// Executes CLI subcommands with both parameter and option support (enables shadowing).
+    /// </summary>
     public interface ISubcommandExecutorWithOptions : ISubcommandExecutor, IOptionStore {
     }
 }

@@ -1,6 +1,9 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
 namespace CalqFramework.DataAccess {
+    /// <summary>
+    /// Combines two key-value stores with primary and secondary lookup priority.
+    /// </summary>
     public class DualKeyValueStore<TKey, TValue> : DualKeyValueStoreBase<TKey, TValue> {
         private readonly IKeyValueStore<TKey, TValue> _primaryStore;
         private readonly IKeyValueStore<TKey, TValue> _secondaryStore;

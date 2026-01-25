@@ -8,6 +8,9 @@ using CalqFramework.Cli.InterfaceComponents;
 
 namespace CalqFramework.Cli.Serialization {
 
+    /// <summary>
+    /// Prints formatted help information for CLI components using XML documentation.
+    /// </summary>
     public class HelpPrinter : IHelpPrinter {
         public void PrintHelp(Type rootType, Submodule submodule, IEnumerable<Submodule> submodules, IEnumerable<Subcommand> subcommands, IEnumerable<Option> options) {
             string description = GetSummary(submodule.MemberInfo);

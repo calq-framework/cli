@@ -5,7 +5,13 @@ using CalqFramework.Cli.Serialization;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
 
+    /// <summary>
+    /// Factory for creating CLI component stores with configurable behavior.
+    /// </summary>
     public class CliComponentStoreFactory : ICliComponentStoreFactory {
+        /// <summary>
+        /// Default binding flags for member lookup (Instance, Static, Public, IgnoreCase).
+        /// </summary>
         public const BindingFlags DefaultLookup = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.IgnoreCase;
         private BindingFlags? _methodBindingFlags = null;
 
@@ -21,18 +27,48 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
             SubcommandAccessValidator = new SubcommandAccessValidator();
         }
 
+        /// <summary>
+        /// Access fields as CLI options.
+        /// </summary>
         public bool AccessFields { get; init; }
+        /// <summary>
+        /// Access properties as CLI options.
+        /// </summary>
         public bool AccessProperties { get; init; }
+        /// <summary>
+        /// Binding flags for member lookup.
+        /// </summary>
         public BindingFlags BindingFlags { get; init; }
+        /// <summary>
+        /// Stringifier for converting member names to CLI format.
+        /// </summary>
         public IClassMemberStringifier ClassMemberStringifier { get; init; }
+        /// <summary>
+        /// Method parameters can shadow fields and properties.
+        /// </summary>
         public bool EnableShadowing { get; init; }
+        /// <summary>
+        /// Binding flags for method lookup (defaults to BindingFlags if not set).
+        /// </summary>
         public BindingFlags MethodBindingFlags {
             get => _methodBindingFlags == null ? BindingFlags : (BindingFlags)_methodBindingFlags;
             init => _methodBindingFlags = value;
         }
+        /// <summary>
+        /// Validator for determining which members are valid options.
+        /// </summary>
         public IAccessValidator OptionAccessValidator { get; init; }
+        /// <summary>
+        /// Validator for determining which methods are valid subcommands.
+        /// </summary>
         public IAccessValidator SubcommandAccessValidator { get; init; }
+        /// <summary>
+        /// Validator for determining which members are valid submodules.
+        /// </summary>
         public IAccessValidator SubmoduleAccessValidator { get; init; }
+        /// <summary>
+        /// Converter for transforming values between CLI strings and internal types.
+        /// </summary>
         public IValueConverter<string?> ValueConverter { get; init; }
         public IOptionStore CreateOptionStore(object obj) {
             ICliKeyValueStore<string, string?, MemberInfo> store;

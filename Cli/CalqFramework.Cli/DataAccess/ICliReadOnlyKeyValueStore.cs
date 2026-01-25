@@ -3,8 +3,14 @@ using CalqFramework.DataAccess;
 
 namespace CalqFramework.Cli.DataAccess {
 
+    /// <summary>
+    /// Provides read-only access to a CLI key-value store with accessor grouping for help generation.
+    /// </summary>
     public interface ICliReadOnlyKeyValueStore<TKey, TValue, TAccessor> : IReadOnlyKeyValueStore<TKey, TValue> {
 
+        /// <summary>
+        /// Gets keys grouped by their accessors (e.g., fields, properties) for displaying alternative names in help.
+        /// </summary>
         IDictionary<TAccessor, IEnumerable<TKey>> GetKeysByAccessors();
     }
 }
