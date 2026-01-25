@@ -7,7 +7,7 @@ var result = new CommandLineInterface() {
     CliComponentStoreFactory = new CliComponentStoreFactory() {
         EnableShadowing = true
     }
-}.Execute(new CloudProviderCLI.RootModule());
+}.Execute(new CloudProviderTool.CloudProvider());
 
 switch (result) {
     case ResultVoid:

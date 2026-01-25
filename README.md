@@ -14,16 +14,17 @@ Both examples implement CLI for the classlib from:
 ### Calq CLI
 The following template is a complete implementation.
 ```csharp
-﻿using CalqFramework.Cli;
+using CalqFramework.Cli;
 using CalqFramework.Cli.DataAccess.InterfaceComponent;
 using System;
 using System.Text.Json;
+using CloudProviderTool;
 
 var result = new CommandLineInterface() {
     CliComponentStoreFactory = new CliComponentStoreFactory() {
         EnableShadowing = true
     }
-}.Execute(new CloudProviderCLI.RootModule());
+}.Execute(new CloudProvider());
 
 switch (result) {
     case ResultVoid:
@@ -42,7 +43,7 @@ The following code was generated with AI using Gemini 2.5 Pro.
 The build failed with 170 errors, compiled with Visual Studio 2022 using .NET 9.
 ```csharp
 using System.CommandLine;
-using CloudProviderCLI;
+using CloudProviderTool;
 
 // Helper Methods
 static T CreateModule<T>(string? apiKey) where T : SubmoduleBase, new()

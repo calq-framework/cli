@@ -1,6 +1,6 @@
 using System;
 
-namespace CloudProviderCLI {
+namespace CloudProviderTool {
     // Compute-specific result records
     public record StartInstanceResult(string Message, int StatusCode);
     public record StopInstanceResult(string Message, int StatusCode);
@@ -31,7 +31,7 @@ namespace CloudProviderCLI {
     }
 
     /// <summary>Everything should just work even if any class or its contents are refactored.</summary>
-    public class RootModule : SubmoduleBase {
+    public class CloudProvider : SubmoduleBase {
         /// <summary>Permanently saves api key into calq.cli.example.txt in the user dir.</summary>
         /// <param name="ApiKey">Without shadowing enabled, throws error on use</param>
         public void Add(string ApiKey) => System.IO.File.WriteAllText(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "calq.cli.example.txt"), ApiKey);
