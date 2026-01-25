@@ -7,6 +7,9 @@ using CalqFramework.DataAccess;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
 
+    /// <summary>
+    /// Converts values between CLI string representation and internal object types.
+    /// </summary>
     public class ValueConverter : IValueConverter<string?> {
 
         public string? ConvertFromInternalValue(object? value, Type internalType) {

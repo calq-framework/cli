@@ -7,20 +7,35 @@ using CalqFramework.DataAccess;
 using static CalqFramework.Cli.Parsing.OptionReaderBase;
 
 namespace CalqFramework.Cli {
+    /// <summary>
+    /// Deserializes command-line options into object properties and fields.
+    /// </summary>
     public class OptionDeserializer {
+        /// <summary>
+        /// Deserializes command-line arguments from the environment into the specified object.
+        /// </summary>
         public static void Deserialize(object obj, OptionDeserializerConfiguration? options = null) {
             Deserialize(obj, Environment.GetCommandLineArgs().Skip(1), options);
         }
 
+        /// <summary>
+        /// Deserializes the specified arguments into the object's properties and fields.
+        /// </summary>
         public static void Deserialize(object obj, IEnumerable<string> args, OptionDeserializerConfiguration? options = null) {
             IOptionStore store = new CliComponentStoreFactory().CreateOptionStore(obj);
             Deserialize(store, args, options);
         }
 
+        /// <summary>
+        /// Deserializes command-line arguments from the environment into the specified store.
+        /// </summary>
         public static void Deserialize(IKeyValueStore<string, string?> store, OptionDeserializerConfiguration? options = null) {
             Deserialize(store, Environment.GetCommandLineArgs().Skip(1), options);
         }
 
+        /// <summary>
+        /// Deserializes the specified arguments into the key-value store.
+        /// </summary>
         public static void Deserialize(IKeyValueStore<string, string?> store, IEnumerable<string> args, OptionDeserializerConfiguration? options = null) {
             using IEnumerator<string> argsEnumerator = args.GetEnumerator();
             var reader = new OptionReader(argsEnumerator, store);

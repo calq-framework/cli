@@ -2,6 +2,9 @@
 
 namespace CalqFramework.Cli {
 
+    /// <summary>
+    /// Exception thrown when CLI command parsing or execution fails.
+    /// </summary>
     [Serializable]
     public class CliException : Exception {
 

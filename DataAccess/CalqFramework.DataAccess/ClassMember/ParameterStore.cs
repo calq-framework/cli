@@ -3,6 +3,9 @@ using System.Reflection;
 
 namespace CalqFramework.DataAccess.ClassMember {
 
+    /// <summary>
+    /// Provides key-value access to method parameters by name.
+    /// </summary>
     public class ParameterStore : ParameterStoreBase<string, object?>, IKeyValueStore<string, object?, ParameterInfo> {
 
         public ParameterStore(MethodInfo method) : base(method) {

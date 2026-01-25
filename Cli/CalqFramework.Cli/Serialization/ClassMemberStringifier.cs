@@ -4,6 +4,9 @@ using System.Text.RegularExpressions;
 
 namespace CalqFramework.Cli.Serialization {
 
+    /// <summary>
+    /// Converts class member names to CLI-friendly kebab-case format.
+    /// </summary>
     public class ClassMemberStringifier : ClassMemberStringifierBase {
         protected override IEnumerable<string> GetAlternativeNames(string name, IEnumerable<CliNameAttribute> cliNameAttributes) {
             var keys = new List<string>();

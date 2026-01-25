@@ -3,6 +3,9 @@ using System.Reflection;
 
 namespace CalqFramework.DataAccess.ClassMember {
 
+    /// <summary>
+    /// Executes methods with parameter assignment and invocation support.
+    /// </summary>
     public class MethodExecutor : MethodExecutorBase<string, object?>, IKeyValueStore<string, object?, ParameterInfo> {
 
         public MethodExecutor(MethodInfo method, object obj) : base(method, obj) {

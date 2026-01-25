@@ -3,6 +3,9 @@ using System.Reflection;
 
 namespace CalqFramework.DataAccess.ClassMember {
 
+    /// <summary>
+    /// Provides key-value access to object properties by name.
+    /// </summary>
     public sealed class PropertyStore : PropertyStoreBase<string, object?>, IKeyValueStore<string, object?, PropertyInfo> {
 
         public PropertyStore(object obj, BindingFlags bindingFlags) : base(obj, bindingFlags) {
