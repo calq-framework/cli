@@ -12,6 +12,15 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
     /// </summary>
     public class ValueConverter : IValueConverter<string?> {
 
+        private readonly ICollectionStoreFactory _collectionStoreFactory;
+
+        public ValueConverter() : this(new CollectionStoreFactory()) {
+        }
+
+        public ValueConverter(ICollectionStoreFactory collectionStoreFactory) {
+            _collectionStoreFactory = collectionStoreFactory;
+        }
+
         public string? ConvertFromInternalValue(object? value, Type internalType) {
             if (value == null) {
                 return null;
@@ -37,7 +46,7 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
             } else {
                 ICollection collection = (currentValue as ICollection)!;
                 object item = ValueParser.ParseValue(value, internalType.GetGenericArguments()[0]);
-                new CollectionStore(collection).AddValue(item);
+                _collectionStoreFactory.CreateStore(collection).AddValue(item);
                 return currentValue;
             }
         }
