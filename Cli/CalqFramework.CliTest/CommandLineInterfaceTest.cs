@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using CalqFramework.Cli;
 using CalqFramework.Cli.DataAccess.InterfaceComponent;
 using Xunit;
@@ -64,7 +65,7 @@ namespace CalqFramework.CliTest {
         public void Execute_MethodWithNamedParameters_BindsCorrectly() {
             var tool = new SomeClassLibrary();
             object result = new CommandLineInterface().Execute(tool, $"{StringHelper.GetKebabCase(nameof(SomeClassLibrary.MethodWithIntegerAndText))} --integer 1 --text abc".Split(' '));
-            Assert.Null(result);
+            Assert.IsType<ResultVoid>(result);
             Assert.Equal(1, tool.integerField);
             Assert.Equal("abc", tool.textField);
         }
@@ -87,7 +88,7 @@ namespace CalqFramework.CliTest {
         public void Execute_MethodWithPositionalTextAndBoolean_BindsBothParameters() {
             var tool = new SomeClassLibrary();
             object result = new CommandLineInterface().Execute(tool, $"{StringHelper.GetKebabCase(nameof(SomeClassLibrary.MethodWithTextAndBoolean))} abc --boolean".Split(' '));
-            Assert.Null(result);
+            Assert.IsType<ResultVoid>(result);
             Assert.Equal("abc", tool.textField);
             Assert.True(tool.booleanField);
         }
@@ -96,7 +97,7 @@ namespace CalqFramework.CliTest {
         public void Execute_MethodWithPositionalTextAndNamedInteger_BindsCorrectly() {
             var tool = new SomeClassLibrary();
             object result = new CommandLineInterface().Execute(tool, $"{StringHelper.GetKebabCase(nameof(SomeClassLibrary.MethodWithTextAndInteger))} abc --integer 1".Split(' '));
-            Assert.Null(result);
+            Assert.IsType<ResultVoid>(result);
             Assert.Equal("abc", tool.textField);
             Assert.Equal(1, tool.integerField);
         }
@@ -105,7 +106,7 @@ namespace CalqFramework.CliTest {
         public void Execute_MethodWithDelimiter_CapturesTextCorrectly() {
             var tool = new SomeClassLibrary();
             object result = new CommandLineInterface().Execute(tool, $"{StringHelper.GetKebabCase(nameof(SomeClassLibrary.MethodWithTextAndInteger))} -- --text -1".Split(' '));
-            Assert.Null(result);
+            Assert.IsType<ResultVoid>(result);
             Assert.Equal("--text", tool.textField);
             Assert.Equal(-1, tool.integerField);
         }
@@ -146,7 +147,7 @@ namespace CalqFramework.CliTest {
             CliException ex = Assert.Throws<CliException>(() => {
                 var tool = new SomeClassLibrary();
                 new CommandLineInterface() {
-                    CliComponentStoreFactory = new CliComponentStoreFactory { BindingFlags = CliComponentStoreFactory.DefaultLookup }
+                    CliComponentStoreFactory = new CliComponentStoreFactory { BindingFlags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public }
                 }.Execute(tool, $"{StringHelper.GetKebabCase(nameof(SomeClassLibrary.Method)).ToUpper()}".Split(' '));
             });
             Assert.Equal("invalid command", ex.Message);
