@@ -1,16 +1,19 @@
 ﻿namespace CalqFramework.DataAccess.Text;
 
-public static class ValueParser {
+/// <summary>
+/// Parses string values to typed objects.
+/// </summary>
+public class ValueParser : IValueParser {
 
-    public static bool IsParseable(Type type) {
+    public bool IsParseable(Type type) {
         return type.IsPrimitive || type == typeof(string);
     }
 
-    public static T ParseValue<T>(string value) {
+    public T ParseValue<T>(string value) {
         return (T)ParseValue(value, typeof(T));
     }
 
-    public static object ParseValue(string value, Type targetType) {
+    public object ParseValue(string value, Type targetType) {
         if (Nullable.GetUnderlyingType(targetType) != null) {
             targetType = Nullable.GetUnderlyingType(targetType)!;
         }
