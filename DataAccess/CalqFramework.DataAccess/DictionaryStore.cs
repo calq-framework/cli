@@ -8,24 +8,27 @@ namespace CalqFramework.DataAccess;
 /// </summary>
 public sealed class DictionaryStore : CollectionStoreBase {
 
-    public DictionaryStore(IDictionary dictionary) : base(dictionary) {
+    private readonly IValueParser _valueParser;
+
+    public DictionaryStore(IDictionary dictionary, IValueParser valueParser) : base(dictionary) {
+        _valueParser = valueParser;
     }
 
     private IDictionary Dictionary => (IDictionary)ParentCollection;
 
     public override object? this[string key] {
         get {
-            object parsedKey = ValueParser.ParseValue(key, Dictionary.GetType().GetGenericArguments()[0]);
+            object parsedKey = _valueParser.ParseValue(key, Dictionary.GetType().GetGenericArguments()[0]);
             return Dictionary[parsedKey];
         }
         set {
-            object parsedKey = ValueParser.ParseValue(key, Dictionary.GetType().GetGenericArguments()[0]);
+            object parsedKey = _valueParser.ParseValue(key, Dictionary.GetType().GetGenericArguments()[0]);
             Dictionary[parsedKey] = value;
         }
     }
 
     public override bool ContainsKey(string key) {
-        object parsedKey = ValueParser.ParseValue(key, Dictionary.GetType().GetGenericArguments()[0]);
+        object parsedKey = _valueParser.ParseValue(key, Dictionary.GetType().GetGenericArguments()[0]);
         return Dictionary.Contains(parsedKey);
     }
 
@@ -34,7 +37,7 @@ public sealed class DictionaryStore : CollectionStoreBase {
     }
 
     public override object? GetValueOrInitialize(string key) {
-        object parsedKey = ValueParser.ParseValue(key, Dictionary.GetType().GetGenericArguments()[0]);
+        object parsedKey = _valueParser.ParseValue(key, Dictionary.GetType().GetGenericArguments()[0]);
         object? element = Dictionary[parsedKey];
         if (element == null) {
             element = Activator.CreateInstance(Dictionary.GetType().GetGenericArguments()[1]!) ??

@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using CalqFramework.Cli.DataAccess.ClassMember;
-using CalqFramework.Cli.Parsing;
+using CalqFramework.DataAccess.Text;
 using CalqFramework.Extensions.System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
@@ -10,8 +10,14 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
     /// </summary>
     public class SubmoduleAccessValidator : IAccessValidator {
 
+        private readonly IValueParser _valueParser;
+
+        public SubmoduleAccessValidator(IValueParser valueParser) {
+            _valueParser = valueParser;
+        }
+
         public bool IsValid(MemberInfo accessor) {
-            return !ValueParser.IsParseable(accessor.GetUnderlyingType());
+            return !_valueParser.IsParseable(accessor.GetUnderlyingType());
         }
     }
 }

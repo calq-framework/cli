@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Reflection;
 using CalqFramework.Cli.DataAccess.ClassMember;
+using CalqFramework.Cli.Parsing;
 using CalqFramework.Cli.Serialization;
+using CalqFramework.DataAccess;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
 
@@ -14,6 +16,9 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
         /// </summary>
         public const BindingFlags DefaultLookup = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.IgnoreCase;
         private BindingFlags? _methodBindingFlags = null;
+        private IAccessValidator? _optionAccessValidator = null;
+        private IAccessValidator? _subcommandAccessValidator = null;
+        private IAccessValidator? _submoduleAccessValidator = null;
 
         public CliComponentStoreFactory() {
             AccessFields = true;
@@ -21,10 +26,10 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
             BindingFlags = DefaultLookup;
             ClassMemberStringifier = new ClassMemberStringifier();
             EnableShadowing = false;
-            ValueConverter = new ValueConverter();
-            OptionAccessValidator = new OptionAccessValidator();
-            SubmoduleAccessValidator = new SubmoduleAccessValidator();
-            SubcommandAccessValidator = new SubcommandAccessValidator();
+            
+            ValueParser = new ValueParser();
+            CollectionStoreFactory = new CollectionStoreFactory() { ValueParser = ValueParser };
+            ValueConverter = new ValueConverter(CollectionStoreFactory, ValueParser);
         }
 
         /// <summary>
@@ -44,6 +49,10 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
         /// </summary>
         public IClassMemberStringifier ClassMemberStringifier { get; init; }
         /// <summary>
+        /// Factory for creating collection stores.
+        /// </summary>
+        public ICollectionStoreFactory CollectionStoreFactory { get; init; }
+        /// <summary>
         /// Method parameters can shadow fields and properties.
         /// </summary>
         public bool EnableShadowing { get; init; }
@@ -56,20 +65,37 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponent {
         }
         /// <summary>
         /// Validator for determining which members are valid options.
+        /// Defaults to using ValueParser if not explicitly set.
         /// </summary>
-        public IAccessValidator OptionAccessValidator { get; init; }
+        public IAccessValidator OptionAccessValidator {
+            get => _optionAccessValidator ?? new OptionAccessValidator(ValueParser);
+            init => _optionAccessValidator = value;
+        }
         /// <summary>
         /// Validator for determining which methods are valid subcommands.
+        /// Defaults to SubcommandAccessValidator if not explicitly set.
         /// </summary>
-        public IAccessValidator SubcommandAccessValidator { get; init; }
+        public IAccessValidator SubcommandAccessValidator {
+            get => _subcommandAccessValidator ?? new SubcommandAccessValidator();
+            init => _subcommandAccessValidator = value;
+        }
         /// <summary>
         /// Validator for determining which members are valid submodules.
+        /// Defaults to using ValueParser if not explicitly set.
         /// </summary>
-        public IAccessValidator SubmoduleAccessValidator { get; init; }
+        public IAccessValidator SubmoduleAccessValidator {
+            get => _submoduleAccessValidator ?? new SubmoduleAccessValidator(ValueParser);
+            init => _submoduleAccessValidator = value;
+        }
         /// <summary>
         /// Converter for transforming values between CLI strings and internal types.
         /// </summary>
         public IValueConverter<string?> ValueConverter { get; init; }
+        /// <summary>
+        /// Parser for converting string values to typed objects.
+        /// </summary>
+        public ValueParser ValueParser { get; init; }
+
         public IOptionStore CreateOptionStore(object obj) {
             ICliKeyValueStore<string, string?, MemberInfo> store;
             if (AccessFields && AccessProperties) {

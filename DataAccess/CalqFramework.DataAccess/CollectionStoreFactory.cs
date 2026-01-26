@@ -16,6 +16,6 @@ public sealed class CollectionStoreFactory : CollectionStoreFactoryBase {
     }
 
     protected override CollectionStoreBase CreateDictionaryStore(IDictionary dictionary) {
-        return new DictionaryStore(dictionary);
+        return new DictionaryStore(dictionary, ValueParser);
     }
 }
