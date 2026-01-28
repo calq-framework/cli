@@ -218,7 +218,7 @@ namespace CalqFramework.CliTest {
                 var obj = new SomeConfiguration();
                 OptionDeserializer.Deserialize(obj, $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.integer))}=0.1".Split(' '));
             });
-            Assert.Equal($"value type mismatch: expected Int32 got 0.1", ex.Message);
+            Assert.Equal($"option 'integer=0.1': invalid format (expected Int32)", ex.Message);
         }
 
         [Fact]
@@ -227,7 +227,7 @@ namespace CalqFramework.CliTest {
                 var obj = new SomeConfiguration();
                 OptionDeserializer.Deserialize(obj, $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.integer))}=a".Split(' '));
             });
-            Assert.Equal($"value type mismatch: expected Int32 got a", ex.Message);
+            Assert.Equal($"option 'integer=a': invalid format (expected Int32)", ex.Message);
         }
 
         [Fact]
@@ -244,7 +244,7 @@ namespace CalqFramework.CliTest {
                 var obj = new SomeConfiguration();
                 OptionDeserializer.Deserialize(obj, $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.aByteNumber))}=256".Split(' '));
             });
-            Assert.Equal($"value is out of range: 256 (0-255)", ex.Message);
+            Assert.Equal($"option 'a-byte-number=256': out of range (0-255)", ex.Message);
         }
 
         [Fact]
@@ -257,7 +257,7 @@ namespace CalqFramework.CliTest {
                     new OptionDeserializerConfiguration() { SkipUnknown = true }
                 );
             });
-            Assert.Equal($"value is out of range: 2147483647 (0-65535)", ex.Message);
+            Assert.Equal($"option 'port=2147483647': out of range (0-65535)", ex.Message);
         }
 
         [Fact]

@@ -127,7 +127,7 @@ namespace CalqFramework.CliTest {
 
         [Fact]
         public void Execute_MethodWithConflictingBooleanOption_ThrowsException() {
-            Exception ex = Assert.Throws<Exception>(() => {
+            CliException ex = Assert.Throws<CliException>(() => {
                 var tool = new SomeClassLibrary();
                 new CommandLineInterface().Execute(tool, $"{StringHelper.GetKebabCase(nameof(SomeClassLibrary.MethodWithTextAndBooleanError))} abc --{StringHelper.GetKebabCase(nameof(SomeClassLibrary.booleanConflict))}".Split(' '));
             });

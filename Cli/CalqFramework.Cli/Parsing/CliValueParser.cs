@@ -11,7 +11,7 @@ public class CliValueParser : IValueParser {
     private readonly ValueParser _valueParser = new();
 
     public bool IsParseable(Type type) {
-        return type.IsPrimitive || type == typeof(string) || type.GetInterface(nameof(ICollection)) != null;
+        return _valueParser.IsParseable(type) || type.GetInterface(nameof(ICollection)) != null;
     }
 
     public T ParseValue<T>(string value) {
@@ -19,19 +19,68 @@ public class CliValueParser : IValueParser {
     }
 
     public object ParseValue(string value, Type type) {
-        try {
-            bool isCollection = type.GetInterface(nameof(ICollection)) != null;
-            if (isCollection) {
-                type = type.GetGenericArguments()[0];
-            }
+        bool isCollection = type.GetInterface(nameof(ICollection)) != null;
+        if (isCollection) {
+            type = type.GetGenericArguments()[0];
+        }
 
+        try {
             return _valueParser.ParseValue(value, type);
         } catch (OverflowException ex) {
-            throw new CliException($"value is out of range: {ex.Message}", ex);
+            long min;
+            ulong max;
+            switch (Type.GetTypeCode(type)) {
+                case TypeCode.Byte:
+                    min = byte.MinValue;
+                    max = byte.MaxValue;
+                    break;
+
+                case TypeCode.SByte:
+                    min = sbyte.MinValue;
+                    max = (ulong)sbyte.MaxValue;
+                    break;
+
+                case TypeCode.Char:
+                    min = char.MinValue;
+                    max = char.MaxValue;
+                    break;
+
+                case TypeCode.Int32:
+                    min = int.MinValue;
+                    max = int.MaxValue;
+                    break;
+
+                case TypeCode.UInt32:
+                    min = uint.MinValue;
+                    max = uint.MaxValue;
+                    break;
+
+                case TypeCode.Int64:
+                    min = long.MinValue;
+                    max = long.MaxValue;
+                    break;
+
+                case TypeCode.UInt64:
+                    min = (long)ulong.MinValue;
+                    max = ulong.MaxValue;
+                    break;
+
+                case TypeCode.Int16:
+                    min = short.MinValue;
+                    max = (ulong)short.MaxValue;
+                    break;
+
+                case TypeCode.UInt16:
+                    min = ushort.MinValue;
+                    max = ushort.MaxValue;
+                    break;
+
+                default:
+                    throw;
+            }
+            throw new CliValueParserException($"out of range ({min}-{max})", ex);
         } catch (FormatException ex) {
-            throw new CliException($"value type mismatch: expected {type.Name} got {value}", ex);
-        } catch (ArgumentException ex) {
-            throw new CliException($"value type mismatch: expected {type.Name} got {value}", ex);
+            throw new CliValueParserException($"invalid format (expected {type.Name})", ex);
         }
     }
 }

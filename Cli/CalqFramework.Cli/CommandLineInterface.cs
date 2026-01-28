@@ -106,7 +106,13 @@ namespace CalqFramework.Cli {
                 ReadParametersAndOptions(skippedEn, subcommandExecutorWithOptions);
             }
 
-            var result = subcommandExecutorWithOptions.Invoke();
+            object? result;
+            try {
+                result = subcommandExecutorWithOptions.Invoke();
+            } catch (CliValueParserException ex) {
+                throw new CliException($"Failed to parse argument: {ex.Message}", ex);
+            }
+            
             if (subcommand.ReturnType == typeof(void)) {
                 return ResultVoid.Value;
             } else {
@@ -141,7 +147,11 @@ namespace CalqFramework.Cli {
                 if (optionAttr.HasFlag(OptionFlags.NotAnOption)) {
                     subcommandExecutorWithOptions.AddArgument(option);
                 } else {
-                    subcommandExecutorWithOptions[option] = value;
+                    try {
+                        subcommandExecutorWithOptions[option] = value;
+                    } catch (CliValueParserException ex) {
+                        throw new CliException(option, value, ex.Message, ex);
+                    }
                 }
             }
 
