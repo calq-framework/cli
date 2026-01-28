@@ -134,14 +134,14 @@ namespace CalqFramework.Cli {
                 if (optionAttr.HasFlag(OptionFlags.AmbigousValue)) {
                     throw new CliException($"Ambigious value {optionReader.ArgsEnumerator.Current} for {option}. Use option=value format for values starting with '-' or '+'.");
                 }
-                if (optionAttr.HasFlag(OptionFlags.ValueUnassigned) && !optionAttr.HasFlag(OptionFlags.NotAnOption)) {
-                    throw new CliException($"{option} requires a value");
-                }
                 if (optionAttr.HasFlag(OptionFlags.Unknown)) {
                     if (SkipUnknown) {
                         continue;
                     }
                     throw new CliException($"unknown option {option}");
+                }
+                if (optionAttr.HasFlag(OptionFlags.ValueUnassigned) && !optionAttr.HasFlag(OptionFlags.NotAnOption)) {
+                    throw new CliException($"{option} requires a value");
                 }
 
                 if (optionAttr.HasFlag(OptionFlags.NotAnOption)) {

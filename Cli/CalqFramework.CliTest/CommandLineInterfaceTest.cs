@@ -198,5 +198,14 @@ namespace CalqFramework.CliTest {
                 new CommandLineInterface().Execute(tool, $"{StringHelper.GetKebabCase(nameof(SomeClassLibrary.nullObjectField))} mested-method".Split(' '));
             });
         }
+
+        [Fact]
+        public void Execute_UnknownOptionWithValue_ThrowsUnknownOptionException() {
+            CliException ex = Assert.Throws<CliException>(() => {
+                var tool = new SomeClassLibrary();
+                new CommandLineInterface().Execute(tool, $"{StringHelper.GetKebabCase(nameof(SomeClassLibrary.Method))} --doesntexist a".Split(' '));
+            });
+            Assert.Equal("unknown option doesntexist", ex.Message);
+        }
     }
 }
