@@ -1,13 +1,14 @@
 ﻿using CalqFramework.Cli;
-using CalqFramework.Cli.DataAccess.InterfaceComponent;
+using CalqFramework.Cli.DataAccess.InterfaceComponents;
 using System;
 using System.Text.Json;
+using CloudProvider;
 
 var result = new CommandLineInterface() {
     CliComponentStoreFactory = new CliComponentStoreFactory() {
         EnableShadowing = true
     }
-}.Execute(new CloudProviderTool.CloudProvider());
+}.Execute(new CloudManager());
 
 switch (result) {
     case ResultVoid:
