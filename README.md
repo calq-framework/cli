@@ -15,7 +15,7 @@ Both examples implement CLI for the classlib from:
 The following template is a complete implementation.
 ```csharp
 using CalqFramework.Cli;
-using CalqFramework.Cli.DataAccess.InterfaceComponent;
+using CalqFramework.Cli.DataAccess.InterfaceComponents;
 using System;
 using System.Text.Json;
 using CloudProviderTool;
@@ -173,7 +173,6 @@ dotnet add package CalqFramework.Cli
 
 ```csharp
 using CalqFramework.Cli;
-using CalqFramework.Cli.Serialization;
 using System;
 using System.Text.Json;
 

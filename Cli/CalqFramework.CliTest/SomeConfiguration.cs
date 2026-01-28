@@ -1,7 +1,7 @@
 ﻿#pragma warning disable CS0649
 
 using System.Collections.Generic;
-using CalqFramework.Cli.Serialization;
+using CalqFramework.Cli;
 
 namespace CalqFramework.CliTest {
 

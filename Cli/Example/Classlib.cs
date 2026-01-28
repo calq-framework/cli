@@ -1,6 +1,6 @@
 using System;
 
-namespace CloudProviderTool {
+namespace CloudProvider {
     // Compute-specific result records
     public record StartInstanceResult(string Message, int StatusCode);
     public record StopInstanceResult(string Message, int StatusCode);
@@ -23,7 +23,7 @@ namespace CloudProviderTool {
     public record TestSpeedResult(string Message, int Bandwidth);
 
     /// <summary>Base class for all CLI submodules.</summary>
-    public abstract class SubmoduleBase {
+    public abstract class ManagerBase {
         /// <summary>API Key used to auth the command.</summary>
         public string? ApiKey { get; set; } = System.IO.File.Exists(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "calq.cli.example.txt"))
             ? System.IO.File.ReadAllText(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "calq.cli.example.txt"))
@@ -31,22 +31,22 @@ namespace CloudProviderTool {
     }
 
     /// <summary>Everything should just work even if any class or its contents are refactored.</summary>
-    public class CloudProvider : SubmoduleBase {
+    public class CloudManager : ManagerBase {
         /// <summary>Permanently saves api key into calq.cli.example.txt in the user dir.</summary>
         /// <param name="ApiKey">Without shadowing enabled, throws error on use</param>
         public void Add(string ApiKey) => System.IO.File.WriteAllText(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "calq.cli.example.txt"), ApiKey);
         /// <summary>Removes calq.cli.example.txt</summary>
         public void Remove() => System.IO.File.Delete(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "calq.cli.example.txt"));
         /// <summary>Compute submodule.</summary>
-        public ComputeModule Compute { get; set; } = new ComputeModule();
+        public ComputeManager Compute { get; set; } = new ComputeManager();
         /// <summary>Storage submodule.</summary>
-        public StorageModule Storage { get; set; } = new StorageModule();
+        public StorageManager Storage { get; set; } = new StorageManager();
         /// <summary>Network submodule.</summary>
-        public NetworkModule Network { get; set; } = new NetworkModule();
+        public NetworkManager Network { get; set; } = new NetworkManager();
     }
 
     /// <summary>Abstract compute submodule.</summary>
-    public abstract class AbstractComputeSubmodule : SubmoduleBase {
+    public abstract class AbstractComputeManager : ManagerBase {
         /// <summary>Maximum number of compute instances.</summary>
         public int MaxInstances { get; set; } = 10;
         /// <summary>Default compute region.</summary>
@@ -88,7 +88,7 @@ namespace CloudProviderTool {
     }
 
     /// <summary>Abstract storage submodule.</summary>
-    public abstract class AbstractStorageSubmodule : SubmoduleBase {
+    public abstract class AbstractStorageManager : ManagerBase {
         /// <summary>Type of storage.</summary>
         public string StorageType { get; set; } = "Blob";
         /// <summary>Maximum storage capacity in GB.</summary>
@@ -130,7 +130,7 @@ namespace CloudProviderTool {
     }
 
     /// <summary>Abstract network submodule.</summary>
-    public abstract class AbstractNetworkSubmodule : SubmoduleBase {
+    public abstract class AbstractNetworkManager : ManagerBase {
         /// <summary>Network type .</summary>
         public string NetworkType { get; set; } = "Virtual";
         /// <summary>Default network region.</summary>
@@ -171,7 +171,7 @@ namespace CloudProviderTool {
     }
 
     /// <summary>Compute module for cloud operations.</summary>
-    public class ComputeModule : AbstractComputeSubmodule {
+    public class ComputeManager : AbstractComputeManager {
         /// <summary>Display name of compute module.</summary>
         public string DisplayName { get; set; } = "Compute";
         /// <summary>Runs a compute action.</summary>
@@ -179,15 +179,15 @@ namespace CloudProviderTool {
         /// <returns>Result of compute action.</returns>
         public string Run(string action = "default") => $"Compute executing {action}.";
         /// <summary>Virtual Machine submodule.</summary>
-        public VirtualMachineModule VirtualMachine { get; set; } = new VirtualMachineModule();
+        public VirtualMachineManager VirtualMachine { get; set; } = new VirtualMachineManager();
         /// <summary>Container submodule.</summary>
-        public ContainerModule Container { get; set; } = new ContainerModule();
+        public ContainerManager Container { get; set; } = new ContainerManager();
     }
 
     /// <summary>Virtual Machine module for compute operations.</summary>
-    public class VirtualMachineModule : AbstractComputeSubmodule {
-        /// <summary>Module identifier for VM.</summary>
-        public string ModuleId { get; set; } = "vm-001";
+    public class VirtualMachineManager : AbstractComputeManager {
+        /// <summary>Manager identifier for VM.</summary>
+        public string ManagerId { get; set; } = "vm-001";
         /// <summary>Deploys a virtual machine.</summary>
         /// <param name="vmName">Name of the virtual machine.</param>
         /// <returns>Deployment result string.</returns>
@@ -199,9 +199,9 @@ namespace CloudProviderTool {
     }
 
     /// <summary>Container module for compute operations.</summary>
-    public class ContainerModule : AbstractComputeSubmodule {
-        /// <summary>Module identifier for container.</summary>
-        public string ModuleId { get; set; } = "container-001";
+    public class ContainerManager : AbstractComputeManager {
+        /// <summary>Manager identifier for container.</summary>
+        public string ManagerId { get; set; } = "container-001";
         /// <summary>Deploys a container.</summary>
         /// <param name="containerName">Name of the container.</param>
         /// <returns>Deployment result string.</returns>
@@ -213,7 +213,7 @@ namespace CloudProviderTool {
     }
 
     /// <summary>Storage module for cloud operations.</summary>
-    public class StorageModule : AbstractStorageSubmodule {
+    public class StorageManager : AbstractStorageManager {
         /// <summary>Display name of storage module.</summary>
         public string DisplayName { get; set; } = "Storage";
         /// <summary>Runs a storage action.</summary>
@@ -221,13 +221,13 @@ namespace CloudProviderTool {
         /// <returns>Result of storage action.</returns>
         public string Run(string action = "default") => $"Storage executing {action}.";
         /// <summary>Blob submodule.</summary>
-        public BlobModule Blob { get; set; } = new BlobModule();
+        public BlobManager Blob { get; set; } = new BlobManager();
         /// <summary>File submodule.</summary>
-        public FileModule File { get; set; } = new FileModule();
+        public FileManager File { get; set; } = new FileManager();
     }
 
     /// <summary>Blob module for storage operations.</summary>
-    public class BlobModule : AbstractStorageSubmodule {
+    public class BlobManager : AbstractStorageManager {
         /// <summary>Name of the blob container.</summary>
         public string ContainerName { get; set; } = "defaultBlobContainer";
         /// <summary>Uploads a file to the blob container.</summary>
@@ -241,7 +241,7 @@ namespace CloudProviderTool {
     }
 
     /// <summary>File module for storage operations.</summary>
-    public class FileModule : AbstractStorageSubmodule {
+    public class FileManager : AbstractStorageManager {
         /// <summary>Name of the file directory.</summary>
         public string DirectoryName { get; set; } = "defaultFileDirectory";
         /// <summary>Uploads a file to the directory.</summary>
@@ -255,7 +255,7 @@ namespace CloudProviderTool {
     }
 
     /// <summary>Network module for cloud operations.</summary>
-    public class NetworkModule : AbstractNetworkSubmodule {
+    public class NetworkManager : AbstractNetworkManager {
         /// <summary>Display name of network module.</summary>
         public string DisplayName { get; set; } = "Network";
         /// <summary>Runs a network action.</summary>
@@ -263,15 +263,15 @@ namespace CloudProviderTool {
         /// <returns>Result of network action.</returns>
         public string Run(string action = "default") => $"Network executing {action}.";
         /// <summary>Virtual network submodule.</summary>
-        public VirtualNetworkModule VirtualNetwork { get; set; } = new VirtualNetworkModule();
+        public VirtualNetworkManager VirtualNetwork { get; set; } = new VirtualNetworkManager();
         /// <summary>Load balancer submodule.</summary>
-        public LoadBalancerModule LoadBalancer { get; set; } = new LoadBalancerModule();
+        public LoadBalancerManager LoadBalancer { get; set; } = new LoadBalancerManager();
         /// <summary>Firewall submodule.</summary>
-        public FirewallModule Firewall { get; set; } = new FirewallModule();
+        public FirewallManager Firewall { get; set; } = new FirewallManager();
     }
 
     /// <summary>Virtual network module for network operations.</summary>
-    public class VirtualNetworkModule : AbstractNetworkSubmodule {
+    public class VirtualNetworkManager : AbstractNetworkManager {
         /// <summary>Identifier for the virtual network.</summary>
         public string NetworkId { get; set; } = "vnet-001";
         /// <summary>Creates a virtual network.</summary>
@@ -285,7 +285,7 @@ namespace CloudProviderTool {
     }
 
     /// <summary>Load balancer module for network operations.</summary>
-    public class LoadBalancerModule : AbstractNetworkSubmodule {
+    public class LoadBalancerManager : AbstractNetworkManager {
         /// <summary>Identifier for the load balancer.</summary>
         public string LBId { get; set; } = "lb-001";
         /// <summary>Creates a load balancer.</summary>
@@ -299,7 +299,7 @@ namespace CloudProviderTool {
     }
 
     /// <summary>Firewall module for network operations.</summary>
-    public class FirewallModule : AbstractNetworkSubmodule {
+    public class FirewallManager : AbstractNetworkManager {
         /// <summary>Identifier for the firewall.</summary>
         public string FirewallId { get; set; } = "fw-001";
         /// <summary>Enables the firewall.</summary>
