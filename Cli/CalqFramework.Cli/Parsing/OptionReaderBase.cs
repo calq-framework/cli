@@ -114,22 +114,30 @@ namespace CalqFramework.Cli.Parsing {
 
                 if (optionAttr.HasFlag(OptionFlags.Short)) {
                     foreach (char shortOption in ReadShort(option)) {
-                        if (HasOption(shortOption)) {
-                            if (optionAttr.HasFlag(OptionFlags.ValueUnassigned)) {
-                                TrySelfAssign(GetOptionType(shortOption), ref value, ref optionAttr);
+                        try {
+                            if (HasOption(shortOption)) {
+                                if (optionAttr.HasFlag(OptionFlags.ValueUnassigned)) {
+                                    TrySelfAssign(GetOptionType(shortOption), ref value, ref optionAttr);
+                                }
+                            } else {
+                                optionAttr |= OptionFlags.Unknown;
                             }
-                        } else {
-                            optionAttr |= OptionFlags.Unknown;
+                        } catch (CliValueParserException ex) {
+                            throw new CliException(shortOption.ToString(), ex.Message, ex);
                         }
                         yield return (shortOption.ToString(), value, optionAttr);
                     }
                 } else {
-                    if (HasOption(option)) {
-                        if (optionAttr.HasFlag(OptionFlags.ValueUnassigned)) {
-                            TrySelfAssign(GetOptionType(option), ref value, ref optionAttr);
+                    try {
+                        if (HasOption(option)) {
+                            if (optionAttr.HasFlag(OptionFlags.ValueUnassigned)) {
+                                TrySelfAssign(GetOptionType(option), ref value, ref optionAttr);
+                            }
+                        } else {
+                            optionAttr |= OptionFlags.Unknown;
                         }
-                    } else {
-                        optionAttr |= OptionFlags.Unknown;
+                    } catch (CliValueParserException ex) {
+                        throw new CliException(option, ex.Message, ex);
                     }
                     yield return (option, value, optionAttr);
                 }

@@ -4,19 +4,25 @@ using System;
 using System.Text.Json;
 using CloudProvider;
 
-var result = new CommandLineInterface() {
-    CliComponentStoreFactory = new CliComponentStoreFactory() {
-        EnableShadowing = true
-    }
-}.Execute(new CloudManager());
+try {
+    var result = new CommandLineInterface() {
+        CliComponentStoreFactory = new CliComponentStoreFactory() {
+            EnableShadowing = true
+        }
+    }.Execute(new CloudManager());
 
-switch (result) {
-    case ResultVoid:
-        break;
-    case string str:
-        Console.WriteLine(str);
-        break;
-    case object obj:
-        Console.WriteLine(JsonSerializer.Serialize(obj));
-        break;
+    switch (result) {
+        case ResultVoid:
+            break;
+        case string str:
+            Console.WriteLine(str);
+            break;
+        case object obj:
+            Console.WriteLine(JsonSerializer.Serialize(obj));
+            break;
+    }
+}
+catch (CliException ex) {
+    Console.Error.WriteLine(ex.Message);
+    Environment.Exit(1);
 }

@@ -20,21 +20,27 @@ using System;
 using System.Text.Json;
 using CloudProviderTool;
 
-var result = new CommandLineInterface() {
-    CliComponentStoreFactory = new CliComponentStoreFactory() {
-        EnableShadowing = true
-    }
-}.Execute(new CloudProvider());
+try {
+    var result = new CommandLineInterface() {
+        CliComponentStoreFactory = new CliComponentStoreFactory() {
+            EnableShadowing = true
+        }
+    }.Execute(new CloudProvider());
 
-switch (result) {
-    case ResultVoid:
-        break;
-    case string str:
-        Console.WriteLine(str);
-        break;
-    case object obj:
-        Console.WriteLine(JsonSerializer.Serialize(obj));
-        break;
+    switch (result) {
+        case ResultVoid:
+            break;
+        case string str:
+            Console.WriteLine(str);
+            break;
+        case object obj:
+            Console.WriteLine(JsonSerializer.Serialize(obj));
+            break;
+    }
+}
+catch (CliException ex) {
+    Console.Error.WriteLine(ex.Message);
+    Environment.Exit(1);
 }
 ```
 
@@ -176,8 +182,14 @@ using CalqFramework.Cli;
 using System;
 using System.Text.Json;
 
-var result = new CommandLineInterface().Execute(new QuickStart());
-if (result is not ResultVoid) Console.WriteLine(JsonSerializer.Serialize(result));
+try {
+    var result = new CommandLineInterface().Execute(new QuickStart());
+    if (result is not ResultVoid) Console.WriteLine(JsonSerializer.Serialize(result));
+}
+catch (CliException ex) {
+    Console.Error.WriteLine(ex.Message);
+    Environment.Exit(1);
+}
 
 /// <summary>Displayed in the help menu.</summary>
 class QuickStart {

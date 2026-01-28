@@ -60,7 +60,11 @@ namespace CalqFramework.Cli {
                     throw new CliException($"unexpected value {option}");
                 }
 
-                store[option] = value;
+                try {
+                    store[option] = value;
+                } catch (CliValueParserException ex) {
+                    throw new CliException(option, value, ex.Message, ex);
+                }
             }
         }
     }
