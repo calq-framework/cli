@@ -14,15 +14,15 @@ namespace CalqFramework.Cli {
         /// <summary>
         /// Deserializes command-line arguments from the environment into the specified object.
         /// </summary>
-        public static void Deserialize(object obj, OptionDeserializerConfiguration? options = null) {
-            Deserialize(obj, Environment.GetCommandLineArgs().Skip(1), options);
+        public static void Deserialize(object target, OptionDeserializerConfiguration? options = null) {
+            Deserialize(target, Environment.GetCommandLineArgs().Skip(1), options);
         }
 
         /// <summary>
         /// Deserializes the specified arguments into the object's properties and fields.
         /// </summary>
-        public static void Deserialize(object obj, IEnumerable<string> args, OptionDeserializerConfiguration? options = null) {
-            IOptionStore store = new CliComponentStoreFactory().CreateOptionStore(obj);
+        public static void Deserialize(object target, IEnumerable<string> args, OptionDeserializerConfiguration? options = null) {
+            IOptionStore store = new CliComponentStoreFactory().CreateOptionStore(target);
             Deserialize(store, args, options);
         }
 
