@@ -6,15 +6,13 @@ namespace CalqFramework.DataAccess.Collections;
 /// <summary>
 /// Provides key-value access to dictionary elements.
 /// </summary>
-public sealed class DictionaryStore : CollectionStoreBase {
+public sealed class DictionaryStore : DictionaryStoreBase<string, object?> {
 
     private readonly IValueParser _valueParser;
 
     public DictionaryStore(IDictionary dictionary, IValueParser valueParser) : base(dictionary) {
         _valueParser = valueParser;
     }
-
-    private IDictionary Dictionary => (IDictionary)ParentCollection;
 
     public override object? this[string key] {
         get {
@@ -28,12 +26,12 @@ public sealed class DictionaryStore : CollectionStoreBase {
     }
 
     public override bool ContainsKey(string key) {
-        object parsedKey = _valueParser.ParseValue(key, Dictionary.GetType().GetGenericArguments()[0]);
-        return Dictionary.Contains(parsedKey);
-    }
-
-    public override Type GetDataType(string key) {
-        return this[key]!.GetType();
+        try {
+            object parsedKey = _valueParser.ParseValue(key, Dictionary.GetType().GetGenericArguments()[0]);
+            return Dictionary.Contains(parsedKey);
+        } catch {
+            return false;
+        }
     }
 
     public override object? GetValueOrInitialize(string key) {
@@ -45,9 +43,5 @@ public sealed class DictionaryStore : CollectionStoreBase {
             Dictionary[parsedKey] = element;
         }
         return element;
-    }
-
-    public override void RemoveValue(string key) {
-        Dictionary.Remove(key);
     }
 }

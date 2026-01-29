@@ -53,7 +53,7 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
         /// <summary>
         /// Factory for creating collection stores.
         /// </summary>
-        public ICollectionStoreFactory CollectionStoreFactory { get; init; }
+        public ICollectionStoreFactory<string, object?> CollectionStoreFactory { get; init; }
         /// <summary>
         /// Method parameters can shadow fields and properties.
         /// </summary>
