@@ -13,10 +13,10 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
     /// </summary>
     public class ValueConverter : IValueConverter<string?> {
 
-        private readonly ICollectionStoreFactory _collectionStoreFactory;
+        private readonly ICollectionStoreFactory<string, object?> _collectionStoreFactory;
         private readonly IValueParser _valueParser;
 
-        public ValueConverter(ICollectionStoreFactory collectionStoreFactory, IValueParser valueParser) {
+        public ValueConverter(ICollectionStoreFactory<string, object?> collectionStoreFactory, IValueParser valueParser) {
             _collectionStoreFactory = collectionStoreFactory;
             _valueParser = valueParser;
         }
@@ -51,7 +51,7 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
             } else {
                 ICollection collection = (currentValue as ICollection)!;
                 object item = _valueParser.ParseValue(value, internalType.GetGenericArguments()[0]);
-                _collectionStoreFactory.CreateStore(collection).AddValue(item);
+                _collectionStoreFactory.CreateStore(collection).Add(item);
                 return currentValue;
             }
         }

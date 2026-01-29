@@ -6,11 +6,11 @@ namespace CalqFramework.DataAccess.Collections;
 /// <summary>
 /// Base class for collection store factories.
 /// </summary>
-public abstract class CollectionStoreFactoryBase : ICollectionStoreFactory {
+public abstract class CollectionStoreFactoryBase<TKey, TValue> : ICollectionStoreFactory<TKey, TValue> {
 
     public IValueParser ValueParser { get; init; } = new ValueParser();
 
-    public virtual CollectionStoreBase CreateStore(ICollection collection) {
+    public virtual ICollectionStore<TKey, TValue> CreateStore(ICollection collection) {
         return collection switch {
             Array array => CreateArrayStore(array),
             IList list => CreateListStore(list),
@@ -19,7 +19,7 @@ public abstract class CollectionStoreFactoryBase : ICollectionStoreFactory {
         };
     }
 
-    protected abstract CollectionStoreBase CreateArrayStore(Array array);
-    protected abstract CollectionStoreBase CreateListStore(IList list);
-    protected abstract CollectionStoreBase CreateDictionaryStore(IDictionary dictionary);
+    protected abstract ICollectionStore<TKey, TValue> CreateArrayStore(Array array);
+    protected abstract ICollectionStore<TKey, TValue> CreateListStore(IList list);
+    protected abstract ICollectionStore<TKey, TValue> CreateDictionaryStore(IDictionary dictionary);
 }
