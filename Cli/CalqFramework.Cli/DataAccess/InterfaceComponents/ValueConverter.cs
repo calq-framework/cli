@@ -21,6 +21,11 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
             _argValueParser = argValueParser;
         }
 
+        /// <summary>
+        /// Culture to use for parsing values. Defaults to InvariantCulture.
+        /// </summary>
+        public IFormatProvider FormatProvider { get; init; } = System.Globalization.CultureInfo.InvariantCulture;
+
         public string? ConvertFromInternalValue(object? value, Type internalType) {
             if (value == null) {
                 return null;
@@ -42,10 +47,10 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
 
             bool isCollection = internalType.GetInterface(nameof(ICollection)) != null;
             if (isCollection == false) {
-                return _argValueParser.ParseValue(value, internalType);
+                return _argValueParser.ParseValue(value, internalType, FormatProvider);
             } else {
                 ICollection collection = (currentValue as ICollection)!;
-                object item = _argValueParser.ParseValue(value, internalType.GetGenericArguments()[0]);
+                object item = _argValueParser.ParseValue(value, internalType.GetGenericArguments()[0], FormatProvider);
                 _collectionStoreFactory.CreateStore(collection).Add(item);
                 return currentValue;
             }
