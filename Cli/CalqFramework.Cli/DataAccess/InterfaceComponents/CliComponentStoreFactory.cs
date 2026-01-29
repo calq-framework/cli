@@ -28,14 +28,11 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
             BindingFlags = DefaultLookup;
             ClassMemberStringifier = new ClassMemberStringifier();
             EnableShadowing = false;
-            
-            ArgValueParser = new ArgValueParser();
-            CollectionStoreFactory = new CollectionStoreFactory() { 
-                IndexParser = ArgValueParser,
-                KeyParser = ArgValueParser 
-            };
-            ValueConverter = new ValueConverter(CollectionStoreFactory, ArgValueParser);
         }
+
+        private IStringParser? _argValueParser;
+        private ICollectionStoreFactory<string, object?>? _collectionStoreFactory;
+        private IValueConverter<string?>? _valueConverter;
 
         /// <summary>
         /// Access fields as CLI options.
@@ -54,9 +51,9 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
         /// </summary>
         public IClassMemberStringifier ClassMemberStringifier { get; init; }
         /// <summary>
-        /// Factory for creating collection stores.
+        /// Culture to use for parsing argument values. Defaults to InvariantCulture.
         /// </summary>
-        public ICollectionStoreFactory<string, object?> CollectionStoreFactory { get; init; }
+        public IFormatProvider FormatProvider { get; init; } = System.Globalization.CultureInfo.InvariantCulture;
         /// <summary>
         /// Method parameters can shadow fields and properties.
         /// </summary>
@@ -93,13 +90,29 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
             init => _submoduleAccessValidator = value;
         }
         /// <summary>
-        /// Converter for transforming values between CLI strings and internal types.
-        /// </summary>
-        public IValueConverter<string?> ValueConverter { get; init; }
-        /// <summary>
         /// Parser for converting string argument values to typed objects.
         /// </summary>
-        public IStringParser ArgValueParser { get; init; }
+        public IStringParser ArgValueParser { 
+            get => _argValueParser ??= new ArgValueParser();
+            init => _argValueParser = value;
+        }
+        /// <summary>
+        /// Factory for creating collection stores.
+        /// </summary>
+        public ICollectionStoreFactory<string, object?> CollectionStoreFactory { 
+            get => _collectionStoreFactory ??= new CollectionStoreFactory() { 
+                IndexParser = ArgValueParser,
+                KeyParser = ArgValueParser 
+            };
+            init => _collectionStoreFactory = value;
+        }
+        /// <summary>
+        /// Converter for transforming values between CLI strings and internal types.
+        /// </summary>
+        public IValueConverter<string?> ValueConverter { 
+            get => _valueConverter ??= new ValueConverter(CollectionStoreFactory, ArgValueParser) { FormatProvider = FormatProvider };
+            init => _valueConverter = value;
+        }
 
         public IOptionStore CreateOptionStore(object obj) {
             ICliKeyValueStore<string, string?, MemberInfo> store;

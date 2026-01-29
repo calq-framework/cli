@@ -18,6 +18,10 @@ public class ArgValueParser : IStringParser {
         return (T)ParseValue(value, typeof(T));
     }
 
+    public T ParseValue<T>(string value, IFormatProvider? formatProvider) {
+        return (T)ParseValue(value, typeof(T), formatProvider);
+    }
+
     public object ParseValue(string value, Type type) {
         bool isCollection = type.GetInterface(nameof(ICollection)) != null;
         if (isCollection) {
@@ -26,6 +30,29 @@ public class ArgValueParser : IStringParser {
 
         try {
             return _stringParser.ParseValue(value, type);
+        } catch (OverflowException ex) {
+            var minField = type.GetField("MinValue");
+            var maxField = type.GetField("MaxValue");
+            
+            if (minField != null && maxField != null) {
+                var min = minField.GetValue(null);
+                var max = maxField.GetValue(null);
+                throw new ArgValueParserException($"out of range ({min}-{max})", ex);
+            }
+            throw;
+        } catch (FormatException ex) {
+            throw new ArgValueParserException($"invalid format (expected {type.Name})", ex);
+        }
+    }
+
+    public object ParseValue(string value, Type type, IFormatProvider? formatProvider) {
+        bool isCollection = type.GetInterface(nameof(ICollection)) != null;
+        if (isCollection) {
+            type = type.GetGenericArguments()[0];
+        }
+
+        try {
+            return _stringParser.ParseValue(value, type, formatProvider);
         } catch (OverflowException ex) {
             var minField = type.GetField("MinValue");
             var maxField = type.GetField("MaxValue");

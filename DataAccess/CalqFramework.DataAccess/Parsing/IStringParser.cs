@@ -15,7 +15,17 @@ public interface IStringParser {
     T ParseValue<T>(string value);
 
     /// <summary>
+    /// Parses a string value to the specified type using a specific format provider.
+    /// </summary>
+    T ParseValue<T>(string value, IFormatProvider? formatProvider);
+
+    /// <summary>
     /// Parses a string value to the specified target type.
     /// </summary>
     object ParseValue(string value, Type targetType);
+
+    /// <summary>
+    /// Parses a string value to the specified target type using a specific format provider.
+    /// </summary>
+    object ParseValue(string value, Type targetType, IFormatProvider? formatProvider);
 }
