@@ -30,7 +30,10 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
             EnableShadowing = false;
             
             ValueParser = new CliValueParser();
-            CollectionStoreFactory = new CollectionStoreFactory() { ValueParser = ValueParser };
+            CollectionStoreFactory = new CollectionStoreFactory() { 
+                IndexParser = ValueParser,
+                KeyParser = ValueParser 
+            };
             ValueConverter = new ValueConverter(CollectionStoreFactory, ValueParser);
         }
 
