@@ -8,8 +8,8 @@ namespace CalqFramework.DataAccess.Collections;
 /// </summary>
 public abstract class CollectionStoreFactoryBase<TKey, TValue> : ICollectionStoreFactory<TKey, TValue> {
 
-    public IValueParser IndexParser { get; init; } = new ValueParser();
-    public IValueParser KeyParser { get; init; } = new ValueParser();
+    public IStringParser IndexParser { get; init; } = new StringParser();
+    public IStringParser KeyParser { get; init; } = new StringParser();
 
     public virtual ICollectionStore<TKey, TValue> CreateStore(ICollection collection) {
         return collection switch {

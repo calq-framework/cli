@@ -99,7 +99,7 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
         /// <summary>
         /// Parser for converting string values to typed objects.
         /// </summary>
-        public IValueParser ValueParser { get; init; }
+        public IStringParser ValueParser { get; init; }
 
         public IOptionStore CreateOptionStore(object obj) {
             ICliKeyValueStore<string, string?, MemberInfo> store;
