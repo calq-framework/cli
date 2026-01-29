@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using CalqFramework.Cli.InterfaceComponents;
 
@@ -24,15 +25,10 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
         }
 
         public IEnumerable<Submodule> GetSubmodules() {
-            var result = new List<Submodule>();
-            IDictionary<MemberInfo, IEnumerable<string>> dict = Store.GetKeysByAccessors();
-            foreach (MemberInfo key in dict.Keys) {
-                result.Add(new Submodule() {
-                    Keys = dict[key],
-                    MemberInfo = key,
-                });
-            }
-            return result;
+            return Store.GetAccessorKeysPairs().Select(pair => new Submodule() {
+                Keys = pair.Keys,
+                MemberInfo = pair.Accessor,
+            });
         }
 
         public object? GetValueOrInitialize(string key) {

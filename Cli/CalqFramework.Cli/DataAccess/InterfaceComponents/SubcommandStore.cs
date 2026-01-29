@@ -25,17 +25,12 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
         }
 
         public IEnumerable<Subcommand> GetSubcommands(Func<MethodInfo, object?, ISubcommandExecutor> createSubcommandExecutor) {
-            var result = new List<Subcommand>();
-            IDictionary<MethodInfo, IEnumerable<string>> dict = Store.GetKeysByAccessors();
-            foreach (MethodInfo key in dict.Keys) {
-                result.Add(new Subcommand() {
-                    ReturnType = GetDataType(dict[key].First()),
-                    Keys = dict[key],
-                    MethodInfo = key,
-                    Parameters = createSubcommandExecutor(key, null).GetParameters()
-                });
-            }
-            return result;
+            return Store.GetAccessorKeysPairs().Select(pair => new Subcommand() {
+                ReturnType = GetDataType(pair.Keys[0]),
+                Keys = pair.Keys,
+                MethodInfo = pair.Accessor,
+                Parameters = createSubcommandExecutor(pair.Accessor, null).GetParameters()
+            });
         }
     }
 }

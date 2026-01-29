@@ -42,14 +42,13 @@ namespace CalqFramework.Cli.DataAccess.ClassMembers {
             return this[key]!.ReturnType;
         }
 
-        public IDictionary<MethodInfo, IEnumerable<string>> GetKeysByAccessors() {
-            var result = AccessorsByNames
+        public IEnumerable<AccessorKeysPair<MethodInfo>> GetAccessorKeysPairs() {
+            return AccessorsByNames
                 .GroupBy(kv => kv.Value)
-                .ToDictionary(
-                    group => (MethodInfo)group.Key,
-                    group => group.Select(kv => kv.Key)
-                );
-            return result;
+                .Select(g => new AccessorKeysPair<MethodInfo>(
+                    (MethodInfo)g.Key,
+                    g.Select(kv => kv.Key).ToArray()
+                ));
         }
 
         public bool TryGetAccessor(string key, [MaybeNullWhen(false)] out MethodInfo result) {

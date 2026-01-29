@@ -6,7 +6,7 @@ namespace CalqFramework.Cli.InterfaceComponents {
     /// Represents a CLI submodule (nested object) with its metadata.
     /// </summary>
     public class Submodule {
-        public required IEnumerable<string> Keys { get; init; }
+        public required IReadOnlyList<string> Keys { get; init; }
         public required MemberInfo MemberInfo { get; init; }
     }
 }
