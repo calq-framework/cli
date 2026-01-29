@@ -10,8 +10,8 @@ namespace CalqFramework.Cli.Parsing;
 public class ArgValueParser : IStringParser {
     private readonly StringParser _stringParser = new();
 
-    public bool IsParseable(Type type) {
-        return _stringParser.IsParseable(type) || type.GetInterface(nameof(ICollection)) != null;
+    public bool IsParsable(Type type) {
+        return _stringParser.IsParsable(type) || type.GetInterface(nameof(ICollection)) != null;
     }
 
     public T ParseValue<T>(string value) {

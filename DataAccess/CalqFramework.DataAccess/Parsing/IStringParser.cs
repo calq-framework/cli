@@ -7,7 +7,7 @@ public interface IStringParser {
     /// <summary>
     /// Determines if a type can be parsed from a string.
     /// </summary>
-    bool IsParseable(Type type);
+    bool IsParsable(Type type);
 
     /// <summary>
     /// Parses a string value to the specified type.

@@ -6,7 +6,7 @@ using CalqFramework.Extensions.System.Reflection;
 namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
 
     /// <summary>
-    /// Validates whether a member is a valid CLI submodule (must be non-parseable type).
+    /// Validates whether a member is a valid CLI submodule (must be non-parsable type).
     /// </summary>
     public class SubmoduleAccessValidator : IAccessValidator {
 
@@ -17,7 +17,7 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
         }
 
         public bool IsValid(MemberInfo accessor) {
-            return !_stringParser.IsParseable(accessor.GetUnderlyingType());
+            return !_stringParser.IsParsable(accessor.GetUnderlyingType());
         }
     }
 }
