@@ -26,14 +26,13 @@ namespace CalqFramework.Cli.DataAccess.ClassMembers {
             return accessor.ReflectedType == ParentType && AccessValidator.IsValid(accessor);
         }
 
-        public IDictionary<MemberInfo, IEnumerable<string>> GetKeysByAccessors() {
-            var result = AccessorsByNames
+        public IEnumerable<AccessorKeysPair<MemberInfo>> GetAccessorKeysPairs() {
+            return AccessorsByNames
                 .GroupBy(kv => kv.Value)
-                .ToDictionary(
-                    group => (MemberInfo)group.Key,
-                    group => group.Select(kv => kv.Key)
-                );
-            return result;
+                .Select(g => new AccessorKeysPair<MemberInfo>(
+                    (MemberInfo)g.Key,
+                    g.Select(kv => kv.Key).ToArray()
+                ));
         }
 
         public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out PropertyInfo result) {

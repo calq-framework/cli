@@ -9,8 +9,8 @@ namespace CalqFramework.Cli.DataAccess {
     public interface ICliReadOnlyKeyValueStore<TKey, TValue, TAccessor> : IReadOnlyKeyValueStore<TKey, TValue> {
 
         /// <summary>
-        /// Gets keys grouped by their accessors (e.g., fields, properties) for displaying alternative names in help.
+        /// Gets an ordered list of accessor-to-keys pairs for displaying alternative names in help.
         /// </summary>
-        IDictionary<TAccessor, IEnumerable<TKey>> GetKeysByAccessors();
+        IEnumerable<AccessorKeysPair<TAccessor>> GetAccessorKeysPairs();
     }
 }

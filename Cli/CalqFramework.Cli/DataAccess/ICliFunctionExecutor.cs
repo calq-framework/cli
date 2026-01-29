@@ -9,8 +9,8 @@ namespace CalqFramework.Cli.DataAccess {
     public interface ICliFunctionExecutor<TKey, TValue, TAccessor> : IFunctionExecutor<TKey, TValue> {
 
         /// <summary>
-        /// Gets keys grouped by their accessors (e.g., parameters) for displaying alternative names in help.
+        /// Gets an ordered list of accessor-to-keys pairs for displaying alternative names in help.
         /// </summary>
-        IDictionary<TAccessor, IEnumerable<TKey>> GetKeysByAccessors();
+        IEnumerable<AccessorKeysPair<TAccessor>> GetAccessorKeysPairs();
     }
 }

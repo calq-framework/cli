@@ -29,18 +29,13 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
         }
 
         public IEnumerable<Parameter> GetParameters() {
-            var result = new List<Parameter>();
-            IDictionary<ParameterInfo, IEnumerable<string>> dict = Executor.GetKeysByAccessors();
-            foreach (ParameterInfo key in dict.Keys) {
-                result.Add(new Parameter() {
-                    Type = GetDataType(dict[key].First()),
-                    Keys = dict[key],
-                    ParameterInfo = key,
-                    Value = this[dict[key].First()],
-                    HasDefaultValue = key.HasDefaultValue
-                });
-            }
-            return result.OrderBy(x => x.ParameterInfo.Position); // TODO consider IEnumerable<KeyValuePair<TAccessor, string[]>> for the whole project and ordering inside MethodExecutor
+            return Executor.GetAccessorKeysPairs().Select(pair => new Parameter() {
+                Type = GetDataType(pair.Keys[0]),
+                Keys = pair.Keys,
+                ParameterInfo = pair.Accessor,
+                Value = this[pair.Keys[0]],
+                HasDefaultValue = pair.Accessor.HasDefaultValue
+            });
         }
 
         public string? GetValueOrInitialize(string key) {

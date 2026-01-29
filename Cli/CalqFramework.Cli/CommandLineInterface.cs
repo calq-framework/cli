@@ -123,7 +123,7 @@ namespace CalqFramework.Cli {
             }
         }
 
-        // TODO move as extension method or convert enumerator to enumerable
+        // TODO move as extension method
         private static IEnumerable<string> GetSkippedEnumerator(IEnumerator<string> en) {
             do {
                 yield return en.Current;

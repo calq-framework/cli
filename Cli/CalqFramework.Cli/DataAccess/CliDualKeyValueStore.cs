@@ -18,8 +18,9 @@ namespace CalqFramework.Cli.DataAccess {
 
         protected override IKeyValueStore<string, TValue> SecondaryStore => _secondaryStore;
 
-        public IDictionary<MemberInfo, IEnumerable<string>> GetKeysByAccessors() {
-            return _primaryStore.GetKeysByAccessors().Concat(_secondaryStore.GetKeysByAccessors()).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        public IEnumerable<AccessorKeysPair<MemberInfo>> GetAccessorKeysPairs() {
+            return _primaryStore.GetAccessorKeysPairs()
+                .Concat(_secondaryStore.GetAccessorKeysPairs());
         }
     }
 }

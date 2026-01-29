@@ -25,17 +25,12 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
         }
 
         public IEnumerable<Option> GetOptions() {
-            var result = new List<Option>();
-            IDictionary<MemberInfo, IEnumerable<string>> dict = Store.GetKeysByAccessors();
-            foreach (MemberInfo key in dict.Keys) {
-                result.Add(new Option() {
-                    Type = GetDataType(dict[key].First()),
-                    Keys = dict[key],
-                    MemberInfo = key,
-                    Value = this[dict[key].First()]
-                });
-            }
-            return result;
+            return Store.GetAccessorKeysPairs().Select(pair => new Option() {
+                Type = GetDataType(pair.Keys[0]),
+                Keys = pair.Keys,
+                MemberInfo = pair.Accessor,
+                Value = this[pair.Keys[0]]
+            });
         }
 
         public string? GetValueOrInitialize(string key) {
