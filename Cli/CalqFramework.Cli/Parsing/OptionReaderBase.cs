@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Numerics;
+using CalqFramework.DataAccess;
 
 namespace CalqFramework.Cli.Parsing {
 
@@ -124,6 +125,8 @@ namespace CalqFramework.Cli.Parsing {
                             }
                         } catch (CliValueParserException ex) {
                             throw new CliException(shortOption.ToString(), ex.Message, ex);
+                        } catch (DataAccessException ex) {
+                            throw new CliException(shortOption.ToString(), ex.Message, ex);
                         }
                         yield return (shortOption.ToString(), value, optionAttr);
                     }
@@ -137,6 +140,8 @@ namespace CalqFramework.Cli.Parsing {
                             optionAttr |= OptionFlags.Unknown;
                         }
                     } catch (CliValueParserException ex) {
+                        throw new CliException(option, ex.Message, ex);
+                    } catch (DataAccessException ex) {
                         throw new CliException(option, ex.Message, ex);
                     }
                     yield return (option, value, optionAttr);
