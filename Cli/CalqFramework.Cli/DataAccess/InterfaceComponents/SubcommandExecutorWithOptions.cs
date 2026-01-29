@@ -6,19 +6,19 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
 
     internal class SubcommandExecutorWithOptions : DistinctDualKeyValueStoreBase<string, string?>, ISubcommandExecutorWithOptions {
         private readonly IOptionStore _optionStore;
-        private readonly ISubcommandExecutor _subcommandExeutor;
+        private readonly ISubcommandExecutor _subcommandExecutor;
 
         public SubcommandExecutorWithOptions(ISubcommandExecutor subcommandExecutor, IOptionStore optionStore) {
-            _subcommandExeutor = subcommandExecutor;
+            _subcommandExecutor = subcommandExecutor;
             _optionStore = optionStore;
         }
 
-        protected override IKeyValueStore<string, string?> PrimaryStore => _subcommandExeutor;
+        protected override IKeyValueStore<string, string?> PrimaryStore => _subcommandExecutor;
 
         protected override IKeyValueStore<string, string?> SecondaryStore => _optionStore;
 
         public void AddArgument(string? value) {
-            _subcommandExeutor.AddArgument(value);
+            _subcommandExecutor.AddArgument(value);
         }
 
         public IEnumerable<Option> GetOptions() {
@@ -26,11 +26,11 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
         }
 
         public IEnumerable<Parameter> GetParameters() {
-            return _subcommandExeutor.GetParameters();
+            return _subcommandExecutor.GetParameters();
         }
 
         public object? Invoke() {
-            return _subcommandExeutor.Invoke();
+            return _subcommandExecutor.Invoke();
         }
     }
 }

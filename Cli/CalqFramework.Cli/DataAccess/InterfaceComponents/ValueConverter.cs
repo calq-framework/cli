@@ -14,17 +14,12 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
     public class ValueConverter : IValueConverter<string?> {
 
         private readonly ICollectionStoreFactory<string, object?> _collectionStoreFactory;
-        private readonly IStringParser _stringParser;
+        private readonly IStringParser _argValueParser;
 
-        public ValueConverter(ICollectionStoreFactory<string, object?> collectionStoreFactory, IStringParser stringParser) {
+        public ValueConverter(ICollectionStoreFactory<string, object?> collectionStoreFactory, IStringParser argValueParser) {
             _collectionStoreFactory = collectionStoreFactory;
-            _stringParser = stringParser;
+            _argValueParser = argValueParser;
         }
-
-        /// <summary>
-        /// Gets the string parser used by this converter.
-        /// </summary>
-        public IStringParser ArgParser => _stringParser;
 
         public string? ConvertFromInternalValue(object? value, Type internalType) {
             if (value == null) {
@@ -47,10 +42,10 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
 
             bool isCollection = internalType.GetInterface(nameof(ICollection)) != null;
             if (isCollection == false) {
-                return _stringParser.ParseValue(value, internalType);
+                return _argValueParser.ParseValue(value, internalType);
             } else {
                 ICollection collection = (currentValue as ICollection)!;
-                object item = _stringParser.ParseValue(value, internalType.GetGenericArguments()[0]);
+                object item = _argValueParser.ParseValue(value, internalType.GetGenericArguments()[0]);
                 _collectionStoreFactory.CreateStore(collection).Add(item);
                 return currentValue;
             }
