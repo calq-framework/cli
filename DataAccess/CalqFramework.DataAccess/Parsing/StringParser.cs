@@ -5,8 +5,15 @@
 /// </summary>
 public class StringParser : IStringParser {
 
-    public bool IsParseable(Type type) {
-        return type.IsPrimitive || type == typeof(string);
+    public bool IsParsable(Type type) {
+        type = Nullable.GetUnderlyingType(type) ?? type;
+        
+        if (type.IsPrimitive || type == typeof(string)) {
+            return true;
+        }
+
+        var parsableInterface = type.GetInterface("IParsable`1");
+        return parsableInterface != null;
     }
 
     public T ParseValue<T>(string value) {
@@ -33,9 +40,30 @@ public class StringParser : IStringParser {
             TypeCode.Int16 => short.Parse(value),
             TypeCode.UInt16 => ushort.Parse(value),
             TypeCode.String => value,
-            _ => throw new ArgumentException($"type cannot be parsed: {targetType.Name}"),
+            _ => TryParseParsable(value, targetType)
         };
         
         return objValue;
+    }
+
+    private static object TryParseParsable(string value, Type targetType) {
+        // Check if type implements IParsable<T>
+        var parsableInterface = targetType.GetInterface("IParsable`1");
+        if (parsableInterface != null) {
+            // Get the Parse method from the actual type, not the interface
+            var parseMethod = targetType.GetMethod("Parse", 
+                new[] { typeof(string), typeof(IFormatProvider) });
+            
+            if (parseMethod != null) {
+                try {
+                    return parseMethod.Invoke(null, new object?[] { value, null })!;
+                } catch (System.Reflection.TargetInvocationException ex) {
+                    // Unwrap the inner exception for cleaner error messages
+                    throw ex.InnerException ?? ex;
+                }
+            }
+        }
+        
+        throw new ArgumentException($"type cannot be parsed: {targetType.Name}");
     }
 }

@@ -33,7 +33,7 @@ public abstract class ListStoreBase<TKey, TValue> : CollectionStoreBase<TKey, TV
         } else if (key is int intKey) {
             List.RemoveAt(intKey);
         } else {
-            throw new ArgumentException($"Key must be an integer or parseable string for list removal, got {key?.GetType().Name}");
+            throw new ArgumentException($"Key must be an integer or parsable string for list removal, got {key?.GetType().Name}");
         }
     }
 }
