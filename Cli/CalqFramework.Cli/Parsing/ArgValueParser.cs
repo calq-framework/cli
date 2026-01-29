@@ -7,7 +7,7 @@ namespace CalqFramework.Cli.Parsing;
 /// <summary>
 /// Parses string values to typed objects in CLI context with enhanced error messages.
 /// </summary>
-public class CliValueParser : IStringParser {
+public class ArgValueParser : IStringParser {
     private readonly StringParser _stringParser = new();
 
     public bool IsParseable(Type type) {
@@ -78,9 +78,9 @@ public class CliValueParser : IStringParser {
                 default:
                     throw;
             }
-            throw new CliValueParserException($"out of range ({min}-{max})", ex);
+            throw new ArgValueParserException($"out of range ({min}-{max})", ex);
         } catch (FormatException ex) {
-            throw new CliValueParserException($"invalid format (expected {type.Name})", ex);
+            throw new ArgValueParserException($"invalid format (expected {type.Name})", ex);
         }
     }
 }

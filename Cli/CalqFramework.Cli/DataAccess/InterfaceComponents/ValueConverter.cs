@@ -24,7 +24,7 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
         /// <summary>
         /// Gets the string parser used by this converter.
         /// </summary>
-        public IStringParser ValueParser => _stringParser;
+        public IStringParser ArgParser => _stringParser;
 
         public string? ConvertFromInternalValue(object? value, Type internalType) {
             if (value == null) {
