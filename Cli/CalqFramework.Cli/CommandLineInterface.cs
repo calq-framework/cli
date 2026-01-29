@@ -78,15 +78,15 @@ namespace CalqFramework.Cli {
             ISubcommandStore subcommandStore = CliComponentStoreFactory.CreateSubcommandStore(submodule);
 
             if (subcommandName == null || subcommandName == "--help" || subcommandName == "-h") {
-                IOptionStore optionSore = CliComponentStoreFactory.CreateOptionStore(submodule);
+                IOptionStore optionStore = CliComponentStoreFactory.CreateOptionStore(submodule);
                 bool isRoot = submodule == obj;
                 if (isRoot) {
-                    HelpPrinter.PrintHelp(obj.GetType(), submoduleStore.GetSubmodules(), subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor), optionSore.GetOptions());
+                    HelpPrinter.PrintHelp(obj.GetType(), submoduleStore.GetSubmodules(), subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor), optionStore.GetOptions());
                     return ResultVoid.Value;
                 } else {
                     ISubmoduleStore parentSubmoduleStore = CliComponentStoreFactory.CreateSubmoduleStore(parentSubmodule!);
                     var submoduleInfo = parentSubmoduleStore.GetSubmodules().Where(x => parentSubmoduleStore[x.Keys.First()] == submodule).First(); // use the store to check for the key to comply with case sensitivity
-                    HelpPrinter.PrintHelp(obj.GetType(), submoduleInfo, submoduleStore.GetSubmodules(), subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor), optionSore.GetOptions());
+                    HelpPrinter.PrintHelp(obj.GetType(), submoduleInfo, submoduleStore.GetSubmodules(), subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor), optionStore.GetOptions());
                     return ResultVoid.Value;
                 }
             }

@@ -29,12 +29,12 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
             ClassMemberStringifier = new ClassMemberStringifier();
             EnableShadowing = false;
             
-            ArgParser = new ArgValueParser();
+            ArgValueParser = new ArgValueParser();
             CollectionStoreFactory = new CollectionStoreFactory() { 
-                IndexParser = ArgParser,
-                KeyParser = ArgParser 
+                IndexParser = ArgValueParser,
+                KeyParser = ArgValueParser 
             };
-            ValueConverter = new ValueConverter(CollectionStoreFactory, ArgParser);
+            ValueConverter = new ValueConverter(CollectionStoreFactory, ArgValueParser);
         }
 
         /// <summary>
@@ -70,10 +70,10 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
         }
         /// <summary>
         /// Validator for determining which members are valid options.
-        /// Defaults to using ArgParser if not explicitly set.
+        /// Defaults to using ArgValueParser if not explicitly set.
         /// </summary>
         public IAccessValidator OptionAccessValidator {
-            get => _optionAccessValidator ?? new OptionAccessValidator(ArgParser);
+            get => _optionAccessValidator ?? new OptionAccessValidator(ArgValueParser);
             init => _optionAccessValidator = value;
         }
         /// <summary>
@@ -86,10 +86,10 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
         }
         /// <summary>
         /// Validator for determining which members are valid submodules.
-        /// Defaults to using ArgParser if not explicitly set.
+        /// Defaults to using ArgValueParser if not explicitly set.
         /// </summary>
         public IAccessValidator SubmoduleAccessValidator {
-            get => _submoduleAccessValidator ?? new SubmoduleAccessValidator(ArgParser);
+            get => _submoduleAccessValidator ?? new SubmoduleAccessValidator(ArgValueParser);
             init => _submoduleAccessValidator = value;
         }
         /// <summary>
@@ -97,9 +97,9 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
         /// </summary>
         public IValueConverter<string?> ValueConverter { get; init; }
         /// <summary>
-        /// Parser for converting string values to typed objects.
+        /// Parser for converting string argument values to typed objects.
         /// </summary>
-        public IStringParser ArgParser { get; init; }
+        public IStringParser ArgValueParser { get; init; }
 
         public IOptionStore CreateOptionStore(object obj) {
             ICliKeyValueStore<string, string?, MemberInfo> store;
