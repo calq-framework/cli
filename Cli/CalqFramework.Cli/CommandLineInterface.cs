@@ -5,6 +5,7 @@ using System.Reflection;
 using CalqFramework.Cli.DataAccess.InterfaceComponents;
 using CalqFramework.Cli.Parsing;
 using CalqFramework.Cli.Formatting;
+using CalqFramework.DataAccess;
 using static CalqFramework.Cli.Parsing.OptionReaderBase;
 
 namespace CalqFramework.Cli {
@@ -111,6 +112,8 @@ namespace CalqFramework.Cli {
                 result = subcommandExecutorWithOptions.Invoke();
             } catch (CliValueParserException ex) {
                 throw new CliException($"Failed to parse argument: {ex.Message}", ex);
+            } catch (DataAccessException ex) {
+                throw new CliException($"Failed to access data: {ex.Message}", ex);
             }
             
             if (subcommand.ReturnType == typeof(void)) {
@@ -150,6 +153,8 @@ namespace CalqFramework.Cli {
                     try {
                         subcommandExecutorWithOptions[option] = value;
                     } catch (CliValueParserException ex) {
+                        throw new CliException(option, value, ex.Message, ex);
+                    } catch (DataAccessException ex) {
                         throw new CliException(option, value, ex.Message, ex);
                     }
                 }

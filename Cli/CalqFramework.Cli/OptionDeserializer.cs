@@ -64,6 +64,8 @@ namespace CalqFramework.Cli {
                     store[option] = value;
                 } catch (CliValueParserException ex) {
                     throw new CliException(option, value, ex.Message, ex);
+                } catch (DataAccessException ex) {
+                    throw new CliException(option, value, ex.Message, ex);
                 }
             }
         }
