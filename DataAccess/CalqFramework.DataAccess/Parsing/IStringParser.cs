@@ -3,7 +3,7 @@ namespace CalqFramework.DataAccess.Parsing;
 /// <summary>
 /// Interface for parsing string values to typed objects.
 /// </summary>
-public interface IValueParser {
+public interface IStringParser {
     /// <summary>
     /// Determines if a type can be parsed from a string.
     /// </summary>

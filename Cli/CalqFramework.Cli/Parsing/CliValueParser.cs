@@ -7,11 +7,11 @@ namespace CalqFramework.Cli.Parsing;
 /// <summary>
 /// Parses string values to typed objects in CLI context with enhanced error messages.
 /// </summary>
-public class CliValueParser : IValueParser {
-    private readonly ValueParser _valueParser = new();
+public class CliValueParser : IStringParser {
+    private readonly StringParser _stringParser = new();
 
     public bool IsParseable(Type type) {
-        return _valueParser.IsParseable(type) || type.GetInterface(nameof(ICollection)) != null;
+        return _stringParser.IsParseable(type) || type.GetInterface(nameof(ICollection)) != null;
     }
 
     public T ParseValue<T>(string value) {
@@ -25,7 +25,7 @@ public class CliValueParser : IValueParser {
         }
 
         try {
-            return _valueParser.ParseValue(value, type);
+            return _stringParser.ParseValue(value, type);
         } catch (OverflowException ex) {
             long min;
             ulong max;

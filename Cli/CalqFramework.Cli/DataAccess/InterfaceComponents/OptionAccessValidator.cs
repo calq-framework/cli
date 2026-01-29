@@ -10,14 +10,14 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
     /// </summary>
     public class OptionAccessValidator : IAccessValidator {
 
-        private readonly IValueParser _valueParser;
+        private readonly IStringParser _stringParser;
 
-        public OptionAccessValidator(IValueParser valueParser) {
-            _valueParser = valueParser;
+        public OptionAccessValidator(IStringParser stringParser) {
+            _stringParser = stringParser;
         }
 
         public bool IsValid(MemberInfo accessor) {
-            return _valueParser.IsParseable(accessor.GetUnderlyingType());
+            return _stringParser.IsParseable(accessor.GetUnderlyingType());
         }
     }
 }

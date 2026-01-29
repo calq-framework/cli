@@ -8,26 +8,26 @@ namespace CalqFramework.DataAccess.Collections;
 /// </summary>
 public sealed class DictionaryStore : DictionaryStoreBase<string, object?> {
 
-    private readonly IValueParser _valueParser;
+    private readonly IStringParser _stringParser;
 
-    public DictionaryStore(IDictionary dictionary, IValueParser valueParser) : base(dictionary) {
-        _valueParser = valueParser;
+    public DictionaryStore(IDictionary dictionary, IStringParser stringParser) : base(dictionary) {
+        _stringParser = stringParser;
     }
 
     public override object? this[string key] {
         get {
-            object parsedKey = _valueParser.ParseValue(key, Dictionary.GetType().GetGenericArguments()[0]);
+            object parsedKey = _stringParser.ParseValue(key, Dictionary.GetType().GetGenericArguments()[0]);
             return Dictionary[parsedKey];
         }
         set {
-            object parsedKey = _valueParser.ParseValue(key, Dictionary.GetType().GetGenericArguments()[0]);
+            object parsedKey = _stringParser.ParseValue(key, Dictionary.GetType().GetGenericArguments()[0]);
             Dictionary[parsedKey] = value;
         }
     }
 
     public override bool ContainsKey(string key) {
         try {
-            object parsedKey = _valueParser.ParseValue(key, Dictionary.GetType().GetGenericArguments()[0]);
+            object parsedKey = _stringParser.ParseValue(key, Dictionary.GetType().GetGenericArguments()[0]);
             return Dictionary.Contains(parsedKey);
         } catch {
             return false;
@@ -35,7 +35,7 @@ public sealed class DictionaryStore : DictionaryStoreBase<string, object?> {
     }
 
     public override object? GetValueOrInitialize(string key) {
-        object parsedKey = _valueParser.ParseValue(key, Dictionary.GetType().GetGenericArguments()[0]);
+        object parsedKey = _stringParser.ParseValue(key, Dictionary.GetType().GetGenericArguments()[0]);
         object? element = Dictionary[parsedKey];
         if (element == null) {
             element = Activator.CreateInstance(Dictionary.GetType().GetGenericArguments()[1]!) ??

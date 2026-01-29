@@ -3,7 +3,7 @@
 /// <summary>
 /// Parses string values to typed objects.
 /// </summary>
-public class ValueParser : IValueParser {
+public class StringParser : IStringParser {
 
     public bool IsParseable(Type type) {
         return type.IsPrimitive || type == typeof(string);
