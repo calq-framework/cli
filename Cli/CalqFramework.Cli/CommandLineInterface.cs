@@ -110,7 +110,7 @@ namespace CalqFramework.Cli {
             object? result;
             try {
                 result = subcommandExecutorWithOptions.Invoke();
-            } catch (CliValueParserException ex) {
+            } catch (ArgValueParserException ex) {
                 throw new CliException($"Failed to parse argument: {ex.Message}", ex);
             } catch (DataAccessException ex) {
                 throw new CliException($"Failed to access data: {ex.Message}", ex);
@@ -152,7 +152,7 @@ namespace CalqFramework.Cli {
                 } else {
                     try {
                         subcommandExecutorWithOptions[option] = value;
-                    } catch (CliValueParserException ex) {
+                    } catch (ArgValueParserException ex) {
                         throw new CliException(option, value, ex.Message, ex);
                     } catch (DataAccessException ex) {
                         throw new CliException(option, value, ex.Message, ex);
