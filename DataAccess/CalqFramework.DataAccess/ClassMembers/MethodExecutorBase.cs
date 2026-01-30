@@ -47,12 +47,12 @@ public abstract class MethodExecutorBase<TParameterKey, TParameterValue> : Param
                     object? value = ConvertToInternalValue(Arguments[argumentIndex++], ParameterInfos[parameterIndex]);
                     ParameterValues[parameterIndex] = value;
                 } else {
-                    ParameterValues[parameterIndex] = ParameterInfos[parameterIndex].HasDefaultValue ? ParameterInfos[parameterIndex].DefaultValue : throw new ArgumentException($"unassigned parameter {ParameterInfos[parameterIndex].Name}"); ;
+                    ParameterValues[parameterIndex] = ParameterInfos[parameterIndex].HasDefaultValue ? ParameterInfos[parameterIndex].DefaultValue : throw DataAccessErrors.UnassignedParameter(ParameterInfos[parameterIndex].Name);
                 }
             }
         }
         if (argumentIndex < Arguments.Count) {
-            throw new ArgumentException($"unexpected argument {Arguments[argumentIndex]}");
+            throw DataAccessErrors.UnexpectedArgument(Arguments[argumentIndex]);
         }
         return ParentMethod.Invoke(ParentObject, ParameterValues);
     }

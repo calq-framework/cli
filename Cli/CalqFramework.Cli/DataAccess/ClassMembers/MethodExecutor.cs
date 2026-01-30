@@ -61,7 +61,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMembers {
             foreach (var accessor in Accessors) {
                 foreach (var name in ClassMemberStringifier.GetRequiredNames(accessor)) {
                     if (!accessorsByRequiredNames.TryAdd(name, accessor)) {
-                        throw new CliException($"cli name of {accessor.Name} collides with {accessorsByRequiredNames[name].Name}");
+                        throw CliErrors.NameCollision(accessor.Name, accessorsByRequiredNames[name].Name);
                     }
 
                 }

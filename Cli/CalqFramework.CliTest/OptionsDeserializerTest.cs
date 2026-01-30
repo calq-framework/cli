@@ -209,7 +209,7 @@ namespace CalqFramework.CliTest {
                 var obj = new SomeConfiguration();
                 OptionDeserializer.Deserialize(obj, $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.inner))}=0".Split(' '));
             });
-            Assert.Equal($"not an option: inner", ex.Message);
+            Assert.Equal($"Not an option: inner", ex.Message);
         }
 
         [Fact]
@@ -218,7 +218,7 @@ namespace CalqFramework.CliTest {
                 var obj = new SomeConfiguration();
                 OptionDeserializer.Deserialize(obj, $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.integer))}=0.1".Split(' '));
             });
-            Assert.Equal($"option 'integer=0.1': invalid format (expected Int32)", ex.Message);
+            Assert.Equal($"option 'integer=0.1': Invalid format (expected Int32)", ex.Message);
         }
 
         [Fact]
@@ -227,7 +227,7 @@ namespace CalqFramework.CliTest {
                 var obj = new SomeConfiguration();
                 OptionDeserializer.Deserialize(obj, $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.integer))}=a".Split(' '));
             });
-            Assert.Equal($"option 'integer=a': invalid format (expected Int32)", ex.Message);
+            Assert.Equal($"option 'integer=a': Invalid format (expected Int32)", ex.Message);
         }
 
         [Fact]
@@ -244,7 +244,7 @@ namespace CalqFramework.CliTest {
                 var obj = new SomeConfiguration();
                 OptionDeserializer.Deserialize(obj, $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.aByteNumber))}=256".Split(' '));
             });
-            Assert.Equal($"option 'a-byte-number=256': out of range (0-255)", ex.Message);
+            Assert.Equal($"option 'a-byte-number=256': Out of range (0-255)", ex.Message);
         }
 
         [Fact]
@@ -257,7 +257,7 @@ namespace CalqFramework.CliTest {
                     new OptionDeserializerConfiguration() { SkipUnknown = true }
                 );
             });
-            Assert.Equal($"option 'port=2147483647': out of range (0-65535)", ex.Message);
+            Assert.Equal($"option 'port=2147483647': Out of range (0-65535)", ex.Message);
         }
 
         [Fact]
@@ -294,7 +294,7 @@ namespace CalqFramework.CliTest {
                     new OptionDeserializerConfiguration() { SkipUnknown = true }
                 );
             });
-            Assert.Equal("unexpected value unknown", ex.Message);
+            Assert.Equal("Unexpected value: unknown", ex.Message);
         }
     }
 }

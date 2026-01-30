@@ -111,9 +111,9 @@ namespace CalqFramework.Cli {
             try {
                 result = subcommandExecutorWithOptions.Invoke();
             } catch (ArgValueParserException ex) {
-                throw new CliException($"Failed to parse argument: {ex.Message}", ex);
+                throw CliErrors.FailedToParseArgument(ex.Message, ex);
             } catch (DataAccessException ex) {
-                throw new CliException($"Failed to access data: {ex.Message}", ex);
+                throw CliErrors.FailedToAccessData(ex.Message, ex);
             }
             
             if (subcommand.ReturnType == typeof(void)) {
@@ -135,16 +135,16 @@ namespace CalqFramework.Cli {
 
             foreach ((string option, string value, OptionFlags optionAttr) in optionReader.Read()) {
                 if (optionAttr.HasFlag(OptionFlags.AmbigousValue)) {
-                    throw new CliException($"Ambigious value {optionReader.ArgsEnumerator.Current} for {option}. Use option=value format for values starting with '-' or '+'.");
+                    throw CliErrors.AmbiguousValue(optionReader.ArgsEnumerator.Current, option);
                 }
                 if (optionAttr.HasFlag(OptionFlags.Unknown)) {
                     if (SkipUnknown) {
                         continue;
                     }
-                    throw new CliException($"unknown option {option}");
+                    throw CliErrors.UnknownOption(option);
                 }
                 if (optionAttr.HasFlag(OptionFlags.ValueUnassigned) && !optionAttr.HasFlag(OptionFlags.NotAnOption)) {
-                    throw new CliException($"{option} requires a value");
+                    throw CliErrors.OptionRequiresValue(option);
                 }
 
                 if (optionAttr.HasFlag(OptionFlags.NotAnOption)) {
@@ -153,9 +153,9 @@ namespace CalqFramework.Cli {
                     try {
                         subcommandExecutorWithOptions[option] = value;
                     } catch (ArgValueParserException ex) {
-                        throw new CliException(option, value, ex.Message, ex);
+                        throw CliErrors.OptionValueError(option, value, ex.Message, ex);
                     } catch (DataAccessException ex) {
-                        throw new CliException(option, value, ex.Message, ex);
+                        throw CliErrors.OptionValueError(option, value, ex.Message, ex);
                     }
                 }
             }

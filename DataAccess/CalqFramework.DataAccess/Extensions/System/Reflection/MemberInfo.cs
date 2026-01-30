@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using CalqFramework.DataAccess;
 
 namespace CalqFramework.Extensions.System.Reflection {
 
@@ -15,7 +16,7 @@ namespace CalqFramework.Extensions.System.Reflection {
                 return eventInfo.EventHandlerType ?? typeof(void);
             }
 
-            throw new ArgumentException("MemberInfo is not a recognized type");
+            throw DataAccessErrors.UnrecognizedMemberType();
         }
     }
 }

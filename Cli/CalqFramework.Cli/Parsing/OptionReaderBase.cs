@@ -70,7 +70,7 @@ namespace CalqFramework.Cli.Parsing {
                 string arg = ArgsEnumerator.Current;
 
                 if (arg.Length == 0) {
-                    throw new ArgumentException("arg length is 0");
+                    throw new ArgumentException("Arg length is 0");
                 }
 
                 OptionFlags optionAttr = OptionFlags.None;
@@ -124,9 +124,9 @@ namespace CalqFramework.Cli.Parsing {
                                 optionAttr |= OptionFlags.Unknown;
                             }
                         } catch (ArgValueParserException ex) {
-                            throw new CliException(shortOption.ToString(), ex.Message, ex);
+                            throw CliErrors.OptionError(shortOption.ToString(), ex.Message, ex);
                         } catch (DataAccessException ex) {
-                            throw new CliException(shortOption.ToString(), ex.Message, ex);
+                            throw CliErrors.OptionError(shortOption.ToString(), ex.Message, ex);
                         }
                         yield return (shortOption.ToString(), value, optionAttr);
                     }
@@ -140,9 +140,9 @@ namespace CalqFramework.Cli.Parsing {
                             optionAttr |= OptionFlags.Unknown;
                         }
                     } catch (ArgValueParserException ex) {
-                        throw new CliException(option, ex.Message, ex);
+                        throw CliErrors.OptionError(option, ex.Message, ex);
                     } catch (DataAccessException ex) {
-                        throw new CliException(option, ex.Message, ex);
+                        throw CliErrors.OptionError(option, ex.Message, ex);
                     }
                     yield return (option, value, optionAttr);
                 }
