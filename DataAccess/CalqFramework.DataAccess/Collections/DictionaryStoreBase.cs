@@ -17,6 +17,6 @@ public abstract class DictionaryStoreBase<TKey, TValue> : CollectionStoreBase<TK
     }
 
     public override void Remove(TKey key) {
-        Dictionary.Remove(key);
+        Dictionary.Remove(key!);
     }
 }
