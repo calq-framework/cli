@@ -19,7 +19,7 @@ public abstract class ClassDataMemberStoreFactoryBase : IClassDataMemberStoreFac
         } else if (AccessProperties) {
             return CreatePropertyStore(obj);
         } else {
-            throw new ArgumentException("Neither AccessFields nor AccessProperties is set.");
+            throw DataAccessErrors.NoAccessConfigured();
         }
     }
 

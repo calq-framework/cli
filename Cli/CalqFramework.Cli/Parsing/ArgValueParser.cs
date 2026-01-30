@@ -36,11 +36,11 @@ public class ArgValueParser : IArgValueParser {
             if (minField != null && maxField != null) {
                 var min = minField.GetValue(null);
                 var max = maxField.GetValue(null);
-                throw new ArgValueParserException($"out of range ({min}-{max})", ex);
+                throw ArgValueParserErrors.OutOfRange(min, max, ex);
             }
             throw;
         } catch (FormatException ex) {
-            throw new ArgValueParserException($"invalid format (expected {type.Name})", ex);
+            throw ArgValueParserErrors.InvalidFormat(type.Name, ex);
         }
     }
 
@@ -59,11 +59,12 @@ public class ArgValueParser : IArgValueParser {
             if (minField != null && maxField != null) {
                 var min = minField.GetValue(null);
                 var max = maxField.GetValue(null);
-                throw new ArgValueParserException($"out of range ({min}-{max})", ex);
+                throw ArgValueParserErrors.OutOfRange(min, max, ex);
             }
             throw;
         } catch (FormatException ex) {
-            throw new ArgValueParserException($"invalid format (expected {type.Name})", ex);
+            throw ArgValueParserErrors.InvalidFormat(type.Name, ex);
         }
     }
 }
+

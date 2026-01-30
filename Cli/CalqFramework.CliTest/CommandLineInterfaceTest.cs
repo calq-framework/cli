@@ -139,7 +139,7 @@ namespace CalqFramework.CliTest {
                 var tool = new SomeClassLibrary();
                 new CommandLineInterface().Execute(tool, $"{StringHelper.GetKebabCase(nameof(SomeClassLibrary.textField))}".Split(' '));
             });
-            Assert.Equal("invalid command", ex.Message);
+            Assert.Equal("Invalid command: text-field", ex.Message);
         }
 
         [Fact]
@@ -150,7 +150,7 @@ namespace CalqFramework.CliTest {
                     CliComponentStoreFactory = new CliComponentStoreFactory { BindingFlags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public }
                 }.Execute(tool, $"{StringHelper.GetKebabCase(nameof(SomeClassLibrary.Method)).ToUpper()}".Split(' '));
             });
-            Assert.Equal("invalid command", ex.Message);
+            Assert.Equal("Invalid command: METHOD", ex.Message);
         }
 
         [Fact]
@@ -179,7 +179,7 @@ namespace CalqFramework.CliTest {
                 var tool = new SomeClassLibrary();
                 new CommandLineInterface().Execute(tool, $"{StringHelper.GetKebabCase(nameof(SomeClassLibrary.MethodWithText))}".Split(' '));
             });
-            Assert.Equal("unassigned parameter text", ex.Message);
+            Assert.Equal("Unassigned parameter: text", ex.Message);
         }
 
         [Fact]
@@ -188,7 +188,7 @@ namespace CalqFramework.CliTest {
                 var tool = new SomeClassLibrary();
                 new CommandLineInterface().Execute(tool, "Unknown".Split(' '));
             });
-            Assert.Equal("invalid command", ex.Message);
+            Assert.Equal("Invalid command: Unknown", ex.Message);
         }
 
         [Fact]
@@ -205,7 +205,7 @@ namespace CalqFramework.CliTest {
                 var tool = new SomeClassLibrary();
                 new CommandLineInterface().Execute(tool, $"{StringHelper.GetKebabCase(nameof(SomeClassLibrary.Method))} --doesntexist a".Split(' '));
             });
-            Assert.Equal("unknown option doesntexist", ex.Message);
+            Assert.Equal("Unknown option: doesntexist", ex.Message);
         }
     }
 }

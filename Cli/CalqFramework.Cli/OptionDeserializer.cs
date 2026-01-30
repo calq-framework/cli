@@ -52,20 +52,20 @@ namespace CalqFramework.Cli {
                         if (options.SkipUnknown) {
                             continue;
                         }
-                        throw new CliException($"not an option: {option}");
+                        throw CliErrors.NotAnOption(option);
                     }
                     if (optionAttr.HasFlag(OptionFlags.AmbigousValue)) {
-                        throw new CliException($"ambiguous syntax around {option} (try using --)");
+                        throw CliErrors.AmbiguousSyntax(option);
                     }
-                    throw new CliException($"unexpected value {option}");
+                    throw CliErrors.UnexpectedValue(option);
                 }
 
                 try {
                     store[option] = value;
                 } catch (ArgValueParserException ex) {
-                    throw new CliException(option, value, ex.Message, ex);
+                    throw CliErrors.OptionValueError(option, value, ex.Message, ex);
                 } catch (DataAccessException ex) {
-                    throw new CliException(option, value, ex.Message, ex);
+                    throw CliErrors.OptionValueError(option, value, ex.Message, ex);
                 }
             }
         }

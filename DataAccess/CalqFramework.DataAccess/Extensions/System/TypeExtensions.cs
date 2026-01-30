@@ -1,3 +1,5 @@
+using CalqFramework.DataAccess;
+
 namespace CalqFramework.Extensions.System;
 
 /// <summary>
@@ -106,6 +108,6 @@ public static class TypeExtensions {
             }
         }
         
-        throw new ArgumentException($"type cannot be parsed: {targetType.Name}");
+        throw DataAccessErrors.TypeCannotBeParsed(targetType.Name);
     }
 }

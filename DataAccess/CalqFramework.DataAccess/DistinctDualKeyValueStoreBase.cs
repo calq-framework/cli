@@ -58,7 +58,7 @@
         private void AssertNoCollision(TKey key) {
             if (!EnableShadowing) {
                 if (PrimaryStore.ContainsKey(key) && SecondaryStore.ContainsKey(key)) {
-                    throw new DataAccessException($"Ambigious key {key}. Enable shadowing to ignore this error.");
+                    throw DataAccessErrors.AmbiguousKey(key);
                 }
             }
         }

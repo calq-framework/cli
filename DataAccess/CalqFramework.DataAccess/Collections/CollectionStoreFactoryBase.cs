@@ -12,7 +12,7 @@ public abstract class CollectionStoreFactoryBase<TKey, TValue> : ICollectionStor
             Array array => CreateArrayStore(array),
             IList list => CreateListStore(list),
             IDictionary dictionary => CreateDictionaryStore(dictionary),
-            _ => throw new ArgumentException($"Unsupported collection type: {collection.GetType().Name}", nameof(collection))
+            _ => throw DataAccessErrors.UnsupportedCollectionType(collection.GetType().Name)
         };
     }
 

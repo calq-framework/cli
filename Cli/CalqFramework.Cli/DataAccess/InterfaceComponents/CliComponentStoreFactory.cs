@@ -119,7 +119,7 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
             } else if (AccessProperties) {
                 store = CreatePropertyStore(obj, OptionAccessValidator, ValueConverter);
             } else {
-                throw new ArgumentException("Neither AccessFields nor AccessProperties is set.");
+                throw DataAccessErrors.NoAccessConfigured();
             }
             return new OptionStore(store);
         }
@@ -146,7 +146,7 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
             } else if (AccessProperties) {
                 store = CreatePropertyStore(obj, SubmoduleAccessValidator, converter);
             } else {
-                throw new ArgumentException("Neither AccessFields nor AccessProperties is set.");
+                throw DataAccessErrors.NoAccessConfigured();
             }
             return new SubmoduleStore(store);
         }
