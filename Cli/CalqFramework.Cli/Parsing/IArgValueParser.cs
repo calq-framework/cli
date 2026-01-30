@@ -1,9 +1,11 @@
-namespace CalqFramework.DataAccess.Parsing;
+using System;
+
+namespace CalqFramework.Cli.Parsing;
 
 /// <summary>
 /// Interface for parsing string values to typed objects.
 /// </summary>
-public interface IStringParser {
+public interface IArgValueParser {
     /// <summary>
     /// Determines if a type can be parsed from a string.
     /// </summary>
@@ -12,20 +14,20 @@ public interface IStringParser {
     /// <summary>
     /// Parses a string value to the specified type.
     /// </summary>
-    T ParseValue<T>(string value);
+    T Parse<T>(string value);
 
     /// <summary>
     /// Parses a string value to the specified type using a specific format provider.
     /// </summary>
-    T ParseValue<T>(string value, IFormatProvider? formatProvider);
+    T Parse<T>(string value, IFormatProvider? formatProvider);
 
     /// <summary>
     /// Parses a string value to the specified target type.
     /// </summary>
-    object ParseValue(string value, Type targetType);
+    object Parse(string value, Type targetType);
 
     /// <summary>
     /// Parses a string value to the specified target type using a specific format provider.
     /// </summary>
-    object ParseValue(string value, Type targetType, IFormatProvider? formatProvider);
+    object Parse(string value, Type targetType, IFormatProvider? formatProvider);
 }

@@ -1,5 +1,4 @@
 using System.Collections;
-using CalqFramework.DataAccess.Parsing;
 
 namespace CalqFramework.DataAccess.Collections;
 
@@ -8,26 +7,23 @@ namespace CalqFramework.DataAccess.Collections;
 /// </summary>
 public sealed class ListStore : ListStoreBase<string, object?> {
 
-    private readonly IStringParser _stringParser;
-
-    public ListStore(IList list, IStringParser stringParser) : base(list) {
-        _stringParser = stringParser;
+    public ListStore(IList list) : base(list) {
     }
 
     public override object? this[string key] {
         get {
-            int index = _stringParser.ParseValue<int>(key);
+            int index = int.Parse(key);
             return List[index];
         }
         set {
-            int index = _stringParser.ParseValue<int>(key);
+            int index = int.Parse(key);
             List[index] = value;
         }
     }
 
     public override bool ContainsKey(string key) {
         try {
-            int index = _stringParser.ParseValue<int>(key);
+            int index = int.Parse(key);
             return index >= 0 && index < List.Count;
         } catch {
             return false;
@@ -35,7 +31,7 @@ public sealed class ListStore : ListStoreBase<string, object?> {
     }
 
     public override object? GetValueOrInitialize(string key) {
-        int index = _stringParser.ParseValue<int>(key);
+        int index = int.Parse(key);
         object? element = List[index];
         if (element == null) {
             element = Activator.CreateInstance(List.GetType().GetGenericArguments()[0]!) ??

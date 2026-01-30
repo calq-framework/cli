@@ -2,9 +2,9 @@
 using System.Collections;
 using System.Linq;
 using CalqFramework.Cli.DataAccess.ClassMembers;
+using CalqFramework.Cli.Parsing;
 using CalqFramework.DataAccess;
 using CalqFramework.DataAccess.Collections;
-using CalqFramework.DataAccess.Parsing;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
 
@@ -14,9 +14,9 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
     public class ValueConverter : IValueConverter<string?> {
 
         private readonly ICollectionStoreFactory<string, object?> _collectionStoreFactory;
-        private readonly IStringParser _argValueParser;
+        private readonly IArgValueParser _argValueParser;
 
-        public ValueConverter(ICollectionStoreFactory<string, object?> collectionStoreFactory, IStringParser argValueParser) {
+        public ValueConverter(ICollectionStoreFactory<string, object?> collectionStoreFactory, IArgValueParser argValueParser) {
             _collectionStoreFactory = collectionStoreFactory;
             _argValueParser = argValueParser;
         }
@@ -47,10 +47,10 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
 
             bool isCollection = internalType.GetInterface(nameof(ICollection)) != null;
             if (isCollection == false) {
-                return _argValueParser.ParseValue(value, internalType, FormatProvider);
+                return _argValueParser.Parse(value, internalType, FormatProvider);
             } else {
                 ICollection collection = (currentValue as ICollection)!;
-                object item = _argValueParser.ParseValue(value, internalType.GetGenericArguments()[0], FormatProvider);
+                object item = _argValueParser.Parse(value, internalType.GetGenericArguments()[0], FormatProvider);
                 _collectionStoreFactory.CreateStore(collection).Add(item);
                 return currentValue;
             }

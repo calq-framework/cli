@@ -5,7 +5,6 @@ using CalqFramework.Cli.Parsing;
 using CalqFramework.Cli.Formatting;
 using CalqFramework.DataAccess;
 using CalqFramework.DataAccess.Collections;
-using CalqFramework.DataAccess.Parsing;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
 
@@ -30,7 +29,7 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
             EnableShadowing = false;
         }
 
-        private IStringParser? _argValueParser;
+        private IArgValueParser? _argValueParser;
         private ICollectionStoreFactory<string, object?>? _collectionStoreFactory;
         private IValueConverter<string?>? _valueConverter;
 
@@ -92,7 +91,7 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
         /// <summary>
         /// Parser for converting string argument values to typed objects.
         /// </summary>
-        public IStringParser ArgValueParser { 
+        public IArgValueParser ArgValueParser { 
             get => _argValueParser ??= new ArgValueParser();
             init => _argValueParser = value;
         }
@@ -100,10 +99,7 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
         /// Factory for creating collection stores.
         /// </summary>
         public ICollectionStoreFactory<string, object?> CollectionStoreFactory { 
-            get => _collectionStoreFactory ??= new CollectionStoreFactory() { 
-                IndexParser = ArgValueParser,
-                KeyParser = ArgValueParser 
-            };
+            get => _collectionStoreFactory ??= new CollectionStoreFactory();
             init => _collectionStoreFactory = value;
         }
         /// <summary>
