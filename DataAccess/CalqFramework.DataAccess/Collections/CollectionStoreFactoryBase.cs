@@ -1,5 +1,4 @@
 using System.Collections;
-using CalqFramework.DataAccess.Parsing;
 
 namespace CalqFramework.DataAccess.Collections;
 
@@ -7,9 +6,6 @@ namespace CalqFramework.DataAccess.Collections;
 /// Base class for collection store factories.
 /// </summary>
 public abstract class CollectionStoreFactoryBase<TKey, TValue> : ICollectionStoreFactory<TKey, TValue> {
-
-    public IStringParser IndexParser { get; init; } = new StringParser();
-    public IStringParser KeyParser { get; init; } = new StringParser();
 
     public virtual ICollectionStore<TKey, TValue> CreateStore(ICollection collection) {
         return collection switch {

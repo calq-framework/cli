@@ -1,11 +1,11 @@
-﻿namespace CalqFramework.DataAccess.Parsing;
+namespace CalqFramework.Extensions.System;
 
 /// <summary>
-/// Parses string values to typed objects.
+/// Extension methods for parsing string values to typed objects.
 /// </summary>
-public class StringParser : IStringParser {
+public static class TypeExtensions {
 
-    public bool IsParsable(Type type) {
+    public static bool IsParsable(this Type type) {
         type = Nullable.GetUnderlyingType(type) ?? type;
         
         if (type.IsPrimitive || type == typeof(string)) {
@@ -16,15 +16,15 @@ public class StringParser : IStringParser {
         return parsableInterface != null;
     }
 
-    public T ParseValue<T>(string value) {
-        return (T)ParseValue(value, typeof(T));
+    public static T Parse<T>(this Type type, string value) {
+        return (T)type.Parse(value);
     }
 
-    public T ParseValue<T>(string value, IFormatProvider? formatProvider) {
-        return (T)ParseValue(value, typeof(T), formatProvider);
+    public static T Parse<T>(this Type type, string value, IFormatProvider? formatProvider) {
+        return (T)type.Parse(value, formatProvider);
     }
 
-    public object ParseValue(string value, Type targetType) {
+    public static object Parse(this Type targetType, string value) {
         if (Nullable.GetUnderlyingType(targetType) != null) {
             targetType = Nullable.GetUnderlyingType(targetType)!;
         }
@@ -45,14 +45,14 @@ public class StringParser : IStringParser {
             TypeCode.UInt16 => ushort.Parse(value),
             TypeCode.DateTime => DateTime.Parse(value),
             TypeCode.String => value,
-            _ => TryParseParsable(value, targetType, null)
+            _ => TryParseParsable(targetType, value, null)
         };
         
         return objValue;
     }
 
-    public object ParseValue(string value, Type targetType, IFormatProvider? formatProvider) {
-        formatProvider ??= System.Globalization.CultureInfo.InvariantCulture;
+    public static object Parse(this Type targetType, string value, IFormatProvider? formatProvider) {
+        formatProvider ??= global::System.Globalization.CultureInfo.InvariantCulture;
         
         if (Nullable.GetUnderlyingType(targetType) != null) {
             targetType = Nullable.GetUnderlyingType(targetType)!;
@@ -74,13 +74,13 @@ public class StringParser : IStringParser {
             TypeCode.UInt16 => ushort.Parse(value, formatProvider),
             TypeCode.DateTime => DateTime.Parse(value, formatProvider),
             TypeCode.String => value,
-            _ => TryParseParsable(value, targetType, formatProvider)
+            _ => TryParseParsable(targetType, value, formatProvider)
         };
         
         return objValue;
     }
 
-    private static object TryParseParsable(string value, Type targetType, IFormatProvider? formatProvider) {
+    private static object TryParseParsable(Type targetType, string value, IFormatProvider? formatProvider) {
         var parsableInterface = targetType.GetInterface("IParsable`1");
         if (parsableInterface != null) {
             if (formatProvider == null) {
@@ -88,7 +88,7 @@ public class StringParser : IStringParser {
                 if (parseMethod != null) {
                     try {
                         return parseMethod.Invoke(null, new object?[] { value })!;
-                    } catch (System.Reflection.TargetInvocationException ex) {
+                    } catch (global::System.Reflection.TargetInvocationException ex) {
                         throw ex.InnerException ?? ex;
                     }
                 }
@@ -99,7 +99,7 @@ public class StringParser : IStringParser {
                 if (parseMethod != null) {
                     try {
                         return parseMethod.Invoke(null, new object?[] { value, formatProvider })!;
-                    } catch (System.Reflection.TargetInvocationException ex) {
+                    } catch (global::System.Reflection.TargetInvocationException ex) {
                         throw ex.InnerException ?? ex;
                     }
                 }

@@ -1,35 +1,34 @@
 ﻿using System;
 using System.Collections;
-using CalqFramework.DataAccess.Parsing;
+using CalqFramework.Extensions.System;
 
 namespace CalqFramework.Cli.Parsing;
 
 /// <summary>
 /// Parses string values to typed objects in CLI context with enhanced error messages.
 /// </summary>
-public class ArgValueParser : IStringParser {
-    private readonly StringParser _stringParser = new();
+public class ArgValueParser : IArgValueParser {
 
     public bool IsParsable(Type type) {
-        return _stringParser.IsParsable(type) || type.GetInterface(nameof(ICollection)) != null;
+        return type.IsParsable() || type.GetInterface(nameof(ICollection)) != null;
     }
 
-    public T ParseValue<T>(string value) {
-        return (T)ParseValue(value, typeof(T));
+    public T Parse<T>(string value) {
+        return (T)Parse(value, typeof(T));
     }
 
-    public T ParseValue<T>(string value, IFormatProvider? formatProvider) {
-        return (T)ParseValue(value, typeof(T), formatProvider);
+    public T Parse<T>(string value, IFormatProvider? formatProvider) {
+        return (T)Parse(value, typeof(T), formatProvider);
     }
 
-    public object ParseValue(string value, Type type) {
+    public object Parse(string value, Type type) {
         bool isCollection = type.GetInterface(nameof(ICollection)) != null;
         if (isCollection) {
             type = type.GetGenericArguments()[0];
         }
 
         try {
-            return _stringParser.ParseValue(value, type);
+            return type.Parse(value);
         } catch (OverflowException ex) {
             var minField = type.GetField("MinValue");
             var maxField = type.GetField("MaxValue");
@@ -45,14 +44,14 @@ public class ArgValueParser : IStringParser {
         }
     }
 
-    public object ParseValue(string value, Type type, IFormatProvider? formatProvider) {
+    public object Parse(string value, Type type, IFormatProvider? formatProvider) {
         bool isCollection = type.GetInterface(nameof(ICollection)) != null;
         if (isCollection) {
             type = type.GetGenericArguments()[0];
         }
 
         try {
-            return _stringParser.ParseValue(value, type, formatProvider);
+            return type.Parse(value, formatProvider);
         } catch (OverflowException ex) {
             var minField = type.GetField("MinValue");
             var maxField = type.GetField("MaxValue");

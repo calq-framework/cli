@@ -8,14 +8,14 @@ namespace CalqFramework.DataAccess.Collections;
 public sealed class CollectionStoreFactory : CollectionStoreFactoryBase<string, object?> {
 
     protected override ICollectionStore<string, object?> CreateArrayStore(Array array) {
-        return new ArrayStore(array, IndexParser);
+        return new ArrayStore(array);
     }
 
     protected override ICollectionStore<string, object?> CreateListStore(IList list) {
-        return new ListStore(list, IndexParser);
+        return new ListStore(list);
     }
 
     protected override ICollectionStore<string, object?> CreateDictionaryStore(IDictionary dictionary) {
-        return new DictionaryStore(dictionary, KeyParser);
+        return new DictionaryStore(dictionary);
     }
 }
