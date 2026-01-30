@@ -47,7 +47,7 @@ public abstract class MethodExecutorBase<TParameterKey, TParameterValue> : Param
                     object? value = ConvertToInternalValue(Arguments[argumentIndex++], ParameterInfos[parameterIndex]);
                     ParameterValues[parameterIndex] = value;
                 } else {
-                    ParameterValues[parameterIndex] = ParameterInfos[parameterIndex].HasDefaultValue ? ParameterInfos[parameterIndex].DefaultValue : throw DataAccessErrors.UnassignedParameter(ParameterInfos[parameterIndex].Name);
+                    ParameterValues[parameterIndex] = ParameterInfos[parameterIndex].HasDefaultValue ? ParameterInfos[parameterIndex].DefaultValue : throw DataAccessErrors.UnassignedParameter(ParameterInfos[parameterIndex].Name!);
                 }
             }
         }

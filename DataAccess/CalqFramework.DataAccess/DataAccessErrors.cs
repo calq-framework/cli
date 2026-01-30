@@ -10,7 +10,7 @@ namespace CalqFramework.DataAccess {
         /// <summary>
         /// Creates an exception for ambiguous keys in dual key stores.
         /// </summary>
-        public static DataAccessException AmbiguousKey(object key) =>
+        public static DataAccessException AmbiguousKey(object? key) =>
             new DataAccessException($"Ambiguous key '{key}', enable shadowing to ignore this error");
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace CalqFramework.DataAccess {
         /// <summary>
         /// Creates an exception for unexpected arguments in method execution.
         /// </summary>
-        public static ArgumentException UnexpectedArgument(object argument) =>
+        public static ArgumentException UnexpectedArgument(object? argument) =>
             new ArgumentException($"Unexpected argument: {argument}");
 
         /// <summary>
