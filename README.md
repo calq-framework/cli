@@ -9,7 +9,7 @@ Support for overloaded methods, generic methods, and any other features not avai
 
 ## Why Calq CLI: Comparison with System.CommandLine
 Both examples implement CLI for the classlib from:  
-[https://github.com/calq-framework/cli/tree/main/Cli/Example](https://github.com/calq-framework/cli/tree/main/Cli/Example)
+[https://github.com/calq-framework/cli/tree/main/Cli/Examples/Example.NestedSubmodules.CloudProvider](https://github.com/calq-framework/cli/tree/main/Cli/Examples/Example.NestedSubmodules.CloudProvider)
 
 ### Calq CLI
 The following template is a complete implementation.
@@ -167,10 +167,10 @@ OptionDeserializer.Deserialize(settingsObject, new OptionDeserializerConfigurati
 });
 ```
 ### Demo Example
-[https://github.com/calq-framework/cli/tree/main/Cli/Example](https://github.com/calq-framework/cli/tree/main/Cli/Example)
+[https://github.com/calq-framework/cli/tree/main/Cli/Examples/Example.NestedSubmodules.CloudProvider](https://github.com/calq-framework/cli/tree/main/Cli/Examples/Example.NestedSubmodules.CloudProvider)
 
-![SubmoduleHelpExample](https://github.com/calq-framework/cli/blob/main/Cli/Example/SubmoduleHelpExample.png?raw=true)  
-![SubcommandHelpExample](https://github.com/calq-framework/cli/blob/main/Cli/Example/SubcommandHelpExample.png?raw=true)
+![SubmoduleHelpExample](https://github.com/calq-framework/cli/blob/main/Cli/Examples/Example.NestedSubmodules.CloudProvider/SubmoduleHelpExample.png?raw=true)  
+![SubcommandHelpExample](https://github.com/calq-framework/cli/blob/main/Cli/Examples/Example.NestedSubmodules.CloudProvider/SubcommandHelpExample.png?raw=true)
 
 ### Quick Start
 ```bash
