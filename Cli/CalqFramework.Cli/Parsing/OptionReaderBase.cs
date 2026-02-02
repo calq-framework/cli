@@ -70,7 +70,7 @@ namespace CalqFramework.Cli.Parsing {
                 string arg = ArgsEnumerator.Current;
 
                 if (arg.Length == 0) {
-                    throw new ArgumentException("Arg length is 0");
+                    throw CliErrors.EmptyArgument();
                 }
 
                 OptionFlags optionAttr = OptionFlags.None;

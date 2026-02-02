@@ -29,6 +29,10 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
             return _subcommandExecutor.GetParameters();
         }
 
+        public Parameter? GetFirstUnassignedParameter() {
+            return _subcommandExecutor.GetFirstUnassignedParameter();
+        }
+
         public object? Invoke() {
             return _subcommandExecutor.Invoke();
         }

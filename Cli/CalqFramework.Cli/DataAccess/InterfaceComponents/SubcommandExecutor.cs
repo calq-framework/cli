@@ -38,6 +38,11 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
             });
         }
 
+        public Parameter? GetFirstUnassignedParameter() {
+            Executor.SetParameterValues();
+            return GetParameters().FirstOrDefault(p => Equals(p.Value, null));
+        }
+
         public string? GetValueOrInitialize(string key) {
             return Executor.GetValueOrInitialize(key);
         }

@@ -89,5 +89,24 @@ namespace CalqFramework.Cli.DataAccess.ClassMembers {
 
             return accessorsByNames;
         }
+
+        public void SetParameterValues() {
+            bool IsAssigned(int i) {
+                return ParameterValues[i] != DBNull.Value;
+            }
+
+            int argumentIndex = 0;
+            for (int parameterIndex = 0; parameterIndex < ParameterValues.Length; ++parameterIndex) {
+                if (!IsAssigned(parameterIndex)) {
+                    if (argumentIndex < Arguments.Count) {
+                        object? value = ConvertToInternalValue(Arguments[argumentIndex++], ParameterInfos[parameterIndex]);
+                        ParameterValues[parameterIndex] = value;
+                    }
+                }
+            }
+            if (argumentIndex < Arguments.Count) {
+                throw CalqFramework.DataAccess.DataAccessErrors.UnexpectedArgument(Arguments[argumentIndex]);
+            }
+        }
     }
 }

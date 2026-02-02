@@ -12,5 +12,10 @@ namespace CalqFramework.Cli.DataAccess {
         /// Gets an ordered list of accessor-to-keys pairs for displaying alternative names in help.
         /// </summary>
         IEnumerable<AccessorKeysPair<TAccessor>> GetAccessorKeysPairs();
+
+        /// <summary>
+        /// Sets the parameter values from arguments without applying defaults or validation.
+        /// </summary>
+        void SetParameterValues();
     }
 }
