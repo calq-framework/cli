@@ -78,5 +78,23 @@ namespace CalqFramework.Cli {
         /// </summary>
         public static CliException OptionValueError(string option, string value, string message, Exception innerException) =>
             new CliException(option, value, message, innerException);
+
+        /// <summary>
+        /// Creates an exception for empty argument strings.
+        /// </summary>
+        public static CliException EmptyArgument() =>
+            new CliException("Argument cannot be empty");
+
+        /// <summary>
+        /// Creates an exception for unsupported member types.
+        /// </summary>
+        public static CliException UnsupportedMemberType(string memberTypeName) =>
+            new CliException($"Unsupported member type: {memberTypeName}");
+
+        /// <summary>
+        /// Creates an exception for invalid completion provider types.
+        /// </summary>
+        public static CliException InvalidCompletionProvider(string providerTypeName) =>
+            new CliException($"Provider type '{providerTypeName}' must implement {nameof(ICompletionProvider)}");
     }
 }

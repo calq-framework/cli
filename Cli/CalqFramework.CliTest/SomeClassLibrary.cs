@@ -1,6 +1,7 @@
 ﻿#pragma warning disable CS0649
 
 using System.Collections.Generic;
+using CalqFramework.Cli;
 
 namespace CalqFramework.CliTest {
 
@@ -63,6 +64,15 @@ namespace CalqFramework.CliTest {
         public void MethodWithTextAndBooleanError(string text, bool booleanConflict = false) {
             textField = text;
             this.booleanConflict = booleanConflict;
+        }
+
+        public static void MethodWithEnum(LogLevel level) {
+        }
+
+        public static void MethodWithCustomCompletion([CliCompletion(typeof(EnvironmentCompletionProvider))] string environment) {
+        }
+
+        public static void MethodWithThreeParameters(string first, int second, bool third) {
         }
     }
 }

@@ -60,7 +60,7 @@ namespace CalqFramework.Cli.Formatting {
                 case FieldInfo field:
                     return $"F:{field.DeclaringType?.FullName}.{field.Name}";
                 default:
-                    throw new Exception("Unsupported member type");
+                    throw CliErrors.UnsupportedMemberType(memberInfo.GetType().Name);
             }
         }
 

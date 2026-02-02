@@ -12,5 +12,10 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
         /// Gets all parameters for the subcommand with their metadata for help generation.
         /// </summary>
         IEnumerable<Parameter> GetParameters();
+
+        /// <summary>
+        /// Gets the first unassigned parameter, or null if all parameters are assigned.
+        /// </summary>
+        Parameter? GetFirstUnassignedParameter();
     }
 }

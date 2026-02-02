@@ -18,6 +18,7 @@ namespace CalqFramework.Cli {
         public CommandLineInterface() {
             CliComponentStoreFactory = new CliComponentStoreFactory();
             HelpPrinter = new HelpPrinter();
+            CompletionPrinter = new CompletionPrinter();
         }
 
         /// <summary>
@@ -29,6 +30,11 @@ namespace CalqFramework.Cli {
         /// Help printer for displaying CLI help information.
         /// </summary>
         public IHelpPrinter HelpPrinter { get; init; }
+        
+        /// <summary>
+        /// Completion printer for displaying completion suggestions.
+        /// </summary>
+        public ICompletionPrinter CompletionPrinter { get; init; }
         
         /// <summary>
         /// Skip unknown options instead of throwing an exception.
@@ -51,6 +57,23 @@ namespace CalqFramework.Cli {
         /// Executes a CLI command using the provided arguments.
         /// </summary>
         public object? Execute(object obj, IEnumerable<string> args) {
+            var argsList = args.ToList();
+            
+            // Check if this is a completion request
+            if (argsList.Count >= 2 && argsList[0] == "completion" && argsList[1] == "complete") {
+                var completionArgs = new CompletionArgs();
+                OptionDeserializer.Deserialize(completionArgs, argsList.Skip(2));
+                ExecuteCompletion(obj, completionArgs);
+                return ResultVoid.Value;
+            }
+            
+            return ExecuteInvoke(obj, argsList);
+        }
+
+        /// <summary>
+        /// Executes a CLI command and invokes the subcommand.
+        /// </summary>
+        private object? ExecuteInvoke(object obj, IEnumerable<string> args) {
             using IEnumerator<string> en = args.GetEnumerator();
 
             object? parentSubmodule = null;
@@ -120,6 +143,133 @@ namespace CalqFramework.Cli {
                 return ResultVoid.Value;
             } else {
                 return result;
+            }
+        }
+
+        /// <summary>
+        /// Executes completion and prints completion suggestions.
+        /// </summary>
+        private void ExecuteCompletion(object obj, CompletionArgs completionArgs) {
+            var words = completionArgs.Words.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            int position = completionArgs.Position;
+            
+            // Position is 0-indexed into the words array
+            // Partial input is the word at the cursor position
+            string partialInput = position >= 0 && position < words.Length ? words[position] : "";
+            
+            // Args before cursor are all words before position, excluding the program name (index 0)
+            var argsBeforeCursor = words.Skip(1).Take(Math.Max(0, position - 1));
+            
+            ExecuteCompletionInternal(obj, argsBeforeCursor, partialInput, completionArgs);
+        }
+
+        private void ExecuteCompletionInternal(object obj, IEnumerable<string> args, string partialInput, CompletionArgs completionArgs) {
+            using IEnumerator<string> en = args.GetEnumerator();
+
+            object? parentSubmodule = null;
+            object submodule = obj;
+            ISubmoduleStore submoduleStore = CliComponentStoreFactory.CreateSubmoduleStore(submodule);
+            string? submoduleName = null;
+            string? subcommandName = null;
+            
+            while (en.MoveNext()) {
+                var arg = en.Current;
+                if (submoduleStore.ContainsKey(arg)) {
+                    submoduleName = arg;
+                    parentSubmodule = submodule;
+                    submodule = submoduleStore[submoduleName]!;
+                    submoduleStore = CliComponentStoreFactory.CreateSubmoduleStore(submodule);
+                } else {
+                    subcommandName = arg;
+                    break;
+                }
+            }
+
+            ISubcommandStore subcommandStore = CliComponentStoreFactory.CreateSubcommandStore(submodule);
+
+            if (subcommandName == null) {
+                var submodules = submoduleStore.GetSubmodules().ToList();
+                var subcommands = subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor).ToList();
+                
+                bool hasMatches = submodules.Any(s => s.Keys.Any(k => k.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase))) ||
+                                  subcommands.Any(s => s.Keys.Any(k => k.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase)));
+                
+                // If no matches, show all options (use empty string as partial input)
+                string effectivePartialInput = hasMatches ? partialInput : "";
+                
+                CompletionPrinter.PrintSubmodules(submodules, effectivePartialInput);
+                CompletionPrinter.PrintSubcommands(subcommands, effectivePartialInput);
+                return;
+            }
+
+            if (!subcommandStore.ContainsKey(subcommandName)) {
+                // Use the invalid subcommand name as the partial input for matching
+                CompletionPrinter.PrintSubcommands(subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor), subcommandName);
+                return;
+            }
+
+            MethodInfo subcommand = subcommandStore[subcommandName]!;
+            ISubcommandExecutorWithOptions subcommandExecutorWithOptions = CliComponentStoreFactory.CreateSubcommandExecutorWithOptions(subcommand, submodule);
+
+            bool hasArguments = en.MoveNext();
+            if (hasArguments) {
+                IEnumerator<string> skippedEn = GetSkippedEnumerator(en).GetEnumerator();
+                ReadParametersAndOptionsForCompletion(skippedEn, subcommandExecutorWithOptions);
+            }
+
+            // Check if we're completing an option/parameter value (previous word starts with -)
+            var words = completionArgs.Words.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            string? previousWord = completionArgs.Position > 0 && completionArgs.Position <= words.Length ? words[completionArgs.Position - 1] : null;
+            bool completingOptionValue = previousWord != null && previousWord.StartsWith("-") && !partialInput.StartsWith("-");
+            
+            if (partialInput.StartsWith("-")) {
+                var parameters = subcommandExecutorWithOptions.GetParameters();
+                var options = subcommandExecutorWithOptions.GetOptions();
+                CompletionPrinter.PrintParameters(parameters, partialInput);
+                CompletionPrinter.PrintOptions(options, partialInput);
+            } else if (completingOptionValue && previousWord != null) {
+                string optionName = previousWord.TrimStart('-', '+');
+                
+                var parameter = subcommandExecutorWithOptions.GetParameters().FirstOrDefault(p => p.Keys.Contains(optionName));
+                if (parameter != null) {
+                    CompletionPrinter.PrintParameterValue(parameter, partialInput);
+                } else {
+                    // Check if it's an option (field/property)
+                    var option = subcommandExecutorWithOptions.GetOptions().FirstOrDefault(o => o.Keys.Contains(optionName));
+                    if (option != null) {
+                        CompletionPrinter.PrintOptionValue(option, partialInput);
+                    }
+                }
+            } else {
+                var parameter = subcommandExecutorWithOptions.GetFirstUnassignedParameter();
+                
+                if (parameter != null) {
+                    CompletionPrinter.PrintParameterValue(parameter, partialInput);
+                }
+            }
+        }
+
+        private void ReadParametersAndOptionsForCompletion(IEnumerator<string> args, ISubcommandExecutorWithOptions subcommandExecutorWithOptions) {
+            var optionReader = new OptionReader(args, subcommandExecutorWithOptions);
+
+            foreach ((string option, string value, OptionFlags optionAttr) in optionReader.Read()) {
+                if (optionAttr.HasFlag(OptionFlags.Unknown) && SkipUnknown) {
+                    continue;
+                }
+
+                if (optionAttr.HasFlag(OptionFlags.NotAnOption)) {
+                    subcommandExecutorWithOptions.AddArgument(option);
+                } else {
+                    try {
+                        subcommandExecutorWithOptions[option] = value;
+                    } catch {
+                        // Ignore errors during completion parsing
+                    }
+                }
+            }
+
+            while (args.MoveNext()) {
+                subcommandExecutorWithOptions.AddArgument(args.Current);
             }
         }
 
