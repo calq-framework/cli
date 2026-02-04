@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using CalqFramework.Cli.InterfaceComponents;
 
-namespace CalqFramework.Cli.Formatting {
+namespace CalqFramework.Cli.Completion {
 
     /// <summary>
     /// Interface for printing completion suggestions.

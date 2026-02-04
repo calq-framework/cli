@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CalqFramework.Cli.InterfaceComponents;
 
-namespace CalqFramework.Cli.Formatting {
+namespace CalqFramework.Cli.Completion {
 
     /// <summary>
     /// Prints completion suggestions based on CLI state and metadata.

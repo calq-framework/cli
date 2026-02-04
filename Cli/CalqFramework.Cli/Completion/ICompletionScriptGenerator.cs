@@ -1,4 +1,4 @@
-namespace CalqFramework.Cli.Formatting {
+namespace CalqFramework.Cli.Completion {
 
     /// <summary>
     /// Interface for generating and managing shell completion scripts.
