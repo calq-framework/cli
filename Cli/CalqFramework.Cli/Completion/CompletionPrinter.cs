@@ -12,7 +12,7 @@ namespace CalqFramework.Cli.Completion {
 
         public void PrintSubmodules(IEnumerable<Submodule> submodules, string partialInput) {
             var completions = submodules
-                .SelectMany(s => s.Keys)
+                .Select(s => s.Keys[0])
                 .Where(k => k.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase))
                 .Distinct()
                 .OrderBy(k => k);
@@ -25,7 +25,7 @@ namespace CalqFramework.Cli.Completion {
 
         public void PrintSubcommands(IEnumerable<Subcommand> subcommands, string partialInput) {
             var completions = subcommands
-                .SelectMany(s => s.Keys)
+                .Select(s => s.Keys[0])
                 .Where(k => k.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase))
                 .Distinct()
                 .OrderBy(k => k);
@@ -41,7 +41,7 @@ namespace CalqFramework.Cli.Completion {
             string partialInputStripped = partialInput.TrimStart('-', '+');
             
             var completions = options
-                .SelectMany(o => o.Keys)
+                .Select(o => o.Keys[0])
                 .Where(k => k.StartsWith(partialInputStripped, StringComparison.OrdinalIgnoreCase))
                 .Select(k => k.Length == 1 ? $"-{k}" : $"--{k}")  // Add appropriate prefix
                 .Distinct()
@@ -58,7 +58,7 @@ namespace CalqFramework.Cli.Completion {
             string partialInputStripped = partialInput.TrimStart('-', '+');
             
             var completions = parameters
-                .SelectMany(p => p.Keys)
+                .Select(p => p.Keys[0])
                 .Where(k => k.StartsWith(partialInputStripped, StringComparison.OrdinalIgnoreCase))
                 .Select(k => k.Length == 1 ? $"-{k}" : $"--{k}")  // Add appropriate prefix
                 .Distinct()
