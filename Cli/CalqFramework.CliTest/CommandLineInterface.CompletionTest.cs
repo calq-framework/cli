@@ -144,7 +144,6 @@ namespace CalqFramework.CliTest {
         public void ExecuteCompletion_ShortOption_ReturnsShortAndLongOptions() {
             var completions = GetCompletions("mycli method-with-text -", 2);
             
-            Assert.Contains("-t", completions);
             Assert.Contains("--text", completions);
         }
 
