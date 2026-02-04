@@ -19,14 +19,9 @@ namespace CalqFramework.Cli.Completion {
         void PrintSubcommands(IEnumerable<Subcommand> subcommands, string partialInput);
 
         /// <summary>
-        /// Prints completion suggestions for option keys.
+        /// Prints completion suggestions for both parameter and option keys (deduplicated).
         /// </summary>
-        void PrintOptions(IEnumerable<Option> options, string partialInput);
-
-        /// <summary>
-        /// Prints completion suggestions for parameter keys.
-        /// </summary>
-        void PrintParameters(IEnumerable<Parameter> parameters, string partialInput);
+        void PrintParametersAndOptions(IEnumerable<Parameter> parameters, IEnumerable<Option> options, string partialInput);
 
         /// <summary>
         /// Prints completion suggestions for a submodule value.

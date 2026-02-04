@@ -255,8 +255,7 @@ namespace CalqFramework.Cli {
             if (partialInput.StartsWith("-")) {
                 var parameters = subcommandExecutorWithOptions.GetParameters();
                 var options = subcommandExecutorWithOptions.GetOptions();
-                CompletionPrinter.PrintParameters(parameters, partialInput);
-                CompletionPrinter.PrintOptions(options, partialInput);
+                CompletionPrinter.PrintParametersAndOptions(parameters, options, partialInput);
             } else if (completingOptionValue && previousWord != null) {
                 string optionName = previousWord.TrimStart('-', '+');
                 
