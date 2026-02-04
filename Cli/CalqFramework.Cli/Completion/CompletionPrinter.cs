@@ -36,32 +36,16 @@ namespace CalqFramework.Cli.Completion {
             Console.Out.Flush();
         }
 
-        public void PrintOptions(IEnumerable<Option> options, string partialInput) {
+        public void PrintParametersAndOptions(IEnumerable<Parameter> parameters, IEnumerable<Option> options, string partialInput) {
             // Strip leading dashes from partial input for matching
             string partialInputStripped = partialInput.TrimStart('-', '+');
             
-            var completions = options
-                .Select(o => o.Keys[0])
+            // Combine parameters and options, deduplicate by key name (case-insensitive)
+            var completions = parameters.Select(p => p.Keys[0])
+                .Concat(options.Select(o => o.Keys[0]))
                 .Where(k => k.StartsWith(partialInputStripped, StringComparison.OrdinalIgnoreCase))
                 .Select(k => k.Length == 1 ? $"-{k}" : $"--{k}")  // Add appropriate prefix
-                .Distinct()
-                .OrderBy(k => k);
-
-            foreach (var completion in completions) {
-                Console.WriteLine(completion);
-            }
-            Console.Out.Flush();
-        }
-
-        public void PrintParameters(IEnumerable<Parameter> parameters, string partialInput) {
-            // Strip leading dashes from partial input for matching
-            string partialInputStripped = partialInput.TrimStart('-', '+');
-            
-            var completions = parameters
-                .Select(p => p.Keys[0])
-                .Where(k => k.StartsWith(partialInputStripped, StringComparison.OrdinalIgnoreCase))
-                .Select(k => k.Length == 1 ? $"-{k}" : $"--{k}")  // Add appropriate prefix
-                .Distinct()
+                .Distinct(StringComparer.OrdinalIgnoreCase)
                 .OrderBy(k => k);
 
             foreach (var completion in completions) {
