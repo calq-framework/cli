@@ -1,4 +1,5 @@
 using System;
+using CalqFramework.Cli.Completion;
 
 namespace CalqFramework.Cli {
 

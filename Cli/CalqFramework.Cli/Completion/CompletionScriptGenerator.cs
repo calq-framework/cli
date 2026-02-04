@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace CalqFramework.Cli.Formatting {
+namespace CalqFramework.Cli.Completion {
 
     /// <summary>
     /// Generates shell completion scripts for various shells.

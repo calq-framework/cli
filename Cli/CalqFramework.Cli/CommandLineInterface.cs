@@ -5,6 +5,7 @@ using System.Reflection;
 using CalqFramework.Cli.DataAccess.InterfaceComponents;
 using CalqFramework.Cli.Parsing;
 using CalqFramework.Cli.Formatting;
+using CalqFramework.Cli.Completion;
 using CalqFramework.DataAccess;
 using static CalqFramework.Cli.Parsing.OptionReaderBase;
 

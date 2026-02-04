@@ -2,6 +2,7 @@
 
 using System.Collections.Generic;
 using CalqFramework.Cli;
+using CalqFramework.Cli.Completion;
 
 namespace CalqFramework.CliTest {
 
