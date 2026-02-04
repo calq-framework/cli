@@ -6,6 +6,7 @@ using Xunit;
 
 namespace CalqFramework.CliTest {
 
+    [Collection("Completion Tests")]
     public class CommandLineInterfaceCompletionTest {
 
         private string CaptureConsoleOutput(Action action) {

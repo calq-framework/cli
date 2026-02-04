@@ -96,5 +96,23 @@ namespace CalqFramework.Cli {
         /// </summary>
         public static CliException InvalidCompletionProvider(string providerTypeName) =>
             new CliException($"Provider type '{providerTypeName}' must implement {nameof(ICompletionProvider)}");
+
+        /// <summary>
+        /// Creates an exception for unsupported shell types.
+        /// </summary>
+        public static CliException UnsupportedShell(string shell) =>
+            new CliException($"Unsupported shell: {shell}. Supported shells: bash, zsh, powershell, pwsh, fish");
+
+        /// <summary>
+        /// Creates an exception for completion installation failures.
+        /// </summary>
+        public static CliException CompletionInstallFailed(string shell, string message, Exception innerException) =>
+            new CliException($"Failed to install completion script for {shell}: {message}", innerException);
+
+        /// <summary>
+        /// Creates an exception for completion uninstallation failures.
+        /// </summary>
+        public static CliException CompletionUninstallFailed(string shell, string message, Exception innerException) =>
+            new CliException($"Failed to uninstall completion script for {shell}: {message}", innerException);
     }
 }

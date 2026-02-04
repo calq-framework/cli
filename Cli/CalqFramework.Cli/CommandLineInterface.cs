@@ -19,6 +19,7 @@ namespace CalqFramework.Cli {
             CliComponentStoreFactory = new CliComponentStoreFactory();
             HelpPrinter = new HelpPrinter();
             CompletionPrinter = new CompletionPrinter();
+            CompletionScriptGenerator = new CompletionScriptGenerator();
         }
 
         /// <summary>
@@ -35,6 +36,11 @@ namespace CalqFramework.Cli {
         /// Completion printer for displaying completion suggestions.
         /// </summary>
         public ICompletionPrinter CompletionPrinter { get; init; }
+        
+        /// <summary>
+        /// Completion script generator for generating shell completion scripts.
+        /// </summary>
+        public ICompletionScriptGenerator CompletionScriptGenerator { get; init; }
         
         /// <summary>
         /// Skip unknown options instead of throwing an exception.
@@ -59,12 +65,35 @@ namespace CalqFramework.Cli {
         public object? Execute(object obj, IEnumerable<string> args) {
             var argsList = args.ToList();
             
-            // Check if this is a completion request
-            if (argsList.Count >= 2 && argsList[0] == "completion" && argsList[1] == "complete") {
-                var completionArgs = new CompletionArgs();
-                OptionDeserializer.Deserialize(completionArgs, argsList.Skip(2));
-                ExecuteCompletion(obj, completionArgs);
-                return ResultVoid.Value;
+            // Check if this is a completion-related command
+            if (argsList.Count >= 2 && argsList[0] == "completion") {
+                var subcommand = argsList[1];
+                
+                switch (subcommand) {
+                    case "complete":
+                        var completionArgs = new CompletionArgs();
+                        OptionDeserializer.Deserialize(completionArgs, argsList.Skip(2));
+                        ExecuteCompletion(obj, completionArgs);
+                        return ResultVoid.Value;
+                    
+                    case "script":
+                        var scriptArgs = new CompletionScriptArgs();
+                        OptionDeserializer.Deserialize(scriptArgs, argsList.Skip(2));
+                        ExecuteCompletionScript(scriptArgs);
+                        return ResultVoid.Value;
+                    
+                    case "install":
+                        var installArgs = new CompletionInstallArgs();
+                        OptionDeserializer.Deserialize(installArgs, argsList.Skip(2));
+                        ExecuteCompletionInstall(installArgs);
+                        return ResultVoid.Value;
+                    
+                    case "uninstall":
+                        var uninstallArgs = new CompletionUninstallArgs();
+                        OptionDeserializer.Deserialize(uninstallArgs, argsList.Skip(2));
+                        ExecuteCompletionUninstall(uninstallArgs);
+                        return ResultVoid.Value;
+                }
             }
             
             return ExecuteInvoke(obj, argsList);
@@ -313,6 +342,79 @@ namespace CalqFramework.Cli {
             while (args.MoveNext()) {
                 subcommandExecutorWithOptions.AddArgument(args.Current);
             }
+        }
+
+        /// <summary>
+        /// Executes the completion script command and outputs the script.
+        /// </summary>
+        private void ExecuteCompletionScript(CompletionScriptArgs args) {
+            var programName = args.ProgramName ?? GetProgramName();
+            var script = args.Shell.ToLower() switch {
+                "bash" => CompletionScriptGenerator.GenerateBashScript(programName),
+                "zsh" => CompletionScriptGenerator.GenerateZshScript(programName),
+                "powershell" or "pwsh" => CompletionScriptGenerator.GeneratePowerShellScript(programName),
+                "fish" => CompletionScriptGenerator.GenerateFishScript(programName),
+                _ => throw CliErrors.UnsupportedShell(args.Shell)
+            };
+
+            Console.WriteLine(script);
+        }
+
+        /// <summary>
+        /// Executes the completion install command.
+        /// </summary>
+        private void ExecuteCompletionInstall(CompletionInstallArgs args) {
+            var programName = args.ProgramName ?? GetProgramName();
+            var script = args.Shell.ToLower() switch {
+                "bash" => CompletionScriptGenerator.GenerateBashScript(programName),
+                "zsh" => CompletionScriptGenerator.GenerateZshScript(programName),
+                "powershell" or "pwsh" => CompletionScriptGenerator.GeneratePowerShellScript(programName),
+                "fish" => CompletionScriptGenerator.GenerateFishScript(programName),
+                _ => throw CliErrors.UnsupportedShell(args.Shell)
+            };
+
+            try {
+                CompletionScriptGenerator.InstallScript(args.Shell.ToLower(), programName, script);
+                var installPath = CompletionScriptGenerator.GetInstallPath(args.Shell.ToLower(), programName);
+                Console.WriteLine($"Completion script installed to: {installPath}");
+                
+                if (args.Shell.ToLower() is "bash" or "zsh") {
+                    Console.WriteLine($"Please restart your shell or run: source {installPath}");
+                } else if (args.Shell.ToLower() is "powershell" or "pwsh") {
+                    Console.WriteLine("Please restart PowerShell for changes to take effect.");
+                } else if (args.Shell.ToLower() == "fish") {
+                    Console.WriteLine("Completion will be available in new Fish shell sessions.");
+                }
+            } catch (Exception ex) {
+                throw CliErrors.CompletionInstallFailed(args.Shell, ex.Message, ex);
+            }
+        }
+
+        /// <summary>
+        /// Executes the completion uninstall command.
+        /// </summary>
+        private void ExecuteCompletionUninstall(CompletionUninstallArgs args) {
+            var programName = args.ProgramName ?? GetProgramName();
+
+            try {
+                var removed = CompletionScriptGenerator.UninstallScript(args.Shell.ToLower(), programName);
+                
+                if (removed) {
+                    Console.WriteLine($"Completion script for {args.Shell} has been uninstalled.");
+                } else {
+                    Console.WriteLine($"No completion script found for {args.Shell}.");
+                }
+            } catch (Exception ex) {
+                throw CliErrors.CompletionUninstallFailed(args.Shell, ex.Message, ex);
+            }
+        }
+
+        /// <summary>
+        /// Gets the program name from the entry assembly.
+        /// </summary>
+        private string GetProgramName() {
+            var assembly = Assembly.GetEntryAssembly();
+            return assembly?.GetName().Name?.ToLower() ?? "program";
         }
     }
 }
