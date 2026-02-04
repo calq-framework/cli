@@ -10,7 +10,7 @@ public static class TypeExtensions {
     public static bool IsParsable(this Type type) {
         type = Nullable.GetUnderlyingType(type) ?? type;
         
-        if (type.IsPrimitive || type == typeof(string)) {
+        if (type.IsPrimitive || type == typeof(string) || type.IsEnum) {
             return true;
         }
 
