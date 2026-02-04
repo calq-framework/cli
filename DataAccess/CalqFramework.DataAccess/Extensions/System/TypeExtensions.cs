@@ -31,6 +31,11 @@ public static class TypeExtensions {
             targetType = Nullable.GetUnderlyingType(targetType)!;
         }
 
+        // Handle enums
+        if (targetType.IsEnum) {
+            return Enum.Parse(targetType, value, ignoreCase: true);
+        }
+
         object objValue = Type.GetTypeCode(targetType) switch {
             TypeCode.Boolean => bool.Parse(value),
             TypeCode.Byte => byte.Parse(value),
@@ -58,6 +63,11 @@ public static class TypeExtensions {
         
         if (Nullable.GetUnderlyingType(targetType) != null) {
             targetType = Nullable.GetUnderlyingType(targetType)!;
+        }
+
+        // Handle enums
+        if (targetType.IsEnum) {
+            return Enum.Parse(targetType, value, ignoreCase: true);
         }
 
         object objValue = Type.GetTypeCode(targetType) switch {
