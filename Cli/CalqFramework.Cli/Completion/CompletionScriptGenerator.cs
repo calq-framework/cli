@@ -12,7 +12,8 @@ namespace CalqFramework.Cli.Completion {
         private static readonly Dictionary<string, ShellConfig> _shellConfigs = new() {
             ["bash"] = new(BashTemplate, GetBashInstallPath),
             ["zsh"] = new(ZshTemplate, GetZshInstallPath),
-            ["powershell"] = new(PowerShellTemplate, GetPowerShellInstallPath),
+            ["powershell"] = new(PowerShellTemplate, GetPowerShell5InstallPath),
+            ["pwsh"] = new(PowerShellTemplate, GetPowerShell7InstallPath),
             ["fish"] = new(FishTemplate, GetFishInstallPath)
         };
 
@@ -95,8 +96,13 @@ complete -c __PROGRAM_NAME__ -f -a ""(____PROGRAM_NAME___completion)""";
             return $"/usr/local/share/zsh/site-functions/_{programName}";
         }
 
-        private static string GetPowerShellInstallPath(string programName) {
-            var profileDir = Path.GetDirectoryName(GetPowerShellProfilePath()) ?? "";
+        private static string GetPowerShell5InstallPath(string programName) {
+            var profileDir = Path.GetDirectoryName(GetPowerShell5ProfilePath()) ?? "";
+            return Path.Combine(profileDir, "Completions", $"{programName}.ps1");
+        }
+
+        private static string GetPowerShell7InstallPath(string programName) {
+            var profileDir = Path.GetDirectoryName(GetPowerShell7ProfilePath()) ?? "";
             return Path.Combine(profileDir, "Completions", $"{programName}.ps1");
         }
 
@@ -107,7 +113,13 @@ complete -c __PROGRAM_NAME__ -f -a ""(____PROGRAM_NAME___completion)""";
             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", "fish", "completions", $"{programName}.fish");
         }
 
-        private static string GetPowerShellProfilePath() {
+        private static string GetPowerShell5ProfilePath() {
+            // Windows PowerShell 5.1 (Windows only)
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "WindowsPowerShell", "Microsoft.PowerShell_profile.ps1");
+        }
+
+        private static string GetPowerShell7ProfilePath() {
+            // PowerShell 7+ (cross-platform)
             if (OperatingSystem.IsWindows()) {
                 return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "PowerShell", "Microsoft.PowerShell_profile.ps1");
             }
@@ -125,13 +137,14 @@ complete -c __PROGRAM_NAME__ -f -a ""(____PROGRAM_NAME___completion)""";
 
             File.WriteAllText(installPath, script);
 
-            if (shell.ToLowerInvariant() == "powershell") {
-                AddToPowerShellProfile(installPath);
+            var normalizedShell = shell.ToLowerInvariant();
+            if (normalizedShell == "powershell" || normalizedShell == "pwsh") {
+                AddToPowerShellProfile(normalizedShell, installPath);
             }
         }
 
-        private void AddToPowerShellProfile(string scriptPath) {
-            var profilePath = GetPowerShellProfilePath();
+        private void AddToPowerShellProfile(string shell, string scriptPath) {
+            var profilePath = shell == "powershell" ? GetPowerShell5ProfilePath() : GetPowerShell7ProfilePath();
             var sourceCommand = $". \"{scriptPath}\"";
 
             if (File.Exists(profilePath)) {
@@ -154,8 +167,9 @@ complete -c __PROGRAM_NAME__ -f -a ""(____PROGRAM_NAME___completion)""";
             if (File.Exists(installPath)) {
                 File.Delete(installPath);
 
-                if (shell.ToLowerInvariant() == "powershell") {
-                    RemoveFromPowerShellProfile(installPath);
+                var normalizedShell = shell.ToLowerInvariant();
+                if (normalizedShell == "powershell" || normalizedShell == "pwsh") {
+                    RemoveFromPowerShellProfile(normalizedShell, installPath);
                 }
 
                 return true;
@@ -164,8 +178,8 @@ complete -c __PROGRAM_NAME__ -f -a ""(____PROGRAM_NAME___completion)""";
             return false;
         }
 
-        private void RemoveFromPowerShellProfile(string scriptPath) {
-            var profilePath = GetPowerShellProfilePath();
+        private void RemoveFromPowerShellProfile(string shell, string scriptPath) {
+            var profilePath = shell == "powershell" ? GetPowerShell5ProfilePath() : GetPowerShell7ProfilePath();
             
             if (File.Exists(profilePath)) {
                 var profileContent = File.ReadAllText(profilePath);
