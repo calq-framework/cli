@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using CalqFramework.Cli.Completion;
+using CalqFramework.Cli;
 
 namespace CalqFramework.CliTest {
     

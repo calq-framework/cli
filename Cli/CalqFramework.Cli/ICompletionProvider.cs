@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace CalqFramework.Cli.Completion {
+namespace CalqFramework.Cli {
 
     /// <summary>
     /// Provides completion suggestions for CLI parameters and options.

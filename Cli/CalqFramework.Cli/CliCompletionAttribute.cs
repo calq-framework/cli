@@ -1,6 +1,6 @@
 using System;
 
-namespace CalqFramework.Cli.Completion {
+namespace CalqFramework.Cli {
 
     /// <summary>
     /// Attribute to specify completion provider for parameters and options.
