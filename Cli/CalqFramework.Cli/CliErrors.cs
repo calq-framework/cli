@@ -101,7 +101,7 @@ namespace CalqFramework.Cli {
         /// Creates an exception for unsupported shell types.
         /// </summary>
         public static CliException UnsupportedShell(string shell) =>
-            new CliException($"Unsupported shell: {shell}. Supported shells: bash, zsh, powershell, pwsh, fish");
+            new CliException($"Unsupported shell: {shell}. Supported shells: bash, zsh, powershell, fish");
 
         /// <summary>
         /// Creates an exception for completion installation failures.

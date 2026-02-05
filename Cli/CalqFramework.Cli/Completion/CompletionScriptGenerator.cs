@@ -1,145 +1,121 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace CalqFramework.Cli.Completion {
 
-    /// <summary>
-    /// Generates shell completion scripts for various shells.
-    /// </summary>
     public class CompletionScriptGenerator : ICompletionScriptGenerator {
 
-        public string GenerateBashScript(string programName) {
-            return $@"# Bash completion script for {programName}
-_{programName}_completion() {{
-    local cur prev words cword
-    _init_completion || return
+        private record ShellConfig(string Template, Func<string, string> GetInstallPath);
 
-    # Get the position of the current word
-    local position=$((cword))
-    
-    # Join all words into a single string
-    local all_words=""${{words[*]}}""
-    
-    # Call the completion command
-    local completions=$({programName} completion complete --position ""$position"" --words ""$all_words"" 2>/dev/null)
-    
-    # Return the completions
-    COMPREPLY=( $(compgen -W ""$completions"" -- ""$cur"") )
-}}
+        private static readonly Dictionary<string, ShellConfig> _shellConfigs = new() {
+            ["bash"] = new(BashTemplate, GetBashInstallPath),
+            ["zsh"] = new(ZshTemplate, GetZshInstallPath),
+            ["powershell"] = new(PowerShellTemplate, GetPowerShellInstallPath),
+            ["fish"] = new(FishTemplate, GetFishInstallPath)
+        };
 
-complete -F _{programName}_completion {programName}
-";
-        }
+        public IReadOnlyCollection<string> SupportedShells => _shellConfigs.Keys;
 
-        public string GenerateZshScript(string programName) {
-            return $@"#compdef {programName}
-# Zsh completion script for {programName}
-
-_{programName}_completion() {{
-    local -a completions
-    local position=$((CURRENT))
-    local words_str=""${{words[*]}}""
-    
-    # Call the completion command
-    local output=$({programName} completion complete --position ""$position"" --words ""$words_str"" 2>/dev/null)
-    
-    # Convert output to array
-    completions=(${{(f)output}})
-    
-    # Return completions
-    _describe '{programName} commands' completions
-}}
-
-_{programName}_completion ""$@""
-";
-        }
-
-        public string GeneratePowerShellScript(string programName) {
-            return $@"# PowerShell completion script for {programName}
-Register-ArgumentCompleter -Native -CommandName {programName} -ScriptBlock {{
-    param($wordToComplete, $commandAst, $cursorPosition)
-    
-    $words = $commandAst.ToString() -split '\s+'
-    $position = $words.Count - 1
-    
-    if ($wordToComplete) {{
-        # If we're completing a partial word, position stays the same
-    }} else {{
-        # If we're at a space, increment position
-        $position++
-    }}
-    
-    $wordsStr = $commandAst.ToString()
-    
-    # Call the completion command
-    $completions = & {programName} completion complete --position $position --words ""$wordsStr"" 2>$null
-    
-    $completions | ForEach-Object {{
-        [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
-    }}
-}}
-";
-        }
-
-        public string GenerateFishScript(string programName) {
-            return $@"# Fish completion script for {programName}
-function __{programName}_completion
-    set -l tokens (commandline -opc)
-    set -l position (count $tokens)
-    set -l words_str (commandline -p)
-    
-    # Call the completion command
-    {programName} completion complete --position $position --words ""$words_str"" 2>/dev/null
-end
-
-complete -c {programName} -f -a ""(__{programName}_completion)""
-";
+        public string GenerateScript(string shell, string programName) {
+            var normalized = shell.ToLowerInvariant();
+            if (!_shellConfigs.TryGetValue(normalized, out var config)) {
+                throw CliErrors.UnsupportedShell(shell);
+            }
+            return config.Template.Replace("__PROGRAM_NAME__", programName);
         }
 
         public string GetInstallPath(string shell, string programName) {
-            return shell.ToLower() switch {
-                "bash" => GetBashInstallPath(programName),
-                "zsh" => GetZshInstallPath(programName),
-                "powershell" or "pwsh" => GetPowerShellInstallPath(programName),
-                "fish" => GetFishInstallPath(programName),
-                _ => throw new ArgumentException($"Unsupported shell: {shell}")
-            };
+            var normalized = shell.ToLowerInvariant();
+            if (!_shellConfigs.TryGetValue(normalized, out var config)) {
+                throw CliErrors.UnsupportedShell(shell);
+            }
+            return config.GetInstallPath(programName);
         }
 
-        private string GetBashInstallPath(string programName) {
+        private const string BashTemplate = @"# Bash completion script for __PROGRAM_NAME__
+___PROGRAM_NAME___completion() {
+    local cur prev words cword
+    _init_completion || return
+    local position=$((cword))
+    local all_words=""${words[*]}""
+    local completions=$(__PROGRAM_NAME__ completion complete --position ""$position"" --words ""$all_words"" 2>/dev/null)
+    COMPREPLY=( $(compgen -W ""$completions"" -- ""$cur"") )
+}
+complete -F ___PROGRAM_NAME___completion __PROGRAM_NAME__";
+
+        private const string ZshTemplate = @"#compdef __PROGRAM_NAME__
+___PROGRAM_NAME___completion() {
+    local -a completions
+    local position=$((CURRENT))
+    local words_str=""${words[*]}""
+    local output=$(__PROGRAM_NAME__ completion complete --position ""$position"" --words ""$words_str"" 2>/dev/null)
+    completions=(${(f)output})
+    _describe '__PROGRAM_NAME__ commands' completions
+}
+___PROGRAM_NAME___completion ""$@""";
+
+        private const string PowerShellTemplate = @"# PowerShell completion script for __PROGRAM_NAME__
+Register-ArgumentCompleter -Native -CommandName __PROGRAM_NAME__ -ScriptBlock {
+    param($wordToComplete, $commandAst, $cursorPosition)
+    $words = $commandAst.ToString() -split '\s+'
+    $position = $words.Count - 1
+    if ($wordToComplete) {
+    } else {
+        $position++
+    }
+    $wordsStr = $commandAst.ToString()
+    $completions = & __PROGRAM_NAME__ completion complete --position $position --words ""$wordsStr"" 2>$null
+    $completions | ForEach-Object {
+        [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
+    }
+}";
+
+        private const string FishTemplate = @"# Fish completion script for __PROGRAM_NAME__
+function ____PROGRAM_NAME___completion
+    set -l tokens (commandline -opc)
+    set -l position (count $tokens)
+    set -l words_str (commandline -p)
+    __PROGRAM_NAME__ completion complete --position $position --words ""$words_str"" 2>/dev/null
+end
+complete -c __PROGRAM_NAME__ -f -a ""(____PROGRAM_NAME___completion)""";
+
+        private static string GetBashInstallPath(string programName) {
             if (OperatingSystem.IsWindows()) {
                 return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".bash_completion.d", $"{programName}.bash");
             }
             return $"/etc/bash_completion.d/{programName}";
         }
 
-        private string GetZshInstallPath(string programName) {
+        private static string GetZshInstallPath(string programName) {
             if (OperatingSystem.IsWindows()) {
                 return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".zsh", "completion", $"_{programName}");
             }
             return $"/usr/local/share/zsh/site-functions/_{programName}";
         }
 
-        private string GetPowerShellInstallPath(string programName) {
+        private static string GetPowerShellInstallPath(string programName) {
             var profileDir = Path.GetDirectoryName(GetPowerShellProfilePath()) ?? "";
             return Path.Combine(profileDir, "Completions", $"{programName}.ps1");
         }
 
-        private string GetFishInstallPath(string programName) {
+        private static string GetFishInstallPath(string programName) {
             if (OperatingSystem.IsWindows()) {
                 return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "fish", "completions", $"{programName}.fish");
             }
             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", "fish", "completions", $"{programName}.fish");
         }
 
-        private string GetPowerShellProfilePath() {
+        private static string GetPowerShellProfilePath() {
             if (OperatingSystem.IsWindows()) {
                 return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "PowerShell", "Microsoft.PowerShell_profile.ps1");
             }
             return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", "powershell", "Microsoft.PowerShell_profile.ps1");
         }
 
-        public void InstallScript(string shell, string programName, string script) {
+        public void InstallScript(string shell, string programName) {
+            var script = GenerateScript(shell, programName);
             var installPath = GetInstallPath(shell, programName);
             var directory = Path.GetDirectoryName(installPath);
             
@@ -149,8 +125,7 @@ complete -c {programName} -f -a ""(__{programName}_completion)""
 
             File.WriteAllText(installPath, script);
 
-            // For PowerShell, also add to profile if not already there
-            if (shell.ToLower() is "powershell" or "pwsh") {
+            if (shell.ToLowerInvariant() == "powershell") {
                 AddToPowerShellProfile(installPath);
             }
         }
@@ -179,8 +154,7 @@ complete -c {programName} -f -a ""(__{programName}_completion)""
             if (File.Exists(installPath)) {
                 File.Delete(installPath);
 
-                // For PowerShell, also remove from profile
-                if (shell.ToLower() is "powershell" or "pwsh") {
+                if (shell.ToLowerInvariant() == "powershell") {
                     RemoveFromPowerShellProfile(installPath);
                 }
 
