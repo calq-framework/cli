@@ -1,4 +1,4 @@
-namespace CalqFramework.Cli {
+namespace CalqFramework.Cli.Completion {
     
     /// <summary>
     /// Arguments for completion requests.

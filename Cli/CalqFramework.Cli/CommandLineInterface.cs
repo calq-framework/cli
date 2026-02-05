@@ -15,13 +15,13 @@ namespace CalqFramework.Cli {
     /// <summary>
     /// Interprets CLI commands and executes methods on any classlib without requiring programming.
     /// </summary>
-    public class CommandLineInterface {
+    public class CommandLineInterface : ICliContext {
+
+        private ICompletionHandler? _completionHandler;
 
         public CommandLineInterface() {
             CliComponentStoreFactory = new CliComponentStoreFactory();
             HelpPrinter = new HelpPrinter();
-            CompletionPrinter = new CompletionPrinter();
-            CompletionScriptGenerator = new CompletionScriptGenerator();
         }
 
         /// <summary>
@@ -34,15 +34,10 @@ namespace CalqFramework.Cli {
         /// </summary>
         public IHelpPrinter HelpPrinter { get; init; }
         
-        /// <summary>
-        /// Completion printer for displaying completion suggestions.
-        /// </summary>
-        public ICompletionPrinter CompletionPrinter { get; init; }
-        
-        /// <summary>
-        /// Completion script generator for generating shell completion scripts.
-        /// </summary>
-        public ICompletionScriptGenerator CompletionScriptGenerator { get; init; }
+        public ICompletionHandler CompletionHandler { 
+            get => _completionHandler ??= new CompletionHandler();
+            init => _completionHandler = value;
+        }
         
         /// <summary>
         /// Skip unknown options instead of throwing an exception.
@@ -57,58 +52,34 @@ namespace CalqFramework.Cli {
         /// <summary>
         /// Executes a CLI command using command-line arguments from the environment.
         /// </summary>
-        public object? Execute(object obj) {
-            return Execute(obj, Environment.GetCommandLineArgs().Skip(1));
+        public object? Execute(object target) {
+            return Execute(target, Environment.GetCommandLineArgs().Skip(1));
         }
 
         /// <summary>
         /// Executes a CLI command using the provided arguments.
         /// </summary>
-        public object? Execute(object obj, IEnumerable<string> args) {
+        public object? Execute(object target, IEnumerable<string> args) {
             var argsList = args.ToList();
             
             // Check if this is a completion-related command
             if (argsList.Count >= 2 && argsList[0] == "completion") {
                 var subcommand = argsList[1];
                 
-                switch (subcommand) {
-                    case "complete":
-                        var completionArgs = new CompletionArgs();
-                        OptionDeserializer.Deserialize(completionArgs, argsList.Skip(2));
-                        ExecuteCompletion(obj, completionArgs);
-                        return ResultVoid.Value;
-                    
-                    case "script":
-                        var scriptArgs = new CompletionScriptArgs();
-                        OptionDeserializer.Deserialize(scriptArgs, argsList.Skip(2));
-                        HandleCompletionScript(scriptArgs);
-                        return ResultVoid.Value;
-                    
-                    case "install":
-                        var installArgs = new CompletionInstallArgs();
-                        OptionDeserializer.Deserialize(installArgs, argsList.Skip(2));
-                        HandleCompletionInstall(installArgs);
-                        return ResultVoid.Value;
-                    
-                    case "uninstall":
-                        var uninstallArgs = new CompletionUninstallArgs();
-                        OptionDeserializer.Deserialize(uninstallArgs, argsList.Skip(2));
-                        HandleCompletionUninstall(uninstallArgs);
-                        return ResultVoid.Value;
-                }
+                return CompletionHandler.Handle(this, subcommand, argsList.Skip(2), target);
             }
             
-            return ExecuteInvoke(obj, argsList);
+            return ExecuteInvoke(target, argsList);
         }
 
         /// <summary>
         /// Executes a CLI command and invokes the subcommand.
         /// </summary>
-        private object? ExecuteInvoke(object obj, IEnumerable<string> args) {
+        private object? ExecuteInvoke(object target, IEnumerable<string> args) {
             using IEnumerator<string> en = args.GetEnumerator();
 
             object? parentSubmodule = null;
-            object submodule = obj;
+            object submodule = target;
             ISubmoduleStore submoduleStore = CliComponentStoreFactory.CreateSubmoduleStore(submodule);
             string? submoduleName = null;
             string? subcommandName = null;
@@ -133,14 +104,14 @@ namespace CalqFramework.Cli {
 
             if (subcommandName == null || subcommandName == "--help" || subcommandName == "-h") {
                 IOptionStore optionStore = CliComponentStoreFactory.CreateOptionStore(submodule);
-                bool isRoot = submodule == obj;
+                bool isRoot = submodule == target;
                 if (isRoot) {
-                    HelpPrinter.PrintHelp(obj.GetType(), submoduleStore.GetSubmodules(), subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor), optionStore.GetOptions());
+                    HelpPrinter.PrintHelp(target.GetType(), submoduleStore.GetSubmodules(), subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor), optionStore.GetOptions());
                     return ResultVoid.Value;
                 } else {
                     ISubmoduleStore parentSubmoduleStore = CliComponentStoreFactory.CreateSubmoduleStore(parentSubmodule!);
                     var submoduleInfo = parentSubmoduleStore.GetSubmodules().Where(x => parentSubmoduleStore[x.Keys.First()] == submodule).First(); // use the store to check for the key to comply with case sensitivity
-                    HelpPrinter.PrintHelp(obj.GetType(), submoduleInfo, submoduleStore.GetSubmodules(), subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor), optionStore.GetOptions());
+                    HelpPrinter.PrintHelp(target.GetType(), submoduleInfo, submoduleStore.GetSubmodules(), subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor), optionStore.GetOptions());
                     return ResultVoid.Value;
                 }
             }
@@ -153,7 +124,7 @@ namespace CalqFramework.Cli {
                 string firstArg = en.Current;
 
                 if (firstArg == "--help" || firstArg == "-h") {
-                    HelpPrinter.PrintSubcommandHelp(obj.GetType(), subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor).Where(x => x.MethodInfo == subcommand).First(), subcommandExecutorWithOptions.GetOptions());
+                    HelpPrinter.PrintSubcommandHelp(target.GetType(), subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor).Where(x => x.MethodInfo == subcommand).First(), subcommandExecutorWithOptions.GetOptions());
                     return ResultVoid.Value;
                 }
 
@@ -177,133 +148,6 @@ namespace CalqFramework.Cli {
             }
         }
 
-        /// <summary>
-        /// Executes completion and prints completion suggestions.
-        /// </summary>
-        private void ExecuteCompletion(object obj, CompletionArgs completionArgs) {
-            var words = completionArgs.Words.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            int position = completionArgs.Position;
-            
-            // Position is 0-indexed into the words array
-            // Partial input is the word at the cursor position
-            string partialInput = position >= 0 && position < words.Length ? words[position] : "";
-            
-            // Args before cursor are all words before position, excluding the program name (index 0)
-            var argsBeforeCursor = words.Skip(1).Take(Math.Max(0, position - 1));
-            
-            ExecuteCompletion(obj, argsBeforeCursor, partialInput, completionArgs);
-        }
-
-        private void ExecuteCompletion(object obj, IEnumerable<string> args, string partialInput, CompletionArgs completionArgs) {
-            using IEnumerator<string> en = args.GetEnumerator();
-
-            object? parentSubmodule = null;
-            object submodule = obj;
-            ISubmoduleStore submoduleStore = CliComponentStoreFactory.CreateSubmoduleStore(submodule);
-            string? submoduleName = null;
-            string? subcommandName = null;
-            
-            while (en.MoveNext()) {
-                var arg = en.Current;
-                if (submoduleStore.ContainsKey(arg)) {
-                    submoduleName = arg;
-                    parentSubmodule = submodule;
-                    submodule = submoduleStore[submoduleName]!;
-                    submoduleStore = CliComponentStoreFactory.CreateSubmoduleStore(submodule);
-                } else {
-                    subcommandName = arg;
-                    break;
-                }
-            }
-
-            ISubcommandStore subcommandStore = CliComponentStoreFactory.CreateSubcommandStore(submodule);
-
-            if (subcommandName == null) {
-                var submodules = submoduleStore.GetSubmodules().ToList();
-                var subcommands = subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor).ToList();
-                
-                bool hasMatches = submodules.Any(s => s.Keys.Any(k => k.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase))) ||
-                                  subcommands.Any(s => s.Keys.Any(k => k.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase)));
-                
-                // If no matches, show all options (use empty string as partial input)
-                string effectivePartialInput = hasMatches ? partialInput : "";
-                
-                CompletionPrinter.PrintSubmodules(submodules, effectivePartialInput);
-                CompletionPrinter.PrintSubcommands(subcommands, effectivePartialInput);
-                return;
-            }
-
-            if (!subcommandStore.ContainsKey(subcommandName)) {
-                // Use the invalid subcommand name as the partial input for matching
-                CompletionPrinter.PrintSubcommands(subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor), subcommandName);
-                return;
-            }
-
-            MethodInfo subcommand = subcommandStore[subcommandName]!;
-            ISubcommandExecutorWithOptions subcommandExecutorWithOptions = CliComponentStoreFactory.CreateSubcommandExecutorWithOptions(subcommand, submodule);
-
-            bool hasArguments = en.MoveNext();
-            if (hasArguments) {
-                IEnumerator<string> skippedEn = GetSkippedEnumerator(en).GetEnumerator();
-                ReadParametersAndOptionsForCompletion(skippedEn, subcommandExecutorWithOptions);
-            }
-
-            // Check if we're completing an option/parameter value (previous word starts with -)
-            var words = completionArgs.Words.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            string? previousWord = completionArgs.Position > 0 && completionArgs.Position <= words.Length ? words[completionArgs.Position - 1] : null;
-            bool completingOptionValue = previousWord != null && previousWord.StartsWith("-") && !partialInput.StartsWith("-");
-            
-            if (partialInput.StartsWith("-")) {
-                var parameters = subcommandExecutorWithOptions.GetParameters();
-                var options = subcommandExecutorWithOptions.GetOptions();
-                CompletionPrinter.PrintParametersAndOptions(parameters, options, partialInput);
-            } else if (completingOptionValue && previousWord != null) {
-                string optionName = previousWord.TrimStart('-', '+');
-                
-                var parameter = subcommandExecutorWithOptions.GetParameters().FirstOrDefault(p => p.Keys.Contains(optionName));
-                if (parameter != null) {
-                    CompletionPrinter.PrintParameterValue(parameter, partialInput);
-                } else {
-                    // Check if it's an option (field/property)
-                    var option = subcommandExecutorWithOptions.GetOptions().FirstOrDefault(o => o.Keys.Contains(optionName));
-                    if (option != null) {
-                        CompletionPrinter.PrintOptionValue(option, partialInput);
-                    }
-                }
-            } else {
-                var parameter = subcommandExecutorWithOptions.GetFirstUnassignedParameter();
-                
-                if (parameter != null) {
-                    CompletionPrinter.PrintParameterValue(parameter, partialInput);
-                }
-            }
-        }
-
-        private void ReadParametersAndOptionsForCompletion(IEnumerator<string> args, ISubcommandExecutorWithOptions subcommandExecutorWithOptions) {
-            var optionReader = new OptionReader(args, subcommandExecutorWithOptions);
-
-            foreach ((string option, string value, OptionFlags optionAttr) in optionReader.Read()) {
-                if (optionAttr.HasFlag(OptionFlags.Unknown) && SkipUnknown) {
-                    continue;
-                }
-
-                if (optionAttr.HasFlag(OptionFlags.NotAnOption)) {
-                    subcommandExecutorWithOptions.AddArgument(option);
-                } else {
-                    try {
-                        subcommandExecutorWithOptions[option] = value;
-                    } catch {
-                        // Ignore errors during completion parsing
-                    }
-                }
-            }
-
-            while (args.MoveNext()) {
-                subcommandExecutorWithOptions.AddArgument(args.Current);
-            }
-        }
-
-        // TODO move as extension method
         private static IEnumerable<string> GetSkippedEnumerator(IEnumerator<string> en) {
             do {
                 yield return en.Current;
@@ -342,50 +186,6 @@ namespace CalqFramework.Cli {
 
             while (args.MoveNext()) {
                 subcommandExecutorWithOptions.AddArgument(args.Current);
-            }
-        }
-
-        /// <summary>
-        /// Executes the completion script command and outputs the script.
-        /// </summary>
-        private void HandleCompletionScript(CompletionScriptArgs args) {
-            var programName = args.ProgramName ?? Assembly.GetEntryAssembly()?.GetToolCommandName() ?? throw CliErrors.UnableToDetermineProgramName();
-            var script = CompletionScriptGenerator.GenerateScript(args.Shell, programName);
-            Console.WriteLine(script);
-        }
-
-        /// <summary>
-        /// Executes the completion install command.
-        /// </summary>
-        private void HandleCompletionInstall(CompletionInstallArgs args) {
-            var programName = args.ProgramName ?? Assembly.GetEntryAssembly()?.GetToolCommandName() ?? throw CliErrors.UnableToDetermineProgramName();
-
-            try {
-                CompletionScriptGenerator.InstallScript(args.Shell, programName);
-                var installPath = CompletionScriptGenerator.GetInstallPath(args.Shell, programName);
-                Console.WriteLine($"Completion script installed to: {installPath}");
-                Console.WriteLine("Please restart your shell for changes to take effect.");
-            } catch (Exception ex) {
-                throw CliErrors.CompletionInstallFailed(args.Shell, ex.Message, ex);
-            }
-        }
-
-        /// <summary>
-        /// Executes the completion uninstall command.
-        /// </summary>
-        private void HandleCompletionUninstall(CompletionUninstallArgs args) {
-            var programName = args.ProgramName ?? Assembly.GetEntryAssembly()?.GetToolCommandName() ?? throw CliErrors.UnableToDetermineProgramName();
-
-            try {
-                var removed = CompletionScriptGenerator.UninstallScript(args.Shell, programName);
-                
-                if (removed) {
-                    Console.WriteLine($"Completion script for {args.Shell} has been uninstalled.");
-                } else {
-                    Console.WriteLine($"No completion script found for {args.Shell}.");
-                }
-            } catch (Exception ex) {
-                throw CliErrors.CompletionUninstallFailed(args.Shell, ex.Message, ex);
             }
         }
     }
