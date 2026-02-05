@@ -81,19 +81,19 @@ namespace CalqFramework.Cli {
                     case "script":
                         var scriptArgs = new CompletionScriptArgs();
                         OptionDeserializer.Deserialize(scriptArgs, argsList.Skip(2));
-                        ExecuteCompletionScript(scriptArgs);
+                        HandleCompletionScript(scriptArgs);
                         return ResultVoid.Value;
                     
                     case "install":
                         var installArgs = new CompletionInstallArgs();
                         OptionDeserializer.Deserialize(installArgs, argsList.Skip(2));
-                        ExecuteCompletionInstall(installArgs);
+                        HandleCompletionInstall(installArgs);
                         return ResultVoid.Value;
                     
                     case "uninstall":
                         var uninstallArgs = new CompletionUninstallArgs();
                         OptionDeserializer.Deserialize(uninstallArgs, argsList.Skip(2));
-                        ExecuteCompletionUninstall(uninstallArgs);
+                        HandleCompletionUninstall(uninstallArgs);
                         return ResultVoid.Value;
                 }
             }
@@ -191,10 +191,10 @@ namespace CalqFramework.Cli {
             // Args before cursor are all words before position, excluding the program name (index 0)
             var argsBeforeCursor = words.Skip(1).Take(Math.Max(0, position - 1));
             
-            ExecuteCompletionInternal(obj, argsBeforeCursor, partialInput, completionArgs);
+            ExecuteCompletion(obj, argsBeforeCursor, partialInput, completionArgs);
         }
 
-        private void ExecuteCompletionInternal(object obj, IEnumerable<string> args, string partialInput, CompletionArgs completionArgs) {
+        private void ExecuteCompletion(object obj, IEnumerable<string> args, string partialInput, CompletionArgs completionArgs) {
             using IEnumerator<string> en = args.GetEnumerator();
 
             object? parentSubmodule = null;
@@ -348,44 +348,23 @@ namespace CalqFramework.Cli {
         /// <summary>
         /// Executes the completion script command and outputs the script.
         /// </summary>
-        private void ExecuteCompletionScript(CompletionScriptArgs args) {
+        private void HandleCompletionScript(CompletionScriptArgs args) {
             var programName = args.ProgramName ?? Assembly.GetEntryAssembly()?.GetToolCommandName() ?? throw CliErrors.UnableToDetermineProgramName();
-            var script = args.Shell.ToLower() switch {
-                "bash" => CompletionScriptGenerator.GenerateBashScript(programName),
-                "zsh" => CompletionScriptGenerator.GenerateZshScript(programName),
-                "powershell" or "pwsh" => CompletionScriptGenerator.GeneratePowerShellScript(programName),
-                "fish" => CompletionScriptGenerator.GenerateFishScript(programName),
-                _ => throw CliErrors.UnsupportedShell(args.Shell)
-            };
-
+            var script = CompletionScriptGenerator.GenerateScript(args.Shell, programName);
             Console.WriteLine(script);
         }
 
         /// <summary>
         /// Executes the completion install command.
         /// </summary>
-        private void ExecuteCompletionInstall(CompletionInstallArgs args) {
+        private void HandleCompletionInstall(CompletionInstallArgs args) {
             var programName = args.ProgramName ?? Assembly.GetEntryAssembly()?.GetToolCommandName() ?? throw CliErrors.UnableToDetermineProgramName();
-            var script = args.Shell.ToLower() switch {
-                "bash" => CompletionScriptGenerator.GenerateBashScript(programName),
-                "zsh" => CompletionScriptGenerator.GenerateZshScript(programName),
-                "powershell" or "pwsh" => CompletionScriptGenerator.GeneratePowerShellScript(programName),
-                "fish" => CompletionScriptGenerator.GenerateFishScript(programName),
-                _ => throw CliErrors.UnsupportedShell(args.Shell)
-            };
 
             try {
-                CompletionScriptGenerator.InstallScript(args.Shell.ToLower(), programName, script);
-                var installPath = CompletionScriptGenerator.GetInstallPath(args.Shell.ToLower(), programName);
+                CompletionScriptGenerator.InstallScript(args.Shell, programName);
+                var installPath = CompletionScriptGenerator.GetInstallPath(args.Shell, programName);
                 Console.WriteLine($"Completion script installed to: {installPath}");
-                
-                if (args.Shell.ToLower() is "bash" or "zsh") {
-                    Console.WriteLine($"Please restart your shell or run: source {installPath}");
-                } else if (args.Shell.ToLower() is "powershell" or "pwsh") {
-                    Console.WriteLine("Please restart PowerShell for changes to take effect.");
-                } else if (args.Shell.ToLower() == "fish") {
-                    Console.WriteLine("Completion will be available in new Fish shell sessions.");
-                }
+                Console.WriteLine("Please restart your shell for changes to take effect.");
             } catch (Exception ex) {
                 throw CliErrors.CompletionInstallFailed(args.Shell, ex.Message, ex);
             }
@@ -394,11 +373,11 @@ namespace CalqFramework.Cli {
         /// <summary>
         /// Executes the completion uninstall command.
         /// </summary>
-        private void ExecuteCompletionUninstall(CompletionUninstallArgs args) {
+        private void HandleCompletionUninstall(CompletionUninstallArgs args) {
             var programName = args.ProgramName ?? Assembly.GetEntryAssembly()?.GetToolCommandName() ?? throw CliErrors.UnableToDetermineProgramName();
 
             try {
-                var removed = CompletionScriptGenerator.UninstallScript(args.Shell.ToLower(), programName);
+                var removed = CompletionScriptGenerator.UninstallScript(args.Shell, programName);
                 
                 if (removed) {
                     Console.WriteLine($"Completion script for {args.Shell} has been uninstalled.");
