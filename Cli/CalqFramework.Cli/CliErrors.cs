@@ -115,5 +115,11 @@ namespace CalqFramework.Cli {
         /// </summary>
         public static CliException CompletionUninstallFailed(string shell, string message, Exception innerException) =>
             new CliException($"Failed to uninstall completion script for {shell}: {message}", innerException);
+
+        /// <summary>
+        /// Creates an exception for when the program name cannot be determined.
+        /// </summary>
+        public static CliException UnableToDetermineProgramName() =>
+            new CliException("Unable to determine program name from entry assembly");
     }
 }

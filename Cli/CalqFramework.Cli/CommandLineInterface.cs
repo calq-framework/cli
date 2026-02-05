@@ -6,6 +6,7 @@ using CalqFramework.Cli.DataAccess.InterfaceComponents;
 using CalqFramework.Cli.Parsing;
 using CalqFramework.Cli.Formatting;
 using CalqFramework.Cli.Completion;
+using CalqFramework.Cli.Extensions.System.Reflection;
 using CalqFramework.DataAccess;
 using static CalqFramework.Cli.Parsing.OptionReaderBase;
 
@@ -348,7 +349,7 @@ namespace CalqFramework.Cli {
         /// Executes the completion script command and outputs the script.
         /// </summary>
         private void ExecuteCompletionScript(CompletionScriptArgs args) {
-            var programName = args.ProgramName ?? GetProgramName();
+            var programName = args.ProgramName ?? Assembly.GetEntryAssembly()?.GetToolCommandName() ?? throw CliErrors.UnableToDetermineProgramName();
             var script = args.Shell.ToLower() switch {
                 "bash" => CompletionScriptGenerator.GenerateBashScript(programName),
                 "zsh" => CompletionScriptGenerator.GenerateZshScript(programName),
@@ -364,7 +365,7 @@ namespace CalqFramework.Cli {
         /// Executes the completion install command.
         /// </summary>
         private void ExecuteCompletionInstall(CompletionInstallArgs args) {
-            var programName = args.ProgramName ?? GetProgramName();
+            var programName = args.ProgramName ?? Assembly.GetEntryAssembly()?.GetToolCommandName() ?? throw CliErrors.UnableToDetermineProgramName();
             var script = args.Shell.ToLower() switch {
                 "bash" => CompletionScriptGenerator.GenerateBashScript(programName),
                 "zsh" => CompletionScriptGenerator.GenerateZshScript(programName),
@@ -394,7 +395,7 @@ namespace CalqFramework.Cli {
         /// Executes the completion uninstall command.
         /// </summary>
         private void ExecuteCompletionUninstall(CompletionUninstallArgs args) {
-            var programName = args.ProgramName ?? GetProgramName();
+            var programName = args.ProgramName ?? Assembly.GetEntryAssembly()?.GetToolCommandName() ?? throw CliErrors.UnableToDetermineProgramName();
 
             try {
                 var removed = CompletionScriptGenerator.UninstallScript(args.Shell.ToLower(), programName);
@@ -407,14 +408,6 @@ namespace CalqFramework.Cli {
             } catch (Exception ex) {
                 throw CliErrors.CompletionUninstallFailed(args.Shell, ex.Message, ex);
             }
-        }
-
-        /// <summary>
-        /// Gets the program name from the entry assembly.
-        /// </summary>
-        private string GetProgramName() {
-            var assembly = Assembly.GetEntryAssembly();
-            return assembly?.GetName().Name?.ToLower() ?? "program";
         }
     }
 }
