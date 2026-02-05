@@ -62,11 +62,14 @@ namespace CalqFramework.Cli {
         public object? Execute(object target, IEnumerable<string> args) {
             var argsList = args.ToList();
             
-            // Check if this is a completion-related command
-            if (argsList.Count >= 2 && argsList[0] == "completion") {
-                var subcommand = argsList[1];
-                
-                return CompletionHandler.Handle(this, subcommand, argsList.Skip(2), target);
+            // Check if this is the __complete command (Cobra-style completion)
+            if (argsList.Count > 0 && argsList[0] == "__complete") {
+                return CompletionHandler.HandleComplete(this, argsList.Skip(1), target);
+            }
+            
+            // Check if this is a completion management command
+            if (argsList.Count > 0 && argsList[0] == "completion") {
+                return CompletionHandler.HandleCompletion(this, argsList.Skip(1), target);
             }
             
             return ExecuteInvoke(target, argsList);

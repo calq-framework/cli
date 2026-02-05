@@ -103,8 +103,14 @@ namespace CalqFramework.Cli {
         public static CliException UnsupportedShell(string shell) =>
             new CliException($"Unsupported shell: {shell}. Supported shells: bash, zsh, powershell, fish");
 
-        public static CliException UnknownCompletionSubcommand(string subcommand) =>
-            new CliException($"Unknown completion subcommand: {subcommand}. Valid subcommands: complete, script, install, uninstall");
+        public static CliException UnknownCompletionAction(string action) =>
+            new CliException($"Unknown completion action: {action}. Valid actions: install, uninstall");
+
+        /// <summary>
+        /// Creates an exception for when completion command is called without a shell parameter.
+        /// </summary>
+        public static CliException CompletionRequiresShell() =>
+            new CliException("Completion command requires a shell parameter. Usage: completion <shell> [install|uninstall]");
 
         public static CliException CompletionInstallFailed(string shell, string message, Exception innerException) =>
             new CliException($"Failed to install completion script for {shell}: {message}", innerException);
