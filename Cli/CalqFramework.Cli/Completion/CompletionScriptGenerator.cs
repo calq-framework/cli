@@ -39,9 +39,10 @@ namespace CalqFramework.Cli.Completion {
 ___PROGRAM_NAME___completion() {
     local cur prev words cword
     _init_completion || return
-    local position=$((cword))
-    local all_words=""${words[*]}""
-    local completions=$(__PROGRAM_NAME__ completion complete --position ""$position"" --words ""$all_words"" 2>/dev/null)
+    
+    local completions
+    completions=$(__PROGRAM_NAME__ __complete ""${words[@]:1}"" ""$cur"" 2>/dev/null)
+    
     COMPREPLY=( $(compgen -W ""$completions"" -- ""$cur"") )
 }
 complete -F ___PROGRAM_NAME___completion __PROGRAM_NAME__";
@@ -49,9 +50,12 @@ complete -F ___PROGRAM_NAME___completion __PROGRAM_NAME__";
         private const string ZshTemplate = @"#compdef __PROGRAM_NAME__
 ___PROGRAM_NAME___completion() {
     local -a completions
-    local position=$((CURRENT))
-    local words_str=""${words[*]}""
-    local output=$(__PROGRAM_NAME__ completion complete --position ""$position"" --words ""$words_str"" 2>/dev/null)
+    local -a words
+    words=(${(z)LBUFFER})
+    
+    local output
+    output=$(__PROGRAM_NAME__ __complete ""${words[@]:1}"" """" 2>/dev/null)
+    
     completions=(${(f)output})
     _describe '__PROGRAM_NAME__ commands' completions
 }
@@ -60,14 +64,10 @@ ___PROGRAM_NAME___completion ""$@""";
         private const string PowerShellTemplate = @"# PowerShell completion script for __PROGRAM_NAME__
 Register-ArgumentCompleter -Native -CommandName __PROGRAM_NAME__ -ScriptBlock {
     param($wordToComplete, $commandAst, $cursorPosition)
-    $words = $commandAst.ToString() -split '\s+'
-    $position = $words.Count - 1
-    if ($wordToComplete) {
-    } else {
-        $position++
-    }
-    $wordsStr = $commandAst.ToString()
-    $completions = & __PROGRAM_NAME__ completion complete --position $position --words ""$wordsStr"" 2>$null
+    
+    $words = $commandAst.ToString() -split '\s+' | Select-Object -Skip 1
+    $completions = & __PROGRAM_NAME__ __complete @words $wordToComplete 2>$null
+    
     $completions | ForEach-Object {
         [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $_)
     }
@@ -76,9 +76,9 @@ Register-ArgumentCompleter -Native -CommandName __PROGRAM_NAME__ -ScriptBlock {
         private const string FishTemplate = @"# Fish completion script for __PROGRAM_NAME__
 function ____PROGRAM_NAME___completion
     set -l tokens (commandline -opc)
-    set -l position (count $tokens)
-    set -l words_str (commandline -p)
-    __PROGRAM_NAME__ completion complete --position $position --words ""$words_str"" 2>/dev/null
+    set -l args (string join ' ' $tokens[2..-1])
+    set -l current (commandline -ct)
+    __PROGRAM_NAME__ __complete $tokens[2..-1] ""$current"" 2>/dev/null
 end
 complete -c __PROGRAM_NAME__ -f -a ""(____PROGRAM_NAME___completion)""";
 
