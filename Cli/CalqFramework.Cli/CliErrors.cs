@@ -1,4 +1,5 @@
 using System;
+using CalqFramework.Cli.Completion.Providers;
 
 namespace CalqFramework.Cli {
 
@@ -126,5 +127,23 @@ namespace CalqFramework.Cli {
         /// </summary>
         public static CliException UnableToDetermineProgramName() =>
             new CliException("Unable to determine program name from entry assembly");
+
+        /// <summary>
+        /// Creates an exception for when a completion method is not found.
+        /// </summary>
+        public static CliException CompletionMethodNotFound(string methodName, string typeName) =>
+            new CliException($"Completion method '{methodName}' not found on type '{typeName}'");
+
+        /// <summary>
+        /// Creates an exception for invalid completion method signature.
+        /// </summary>
+        public static CliException InvalidCompletionMethodSignature(string methodName, string typeName) =>
+            new CliException($"Completion method '{methodName}' on type '{typeName}' must have signature: IEnumerable<string> {methodName}(string partialInput)");
+
+        /// <summary>
+        /// Creates an exception for invalid completion method return type.
+        /// </summary>
+        public static CliException InvalidCompletionMethodReturnType(string methodName, string typeName) =>
+            new CliException($"Completion method '{methodName}' on type '{typeName}' must return IEnumerable<string>");
     }
 }

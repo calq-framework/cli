@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CalqFramework.Cli.Completion.Providers;
 using CalqFramework.Cli.InterfaceComponents;
 
 namespace CalqFramework.Cli.Completion {
@@ -62,42 +63,44 @@ namespace CalqFramework.Cli.Completion {
             // Subcommands don't have values to complete
         }
 
-        public void PrintOptionValue(Option option, string partialInput) {
-            var completions = GetValueCompletions(option.Type, option.MemberInfo, partialInput);
+        public void PrintOptionValue(Option option, string partialInput, object? submodule) {
+            var completions = GetValueCompletions(option.Type, option.MemberInfo, partialInput, submodule);
             PrintCompletions(completions);
         }
 
-        public void PrintParameterValue(Parameter parameter, string partialInput) {
-            var completions = GetValueCompletions(parameter.Type, parameter.ParameterInfo, partialInput);
+        public void PrintParameterValue(Parameter parameter, string partialInput, object? submodule) {
+            var completions = GetValueCompletions(parameter.Type, parameter.ParameterInfo, partialInput, submodule);
             PrintCompletions(completions);
         }
 
-        private IEnumerable<string> GetValueCompletions(Type type, System.Reflection.ICustomAttributeProvider attributeProvider, string partialInput) {
-            // Check for CliCompletionAttribute
+        private IEnumerable<string> GetValueCompletions(Type type, System.Reflection.ICustomAttributeProvider attributeProvider, string partialInput, object? submodule) {
             var completionAttr = attributeProvider
                 .GetCustomAttributes(typeof(CliCompletionAttribute), false)
                 .Cast<CliCompletionAttribute>()
                 .FirstOrDefault();
 
             if (completionAttr != null) {
+                var context = new CompletionProviderContext {
+                    PartialInput = partialInput,
+                    Submodule = submodule,
+                    Filter = completionAttr.Filter
+                };
+                
                 var provider = (ICompletionProvider)Activator.CreateInstance(completionAttr.ProviderType)!;
-                return provider.GetCompletions(partialInput);
+                return provider.GetCompletions(context);
             }
 
-            // Auto-generate completions for enums
             if (type.IsEnum) {
                 return Enum.GetNames(type)
                     .Where(name => name.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase))
                     .OrderBy(name => name);
             }
 
-            // Auto-generate completions for bool
             if (type == typeof(bool)) {
                 return new[] { "true", "false" }
                     .Where(value => value.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase));
             }
 
-            // No completions for other types
             return Enumerable.Empty<string>();
         }
 

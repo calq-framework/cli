@@ -185,5 +185,45 @@ namespace CalqFramework.CliTest {
             Assert.Contains("true", completions);
             Assert.Contains("false", completions);
         }
+
+        [Fact]
+        public void ExecuteCompletion_MethodBasedCompletion_ReturnsMethodProvidedValues() {
+            var completions = GetCompletions("mycli method-with-method-completion ");
+            
+            Assert.Contains("us-east-1", completions);
+            Assert.Contains("us-west-2", completions);
+            Assert.Contains("eu-west-1", completions);
+            Assert.Contains("ap-southeast-1", completions);
+        }
+
+        [Fact]
+        public void ExecuteCompletion_PartialMethodBasedCompletion_ReturnsMatchingValues() {
+            var completions = GetCompletions("mycli method-with-method-completion eu");
+            
+            Assert.Contains("eu-west-1", completions);
+            Assert.DoesNotContain("us-east-1", completions);
+            Assert.DoesNotContain("us-west-2", completions);
+            Assert.DoesNotContain("ap-southeast-1", completions);
+        }
+
+        [Fact]
+        public void ExecuteCompletion_CompletionProvidersMethodSyntax_ReturnsMethodProvidedValues() {
+            var completions = GetCompletions("mycli method-with-completion-providers-method ");
+            
+            Assert.Contains("us-east-1", completions);
+            Assert.Contains("us-west-2", completions);
+            Assert.Contains("eu-west-1", completions);
+            Assert.Contains("ap-southeast-1", completions);
+        }
+
+        [Fact]
+        public void ExecuteCompletion_CompletionProvidersMethodSyntaxPartial_ReturnsMatchingValues() {
+            var completions = GetCompletions("mycli method-with-completion-providers-method ap");
+            
+            Assert.Contains("ap-southeast-1", completions);
+            Assert.DoesNotContain("us-east-1", completions);
+            Assert.DoesNotContain("us-west-2", completions);
+            Assert.DoesNotContain("eu-west-1", completions);
+        }
     }
 }

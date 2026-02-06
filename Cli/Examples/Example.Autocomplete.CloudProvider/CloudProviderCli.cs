@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using CalqFramework.Cli;
+using CalqFramework.Cli.Completion.Providers;
 
 namespace AutocompleteExample {
 
@@ -24,23 +25,23 @@ namespace AutocompleteExample {
 
     /// <summary>Custom completion provider for region strings.</summary>
     public class RegionCompletionProvider : ICompletionProvider {
-        public IEnumerable<string> GetCompletions(string partialInput) {
+        public IEnumerable<string> GetCompletions(ICompletionProviderContext context) {
             var regions = new[] { 
                 "us-east-1", "us-west-1", "us-west-2", 
                 "eu-west-1", "eu-central-1", 
                 "ap-southeast-1", "ap-northeast-1" 
             };
-            return regions.Where(r => r.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase));
+            return regions.Where(r => r.StartsWith(context.PartialInput, StringComparison.OrdinalIgnoreCase));
         }
     }
 
     /// <summary>Custom completion provider for output format strings.</summary>
     public class FormatCompletionProvider : ICompletionProvider {
-        public IEnumerable<string> GetCompletions(string partialInput) {
+        public IEnumerable<string> GetCompletions(ICompletionProviderContext context) {
             var formats = new[] { 
                 "json", "yaml", "xml", "table", "csv"
             };
-            return formats.Where(f => f.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase));
+            return formats.Where(f => f.StartsWith(context.PartialInput, StringComparison.OrdinalIgnoreCase));
         }
     }
 
@@ -54,18 +55,28 @@ namespace AutocompleteExample {
         [CliCompletion(typeof(FormatCompletionProvider))]
         public string Format { get; set; } = "json";
 
+        /// <summary>Profile name option (string with method-based completion).</summary>
+        [CliCompletion("GetProfileNames")]
+        public string Profile { get; set; } = "default";
+
+        /// <summary>Instance method providing profile name completions.</summary>
+        private IEnumerable<string> GetProfileNames(string partialInput) {
+            var profiles = new[] { "default", "production", "staging", "development", "testing" };
+            return profiles.Where(p => p.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase));
+        }
+
         /// <summary>Deploy resources to a cloud provider (enum parameter with autocomplete).</summary>
         /// <param name="provider">The cloud provider to deploy to.</param>
         /// <returns>Deployment result message.</returns>
         public string Deploy(CloudProvider provider) {
-            return $"[{Verbosity}] Deploying resources to {provider}... (format: {Format})";
+            return $"[{Verbosity}] Deploying resources to {provider} using profile '{Profile}'... (format: {Format})";
         }
 
         /// <summary>Configure region for operations (string parameter with custom completion provider).</summary>
         /// <param name="region">The region to configure.</param>
         /// <returns>Configuration result message.</returns>
         public string ConfigureRegion([CliCompletion(typeof(RegionCompletionProvider))] string region) {
-            return $"[{Verbosity}] Configured region: {region} (format: {Format})";
+            return $"[{Verbosity}] Configured region: {region} for profile '{Profile}' (format: {Format})";
         }
     }
 }
