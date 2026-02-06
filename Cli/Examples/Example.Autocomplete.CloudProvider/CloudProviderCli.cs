@@ -59,6 +59,10 @@ namespace AutocompleteExample {
         [CliCompletion("GetProfileNames")]
         public string Profile { get; set; } = "default";
 
+        /// <summary>Configuration file option (file path with extension filter).</summary>
+        [CliCompletion(typeof(FileCompletionProvider), "*.json;*.yaml;*.yml")]
+        public string? ConfigFile { get; set; }
+
         /// <summary>Instance method providing profile name completions.</summary>
         private IEnumerable<string> GetProfileNames(string partialInput) {
             var profiles = new[] { "default", "production", "staging", "development", "testing" };
@@ -69,7 +73,8 @@ namespace AutocompleteExample {
         /// <param name="provider">The cloud provider to deploy to.</param>
         /// <returns>Deployment result message.</returns>
         public string Deploy(CloudProvider provider) {
-            return $"[{Verbosity}] Deploying resources to {provider} using profile '{Profile}'... (format: {Format})";
+            var configInfo = ConfigFile != null ? $" (config: {ConfigFile})" : "";
+            return $"[{Verbosity}] Deploying resources to {provider} using profile '{Profile}'...{configInfo} (format: {Format})";
         }
 
         /// <summary>Configure region for operations (string parameter with custom completion provider).</summary>
@@ -77,6 +82,42 @@ namespace AutocompleteExample {
         /// <returns>Configuration result message.</returns>
         public string ConfigureRegion([CliCompletion(typeof(RegionCompletionProvider))] string region) {
             return $"[{Verbosity}] Configured region: {region} for profile '{Profile}' (format: {Format})";
+        }
+
+        /// <summary>Backup configuration to a directory.</summary>
+        /// <param name="outputDir">The directory to save the backup.</param>
+        /// <returns>Backup result message.</returns>
+        public string Backup([CliCompletion(typeof(DirectoryCompletionProvider))] string outputDir) {
+            return $"[{Verbosity}] Backed up configuration to {outputDir} (format: {Format})";
+        }
+
+        /// <summary>Import configuration from a file or directory.</summary>
+        /// <param name="path">The file or directory path to import from.</param>
+        /// <returns>Import result message.</returns>
+        public string Import([CliCompletion(typeof(FileSystemCompletionProvider), "*.json;*.yaml")] string path) {
+            return $"[{Verbosity}] Imported configuration from {path} (format: {Format})";
+        }
+
+        /// <summary>Read a log file (auto-completes with FileInfo).</summary>
+        /// <param name="logFile">The log file to read.</param>
+        /// <returns>Log file read result.</returns>
+        public string ReadLog(System.IO.FileInfo logFile) {
+            return $"[{Verbosity}] Reading log file: {logFile.FullName} (format: {Format})";
+        }
+
+        /// <summary>List resources in a directory (auto-completes with DirectoryInfo).</summary>
+        /// <param name="resourceDir">The directory containing resources.</param>
+        /// <returns>Resource listing result.</returns>
+        public string ListResources(System.IO.DirectoryInfo resourceDir) {
+            return $"[{Verbosity}] Listing resources in: {resourceDir.FullName} (format: {Format})";
+        }
+
+        /// <summary>Process a file or directory (auto-completes with FileSystemInfo).</summary>
+        /// <param name="target">The file or directory to process.</param>
+        /// <returns>Processing result.</returns>
+        public string Process(System.IO.FileSystemInfo target) {
+            var type = target is System.IO.DirectoryInfo ? "directory" : "file";
+            return $"[{Verbosity}] Processing {type}: {target.FullName} (format: {Format})";
         }
     }
 }

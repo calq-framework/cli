@@ -91,5 +91,15 @@ namespace CalqFramework.CliTest {
         public void MethodWithCompletionProvidersMethod([CliCompletion(typeof(MethodCompletionProvider), "GetRegionNames")] string region) {
             textField = region;
         }
+
+        // Commands using FileInfo, DirectoryInfo, and FileSystemInfo for auto-completion
+        public static void MethodWithFileInfo(System.IO.FileInfo file) {
+        }
+
+        public static void MethodWithDirectoryInfo(System.IO.DirectoryInfo directory) {
+        }
+
+        public static void MethodWithFileSystemInfo(System.IO.FileSystemInfo path) {
+        }
     }
 }
