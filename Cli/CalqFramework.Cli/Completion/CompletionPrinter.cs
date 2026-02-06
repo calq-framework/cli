@@ -90,6 +90,37 @@ namespace CalqFramework.Cli.Completion {
                 return provider.GetCompletions(context);
             }
 
+            // Auto-detect FileInfo, DirectoryInfo, and FileSystemInfo types
+            if (type == typeof(System.IO.FileInfo)) {
+                var context = new CompletionProviderContext {
+                    PartialInput = partialInput,
+                    Submodule = submodule,
+                    Filter = null
+                };
+                var provider = new FileCompletionProvider();
+                return provider.GetCompletions(context);
+            }
+
+            if (type == typeof(System.IO.DirectoryInfo)) {
+                var context = new CompletionProviderContext {
+                    PartialInput = partialInput,
+                    Submodule = submodule,
+                    Filter = null
+                };
+                var provider = new DirectoryCompletionProvider();
+                return provider.GetCompletions(context);
+            }
+
+            if (type == typeof(System.IO.FileSystemInfo)) {
+                var context = new CompletionProviderContext {
+                    PartialInput = partialInput,
+                    Submodule = submodule,
+                    Filter = null
+                };
+                var provider = new FileSystemCompletionProvider();
+                return provider.GetCompletions(context);
+            }
+
             if (type.IsEnum) {
                 return Enum.GetNames(type)
                     .Where(name => name.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase))

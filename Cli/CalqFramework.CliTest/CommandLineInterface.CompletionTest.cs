@@ -225,5 +225,68 @@ namespace CalqFramework.CliTest {
             Assert.DoesNotContain("us-west-2", completions);
             Assert.DoesNotContain("eu-west-1", completions);
         }
+
+        [Fact]
+        public void ExecuteCompletion_FileInfoParameter_ReturnsFileCompletions() {
+            // Create a temporary test file to ensure we have something to complete
+            var testFileName = $"test_{Guid.NewGuid()}.txt";
+            File.WriteAllText(testFileName, "test");
+            
+            try {
+                var completions = GetCompletions("mycli method-with-file-info ");
+                
+                // Should return files in current directory
+                Assert.NotEmpty(completions);
+                Assert.Contains(testFileName, completions);
+            } finally {
+                if (File.Exists(testFileName)) {
+                    File.Delete(testFileName);
+                }
+            }
+        }
+
+        [Fact]
+        public void ExecuteCompletion_DirectoryInfoParameter_ReturnsDirectoryCompletions() {
+            // Create a temporary test directory to ensure we have something to complete
+            var testDirName = $"testdir_{Guid.NewGuid()}";
+            Directory.CreateDirectory(testDirName);
+            
+            try {
+                var completions = GetCompletions("mycli method-with-directory-info ");
+                
+                // Should return directories in current directory
+                Assert.NotEmpty(completions);
+                Assert.Contains(testDirName, completions);
+            } finally {
+                if (Directory.Exists(testDirName)) {
+                    Directory.Delete(testDirName);
+                }
+            }
+        }
+
+        [Fact]
+        public void ExecuteCompletion_FileSystemInfoParameter_ReturnsBothFilesAndDirectories() {
+            // Create temporary test file and directory
+            var testFileName = $"test_{Guid.NewGuid()}.txt";
+            var testDirName = $"testdir_{Guid.NewGuid()}";
+            File.WriteAllText(testFileName, "test");
+            Directory.CreateDirectory(testDirName);
+            
+            try {
+                var completions = GetCompletions("mycli method-with-file-system-info ");
+                
+                // Should return both files and directories
+                Assert.NotEmpty(completions);
+                Assert.Contains(testFileName, completions);
+                Assert.Contains(testDirName, completions);
+            } finally {
+                if (File.Exists(testFileName)) {
+                    File.Delete(testFileName);
+                }
+                if (Directory.Exists(testDirName)) {
+                    Directory.Delete(testDirName);
+                }
+            }
+        }
     }
 }

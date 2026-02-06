@@ -11,10 +11,12 @@ namespace CalqFramework.Cli {
 
         /// <summary>
         /// Specifies a completion provider type with optional filter.
-        /// Use built-in providers from <see cref="CompletionProviders"/> or provide a custom type implementing <see cref="ICompletionProvider"/>.
+        /// Built-in providers: <see cref="MethodCompletionProvider"/>, <see cref="FileCompletionProvider"/>, 
+        /// <see cref="DirectoryCompletionProvider"/>, <see cref="FileSystemCompletionProvider"/>.
+        /// Custom providers must implement <see cref="ICompletionProvider"/>.
         /// </summary>
         /// <param name="providerType">The type of the completion provider.</param>
-        /// <param name="filter">Optional filter value (e.g., method name for <see cref="CompletionProviders.Method"/>).</param>
+        /// <param name="filter">Optional filter value (e.g., method name for <see cref="MethodCompletionProvider"/>, glob pattern for file providers).</param>
         public CliCompletionAttribute(Type providerType, string? filter = null) {
             if (!typeof(ICompletionProvider).IsAssignableFrom(providerType)) {
                 throw CliErrors.InvalidCompletionProvider(providerType.Name);
@@ -25,7 +27,7 @@ namespace CalqFramework.Cli {
 
         /// <summary>
         /// Specifies an instance method name to call for completions.
-        /// Equivalent to using <see cref="CompletionProviders.Method"/> with a filter.
+        /// Shorthand for using <see cref="MethodCompletionProvider"/> with a method name filter.
         /// </summary>
         /// <param name="methodName">The name of the instance method to invoke for completions.</param>
         public CliCompletionAttribute(string methodName) 
@@ -38,7 +40,7 @@ namespace CalqFramework.Cli {
         public Type ProviderType { get; }
         
         /// <summary>
-        /// Gets the filter value (e.g., method name for method-based completion).
+        /// Gets the filter value (e.g., method name for method-based completion, glob pattern for file completion).
         /// </summary>
         public string? Filter { get; }
     }
