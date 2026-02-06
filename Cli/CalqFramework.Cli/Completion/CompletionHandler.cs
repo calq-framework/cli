@@ -139,18 +139,18 @@ namespace CalqFramework.Cli.Completion {
                 
                 var parameter = subcommandExecutorWithOptions.GetParameters().FirstOrDefault(p => p.Keys.Contains(optionName));
                 if (parameter != null) {
-                    CompletionPrinter.PrintParameterValue(parameter, toComplete);
+                    CompletionPrinter.PrintParameterValue(parameter, toComplete, submodule);
                 } else {
                     var option = subcommandExecutorWithOptions.GetOptions().FirstOrDefault(o => o.Keys.Contains(optionName));
                     if (option != null) {
-                        CompletionPrinter.PrintOptionValue(option, toComplete);
+                        CompletionPrinter.PrintOptionValue(option, toComplete, submodule);
                     }
                 }
             } else {
                 var parameter = subcommandExecutorWithOptions.GetFirstUnassignedParameter();
                 
                 if (parameter != null) {
-                    CompletionPrinter.PrintParameterValue(parameter, toComplete);
+                    CompletionPrinter.PrintParameterValue(parameter, toComplete, submodule);
                 }
             }
         }

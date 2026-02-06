@@ -2,7 +2,7 @@
 
 using System.Collections.Generic;
 using CalqFramework.Cli;
-using CalqFramework.Cli.Completion;
+using CalqFramework.Cli.Completion.Providers;
 
 namespace CalqFramework.CliTest {
 
@@ -74,6 +74,22 @@ namespace CalqFramework.CliTest {
         }
 
         public static void MethodWithThreeParameters(string first, int second, bool third) {
+        }
+
+        // Instance method for providing completions
+        private IEnumerable<string> GetRegionNames(string partialInput) {
+            var regions = new[] { "us-east-1", "us-west-2", "eu-west-1", "ap-southeast-1" };
+            return System.Linq.Enumerable.Where(regions, r => r.StartsWith(partialInput, System.StringComparison.OrdinalIgnoreCase));
+        }
+
+        // Command using method-based completion
+        public void MethodWithMethodCompletion([CliCompletion("GetRegionNames")] string region) {
+            textField = region;
+        }
+
+        // Command using CompletionProviders.Method with filter
+        public void MethodWithCompletionProvidersMethod([CliCompletion(typeof(MethodCompletionProvider), "GetRegionNames")] string region) {
+            textField = region;
         }
     }
 }

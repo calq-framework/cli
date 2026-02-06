@@ -36,11 +36,11 @@ namespace CalqFramework.Cli.Completion {
         /// <summary>
         /// Prints completion suggestions for an option value.
         /// </summary>
-        void PrintOptionValue(Option option, string partialInput);
+        void PrintOptionValue(Option option, string partialInput, object? submodule);
 
         /// <summary>
         /// Prints completion suggestions for a parameter value.
         /// </summary>
-        void PrintParameterValue(Parameter parameter, string partialInput);
+        void PrintParameterValue(Parameter parameter, string partialInput, object? submodule);
     }
 }
