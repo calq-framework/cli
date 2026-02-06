@@ -119,5 +119,13 @@ namespace AutocompleteExample {
             var type = target is System.IO.DirectoryInfo ? "directory" : "file";
             return $"[{Verbosity}] Processing {type}: {target.FullName} (format: {Format})";
         }
+
+        /// <summary>Enable features for multiple cloud providers (ICollection enum with autocomplete).</summary>
+        /// <param name="providers">The cloud providers to enable features for.</param>
+        /// <returns>Feature enablement result.</returns>
+        public string EnableFeatures(List<CloudProvider> providers) {
+            var providerList = string.Join(", ", providers);
+            return $"[{Verbosity}] Enabled features for providers: {providerList} (format: {Format})";
+        }
     }
 }

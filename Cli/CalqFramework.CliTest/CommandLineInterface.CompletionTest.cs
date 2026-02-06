@@ -288,5 +288,33 @@ namespace CalqFramework.CliTest {
                 }
             }
         }
+
+        [Fact]
+        public void ExecuteCompletion_ICollectionEnumParameter_ReturnsEnumValues() {
+            var completions = GetCompletions("mycli method-with-enum-list ");
+            
+            Assert.Contains("Debug", completions);
+            Assert.Contains("Info", completions);
+            Assert.Contains("Warning", completions);
+            Assert.Contains("Error", completions);
+        }
+
+        [Fact]
+        public void ExecuteCompletion_PartialICollectionEnumValue_ReturnsMatchingEnumValues() {
+            var completions = GetCompletions("mycli method-with-enum-list Err");
+            
+            Assert.Contains("Error", completions);
+            Assert.DoesNotContain("Debug", completions);
+            Assert.DoesNotContain("Info", completions);
+            Assert.DoesNotContain("Warning", completions);
+        }
+
+        [Fact]
+        public void ExecuteCompletion_ICollectionBoolParameter_ReturnsTrueFalse() {
+            var completions = GetCompletions("mycli method-with-bool-list ");
+            
+            Assert.Contains("true", completions);
+            Assert.Contains("false", completions);
+        }
     }
 }
