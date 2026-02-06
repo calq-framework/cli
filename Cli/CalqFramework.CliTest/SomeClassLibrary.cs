@@ -101,5 +101,12 @@ namespace CalqFramework.CliTest {
 
         public static void MethodWithFileSystemInfo(System.IO.FileSystemInfo path) {
         }
+
+        // Commands using ICollection types for completion
+        public static void MethodWithEnumList(List<LogLevel> levels) {
+        }
+
+        public static void MethodWithBoolList(List<bool> flags) {
+        }
     }
 }

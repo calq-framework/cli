@@ -90,6 +90,15 @@ namespace CalqFramework.Cli.Completion {
                 return provider.GetCompletions(context);
             }
 
+            // Handle ICollection types by extracting the generic type argument
+            bool isCollection = type.GetInterface(nameof(System.Collections.ICollection)) != null;
+            if (isCollection) {
+                var genericArgs = type.GetGenericArguments();
+                if (genericArgs.Length > 0) {
+                    type = genericArgs[0];
+                }
+            }
+
             // Auto-detect FileInfo, DirectoryInfo, and FileSystemInfo types
             if (type == typeof(System.IO.FileInfo)) {
                 var context = new CompletionProviderContext {
