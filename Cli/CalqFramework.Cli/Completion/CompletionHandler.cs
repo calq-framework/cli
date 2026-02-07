@@ -47,8 +47,9 @@ namespace CalqFramework.Cli.Completion {
             }
 
             string shell = argsList[0];
+            bool isAllShells = shell.Equals("all", StringComparison.OrdinalIgnoreCase);
             
-            if (!CompletionScriptGenerator.SupportedShells.Contains(shell.ToLowerInvariant())) {
+            if (!isAllShells && !CompletionScriptGenerator.SupportedShells.Contains(shell.ToLowerInvariant())) {
                 throw CliErrors.UnsupportedShell(shell);
             }
 
@@ -59,11 +60,19 @@ namespace CalqFramework.Cli.Completion {
 
                 switch (action.ToLowerInvariant()) {
                     case "install":
-                        HandleCompletionInstall(shell);
+                        if (isAllShells) {
+                            HandleCompletionInstallAll();
+                        } else {
+                            HandleCompletionInstall(shell);
+                        }
                         return ResultVoid.Value;
                     
                     case "uninstall":
-                        HandleCompletionUninstall(shell);
+                        if (isAllShells) {
+                            HandleCompletionUninstallAll();
+                        } else {
+                            HandleCompletionUninstall(shell);
+                        }
                         return ResultVoid.Value;
                     
                     default:
@@ -71,7 +80,11 @@ namespace CalqFramework.Cli.Completion {
                 }
             }
             
-            HandleCompletionScript(shell);
+            if (isAllShells) {
+                HandleCompletionScriptAll();
+            } else {
+                HandleCompletionScript(shell);
+            }
             return ResultVoid.Value;
         }
 
@@ -216,6 +229,68 @@ namespace CalqFramework.Cli.Completion {
                 }
             } catch (Exception ex) {
                 throw CliErrors.CompletionUninstallFailed(shell, ex.Message, ex);
+            }
+        }
+
+        private void HandleCompletionScriptAll() {
+            var programName = Assembly.GetEntryAssembly()?.GetToolCommandName() ?? throw CliErrors.UnableToDetermineProgramName();
+            
+            foreach (var shell in CompletionScriptGenerator.SupportedShells) {
+                Console.WriteLine($"# Completion script for {shell}");
+                Console.WriteLine();
+                var script = CompletionScriptGenerator.GenerateScript(shell, programName);
+                Console.WriteLine(script);
+                Console.WriteLine();
+            }
+        }
+
+        private void HandleCompletionInstallAll() {
+            var programName = Assembly.GetEntryAssembly()?.GetToolCommandName() ?? throw CliErrors.UnableToDetermineProgramName();
+            
+            foreach (var shell in CompletionScriptGenerator.SupportedShells) {
+                var processStartInfo = new System.Diagnostics.ProcessStartInfo {
+                    FileName = shell,
+                    Arguments = $"-c \"{programName} completion {shell} install\"",
+                    CreateNoWindow = true,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true
+                };
+
+                try {
+                    using var process = System.Diagnostics.Process.Start(processStartInfo);
+                    if (process != null) {
+                        process.WaitForExit();
+                        var output = process.StandardOutput.ReadToEnd();
+                        var error = process.StandardError.ReadToEnd();
+                        
+                        if (process.ExitCode == 0) {
+                            Console.WriteLine($"[{shell}] {output}");
+                        } else {
+                            Console.WriteLine($"[{shell}] Failed: {error}");
+                        }
+                    }
+                } catch (Exception ex) {
+                    Console.WriteLine($"[{shell}] Error: {ex.Message}");
+                }
+            }
+        }
+
+        private void HandleCompletionUninstallAll() {
+            var programName = Assembly.GetEntryAssembly()?.GetToolCommandName() ?? throw CliErrors.UnableToDetermineProgramName();
+            
+            foreach (var shell in CompletionScriptGenerator.SupportedShells) {
+                try {
+                    var removed = CompletionScriptGenerator.UninstallScript(shell, programName);
+                    
+                    if (removed) {
+                        Console.WriteLine($"[{shell}] Completion script has been uninstalled.");
+                    } else {
+                        Console.WriteLine($"[{shell}] No completion script found.");
+                    }
+                } catch (Exception ex) {
+                    Console.WriteLine($"[{shell}] Error: {ex.Message}");
+                }
             }
         }
     }

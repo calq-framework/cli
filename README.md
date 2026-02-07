@@ -166,11 +166,96 @@ OptionDeserializer.Deserialize(settingsObject, new OptionDeserializerConfigurati
     SkipUnknown = true 
 });
 ```
-### Demo Example
-[https://github.com/calq-framework/cli/tree/main/Cli/Examples/Example.NestedSubmodules.CloudProvider](https://github.com/calq-framework/cli/tree/main/Cli/Examples/Example.NestedSubmodules.CloudProvider)
+## Shell Completion
+Calq CLI provides automatic shell completion for commands, options, and parameters across multiple shells.
+
+### Automatic Completion
+Completion works automatically for:
+- **Submodules and subcommands** - All available commands at any level
+- **Options and parameters** - All flags and their values
+- **Enums** - All enum values with case-insensitive matching
+- **Booleans** - `true` and `false` values
+- **Collections** - `List<T>`, `ICollection<T>` with element type completion (enums, bools, etc.)
+- **File paths** - Files with optional extension filtering via `FileInfo` or `[CliCompletion(typeof(FileCompletionProvider), "*.json;*.yaml")]`
+- **Directory paths** - Directories via `DirectoryInfo` or `[CliCompletion(typeof(DirectoryCompletionProvider))]`
+- **File system paths** - Both files and directories via `FileSystemInfo` or `[CliCompletion(typeof(FileSystemCompletionProvider))]`
+
+### Custom Completion
+Use `[CliCompletion]` attribute for custom completion providers:
+
+**Method-based completion** - Call an instance method:
+```csharp
+[CliCompletion("GetRegions")]
+public string Region { get; set; } = "us-east-1";
+
+private IEnumerable<string> GetRegions(string partialInput) {
+    var regions = new[] { "us-east-1", "us-west-2", "eu-west-1" };
+    return regions.Where(r => r.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase));
+}
+```
+
+**Custom provider** - Implement `ICompletionProvider`:
+```csharp
+public class RegionCompletionProvider : ICompletionProvider {
+    public IEnumerable<string> GetCompletions(ICompletionProviderContext context) {
+        var regions = new[] { "us-east-1", "us-west-2", "eu-west-1" };
+        return regions.Where(r => r.StartsWith(context.PartialInput, StringComparison.OrdinalIgnoreCase));
+    }
+}
+
+[CliCompletion(typeof(RegionCompletionProvider))]
+public string Region { get; set; }
+```
+
+### Shell Installation
+Generate and install completion scripts:
+
+```bash
+# Generate script
+mycli completion bash
+mycli completion zsh
+mycli completion powershell
+mycli completion pwsh
+mycli completion fish
+
+# Install (creates completion file and updates shell profile)
+mycli completion bash install
+mycli completion zsh install
+mycli completion powershell install
+mycli completion pwsh install
+mycli completion fish install
+
+# Uninstall
+mycli completion bash uninstall
+
+# All shells at once
+mycli completion all
+mycli completion all install
+mycli completion all uninstall
+```
+
+After installation, restart your shell or source the profile.
+
+### Completion Protocols
+Calq CLI supports multiple completion protocols:
+
+**Cobra-style** - `__complete` command (used by generated shell scripts):
+```bash
+mycli __complete
+```
+
+**dotnet-suggest** - Microsoft's completion protocol for .NET tools:
+```bash
+dotnet tool install -g dotnet-suggest
+```
+
+### Demo Examples
+[Nested Submodules Example](https://github.com/calq-framework/cli/tree/main/Cli/Examples/Example.NestedSubmodules.CloudProvider)
 
 ![SubmoduleHelpExample](https://github.com/calq-framework/cli/blob/main/Cli/Examples/Example.NestedSubmodules.CloudProvider/SubmoduleHelpExample.png?raw=true)  
 ![SubcommandHelpExample](https://github.com/calq-framework/cli/blob/main/Cli/Examples/Example.NestedSubmodules.CloudProvider/SubcommandHelpExample.png?raw=true)
+
+[Autocomplete Example](https://github.com/calq-framework/cli/tree/main/Cli/Examples/Example.Autocomplete.CloudProvider)
 
 ### Quick Start
 ```bash
