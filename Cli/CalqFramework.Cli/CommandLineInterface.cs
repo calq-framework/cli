@@ -18,6 +18,7 @@ namespace CalqFramework.Cli {
     public class CommandLineInterface : ICliContext {
 
         private ICompletionHandler? _completionHandler;
+        private IDotnetSuggestHandler? _dotnetSuggestHandler;
 
         public CommandLineInterface() {
             CliComponentStoreFactory = new CliComponentStoreFactory();
@@ -37,6 +38,11 @@ namespace CalqFramework.Cli {
         public ICompletionHandler CompletionHandler { 
             get => _completionHandler ??= new CompletionHandler();
             init => _completionHandler = value;
+        }
+
+        public IDotnetSuggestHandler DotnetSuggestHandler {
+            get => _dotnetSuggestHandler ??= new DotnetSuggestHandler();
+            init => _dotnetSuggestHandler = value;
         }
         
         /// <summary>
@@ -61,6 +67,11 @@ namespace CalqFramework.Cli {
         /// </summary>
         public object? Execute(object target, IEnumerable<string> args) {
             var argsList = args.ToList();
+            
+            // Check if this is the dotnet-suggest protocol ([suggest] or [suggest:N] where N is cursor position)
+            if (argsList.Count > 0 && argsList[0].StartsWith("[suggest")) {
+                return DotnetSuggestHandler.HandleDotnetSuggest(this, CompletionHandler, argsList, target);
+            }
             
             // Check if this is the __complete command (Cobra-style completion)
             if (argsList.Count > 0 && argsList[0] == "__complete") {
