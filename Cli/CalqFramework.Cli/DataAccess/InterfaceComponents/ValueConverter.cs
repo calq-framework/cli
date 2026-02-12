@@ -26,6 +26,10 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
         /// </summary>
         public IFormatProvider FormatProvider { get; init; } = System.Globalization.CultureInfo.InvariantCulture;
 
+        public bool IsConvertible(Type type) {
+            return _argValueParser.IsParsable(type) || type.GetInterface(nameof(ICollection)) != null;
+        }
+
         public string? ConvertFromInternalValue(object? value, Type internalType) {
             if (value == null) {
                 return null;

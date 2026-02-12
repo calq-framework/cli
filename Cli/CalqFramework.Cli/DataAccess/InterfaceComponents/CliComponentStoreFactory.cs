@@ -66,10 +66,10 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
         }
         /// <summary>
         /// Validator for determining which members are valid options.
-        /// Defaults to using ArgValueParser if not explicitly set.
+        /// Defaults to using ValueConverter if not explicitly set.
         /// </summary>
         public IAccessValidator OptionAccessValidator {
-            get => _optionAccessValidator ?? new OptionAccessValidator(ArgValueParser);
+            get => _optionAccessValidator ?? new OptionAccessValidator(ValueConverter);
             init => _optionAccessValidator = value;
         }
         /// <summary>
@@ -82,10 +82,10 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
         }
         /// <summary>
         /// Validator for determining which members are valid submodules.
-        /// Defaults to using ArgValueParser if not explicitly set.
+        /// Defaults to using ValueConverter if not explicitly set.
         /// </summary>
         public IAccessValidator SubmoduleAccessValidator {
-            get => _submoduleAccessValidator ?? new SubmoduleAccessValidator(ArgValueParser);
+            get => _submoduleAccessValidator ?? new SubmoduleAccessValidator(ValueConverter);
             init => _submoduleAccessValidator = value;
         }
         /// <summary>

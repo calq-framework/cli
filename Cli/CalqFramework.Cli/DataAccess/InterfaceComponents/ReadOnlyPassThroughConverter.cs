@@ -5,6 +5,10 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
 
     internal class ReadOnlyPassThroughConverter : IValueConverter<object?> {
 
+        public bool IsConvertible(Type type) {
+            return true;
+        }
+
         public object? ConvertFromInternalValue(object? value, Type internalType) {
             return value;
         }
