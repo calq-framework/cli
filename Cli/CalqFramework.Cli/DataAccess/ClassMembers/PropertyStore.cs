@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using CalqFramework.Cli.Formatting;
 using CalqFramework.DataAccess.ClassMembers;
+using CalqFramework.Extensions.System;
 
 namespace CalqFramework.Cli.DataAccess.ClassMembers {
 
@@ -26,6 +27,10 @@ namespace CalqFramework.Cli.DataAccess.ClassMembers {
             return accessor.ReflectedType == ParentType && AccessValidator.IsValid(accessor);
         }
 
+        public override Type GetDataType(PropertyInfo accessor) {
+            return accessor.PropertyType.GetCollectionElementType();
+        }
+
         public IEnumerable<AccessorKeysPair<MemberInfo>> GetAccessorKeysPairs() {
             return AccessorsByNames
                 .GroupBy(kv => kv.Value)
@@ -35,12 +40,17 @@ namespace CalqFramework.Cli.DataAccess.ClassMembers {
                 ));
         }
 
+        public bool IsCollection(string key) {
+            PropertyInfo accessor = GetAccessor(key);
+            return accessor.PropertyType.IsCollection();
+        }
+
         public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out PropertyInfo result) {
             return AccessorsByNames.TryGetValue(key, out result);
         }
 
         protected override TValue ConvertFromInternalValue(object? value, PropertyInfo accessor) {
-            return ValueConverter.ConvertFromInternalValue(value, GetDataType(accessor));
+            return ValueConverter.ConvertFromInternalValue(value, accessor.PropertyType);
         }
 
         protected override object? ConvertToInternalValue(TValue value, PropertyInfo accessor) {
@@ -50,7 +60,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMembers {
             } catch (MissingMethodException) {
                 currentValue = null;
             }
-            return ValueConverter.ConvertToInternalValue(value, GetDataType(accessor), currentValue);
+            return ValueConverter.ConvertToInternalValue(value, accessor.PropertyType, currentValue);
         }
 
         private IDictionary<string, PropertyInfo> GetAccessorsByNames() {

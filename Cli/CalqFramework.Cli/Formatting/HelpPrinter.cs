@@ -152,18 +152,20 @@ namespace CalqFramework.Cli.Formatting {
         }
 
         private string GetDescription(Parameter item) {
-            return GetDescription(item.Type, item.Value, item.HasDefaultValue, GetSummary(item.ParameterInfo));
+            return GetDescription(item.ValueType, item.IsCollection, item.Value, item.HasDefaultValue, GetSummary(item.ParameterInfo));
         }
 
         private string GetDescription(Option item) {
-            return GetDescription(item.Type, item.Value, true, GetSummary(item.MemberInfo));
+            return GetDescription(item.ValueType, item.IsCollection, item.Value, true, GetSummary(item.MemberInfo));
         }
 
-        private string GetDescription(Type type, string? defaultValue, bool hasDefaultValue, string? summary) {
+        private string GetDescription(Type type, bool isCollection, string? defaultValue, bool hasDefaultValue, string? summary) {
             var parts = new List<string>();
 
             if (!hasDefaultValue) {
-                string typeDescription = GetTypeDescription(type);
+                string typeDescription = isCollection 
+                    ? "list of " + GetTypeDescription(type)
+                    : GetTypeDescription(type);
                 parts.Add($"(Requires: {typeDescription})");
             }
 
@@ -200,13 +202,6 @@ namespace CalqFramework.Cli.Formatting {
         }
 
         private string GetTypeDescription(Type type) {
-            if (type.IsGenericType &&
-                (typeof(IList<>).IsAssignableFrom(type.GetGenericTypeDefinition()) ||
-                 type.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IList<>)))) {
-                Type elementType = type.GetGenericArguments()[0];
-                return "list of " + GetTypeDescription(elementType);
-            }
-
             if (type.IsPrimitive) {
                 return type.Name.ToLowerInvariant();
             }

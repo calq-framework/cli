@@ -31,10 +31,6 @@ namespace CalqFramework.Cli.Parsing {
             }
 
             void TrySelfAssign(Type type, ref string value, ref OptionFlags optionAttr) {
-                bool isCollection = type.GetInterface(nameof(ICollection)) != null;
-                if (isCollection) {
-                    type = type.GetGenericArguments()[0];
-                }
                 if (type == typeof(bool)) {
                     value = optionAttr.HasFlag(OptionFlags.Plus) ? "false" : "true";
                     optionAttr |= OptionFlags.AmbigousValue;

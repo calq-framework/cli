@@ -22,5 +22,13 @@ namespace CalqFramework.Cli.DataAccess {
             return _primaryStore.GetAccessorKeysPairs()
                 .Concat(_secondaryStore.GetAccessorKeysPairs());
         }
+
+        public bool IsCollection(string key) {
+            if (_primaryStore.ContainsKey(key)) {
+                return _primaryStore.IsCollection(key);
+            } else {
+                return _secondaryStore.IsCollection(key);
+            }
+        }
     }
 }

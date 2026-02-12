@@ -8,8 +8,8 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
 
     internal class SubcommandExecutor : ISubcommandExecutor {
 
-        public SubcommandExecutor(ICliFunctionExecutor<string, string?, ParameterInfo> store) {
-            Executor = store;
+        public SubcommandExecutor(ICliFunctionExecutor<string, string?, ParameterInfo> executor) {
+            Executor = executor;
         }
 
         private ICliFunctionExecutor<string, string?, ParameterInfo> Executor { get; }
@@ -30,7 +30,8 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
 
         public IEnumerable<Parameter> GetParameters() {
             return Executor.GetAccessorKeysPairs().Select(pair => new Parameter() {
-                Type = GetDataType(pair.Keys[0]),
+                ValueType = GetDataType(pair.Keys[0]),
+                IsCollection = Executor.IsCollection(pair.Keys[0]),
                 Keys = pair.Keys,
                 ParameterInfo = pair.Accessor,
                 Value = this[pair.Keys[0]],

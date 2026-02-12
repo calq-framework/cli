@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using CalqFramework.Cli.Formatting;
 using CalqFramework.DataAccess.ClassMembers;
+using CalqFramework.Extensions.System;
 
 namespace CalqFramework.Cli.DataAccess.ClassMembers {
 
@@ -26,6 +27,10 @@ namespace CalqFramework.Cli.DataAccess.ClassMembers {
             return accessor.Member == ParentMethod;
         }
 
+        public override Type GetDataType(ParameterInfo accessor) {
+            return accessor.ParameterType.GetCollectionElementType();
+        }
+
         public IEnumerable<AccessorKeysPair<ParameterInfo>> GetAccessorKeysPairs() {
             return AccessorsByNames
                 .GroupBy(kv => kv.Value)
@@ -36,12 +41,17 @@ namespace CalqFramework.Cli.DataAccess.ClassMembers {
                 ));
         }
 
+        public bool IsCollection(string key) {
+            ParameterInfo accessor = GetAccessor(key);
+            return accessor.ParameterType.IsCollection();
+        }
+
         public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out ParameterInfo result) {
             return AccessorsByNames.TryGetValue(key, out result);
         }
 
         protected override TValue ConvertFromInternalValue(object? value, ParameterInfo accessor) {
-            return ValueConverter.ConvertFromInternalValue(value, GetDataType(accessor));
+            return ValueConverter.ConvertFromInternalValue(value, accessor.ParameterType);
         }
 
         protected override object? ConvertToInternalValue(TValue value, ParameterInfo accessor) {
@@ -51,7 +61,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMembers {
             } catch (MissingMethodException) {
                 currentValue = null;
             }
-            return ValueConverter.ConvertToInternalValue(value, GetDataType(accessor), currentValue);
+            return ValueConverter.ConvertToInternalValue(value, accessor.ParameterType, currentValue);
         }
 
         private IDictionary<string, ParameterInfo> GetAccessorsByNames() {

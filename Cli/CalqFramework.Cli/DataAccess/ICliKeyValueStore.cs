@@ -12,5 +12,10 @@ namespace CalqFramework.Cli.DataAccess {
         /// Gets an ordered list of accessor-to-keys pairs for displaying alternative names in help.
         /// </summary>
         IEnumerable<AccessorKeysPair<TAccessor>> GetAccessorKeysPairs();
+
+        /// <summary>
+        /// Determines whether the value associated with the specified key is a collection type.
+        /// </summary>
+        bool IsCollection(TKey key);
     }
 }

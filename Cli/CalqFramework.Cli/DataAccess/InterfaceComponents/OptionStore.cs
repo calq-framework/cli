@@ -26,7 +26,8 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
 
         public IEnumerable<Option> GetOptions() {
             return Store.GetAccessorKeysPairs().Select(pair => new Option() {
-                Type = GetDataType(pair.Keys[0]),
+                ValueType = GetDataType(pair.Keys[0]),
+                IsCollection = Store.IsCollection(pair.Keys[0]),
                 Keys = pair.Keys,
                 MemberInfo = pair.Accessor,
                 Value = this[pair.Keys[0]]
