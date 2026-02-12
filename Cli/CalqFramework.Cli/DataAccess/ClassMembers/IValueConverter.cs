@@ -6,6 +6,11 @@ namespace CalqFramework.Cli.DataAccess.ClassMembers {
     /// </summary>
     public interface IValueConverter<TValue> {
         /// <summary>
+        /// Determines if a type can be converted from CLI representation.
+        /// </summary>
+        bool IsConvertible(Type type);
+
+        /// <summary>
         /// Converts an internal value to the CLI representation.
         /// </summary>
         TValue ConvertFromInternalValue(object? value, Type internalType);

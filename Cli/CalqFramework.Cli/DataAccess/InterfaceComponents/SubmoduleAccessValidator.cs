@@ -1,23 +1,22 @@
 ﻿using System.Reflection;
 using CalqFramework.Cli.DataAccess.ClassMembers;
-using CalqFramework.Cli.Parsing;
 using CalqFramework.Extensions.System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
 
     /// <summary>
-    /// Validates whether a member is a valid CLI submodule (must be non-parsable type).
+    /// Validates whether a member is a valid CLI submodule (must be non-convertible type).
     /// </summary>
     public class SubmoduleAccessValidator : IAccessValidator {
 
-        private readonly IArgValueParser _argValueParser;
+        private readonly IValueConverter<string?> _valueConverter;
 
-        public SubmoduleAccessValidator(IArgValueParser argValueParser) {
-            _argValueParser = argValueParser;
+        public SubmoduleAccessValidator(IValueConverter<string?> valueConverter) {
+            _valueConverter = valueConverter;
         }
 
         public bool IsValid(MemberInfo accessor) {
-            return !_argValueParser.IsParsable(accessor.GetUnderlyingType());
+            return !_valueConverter.IsConvertible(accessor.GetUnderlyingType());
         }
     }
 }

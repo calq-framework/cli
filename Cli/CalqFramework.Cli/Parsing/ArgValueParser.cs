@@ -1,16 +1,15 @@
 ﻿using System;
-using System.Collections;
 using CalqFramework.Extensions.System;
 
 namespace CalqFramework.Cli.Parsing;
 
 /// <summary>
-/// Parses string values to typed objects in CLI context with enhanced error messages.
+/// Parses string values to typed objects with enhanced error messages.
 /// </summary>
 public class ArgValueParser : IArgValueParser {
 
     public bool IsParsable(Type type) {
-        return type.IsParsable() || type.GetInterface(nameof(ICollection)) != null;
+        return type.IsParsable();
     }
 
     public T Parse<T>(string value) {
@@ -22,11 +21,6 @@ public class ArgValueParser : IArgValueParser {
     }
 
     public object Parse(string value, Type type) {
-        bool isCollection = type.GetInterface(nameof(ICollection)) != null;
-        if (isCollection) {
-            type = type.GetGenericArguments()[0];
-        }
-
         try {
             return type.Parse(value);
         } catch (OverflowException ex) {
@@ -45,11 +39,6 @@ public class ArgValueParser : IArgValueParser {
     }
 
     public object Parse(string value, Type type, IFormatProvider? formatProvider) {
-        bool isCollection = type.GetInterface(nameof(ICollection)) != null;
-        if (isCollection) {
-            type = type.GetGenericArguments()[0];
-        }
-
         try {
             return type.Parse(value, formatProvider);
         } catch (OverflowException ex) {
