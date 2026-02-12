@@ -7,7 +7,27 @@ namespace CalqFramework.Extensions.System;
 /// </summary>
 public static class TypeExtensions {
 
-    public static bool IsParsable(this Type type) {
+    /// <summary>
+    /// Determines whether the specified type is a collection type.
+    /// </summary>
+    public static bool IsCollection(this global::System.Type type) {
+        return type.GetInterface(nameof(global::System.Collections.ICollection)) != null;
+    }
+
+    /// <summary>
+    /// Gets the element type for a collection, or the type itself if not a collection.
+    /// For generic collections like List&lt;T&gt;, returns T. For non-collections, returns the type itself.
+    /// </summary>
+    public static global::System.Type GetCollectionElementType(this global::System.Type type) {
+        if (!type.IsCollection()) {
+            return type;
+        }
+        
+        var genericArgs = type.GetGenericArguments();
+        return genericArgs.Length > 0 ? genericArgs[0] : type;
+    }
+
+    public static bool IsParsable(this global::System.Type type) {
         type = Nullable.GetUnderlyingType(type) ?? type;
         
         if (type.IsPrimitive || type == typeof(string) || type.IsEnum) {

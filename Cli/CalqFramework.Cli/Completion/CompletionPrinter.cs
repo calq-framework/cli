@@ -64,12 +64,12 @@ namespace CalqFramework.Cli.Completion {
         }
 
         public void PrintOptionValue(Option option, string partialInput, object? submodule) {
-            var completions = GetValueCompletions(option.Type, option.MemberInfo, partialInput, submodule);
+            var completions = GetValueCompletions(option.ValueType, option.MemberInfo, partialInput, submodule);
             PrintCompletions(completions);
         }
 
         public void PrintParameterValue(Parameter parameter, string partialInput, object? submodule) {
-            var completions = GetValueCompletions(parameter.Type, parameter.ParameterInfo, partialInput, submodule);
+            var completions = GetValueCompletions(parameter.ValueType, parameter.ParameterInfo, partialInput, submodule);
             PrintCompletions(completions);
         }
 
@@ -88,15 +88,6 @@ namespace CalqFramework.Cli.Completion {
                 
                 var provider = (ICompletionProvider)Activator.CreateInstance(completionAttr.ProviderType)!;
                 return provider.GetCompletions(context);
-            }
-
-            // Handle ICollection types by extracting the generic type argument
-            bool isCollection = type.GetInterface(nameof(System.Collections.ICollection)) != null;
-            if (isCollection) {
-                var genericArgs = type.GetGenericArguments();
-                if (genericArgs.Length > 0) {
-                    type = genericArgs[0];
-                }
             }
 
             // Auto-detect FileInfo, DirectoryInfo, and FileSystemInfo types
