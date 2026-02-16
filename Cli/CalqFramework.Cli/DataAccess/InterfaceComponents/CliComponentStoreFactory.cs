@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Reflection;
 using CalqFramework.Cli.DataAccess.ClassMembers;
-using CalqFramework.Cli.Parsing;
 using CalqFramework.Cli.Formatting;
 using CalqFramework.DataAccess;
 using CalqFramework.DataAccess.Collections;
@@ -29,9 +28,8 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
             EnableShadowing = false;
         }
 
-        private IArgValueParser? _argValueParser;
         private ICollectionStoreFactory<string, object?>? _collectionStoreFactory;
-        private IValueConverter<string?>? _valueConverter;
+        private ICollectionValueConverter<string?>? _valueConverter;
 
         /// <summary>
         /// Access fields as CLI options.
@@ -89,13 +87,6 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
             init => _submoduleAccessValidator = value;
         }
         /// <summary>
-        /// Parser for converting string argument values to typed objects.
-        /// </summary>
-        public IArgValueParser ArgValueParser { 
-            get => _argValueParser ??= new ArgValueParser();
-            init => _argValueParser = value;
-        }
-        /// <summary>
         /// Factory for creating collection stores.
         /// </summary>
         public ICollectionStoreFactory<string, object?> CollectionStoreFactory { 
@@ -104,9 +95,16 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
         }
         /// <summary>
         /// Converter for transforming values between CLI strings and internal types.
+        /// Defaults to CollectionValueConverter wrapping ValueConverter with collection support.
         /// </summary>
-        public IValueConverter<string?> ValueConverter { 
-            get => _valueConverter ??= new ValueConverter(CollectionStoreFactory, ArgValueParser) { FormatProvider = FormatProvider };
+        public ICollectionValueConverter<string?> ValueConverter { 
+            get {
+                if (_valueConverter == null) {
+                    var baseConverter = new ValueConverter() { FormatProvider = FormatProvider };
+                    _valueConverter = new CollectionValueConverter(baseConverter, CollectionStoreFactory);
+                }
+                return _valueConverter;
+            }
             init => _valueConverter = value;
         }
 
@@ -137,7 +135,7 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
         }
 
         public ISubmoduleStore CreateSubmoduleStore(object obj) {
-            var converter = new ReadOnlyPassThroughConverter();
+            var converter = new ReadOnlyPassThroughConverter<object?>();
             ICliKeyValueStore<string, object?, MemberInfo> store;
             if (AccessFields && AccessProperties) {
                 store = CreateFieldAndPropertyStore(obj, SubmoduleAccessValidator, converter);
@@ -151,15 +149,15 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
             return new SubmoduleStore(store);
         }
 
-        private ICliKeyValueStore<string, TValue, MemberInfo> CreateFieldAndPropertyStore<TValue>(object obj, IAccessValidator cliValidator, IValueConverter<TValue> converter) {
+        private ICliKeyValueStore<string, TValue, MemberInfo> CreateFieldAndPropertyStore<TValue>(object obj, IAccessValidator cliValidator, ICollectionValueConverter<TValue> converter) {
             return new CliDualKeyValueStore<TValue>(CreateFieldStore(obj, cliValidator, converter), CreatePropertyStore(obj, cliValidator, converter));
         }
 
-        private ICliKeyValueStore<string, TValue, MemberInfo> CreateFieldStore<TValue>(object obj, IAccessValidator cliValidator, IValueConverter<TValue> converter) {
+        private ICliKeyValueStore<string, TValue, MemberInfo> CreateFieldStore<TValue>(object obj, IAccessValidator cliValidator, ICollectionValueConverter<TValue> converter) {
             return new FieldStore<TValue>(obj, BindingFlags, ClassMemberStringifier, cliValidator, converter);
         }
 
-        private ICliKeyValueStore<string, TValue, MemberInfo> CreatePropertyStore<TValue>(object obj, IAccessValidator cliValidator, IValueConverter<TValue> converter) {
+        private ICliKeyValueStore<string, TValue, MemberInfo> CreatePropertyStore<TValue>(object obj, IAccessValidator cliValidator, ICollectionValueConverter<TValue> converter) {
             return new PropertyStore<TValue>(obj, BindingFlags, ClassMemberStringifier, cliValidator, converter);
         }
     }

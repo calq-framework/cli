@@ -119,8 +119,6 @@ namespace CalqFramework.Cli.Parsing {
                             } else {
                                 optionAttr |= OptionFlags.Unknown;
                             }
-                        } catch (ArgValueParserException ex) {
-                            throw CliErrors.OptionError(shortOption.ToString(), ex.Message, ex);
                         } catch (DataAccessException ex) {
                             throw CliErrors.OptionError(shortOption.ToString(), ex.Message, ex);
                         }
@@ -135,8 +133,6 @@ namespace CalqFramework.Cli.Parsing {
                         } else {
                             optionAttr |= OptionFlags.Unknown;
                         }
-                    } catch (ArgValueParserException ex) {
-                        throw CliErrors.OptionError(option, ex.Message, ex);
                     } catch (DataAccessException ex) {
                         throw CliErrors.OptionError(option, ex.Message, ex);
                     }

@@ -149,8 +149,6 @@ namespace CalqFramework.Cli {
             object? result;
             try {
                 result = subcommandExecutorWithOptions.Invoke();
-            } catch (ArgValueParserException ex) {
-                throw CliErrors.FailedToParseArgument(ex.Message, ex);
             } catch (DataAccessException ex) {
                 throw CliErrors.FailedToAccessData(ex.Message, ex);
             }
@@ -190,8 +188,6 @@ namespace CalqFramework.Cli {
                 } else {
                     try {
                         subcommandExecutorWithOptions[option] = value;
-                    } catch (ArgValueParserException ex) {
-                        throw CliErrors.OptionValueError(option, value, ex.Message, ex);
                     } catch (DataAccessException ex) {
                         throw CliErrors.OptionValueError(option, value, ex.Message, ex);
                     }

@@ -30,32 +30,38 @@ public static class TypeExtensions {
     public static bool IsParsable(this global::System.Type type) {
         type = Nullable.GetUnderlyingType(type) ?? type;
         
-        if (type.IsPrimitive || type == typeof(string) || type.IsEnum) {
-            return true;
+        switch (Type.GetTypeCode(type)) {
+            case TypeCode.Boolean:
+            case TypeCode.Byte:
+            case TypeCode.SByte:
+            case TypeCode.Char:
+            case TypeCode.Decimal:
+            case TypeCode.Double:
+            case TypeCode.Single:
+            case TypeCode.Int32:
+            case TypeCode.UInt32:
+            case TypeCode.Int64:
+            case TypeCode.UInt64:
+            case TypeCode.Int16:
+            case TypeCode.UInt16:
+            case TypeCode.DateTime:
+            case TypeCode.String:
+                return true;
+            default:
+                var parsableInterface = type.GetInterface("IParsable`1");
+                return parsableInterface != null;
         }
-
-        var parsableInterface = type.GetInterface("IParsable`1");
-        return parsableInterface != null;
     }
 
     public static T Parse<T>(this Type type, string value) {
         return (T)type.Parse(value);
     }
 
-    public static T Parse<T>(this Type type, string value, IFormatProvider? formatProvider) {
+    public static T Parse<T>(this Type type, string value, IFormatProvider formatProvider) {
         return (T)type.Parse(value, formatProvider);
     }
 
     public static object Parse(this Type targetType, string value) {
-        if (Nullable.GetUnderlyingType(targetType) != null) {
-            targetType = Nullable.GetUnderlyingType(targetType)!;
-        }
-
-        // Handle enums
-        if (targetType.IsEnum) {
-            return Enum.Parse(targetType, value, ignoreCase: true);
-        }
-
         object objValue = Type.GetTypeCode(targetType) switch {
             TypeCode.Boolean => bool.Parse(value),
             TypeCode.Byte => byte.Parse(value),
@@ -72,24 +78,13 @@ public static class TypeExtensions {
             TypeCode.UInt16 => ushort.Parse(value),
             TypeCode.DateTime => DateTime.Parse(value),
             TypeCode.String => value,
-            _ => TryParseParsable(targetType, value, null)
+            _ => TryParseParsable(targetType, value)
         };
         
         return objValue;
     }
 
-    public static object Parse(this Type targetType, string value, IFormatProvider? formatProvider) {
-        formatProvider ??= global::System.Globalization.CultureInfo.InvariantCulture;
-        
-        if (Nullable.GetUnderlyingType(targetType) != null) {
-            targetType = Nullable.GetUnderlyingType(targetType)!;
-        }
-
-        // Handle enums
-        if (targetType.IsEnum) {
-            return Enum.Parse(targetType, value, ignoreCase: true);
-        }
-
+    public static object Parse(this Type targetType, string value, IFormatProvider formatProvider) {
         object objValue = Type.GetTypeCode(targetType) switch {
             TypeCode.Boolean => bool.Parse(value),
             TypeCode.Byte => byte.Parse(value, formatProvider),
@@ -106,34 +101,49 @@ public static class TypeExtensions {
             TypeCode.UInt16 => ushort.Parse(value, formatProvider),
             TypeCode.DateTime => DateTime.Parse(value, formatProvider),
             TypeCode.String => value,
-            _ => TryParseParsable(targetType, value, formatProvider)
+            _ => TryParseParsableWithFormatProvider(targetType, value, formatProvider)
         };
         
         return objValue;
     }
 
-    private static object TryParseParsable(Type targetType, string value, IFormatProvider? formatProvider) {
+    private static object TryParseParsable(Type targetType, string value) {
+        if (Nullable.GetUnderlyingType(targetType) != null) {
+            targetType = Nullable.GetUnderlyingType(targetType)!;
+            return Parse(targetType, value);
+        }
+
         var parsableInterface = targetType.GetInterface("IParsable`1");
         if (parsableInterface != null) {
-            if (formatProvider == null) {
-                var parseMethod = targetType.GetMethod("Parse", new[] { typeof(string) });
-                if (parseMethod != null) {
-                    try {
-                        return parseMethod.Invoke(null, new object?[] { value })!;
-                    } catch (global::System.Reflection.TargetInvocationException ex) {
-                        throw ex.InnerException ?? ex;
-                    }
+            var parseMethod = targetType.GetMethod("Parse", new[] { typeof(string) });
+            if (parseMethod != null) {
+                try {
+                    return parseMethod.Invoke(null, new object?[] { value })!;
+                } catch (global::System.Reflection.TargetInvocationException ex) {
+                    throw ex.InnerException ?? ex;
                 }
-            } else {
-                var parseMethod = targetType.GetMethod("Parse", 
-                    new[] { typeof(string), typeof(IFormatProvider) });
-                
-                if (parseMethod != null) {
-                    try {
-                        return parseMethod.Invoke(null, new object?[] { value, formatProvider })!;
-                    } catch (global::System.Reflection.TargetInvocationException ex) {
-                        throw ex.InnerException ?? ex;
-                    }
+            }
+        }
+        
+        throw DataAccessErrors.TypeCannotBeParsed(targetType.Name);
+    }
+
+    private static object TryParseParsableWithFormatProvider(Type targetType, string value, IFormatProvider formatProvider) {
+        if (Nullable.GetUnderlyingType(targetType) != null) {
+            targetType = Nullable.GetUnderlyingType(targetType)!;
+            return Parse(targetType, value, formatProvider);
+        }
+
+        var parsableInterface = targetType.GetInterface("IParsable`1");
+        if (parsableInterface != null) {
+            var parseMethod = targetType.GetMethod("Parse", 
+                new[] { typeof(string), typeof(IFormatProvider) });
+            
+            if (parseMethod != null) {
+                try {
+                    return parseMethod.Invoke(null, new object?[] { value, formatProvider })!;
+                } catch (global::System.Reflection.TargetInvocationException ex) {
+                    throw ex.InnerException ?? ex;
                 }
             }
         }

@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using CalqFramework.Cli.DataAccess.ClassMembers;
+using CalqFramework.Extensions.System;
 using CalqFramework.Extensions.System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
@@ -16,7 +17,8 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
         }
 
         public bool IsValid(MemberInfo accessor) {
-            return !_valueConverter.IsConvertible(accessor.GetUnderlyingType());
+            var type = accessor.GetUnderlyingType();
+            return !_valueConverter.IsConvertible(type);
         }
     }
 }

@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections;
-using System.Linq;
 using CalqFramework.Cli.DataAccess.ClassMembers;
-using CalqFramework.Cli.Parsing;
-using CalqFramework.DataAccess;
-using CalqFramework.DataAccess.Collections;
+using CalqFramework.Extensions.System;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
 
@@ -13,35 +9,17 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
     /// </summary>
     public class ValueConverter : IValueConverter<string?> {
 
-        private readonly ICollectionStoreFactory<string, object?> _collectionStoreFactory;
-        private readonly IArgValueParser _argValueParser;
-
-        public ValueConverter(ICollectionStoreFactory<string, object?> collectionStoreFactory, IArgValueParser argValueParser) {
-            _collectionStoreFactory = collectionStoreFactory;
-            _argValueParser = argValueParser;
-        }
-
         /// <summary>
         /// Culture to use for parsing values. Defaults to InvariantCulture.
         /// </summary>
         public IFormatProvider FormatProvider { get; init; } = System.Globalization.CultureInfo.InvariantCulture;
 
         public bool IsConvertible(Type type) {
-            return _argValueParser.IsParsable(type) || type.GetInterface(nameof(ICollection)) != null;
+            return type.IsParsable() || type.IsEnum || (Nullable.GetUnderlyingType(type)?.IsEnum ?? false);
         }
 
         public string? ConvertFromInternalValue(object? value, Type internalType) {
-            if (value == null) {
-                return null;
-            }
-
-            bool isCollection = internalType.GetInterface(nameof(ICollection)) != null;
-            if (isCollection == false) {
-                return value.ToString();
-            } else {
-                ICollection collection = (value as ICollection)!;
-                return "[" + string.Join(", ", collection.Cast<object?>().Select(x => x?.ToString() ?? "NULL").Cast<string?>()) + "]";
-            }
+            return value?.ToString();
         }
 
         public object? ConvertToInternalValue(string? value, Type internalType, object? currentValue) {
@@ -49,14 +27,28 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponents {
                 return null;
             }
 
-            bool isCollection = internalType.GetInterface(nameof(ICollection)) != null;
-            if (isCollection == false) {
-                return _argValueParser.Parse(value, internalType, FormatProvider);
-            } else {
-                ICollection collection = (currentValue as ICollection)!;
-                object item = _argValueParser.Parse(value, internalType.GetGenericArguments()[0], FormatProvider);
-                _collectionStoreFactory.CreateStore(collection).Add(item);
-                return currentValue;
+            var underlyingType = Nullable.GetUnderlyingType(internalType) ?? internalType;
+
+            try {
+                if (underlyingType.IsEnum) {
+                    return Enum.Parse(underlyingType, value, ignoreCase: true);
+                }
+
+                return internalType.Parse(value, FormatProvider);
+            } catch (ArgumentException ex) {
+                throw CliErrors.InvalidValueFormat(internalType.Name, ex);
+            } catch (OverflowException ex) {
+                var minField = internalType.GetField("MinValue");
+                var maxField = internalType.GetField("MaxValue");
+                
+                if (minField != null && maxField != null) {
+                    var min = minField.GetValue(null);
+                    var max = maxField.GetValue(null);
+                    throw CliErrors.ValueOutOfRange(min, max, ex);
+                }
+                throw;
+            } catch (FormatException ex) {
+                throw CliErrors.InvalidValueFormat(internalType.Name, ex);
             }
         }
     }
