@@ -75,26 +75,4 @@ public class TypeExtensionsTest {
         var result = typeof(int?).Parse("42");
         Assert.Equal(42, result);
     }
-
-    [Fact]
-    public void IsParsable_Enum_ReturnsTrue() {
-        Assert.True(typeof(DayOfWeek).IsParsable());
-    }
-
-    [Fact]
-    public void IsParsable_NullableEnum_ReturnsTrue() {
-        Assert.True(typeof(DayOfWeek?).IsParsable());
-    }
-
-    [Fact]
-    public void Parse_Enum_ReturnsCorrectValue() {
-        var result = typeof(DayOfWeek).Parse<DayOfWeek>("Monday");
-        Assert.Equal(DayOfWeek.Monday, result);
-    }
-
-    [Fact]
-    public void Parse_EnumCaseInsensitive_ReturnsCorrectValue() {
-        var result = typeof(DayOfWeek).Parse<DayOfWeek>("monday");
-        Assert.Equal(DayOfWeek.Monday, result);
-    }
 }

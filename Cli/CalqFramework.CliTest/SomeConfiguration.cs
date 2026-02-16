@@ -15,6 +15,8 @@ namespace CalqFramework.CliTest {
         public bool boolean;
         public bool xtrueBoolean = true;
         public string text;
+        public LogLevel logLevel;
+        public LogLevel? nullableLogLevel;
 
         [CliName("customname")]
         public bool longOption;

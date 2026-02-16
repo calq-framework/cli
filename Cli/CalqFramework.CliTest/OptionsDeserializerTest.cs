@@ -296,5 +296,34 @@ namespace CalqFramework.CliTest {
             });
             Assert.Equal("Unexpected value: unknown", ex.Message);
         }
+
+        [Fact]
+        public void Deserialize_EnumValue_SetsEnumProperty() {
+            var obj = new SomeConfiguration();
+            OptionDeserializer.Deserialize(obj, $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.logLevel))}=Info".Split(' '));
+            Assert.Equal(LogLevel.Info, obj.logLevel);
+        }
+
+        [Fact]
+        public void Deserialize_EnumValueCaseInsensitive_SetsEnumProperty() {
+            var obj = new SomeConfiguration();
+            OptionDeserializer.Deserialize(obj, $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.logLevel))}=warning".Split(' '));
+            Assert.Equal(LogLevel.Warning, obj.logLevel);
+        }
+
+        [Fact]
+        public void Deserialize_NullableEnumValue_SetsNullableEnumProperty() {
+            var obj = new SomeConfiguration();
+            OptionDeserializer.Deserialize(obj, $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.nullableLogLevel))}=Error".Split(' '));
+            Assert.Equal(LogLevel.Error, obj.nullableLogLevel);
+        }
+
+        [Fact]
+        public void Deserialize_InvalidEnumValue_ThrowsCliException() {
+            var obj = new SomeConfiguration();
+            CliException ex = Assert.Throws<CliException>(() => {
+                OptionDeserializer.Deserialize(obj, $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.logLevel))}=InvalidValue".Split(' '));
+            });
+        }
     }
 }

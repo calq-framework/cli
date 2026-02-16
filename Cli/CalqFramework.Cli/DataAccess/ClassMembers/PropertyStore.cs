@@ -1,17 +1,19 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using CalqFramework.Cli.Formatting;
 using CalqFramework.DataAccess.ClassMembers;
+using CalqFramework.DataAccess.Collections;
 using CalqFramework.Extensions.System;
 
 namespace CalqFramework.Cli.DataAccess.ClassMembers {
 
     internal class PropertyStore<TValue> : PropertyStoreBase<string, TValue>, ICliKeyValueStore<string, TValue, MemberInfo> {
 
-        public PropertyStore(object obj, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier, IAccessValidator accessValidator, IValueConverter<TValue> valueConverter) : base(obj, bindingFlags) {
+        public PropertyStore(object obj, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier, IAccessValidator accessValidator, ICollectionValueConverter<TValue> valueConverter) : base(obj, bindingFlags) {
             ClassMemberStringifier = classMemberStringifier;
             AccessValidator = accessValidator;
             ValueConverter = valueConverter;
@@ -21,14 +23,14 @@ namespace CalqFramework.Cli.DataAccess.ClassMembers {
         protected IClassMemberStringifier ClassMemberStringifier { get; }
         private IDictionary<string, PropertyInfo> AccessorsByNames { get; }
         private IAccessValidator AccessValidator { get; }
-        private IValueConverter<TValue> ValueConverter { get; }
+        private ICollectionValueConverter<TValue> ValueConverter { get; }
 
         public override bool ContainsAccessor(PropertyInfo accessor) {
             return accessor.ReflectedType == ParentType && AccessValidator.IsValid(accessor);
         }
 
         public override Type GetDataType(PropertyInfo accessor) {
-            return accessor.PropertyType.GetCollectionElementType();
+            return ValueConverter.GetDataType(accessor.PropertyType);
         }
 
         public IEnumerable<AccessorKeysPair<MemberInfo>> GetAccessorKeysPairs() {
@@ -42,7 +44,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMembers {
 
         public bool IsCollection(string key) {
             PropertyInfo accessor = GetAccessor(key);
-            return accessor.PropertyType.IsCollection();
+            return ValueConverter.IsCollection(accessor.PropertyType);
         }
 
         public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out PropertyInfo result) {
@@ -60,6 +62,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMembers {
             } catch (MissingMethodException) {
                 currentValue = null;
             }
+            
             return ValueConverter.ConvertToInternalValue(value, accessor.PropertyType, currentValue);
         }
 

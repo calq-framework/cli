@@ -1,17 +1,19 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using CalqFramework.Cli.Formatting;
 using CalqFramework.DataAccess.ClassMembers;
+using CalqFramework.DataAccess.Collections;
 using CalqFramework.Extensions.System;
 
 namespace CalqFramework.Cli.DataAccess.ClassMembers {
 
     internal class MethodExecutor<TValue> : MethodExecutorBase<string, TValue>, ICliFunctionExecutor<string, TValue, ParameterInfo> {
 
-        public MethodExecutor(MethodInfo method, object? obj, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier, IValueConverter<TValue> valueConverter) : base(method, obj) {
+        public MethodExecutor(MethodInfo method, object? obj, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier, ICollectionValueConverter<TValue> valueConverter) : base(method, obj) {
             BindingFlags = bindingFlags;
             ClassMemberStringifier = classMemberStringifier;
             ValueConverter = valueConverter;
@@ -21,14 +23,14 @@ namespace CalqFramework.Cli.DataAccess.ClassMembers {
         protected BindingFlags BindingFlags { get; }
         protected IClassMemberStringifier ClassMemberStringifier { get; }
         private IDictionary<string, ParameterInfo> AccessorsByNames { get; }
-        private IValueConverter<TValue> ValueConverter { get; }
+        private ICollectionValueConverter<TValue> ValueConverter { get; }
 
         public override bool ContainsAccessor(ParameterInfo accessor) {
             return accessor.Member == ParentMethod;
         }
 
         public override Type GetDataType(ParameterInfo accessor) {
-            return accessor.ParameterType.GetCollectionElementType();
+            return ValueConverter.GetDataType(accessor.ParameterType);
         }
 
         public IEnumerable<AccessorKeysPair<ParameterInfo>> GetAccessorKeysPairs() {
@@ -43,7 +45,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMembers {
 
         public bool IsCollection(string key) {
             ParameterInfo accessor = GetAccessor(key);
-            return accessor.ParameterType.IsCollection();
+            return ValueConverter.IsCollection(accessor.ParameterType);
         }
 
         public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out ParameterInfo result) {
@@ -61,6 +63,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMembers {
             } catch (MissingMethodException) {
                 currentValue = null;
             }
+            
             return ValueConverter.ConvertToInternalValue(value, accessor.ParameterType, currentValue);
         }
 

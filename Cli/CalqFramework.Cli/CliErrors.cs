@@ -145,5 +145,17 @@ namespace CalqFramework.Cli {
         /// </summary>
         public static CliException InvalidCompletionMethodReturnType(string methodName, string typeName) =>
             new CliException($"Completion method '{methodName}' on type '{typeName}' must return IEnumerable<string>");
+
+        /// <summary>
+        /// Creates a DataAccessException for out of range values during value conversion.
+        /// </summary>
+        public static CalqFramework.DataAccess.DataAccessException ValueOutOfRange(object? min, object? max, Exception innerException) =>
+            new CalqFramework.DataAccess.DataAccessException($"Out of range ({min}-{max})", innerException);
+
+        /// <summary>
+        /// Creates a DataAccessException for invalid format during value conversion.
+        /// </summary>
+        public static CalqFramework.DataAccess.DataAccessException InvalidValueFormat(string expectedTypeName, Exception innerException) =>
+            new CalqFramework.DataAccess.DataAccessException($"Invalid format (expected {expectedTypeName})", innerException);
     }
 }
