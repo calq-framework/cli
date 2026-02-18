@@ -10,21 +10,21 @@ namespace CalqFramework.Cli.DataAccess.ClassMemberStores {
 
     internal class MethodInfoStore : ICliReadOnlyKeyValueStore<string, MethodInfo, MethodInfo> {
 
-        public MethodInfoStore(object obj, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier, IAccessValidator accessValidator) {
-            ParentObject = obj;
+        public MethodInfoStore(object targetObject, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier, IAccessValidator accessValidator) {
+            TargetObject = targetObject;
             BindingFlags = bindingFlags;
             ClassMemberStringifier = classMemberStringifier;
             AccessValidator = accessValidator;
-            ParentType = obj.GetType();
+            TargetType = targetObject.GetType();
             AccessorsByNames = GetAccessorsByNames();
         }
 
-        public IEnumerable<MethodInfo> Accessors => ParentType.GetMethods(BindingFlags).Where(ContainsAccessor);
+        public IEnumerable<MethodInfo> Accessors => TargetType.GetMethods(BindingFlags).Where(ContainsAccessor);
         public IAccessValidator AccessValidator { get; }
         protected BindingFlags BindingFlags { get; }
         protected IClassMemberStringifier ClassMemberStringifier { get; }
-        protected object ParentObject { get; }
-        protected Type ParentType { get; }
+        protected object TargetObject { get; }
+        protected Type TargetType { get; }
         private IDictionary<string, MethodInfo> AccessorsByNames { get; }
         public MethodInfo this[string key] {
             get {
@@ -57,7 +57,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMemberStores {
         }
 
         private bool ContainsAccessor(MethodInfo accessor) {
-            return accessor.ReflectedType == ParentType && AccessValidator.IsValid(accessor);
+            return accessor.ReflectedType == TargetType && AccessValidator.IsValid(accessor);
         }
 
         private IDictionary<string, MethodInfo> GetAccessorsByNames() {

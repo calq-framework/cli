@@ -30,8 +30,8 @@ namespace CalqFramework.Cli.Parsing {
                 return BigInteger.TryParse(input, out _);
             }
 
-            void TrySelfAssign(Type type, ref string value, ref OptionFlags optionAttr) {
-                if (type == typeof(bool)) {
+            void TrySelfAssign(Type targetType, ref string value, ref OptionFlags optionAttr) {
+                if (targetType == typeof(bool)) {
                     value = optionAttr.HasFlag(OptionFlags.Plus) ? "false" : "true";
                     optionAttr |= OptionFlags.AmbigousValue;
                     optionAttr ^= OptionFlags.AmbigousValue;

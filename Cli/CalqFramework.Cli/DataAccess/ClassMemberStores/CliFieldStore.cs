@@ -14,7 +14,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMemberStores {
 
     internal class CliFieldStore<TValue> : FieldStoreBase<string, TValue>, ICliKeyValueStore<string, TValue, MemberInfo> {
 
-        public CliFieldStore(object obj, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier, IAccessValidator accessValidator, ICompositeValueConverter<TValue> valueConverter) : base(obj, bindingFlags) {
+        public CliFieldStore(object targetObject, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier, IAccessValidator accessValidator, ICompositeValueConverter<TValue> valueConverter) : base(targetObject, bindingFlags) {
             ClassMemberStringifier = classMemberStringifier;
             AccessValidator = accessValidator;
             ValueConverter = valueConverter;
@@ -27,7 +27,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMemberStores {
         private ICompositeValueConverter<TValue> ValueConverter { get; }
 
         public override bool ContainsAccessor(FieldInfo accessor) {
-            return accessor.ReflectedType == ParentType && AccessValidator.IsValid(accessor);
+            return accessor.ReflectedType == TargetType && AccessValidator.IsValid(accessor);
         }
 
         public override Type GetDataType(FieldInfo accessor) {
@@ -53,7 +53,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMemberStores {
         }
 
         protected override TValue ConvertFromInternalValue(object? value, FieldInfo accessor) {
-            return ValueConverter.ConvertFromInternalValue(value, accessor.FieldType);
+            return ValueConverter.ConvertFrom(value, accessor.FieldType);
         }
 
         protected override object? ConvertToInternalValue(TValue value, FieldInfo accessor) {
@@ -64,7 +64,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMemberStores {
                 currentValue = null;
             }
             
-            return ValueConverter.ConvertToInternalValue(value, accessor.FieldType, currentValue);
+            return ValueConverter.ConvertToOrUpdate(value, accessor.FieldType, currentValue);
         }
 
         private IDictionary<string, FieldInfo> GetAccessorsByNames() {

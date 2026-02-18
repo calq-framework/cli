@@ -7,10 +7,10 @@ namespace CalqFramework.DataAccess.CollectionElementStores;
 /// </summary>
 public abstract class ListElementStoreBase<TKey, TValue> : CollectionElementStoreBase<TKey, TValue> {
 
-    protected ListElementStoreBase(IList list) : base(list) {
+    protected ListElementStoreBase(IList targetList) : base(targetList) {
     }
 
-    protected IList List => (IList)ParentCollection;
+    protected IList List => (IList)TargetCollection;
 
     public override Type GetDataType(TKey key) {
         return List.GetType().GetGenericArguments()[0];

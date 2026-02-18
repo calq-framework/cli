@@ -12,11 +12,11 @@ public sealed class PropertyStore : PropertyStoreBase<string, object?>, IKeyValu
     }
 
     public override bool ContainsAccessor(PropertyInfo accessor) {
-        return accessor.ReflectedType == ParentType;
+        return accessor.ReflectedType == TargetType;
     }
 
     public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out PropertyInfo result) {
-        result = ParentType.GetProperty(key, BindingFlags);
+        result = TargetType.GetProperty(key, BindingFlags);
         return result != null;
     }
 

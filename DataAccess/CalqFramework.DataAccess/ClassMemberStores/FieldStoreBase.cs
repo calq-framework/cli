@@ -4,29 +4,29 @@ namespace CalqFramework.DataAccess.ClassMemberStores;
 
 public abstract class FieldStoreBase<TKey, TValue> : ClassDataMemberStoreBase<TKey, TValue, FieldInfo, object?> {
 
-    public FieldStoreBase(object obj, BindingFlags bindingFlags) : base(obj, bindingFlags) {
+    public FieldStoreBase(object targetObject, BindingFlags bindingFlags) : base(targetObject, bindingFlags) {
     }
 
-    public override IEnumerable<FieldInfo> Accessors => ParentType.GetFields(BindingFlags).Where(ContainsAccessor);
+    public override IEnumerable<FieldInfo> Accessors => TargetType.GetFields(BindingFlags).Where(ContainsAccessor);
 
     public override object? this[FieldInfo accessor] {
         get {
-            return ((FieldInfo)accessor).GetValue(ParentObject);
+            return accessor.GetValue(TargetObject);
         }
         set {
-            ((FieldInfo)accessor).SetValue(ParentObject, value);
+            accessor.SetValue(TargetObject, value);
         }
     }
 
     public override Type GetDataType(FieldInfo accessor) {
-        return ((FieldInfo)accessor).FieldType;
+        return accessor.FieldType;
     }
 
     public override object? GetValueOrInitialize(FieldInfo accessor) {
-        object value = ((FieldInfo)accessor).GetValue(ParentObject) ??
-               Activator.CreateInstance(((FieldInfo)accessor).FieldType) ??
-               Activator.CreateInstance(Nullable.GetUnderlyingType(((FieldInfo)accessor).FieldType)!)!;
-        ((FieldInfo)accessor).SetValue(ParentObject, value);
+        object value = accessor.GetValue(TargetObject) ??
+               Activator.CreateInstance(accessor.FieldType) ??
+               Activator.CreateInstance(Nullable.GetUnderlyingType(accessor.FieldType)!)!;
+        accessor.SetValue(TargetObject, value);
         return value;
     }
 }

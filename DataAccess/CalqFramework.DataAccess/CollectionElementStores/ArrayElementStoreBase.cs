@@ -7,10 +7,10 @@ namespace CalqFramework.DataAccess.CollectionElementStores;
 /// </summary>
 public abstract class ArrayElementStoreBase<TKey, TValue> : CollectionElementStoreBase<TKey, TValue> {
 
-    protected ArrayElementStoreBase(Array array) : base(array) {
+    protected ArrayElementStoreBase(Array targetArray) : base(targetArray) {
     }
 
-    protected Array Array => (Array)ParentCollection;
+    protected Array Array => (Array)TargetCollection;
 
     public override Type GetDataType(TKey key) {
         return Array.GetType().GetElementType()!;

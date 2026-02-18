@@ -36,7 +36,7 @@ namespace CalqFramework.DataAccess {
         }
 
         public TAccessor GetAccessor(TKey key) {
-            return TryGetAccessor(key, out TAccessor? result) ? result : throw CreateMissingMemberException(key);
+            return TryGetAccessor(key, out TAccessor? result) ? result : throw DataAccessErrors.KeyNotFound(key);
         }
 
         public Type GetDataType(TKey key) {
@@ -58,7 +58,5 @@ namespace CalqFramework.DataAccess {
         protected abstract TValue ConvertFromInternalValue(TInternalValue value, TAccessor accessor);
 
         protected abstract TInternalValue ConvertToInternalValue(TValue value, TAccessor accessor);
-
-        protected abstract MissingMemberException CreateMissingMemberException(TKey key);
     }
 }

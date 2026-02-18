@@ -54,7 +54,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMemberStores {
         }
 
         protected override TValue ConvertFromInternalValue(object? value, ParameterInfo accessor) {
-            return ValueConverter.ConvertFromInternalValue(value, accessor.ParameterType);
+            return ValueConverter.ConvertFrom(value, accessor.ParameterType);
         }
 
         protected override object? ConvertToInternalValue(TValue value, ParameterInfo accessor) {
@@ -65,7 +65,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMemberStores {
                 currentValue = null;
             }
             
-            return ValueConverter.ConvertToInternalValue(value, accessor.ParameterType, currentValue);
+            return ValueConverter.ConvertToOrUpdate(value, accessor.ParameterType, currentValue);
         }
 
         private IDictionary<string, ParameterInfo> GetAccessorsByNames() {

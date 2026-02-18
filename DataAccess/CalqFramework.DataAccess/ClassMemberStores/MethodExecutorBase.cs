@@ -4,14 +4,14 @@ namespace CalqFramework.DataAccess.ClassMemberStores;
 
 public abstract class MethodExecutorBase<TParameterKey, TParameterValue> : ParameterStoreBase<TParameterKey, TParameterValue>, IFunctionExecutor<TParameterKey, TParameterValue> {
 
-    protected MethodExecutorBase(MethodInfo method, object? obj) : base(method) {
-        ParentObject = obj;
+    protected MethodExecutorBase(MethodInfo method, object? targetObject) : base(method) {
+        TargetObject = targetObject;
         Arguments = new List<TParameterValue>();
         for (int j = 0; j < ParameterIndexByParameter.Count; j++) {
             ParameterValues[j] = DBNull.Value;
         }
     }
-    public object? ParentObject { get; }
+    public object? TargetObject { get; }
 
     protected List<TParameterValue> Arguments { get; }
 
@@ -54,6 +54,6 @@ public abstract class MethodExecutorBase<TParameterKey, TParameterValue> : Param
         if (argumentIndex < Arguments.Count) {
             throw DataAccessErrors.UnexpectedArgument(Arguments[argumentIndex]);
         }
-        return ParentMethod.Invoke(ParentObject, ParameterValues);
+        return ParentMethod.Invoke(TargetObject, ParameterValues);
     }
 }
