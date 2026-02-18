@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using CalqFramework.Cli;
-using CalqFramework.Cli.DataAccess.InterfaceComponents;
+using CalqFramework.Cli.DataAccess;
 using Xunit;
 
 namespace CalqFramework.CliTest {

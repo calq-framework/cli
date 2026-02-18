@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using CalqFramework.Cli.DataAccess.InterfaceComponents;
+using CalqFramework.Cli.DataAccess;
+using CalqFramework.Cli.DataAccess.InterfaceComponentStores;
 using CalqFramework.Cli.Parsing;
 using CalqFramework.Cli.Formatting;
 using CalqFramework.Cli.Completion;

@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
-using CalqFramework.Cli.DataAccess.InterfaceComponents;
+using CalqFramework.Cli.DataAccess;
 using CalqFramework.DataAccess;
-using CalqFramework.DataAccess.ClassMembers;
+using CalqFramework.DataAccess.ClassMemberStores;
 
 namespace CalqFramework.Cli {
     /// <summary>
