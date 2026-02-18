@@ -1,5 +1,5 @@
 using CalqFramework.Cli;
-using CalqFramework.Cli.DataAccess.InterfaceComponents;
+using CalqFramework.Cli.DataAccess;
 using System;
 using System.Text.Json;
 using CloudProvider;
