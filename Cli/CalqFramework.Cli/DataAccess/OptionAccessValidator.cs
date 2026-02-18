@@ -17,7 +17,7 @@ namespace CalqFramework.Cli.DataAccess {
 
         public bool IsValid(MemberInfo accessor) {
             var type = accessor.GetUnderlyingType();
-            return _valueConverter.IsConvertible(type);
+            return _valueConverter.CanConvert(type);
         }
     }
 }

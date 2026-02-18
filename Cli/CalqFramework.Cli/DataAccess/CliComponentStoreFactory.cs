@@ -30,7 +30,7 @@ namespace CalqFramework.Cli.DataAccess {
             EnableShadowing = false;
         }
 
-        private ICollectionElementStoreFactory<string, object?>? _collectionStoreFactory;
+        private ICollectionElementStoreFactory<string, object?>? _collectionElementStoreFactory;
         private ICompositeValueConverter<string?>? _valueConverter;
 
         /// <summary>
@@ -92,8 +92,8 @@ namespace CalqFramework.Cli.DataAccess {
         /// Factory for creating collection stores.
         /// </summary>
         public ICollectionElementStoreFactory<string, object?> CollectionStoreFactory { 
-            get => _collectionStoreFactory ??= new CollectionElementStoreFactory();
-            init => _collectionStoreFactory = value;
+            get => _collectionElementStoreFactory ??= new CollectionElementStoreFactory();
+            init => _collectionElementStoreFactory = value;
         }
         /// <summary>
         /// Converter for transforming values between CLI strings and internal types.

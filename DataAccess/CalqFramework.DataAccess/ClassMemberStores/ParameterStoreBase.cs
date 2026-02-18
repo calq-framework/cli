@@ -43,8 +43,4 @@ public abstract class ParameterStoreBase<TKey, TValue> : KeyValueStoreBase<TKey,
         ParameterValues[ParameterIndexByParameter[accessor]] = value;
         return value;
     }
-
-    protected override MissingMemberException CreateMissingMemberException(TKey key) {
-        return new MissingMemberException($"Missing {key} in {ParentMethod}.");
-    }
 }

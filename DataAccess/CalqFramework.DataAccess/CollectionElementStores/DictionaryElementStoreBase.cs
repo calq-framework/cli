@@ -7,10 +7,10 @@ namespace CalqFramework.DataAccess.CollectionElementStores;
 /// </summary>
 public abstract class DictionaryElementStoreBase<TKey, TValue> : CollectionElementStoreBase<TKey, TValue> {
 
-    protected DictionaryElementStoreBase(IDictionary dictionary) : base(dictionary) {
+    protected DictionaryElementStoreBase(IDictionary targetDictionary) : base(targetDictionary) {
     }
 
-    protected IDictionary Dictionary => (IDictionary)ParentCollection;
+    protected IDictionary Dictionary => (IDictionary)TargetCollection;
 
     public override Type GetDataType(TKey key) {
         return Dictionary.GetType().GetGenericArguments()[1];

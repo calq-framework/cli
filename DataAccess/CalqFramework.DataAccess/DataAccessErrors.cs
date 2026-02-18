@@ -8,6 +8,12 @@ namespace CalqFramework.DataAccess {
     public static class DataAccessErrors {
 
         /// <summary>
+        /// Creates an exception for when a key is not found in a store.
+        /// </summary>
+        public static DataAccessException KeyNotFound<TKey>(TKey key) =>
+            new DataAccessException($"Key '{key}' not found.");
+
+        /// <summary>
         /// Creates an exception for ambiguous keys in dual key stores.
         /// </summary>
         public static DataAccessException AmbiguousKey(object? key) =>

@@ -14,7 +14,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMemberStores {
 
     internal class CliPropertyStore<TValue> : PropertyStoreBase<string, TValue>, ICliKeyValueStore<string, TValue, MemberInfo> {
 
-        public CliPropertyStore(object obj, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier, IAccessValidator accessValidator, ICompositeValueConverter<TValue> valueConverter) : base(obj, bindingFlags) {
+        public CliPropertyStore(object targetObject, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier, IAccessValidator accessValidator, ICompositeValueConverter<TValue> valueConverter) : base(targetObject, bindingFlags) {
             ClassMemberStringifier = classMemberStringifier;
             AccessValidator = accessValidator;
             ValueConverter = valueConverter;
@@ -27,7 +27,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMemberStores {
         private ICompositeValueConverter<TValue> ValueConverter { get; }
 
         public override bool ContainsAccessor(PropertyInfo accessor) {
-            return accessor.ReflectedType == ParentType && AccessValidator.IsValid(accessor);
+            return accessor.ReflectedType == TargetType && AccessValidator.IsValid(accessor);
         }
 
         public override Type GetDataType(PropertyInfo accessor) {
@@ -53,7 +53,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMemberStores {
         }
 
         protected override TValue ConvertFromInternalValue(object? value, PropertyInfo accessor) {
-            return ValueConverter.ConvertFromInternalValue(value, accessor.PropertyType);
+            return ValueConverter.ConvertFrom(value, accessor.PropertyType);
         }
 
         protected override object? ConvertToInternalValue(TValue value, PropertyInfo accessor) {
@@ -64,7 +64,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMemberStores {
                 currentValue = null;
             }
             
-            return ValueConverter.ConvertToInternalValue(value, accessor.PropertyType, currentValue);
+            return ValueConverter.ConvertToOrUpdate(value, accessor.PropertyType, currentValue);
         }
 
         private IDictionary<string, PropertyInfo> GetAccessorsByNames() {

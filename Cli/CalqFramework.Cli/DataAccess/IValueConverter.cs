@@ -8,16 +8,16 @@ namespace CalqFramework.Cli.DataAccess {
         /// <summary>
         /// Determines if a type can be converted from CLI representation.
         /// </summary>
-        bool IsConvertible(Type type);
+        bool CanConvert(Type targetType);
 
         /// <summary>
         /// Converts an internal value to the CLI representation.
         /// </summary>
-        TValue ConvertFromInternalValue(object? value, Type internalType);
+        TValue ConvertFrom(object? value, Type targetType);
 
         /// <summary>
-        /// Converts a CLI value to the internal object representation.
+        /// Converts a CLI value to the internal object representation, or updates an existing value.
         /// </summary>
-        object? ConvertToInternalValue(TValue value, Type internalType, object? currentValue);
+        object? ConvertToOrUpdate(TValue value, Type targetType, object? currentValue);
     }
 }

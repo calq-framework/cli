@@ -7,11 +7,11 @@ namespace CalqFramework.DataAccess.CollectionElementStores;
 /// </summary>
 public abstract class CollectionElementStoreBase<TKey, TValue> : ICollectionElementStore<TKey, TValue> {
 
-    protected CollectionElementStoreBase(ICollection collection) {
-        ParentCollection = collection;
+    protected CollectionElementStoreBase(ICollection targetCollection) {
+        TargetCollection = targetCollection;
     }
 
-    protected ICollection ParentCollection { get; }
+    protected ICollection TargetCollection { get; }
 
     public abstract TValue this[TKey key] { get; set; }
 
@@ -25,20 +25,20 @@ public abstract class CollectionElementStoreBase<TKey, TValue> : ICollectionElem
     /// Adds a value to the collection (for list-like collections).
     /// </summary>
     public virtual void Add(TValue value) {
-        throw DataAccessErrors.OperationNotSupported("Add", ParentCollection.GetType().Name);
+        throw DataAccessErrors.OperationNotSupported("Add", TargetCollection.GetType().Name);
     }
 
     /// <summary>
     /// Creates and adds a new instance to the collection (for list-like collections).
     /// </summary>
     public virtual TValue AddNew() {
-        throw DataAccessErrors.OperationNotSupported("AddNew", ParentCollection.GetType().Name);
+        throw DataAccessErrors.OperationNotSupported("AddNew", TargetCollection.GetType().Name);
     }
 
     /// <summary>
     /// Removes a value from the collection by key.
     /// </summary>
     public virtual void Remove(TKey key) {
-        throw DataAccessErrors.OperationNotSupported("Remove", ParentCollection.GetType().Name);
+        throw DataAccessErrors.OperationNotSupported("Remove", TargetCollection.GetType().Name);
     }
 }

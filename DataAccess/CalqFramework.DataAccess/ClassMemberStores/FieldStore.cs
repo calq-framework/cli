@@ -12,11 +12,11 @@ public sealed class FieldStore : FieldStoreBase<string, object?>, IKeyValueStore
     }
 
     public override bool ContainsAccessor(FieldInfo accessor) {
-        return accessor.ReflectedType == ParentType;
+        return accessor.ReflectedType == TargetType;
     }
 
     public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out FieldInfo result) {
-        result = ParentType.GetField(key, BindingFlags);
+        result = TargetType.GetField(key, BindingFlags);
         return result != null;
     }
 

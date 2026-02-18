@@ -4,29 +4,29 @@ namespace CalqFramework.DataAccess.ClassMemberStores;
 
 public abstract class PropertyStoreBase<TKey, TValue> : ClassDataMemberStoreBase<TKey, TValue, PropertyInfo, object?> {
 
-    public PropertyStoreBase(object obj, BindingFlags bindingFlags) : base(obj, bindingFlags) {
+    public PropertyStoreBase(object targetObject, BindingFlags bindingFlags) : base(targetObject, bindingFlags) {
     }
 
-    public override IEnumerable<PropertyInfo> Accessors => ParentType.GetProperties(BindingFlags).Where(ContainsAccessor);
+    public override IEnumerable<PropertyInfo> Accessors => TargetType.GetProperties(BindingFlags).Where(ContainsAccessor);
 
     public override object? this[PropertyInfo accessor] {
         get {
-            return ((PropertyInfo)accessor).GetValue(ParentObject);
+            return accessor.GetValue(TargetObject);
         }
         set {
-            ((PropertyInfo)accessor).SetValue(ParentObject, value);
+            accessor.SetValue(TargetObject, value);
         }
     }
 
     public override Type GetDataType(PropertyInfo accessor) {
-        return ((PropertyInfo)accessor).PropertyType;
+        return accessor.PropertyType;
     }
 
     public override object? GetValueOrInitialize(PropertyInfo accessor) {
-        object value = ((PropertyInfo)accessor).GetValue(ParentObject) ??
-               Activator.CreateInstance(((PropertyInfo)accessor).PropertyType) ??
-               Activator.CreateInstance(Nullable.GetUnderlyingType(((PropertyInfo)accessor).PropertyType)!)!;
-        ((PropertyInfo)accessor).SetValue(ParentObject, value);
+        object value = accessor.GetValue(TargetObject) ??
+               Activator.CreateInstance(accessor.PropertyType) ??
+               Activator.CreateInstance(Nullable.GetUnderlyingType(accessor.PropertyType)!)!;
+        accessor.SetValue(TargetObject, value);
         return value;
     }
 }

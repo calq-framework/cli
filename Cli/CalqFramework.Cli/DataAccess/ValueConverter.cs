@@ -13,32 +13,32 @@ namespace CalqFramework.Cli.DataAccess {
         /// </summary>
         public IFormatProvider FormatProvider { get; init; } = System.Globalization.CultureInfo.InvariantCulture;
 
-        public bool IsConvertible(Type type) {
-            return type.IsParsable() || type.IsEnum || (Nullable.GetUnderlyingType(type)?.IsEnum ?? false);
+        public bool CanConvert(Type targetType) {
+            return targetType.IsParsable() || targetType.IsEnum || (Nullable.GetUnderlyingType(targetType)?.IsEnum ?? false);
         }
 
-        public string? ConvertFromInternalValue(object? value, Type internalType) {
+        public string? ConvertFrom(object? value, Type targetType) {
             return value?.ToString();
         }
 
-        public object? ConvertToInternalValue(string? value, Type internalType, object? currentValue) {
+        public object? ConvertToOrUpdate(string? value, Type targetType, object? currentValue) {
             if (value == null) {
                 return null;
             }
 
-            var underlyingType = Nullable.GetUnderlyingType(internalType) ?? internalType;
+            var underlyingType = Nullable.GetUnderlyingType(targetType) ?? targetType;
 
             try {
                 if (underlyingType.IsEnum) {
                     return Enum.Parse(underlyingType, value, ignoreCase: true);
                 }
 
-                return internalType.Parse(value, FormatProvider);
+                return targetType.Parse(value, FormatProvider);
             } catch (ArgumentException ex) {
-                throw CliErrors.InvalidValueFormat(internalType.Name, ex);
+                throw CliErrors.InvalidValueFormat(targetType.Name, ex);
             } catch (OverflowException ex) {
-                var minField = internalType.GetField("MinValue");
-                var maxField = internalType.GetField("MaxValue");
+                var minField = targetType.GetField("MinValue");
+                var maxField = targetType.GetField("MaxValue");
                 
                 if (minField != null && maxField != null) {
                     var min = minField.GetValue(null);
@@ -47,7 +47,7 @@ namespace CalqFramework.Cli.DataAccess {
                 }
                 throw;
             } catch (FormatException ex) {
-                throw CliErrors.InvalidValueFormat(internalType.Name, ex);
+                throw CliErrors.InvalidValueFormat(targetType.Name, ex);
             }
         }
     }
