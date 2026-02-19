@@ -15,8 +15,8 @@
         bool ContainsKey(TKey key);
 
         /// <summary>
-        /// Gets the data type of the value associated with the specified key.
+        /// Gets the type of the value associated with the specified key.
         /// </summary>
-        Type GetDataType(TKey key);
+        Type GetValueType(TKey key);
     }
 }

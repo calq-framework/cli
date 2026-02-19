@@ -20,8 +20,8 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponentStores {
             return Store.ContainsKey(key);
         }
 
-        public Type GetDataType(string key) {
-            return Store.GetDataType(key);
+        public Type GetValueType(string key) {
+            return Store.GetValueType(key);
         }
 
         public IEnumerable<Submodule> GetSubmodules() {

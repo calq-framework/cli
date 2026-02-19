@@ -39,7 +39,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMemberStores {
             return TryGetAccessor(key, out _);
         }
 
-        public Type GetDataType(string key) {
+        public Type GetValueType(string key) {
             return this[key]!.ReturnType;
         }
 

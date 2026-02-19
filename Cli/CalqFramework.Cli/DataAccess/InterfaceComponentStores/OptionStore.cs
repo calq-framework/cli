@@ -20,14 +20,14 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponentStores {
             return Store.ContainsKey(key);
         }
 
-        public Type GetDataType(string key) {
-            return Store.GetDataType(key);
+        public Type GetValueType(string key) {
+            return Store.GetValueType(key);
         }
 
         public IEnumerable<Option> GetOptions() {
             return Store.GetAccessorKeysPairs().Select(pair => new Option() {
-                ValueType = GetDataType(pair.Keys[0]),
-                IsCollection = Store.IsCollection(pair.Keys[0]),
+                ValueType = GetValueType(pair.Keys[0]),
+                IsMultiValue = Store.IsMultiValue(pair.Keys[0]),
                 Keys = pair.Keys,
                 MemberInfo = pair.Accessor,
                 Value = this[pair.Keys[0]]

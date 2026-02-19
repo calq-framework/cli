@@ -24,14 +24,14 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponentStores {
             return Executor.ContainsKey(key);
         }
 
-        public Type GetDataType(string key) {
-            return Executor.GetDataType(key);
+        public Type GetValueType(string key) {
+            return Executor.GetValueType(key);
         }
 
         public IEnumerable<Parameter> GetParameters() {
             return Executor.GetAccessorKeysPairs().Select(pair => new Parameter() {
-                ValueType = GetDataType(pair.Keys[0]),
-                IsCollection = Executor.IsCollection(pair.Keys[0]),
+                ValueType = GetValueType(pair.Keys[0]),
+                IsMultiValue = Executor.IsMultiValue(pair.Keys[0]),
                 Keys = pair.Keys,
                 ParameterInfo = pair.Accessor,
                 Value = this[pair.Keys[0]],

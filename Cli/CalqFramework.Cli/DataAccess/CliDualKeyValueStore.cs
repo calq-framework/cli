@@ -23,11 +23,11 @@ namespace CalqFramework.Cli.DataAccess {
                 .Concat(_secondaryStore.GetAccessorKeysPairs());
         }
 
-        public bool IsCollection(string key) {
+        public bool IsMultiValue(string key) {
             if (_primaryStore.ContainsKey(key)) {
-                return _primaryStore.IsCollection(key);
+                return _primaryStore.IsMultiValue(key);
             } else {
-                return _secondaryStore.IsCollection(key);
+                return _secondaryStore.IsMultiValue(key);
             }
         }
     }

@@ -39,12 +39,12 @@ namespace CalqFramework.DataAccess {
             return TryGetAccessor(key, out TAccessor? result) ? result : throw DataAccessErrors.KeyNotFound(key);
         }
 
-        public Type GetDataType(TKey key) {
+        public Type GetValueType(TKey key) {
             TAccessor? accessor = GetAccessor(key);
-            return GetDataType(accessor);
+            return GetValueType(accessor);
         }
 
-        public abstract Type GetDataType(TAccessor accessor);
+        public abstract Type GetValueType(TAccessor accessor);
 
         public TValue GetValueOrInitialize(TKey key) {
             TAccessor? accessor = GetAccessor(key);

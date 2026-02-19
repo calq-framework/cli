@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using CalqFramework.Cli;
@@ -52,6 +52,25 @@ namespace CalqFramework.CliTest {
             Assert.False(((List<bool>)result)[0]);
             Assert.True(((List<bool>)result)[1]);
         }
+
+        [Fact]
+        public void Execute_MethodWithEnumerableParameter_AcceptsMultipleValues() {
+            var tool = new SomeClassLibrary();
+            object result = new CommandLineInterface().Execute(tool, $"{StringHelper.GetKebabCase(nameof(SomeClassLibrary.MethodWithEnumerable))} --param-enumerable false --param-enumerable true".Split(' '));
+            var enumerable = (IEnumerable<bool>)result;
+            Assert.Equal(new[] { false, true }, enumerable);
+        }
+
+        [Fact]
+        public void Execute_MethodWithSetParameter_DeduplicatesValues() {
+            var tool = new SomeClassLibrary();
+            object result = new CommandLineInterface().Execute(tool, $"{StringHelper.GetKebabCase(nameof(SomeClassLibrary.MethodWithSet))} --tags urgent --tags important --tags urgent".Split(' '));
+            var set = (ISet<string>)result;
+            Assert.Equal(2, set.Count);
+            Assert.Contains("urgent", set);
+            Assert.Contains("important", set);
+        }
+
 
         [Fact]
         public void Execute_MethodWithInitializedBoolList_UpdatesListElements() {

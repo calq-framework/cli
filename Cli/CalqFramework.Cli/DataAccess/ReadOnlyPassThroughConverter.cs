@@ -15,12 +15,12 @@ namespace CalqFramework.Cli.DataAccess {
 
         public object? ConvertToOrUpdate(TValue value, Type targetType, object? currentValue) => throw new NotSupportedException();
 
-        public bool IsCollection(Type type) {
-            return type.IsCollection();
+        public bool IsMultiValue(Type type) {
+            return type.IsEnumerable();
         }
 
-        public Type GetDataType(Type type) {
-            return type.GetCollectionElementType();
+        public Type GetValueType(Type type) {
+            return type.GetEnumerableElementType();
         }
     }
 }

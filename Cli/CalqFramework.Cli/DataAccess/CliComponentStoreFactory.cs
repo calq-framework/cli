@@ -31,7 +31,7 @@ namespace CalqFramework.Cli.DataAccess {
         }
 
         private ICollectionElementStoreFactory<string, object?>? _collectionElementStoreFactory;
-        private ICompositeValueConverter<string?>? _valueConverter;
+        private ICompositeValueConverter<string?>? _compositeValueConverter;
 
         /// <summary>
         /// Access fields as CLI options.
@@ -66,10 +66,10 @@ namespace CalqFramework.Cli.DataAccess {
         }
         /// <summary>
         /// Validator for determining which members are valid options.
-        /// Defaults to using ValueConverter if not explicitly set.
+        /// Defaults to using CompositeValueConverter if not explicitly set.
         /// </summary>
         public IAccessValidator OptionAccessValidator {
-            get => _optionAccessValidator ?? new OptionAccessValidator(ValueConverter);
+            get => _optionAccessValidator ?? new OptionAccessValidator(CompositeValueConverter);
             init => _optionAccessValidator = value;
         }
         /// <summary>
@@ -82,10 +82,10 @@ namespace CalqFramework.Cli.DataAccess {
         }
         /// <summary>
         /// Validator for determining which members are valid submodules.
-        /// Defaults to using ValueConverter if not explicitly set.
+        /// Defaults to using CompositeValueConverter if not explicitly set.
         /// </summary>
         public IAccessValidator SubmoduleAccessValidator {
-            get => _submoduleAccessValidator ?? new SubmoduleAccessValidator(ValueConverter);
+            get => _submoduleAccessValidator ?? new SubmoduleAccessValidator(CompositeValueConverter);
             init => _submoduleAccessValidator = value;
         }
         /// <summary>
@@ -99,25 +99,25 @@ namespace CalqFramework.Cli.DataAccess {
         /// Converter for transforming values between CLI strings and internal types.
         /// Defaults to CompositeValueConverter wrapping ValueConverter with collection support.
         /// </summary>
-        public ICompositeValueConverter<string?> ValueConverter { 
+        public ICompositeValueConverter<string?> CompositeValueConverter { 
             get {
-                if (_valueConverter == null) {
+                if (_compositeValueConverter == null) {
                     var baseConverter = new ValueConverter() { FormatProvider = FormatProvider };
-                    _valueConverter = new CompositeValueConverter(baseConverter, CollectionStoreFactory);
+                    _compositeValueConverter = new CompositeValueConverter(baseConverter, CollectionStoreFactory);
                 }
-                return _valueConverter;
+                return _compositeValueConverter;
             }
-            init => _valueConverter = value;
+            init => _compositeValueConverter = value;
         }
 
         public IOptionStore CreateOptionStore(object obj) {
             ICliKeyValueStore<string, string?, MemberInfo> store;
             if (AccessFields && AccessProperties) {
-                store = CreateFieldAndPropertyStore(obj, OptionAccessValidator, ValueConverter);
+                store = CreateFieldAndPropertyStore(obj, OptionAccessValidator, CompositeValueConverter);
             } else if (AccessFields) {
-                store = CreateFieldStore(obj, OptionAccessValidator, ValueConverter);
+                store = CreateFieldStore(obj, OptionAccessValidator, CompositeValueConverter);
             } else if (AccessProperties) {
-                store = CreatePropertyStore(obj, OptionAccessValidator, ValueConverter);
+                store = CreatePropertyStore(obj, OptionAccessValidator, CompositeValueConverter);
             } else {
                 throw DataAccessErrors.NoAccessConfigured();
             }
@@ -125,7 +125,7 @@ namespace CalqFramework.Cli.DataAccess {
         }
 
         public ISubcommandExecutor CreateSubcommandExecutor(MethodInfo method, object? obj) {
-            return new SubcommandExecutor(new CliMethodExecutor<string?>(method, obj, BindingFlags, ClassMemberStringifier, ValueConverter));
+            return new SubcommandExecutor(new CliMethodExecutor<string?>(method, obj, BindingFlags, ClassMemberStringifier, CompositeValueConverter));
         }
 
         public ISubcommandExecutorWithOptions CreateSubcommandExecutorWithOptions(MethodInfo method, object obj) {
@@ -151,16 +151,16 @@ namespace CalqFramework.Cli.DataAccess {
             return new SubmoduleStore(store);
         }
 
-        private ICliKeyValueStore<string, TValue, MemberInfo> CreateFieldAndPropertyStore<TValue>(object obj, IAccessValidator cliValidator, ICompositeValueConverter<TValue> converter) {
-            return new CliDualKeyValueStore<TValue>(CreateFieldStore(obj, cliValidator, converter), CreatePropertyStore(obj, cliValidator, converter));
+        private ICliKeyValueStore<string, TValue, MemberInfo> CreateFieldAndPropertyStore<TValue>(object obj, IAccessValidator cliValidator, ICompositeValueConverter<TValue> compositeValueConverter) {
+            return new CliDualKeyValueStore<TValue>(CreateFieldStore(obj, cliValidator, compositeValueConverter), CreatePropertyStore(obj, cliValidator, compositeValueConverter));
         }
 
-        private ICliKeyValueStore<string, TValue, MemberInfo> CreateFieldStore<TValue>(object obj, IAccessValidator cliValidator, ICompositeValueConverter<TValue> converter) {
-            return new CliFieldStore<TValue>(obj, BindingFlags, ClassMemberStringifier, cliValidator, converter);
+        private ICliKeyValueStore<string, TValue, MemberInfo> CreateFieldStore<TValue>(object obj, IAccessValidator cliValidator, ICompositeValueConverter<TValue> compositeValueConverter) {
+            return new CliFieldStore<TValue>(obj, BindingFlags, ClassMemberStringifier, cliValidator, compositeValueConverter);
         }
 
-        private ICliKeyValueStore<string, TValue, MemberInfo> CreatePropertyStore<TValue>(object obj, IAccessValidator cliValidator, ICompositeValueConverter<TValue> converter) {
-            return new CliPropertyStore<TValue>(obj, BindingFlags, ClassMemberStringifier, cliValidator, converter);
+        private ICliKeyValueStore<string, TValue, MemberInfo> CreatePropertyStore<TValue>(object obj, IAccessValidator cliValidator, ICompositeValueConverter<TValue> compositeValueConverter) {
+            return new CliPropertyStore<TValue>(obj, BindingFlags, ClassMemberStringifier, cliValidator, compositeValueConverter);
         }
     }
 }
