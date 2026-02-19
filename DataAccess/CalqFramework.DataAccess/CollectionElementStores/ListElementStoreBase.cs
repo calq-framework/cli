@@ -1,4 +1,6 @@
 using System.Collections;
+using System.Linq;
+using CalqFramework.Extensions.System;
 
 namespace CalqFramework.DataAccess.CollectionElementStores;
 
@@ -7,12 +9,13 @@ namespace CalqFramework.DataAccess.CollectionElementStores;
 /// </summary>
 public abstract class ListElementStoreBase<TKey, TValue> : CollectionElementStoreBase<TKey, TValue> {
 
-    protected ListElementStoreBase(IList targetList) : base(targetList) {
+    protected ListElementStoreBase(IList targetList) {
+        List = targetList;
     }
 
-    protected IList List => (IList)TargetCollection;
+    protected IList List { get; }
 
-    public override Type GetDataType(TKey key) {
+    public override Type GetValueType(TKey key) {
         return List.GetType().GetGenericArguments()[0];
     }
 
@@ -20,20 +23,14 @@ public abstract class ListElementStoreBase<TKey, TValue> : CollectionElementStor
         List.Add(value);
     }
 
-    public override TValue AddNew() {
-        object value = Activator.CreateInstance(List.GetType().GetGenericArguments()[0]) ??
-            Activator.CreateInstance(Nullable.GetUnderlyingType(List.GetType().GetGenericArguments()[0])!)!;
-        List.Add(value);
-        return (TValue)value;
+    public override IEnumerable Append(TValue value) {
+        Add(value);
+        return List;
     }
 
-    public override void Remove(TKey key) {
-        if (key is string strKey && int.TryParse(strKey, out int index)) {
-            List.RemoveAt(index);
-        } else if (key is int intKey) {
-            List.RemoveAt(intKey);
-        } else {
-            throw DataAccessErrors.InvalidListKey(key?.GetType().Name);
-        }
+    public override TValue AddNew() {
+        object value = List.GetType().GetGenericArguments()[0].CreateInstance();
+        List.Add(value);
+        return (TValue)value;
     }
 }

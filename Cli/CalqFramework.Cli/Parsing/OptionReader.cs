@@ -13,11 +13,11 @@ namespace CalqFramework.Cli.Parsing {
         public IKeyValueStore<string, string?> Store { get; }
 
         protected override Type GetOptionType(char option) {
-            return Store.GetDataType(option.ToString());
+            return Store.GetValueType(option.ToString());
         }
 
         protected override Type GetOptionType(string option) {
-            return Store.GetDataType(option);
+            return Store.GetValueType(option);
         }
 
         protected override bool HasOption(char option) {

@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS0649
+﻿﻿#pragma warning disable CS0649
 
 using System.Collections.Generic;
 using CalqFramework.Cli;
@@ -37,6 +37,10 @@ namespace CalqFramework.CliTest {
 
         public static List<bool> MethodWithList(List<bool> paramList) {
             return paramList;
+        }
+
+        public static IEnumerable<bool> MethodWithEnumerable(IEnumerable<bool> paramEnumerable) {
+            return paramEnumerable;
         }
 
         public static string MethodWithText(string text) {
@@ -107,6 +111,10 @@ namespace CalqFramework.CliTest {
         }
 
         public static void MethodWithBoolList(List<bool> flags) {
+        }
+
+        public static ISet<string> MethodWithSet(ISet<string> tags) {
+            return tags;
         }
     }
 }

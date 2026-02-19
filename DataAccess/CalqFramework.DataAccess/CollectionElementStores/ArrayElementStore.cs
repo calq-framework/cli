@@ -1,4 +1,5 @@
 using System.Collections;
+using CalqFramework.Extensions.System;
 
 namespace CalqFramework.DataAccess.CollectionElementStores;
 
@@ -22,20 +23,17 @@ public sealed class ArrayElementStore : ArrayElementStoreBase<string, object?> {
     }
 
     public override bool ContainsKey(string key) {
-        try {
-            int index = int.Parse(key);
-            return index >= 0 && index < Array.Length;
-        } catch {
+        if (!int.TryParse(key, out int index)) {
             return false;
         }
+        return index >= 0 && index < Array.Length;
     }
 
     public override object? GetValueOrInitialize(string key) {
         int index = int.Parse(key);
         object? element = Array.GetValue(index);
         if (element == null) {
-            element = Activator.CreateInstance(Array.GetType().GetElementType()!) ??
-                Activator.CreateInstance(Nullable.GetUnderlyingType(Array.GetType().GetElementType()!)!)!;
+            element = Array.GetType().GetElementType()!.CreateInstance();
             Array.SetValue(element, index);
         }
         return element;

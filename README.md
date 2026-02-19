@@ -4,8 +4,9 @@
 Calq CLI automates development of command-line tools. It interprets CLI commands, making it possible to operate on any classlib directly from the command-line without requiring any programming, through a fully customizable CLI.
 
 ## No programming required
-Calq CLI in its default configuration follows GNU (and POSIX) [conventions](https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html) and should be able to process any classlib out of the box with few limitations.
-Support for overloaded methods, generic methods, and any other features not available in conventional frameworks is under consideration.
+Calq CLI in its default configuration follows GNU (and POSIX) [conventions](https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html) and processes any classlib out of the box with comprehensive type support.
+
+Supports interface collections (`IList<T>`, `ICollection<T>`, `IEnumerable<T>`, `ISet<T>`, `IDictionary<K,V>`) with automatic concrete type mapping, overloaded methods, generic methods, and other advanced features.
 
 ## Why Calq CLI: Comparison with System.CommandLine
 Both examples implement CLI for the classlib from:  
@@ -175,7 +176,7 @@ Completion works automatically for:
 - **Options and parameters** - All flags and their values
 - **Enums** - All enum values with case-insensitive matching
 - **Booleans** - `true` and `false` values
-- **Collections** - `List<T>`, `ICollection<T>` with element type completion (enums, bools, etc.)
+- **Collections** - `List<T>`, `ICollection<T>`, `IEnumerable<T>`, `ISet<T>` with element type completion (enums, bools, etc.)
 - **File paths** - Files with optional extension filtering via `FileInfo` or `[CliCompletion(typeof(FileCompletionProvider), "*.json;*.yaml")]`
 - **Directory paths** - Directories via `DirectoryInfo` or `[CliCompletion(typeof(DirectoryCompletionProvider))]`
 - **File system paths** - Both files and directories via `FileSystemInfo` or `[CliCompletion(typeof(FileSystemCompletionProvider))]`

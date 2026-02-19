@@ -20,12 +20,6 @@ namespace CalqFramework.DataAccess {
             new DataAccessException($"Ambiguous key '{key}', enable shadowing to ignore this error");
 
         /// <summary>
-        /// Creates an exception for unsupported collection types.
-        /// </summary>
-        public static ArgumentException UnsupportedCollectionType(string typeName) =>
-            new ArgumentException($"Unsupported collection type: {typeName}", nameof(typeName));
-
-        /// <summary>
         /// Creates an exception for when neither fields nor properties access is configured.
         /// </summary>
         public static ArgumentException NoAccessConfigured() =>
@@ -62,9 +56,15 @@ namespace CalqFramework.DataAccess {
             new ArgumentException("MemberInfo is not a recognized type");
 
         /// <summary>
-        /// Creates an exception for unsupported operations on collections.
+        /// Creates an exception for unsupported operations.
         /// </summary>
-        public static NotSupportedException OperationNotSupported(string operation, string collectionTypeName) =>
-            new NotSupportedException($"{operation} is not supported for {collectionTypeName}");
+        public static NotSupportedException OperationNotSupported(string operation) =>
+            new NotSupportedException($"Operation '{operation}' is not supported");
+
+        /// <summary>
+        /// Creates an exception for when a type cannot be instantiated.
+        /// </summary>
+        public static InvalidOperationException CannotCreateInstance(string typeName) =>
+            new InvalidOperationException($"Cannot create instance of type '{typeName}'");
     }
 }

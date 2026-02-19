@@ -152,18 +152,18 @@ namespace CalqFramework.Cli.Formatting {
         }
 
         private string GetDescription(Parameter item) {
-            return GetDescription(item.ValueType, item.IsCollection, item.Value, item.HasDefaultValue, GetSummary(item.ParameterInfo));
+            return GetDescription(item.ValueType, item.IsMultiValue, item.Value, item.HasDefaultValue, GetSummary(item.ParameterInfo));
         }
 
         private string GetDescription(Option item) {
-            return GetDescription(item.ValueType, item.IsCollection, item.Value, true, GetSummary(item.MemberInfo));
+            return GetDescription(item.ValueType, item.IsMultiValue, item.Value, true, GetSummary(item.MemberInfo));
         }
 
-        private string GetDescription(Type type, bool isCollection, string? defaultValue, bool hasDefaultValue, string? summary) {
+        private string GetDescription(Type type, bool isMultiValue, string? defaultValue, bool hasDefaultValue, string? summary) {
             var parts = new List<string>();
 
             if (!hasDefaultValue) {
-                string typeDescription = isCollection 
+                string typeDescription = isMultiValue 
                     ? "list of " + GetTypeDescription(type)
                     : GetTypeDescription(type);
                 parts.Add($"(Requires: {typeDescription})");

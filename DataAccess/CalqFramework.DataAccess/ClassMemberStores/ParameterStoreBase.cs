@@ -1,4 +1,5 @@
 using System.Reflection;
+using CalqFramework.Extensions.System;
 
 namespace CalqFramework.DataAccess.ClassMemberStores;
 
@@ -31,15 +32,14 @@ public abstract class ParameterStoreBase<TKey, TValue> : KeyValueStoreBase<TKey,
         }
     }
 
-    public override Type GetDataType(ParameterInfo accessor) {
+    public override Type GetValueType(ParameterInfo accessor) {
         return accessor.ParameterType;
     }
 
     public override object? GetValueOrInitialize(ParameterInfo accessor) {
         object? value = ParameterValues[ParameterIndexByParameter[accessor]];
         value = value != DBNull.Value ? value : null;
-        value ??= Activator.CreateInstance(accessor.ParameterType) ??
-               Activator.CreateInstance(Nullable.GetUnderlyingType(accessor.ParameterType)!)!;
+        value ??= accessor.ParameterType.CreateInstance();
         ParameterValues[ParameterIndexByParameter[accessor]] = value;
         return value;
     }

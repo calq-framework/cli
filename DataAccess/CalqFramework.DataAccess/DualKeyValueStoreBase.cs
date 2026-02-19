@@ -28,11 +28,11 @@
             }
         }
 
-        public Type GetDataType(TKey key) {
+        public Type GetValueType(TKey key) {
             if (PrimaryStore.ContainsKey(key)) {
-                return PrimaryStore.GetDataType(key);
+                return PrimaryStore.GetValueType(key);
             } else {
-                return SecondaryStore.GetDataType(key);
+                return SecondaryStore.GetValueType(key);
             }
         }
 

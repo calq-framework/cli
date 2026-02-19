@@ -26,7 +26,9 @@ public sealed class DictionaryElementStore : DictionaryElementStoreBase<string, 
         try {
             object parsedKey = Dictionary.GetType().GetGenericArguments()[0].Parse(key);
             return Dictionary.Contains(parsedKey);
-        } catch {
+        } catch (FormatException) {
+            return false;
+        } catch (OverflowException) {
             return false;
         }
     }
@@ -35,8 +37,7 @@ public sealed class DictionaryElementStore : DictionaryElementStoreBase<string, 
         object parsedKey = Dictionary.GetType().GetGenericArguments()[0].Parse(key);
         object? element = Dictionary[parsedKey];
         if (element == null) {
-            element = Activator.CreateInstance(Dictionary.GetType().GetGenericArguments()[1]!) ??
-                Activator.CreateInstance(Nullable.GetUnderlyingType(Dictionary.GetType().GetGenericArguments()[1])!)!;
+            element = Dictionary.GetType().GetGenericArguments()[1].CreateInstance();
             Dictionary[parsedKey] = element;
         }
         return element;

@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq;
 
 namespace CalqFramework.DataAccess.CollectionElementStores;
 
@@ -7,13 +8,13 @@ namespace CalqFramework.DataAccess.CollectionElementStores;
 /// </summary>
 public abstract class ArrayElementStoreBase<TKey, TValue> : CollectionElementStoreBase<TKey, TValue> {
 
-    protected ArrayElementStoreBase(Array targetArray) : base(targetArray) {
+    protected ArrayElementStoreBase(Array targetArray) {
+        Array = targetArray;
     }
 
-    protected Array Array => (Array)TargetCollection;
+    protected Array Array { get; }
 
-    public override Type GetDataType(TKey key) {
+    public override Type GetValueType(TKey key) {
         return Array.GetType().GetElementType()!;
     }
 }
-

@@ -14,24 +14,24 @@ namespace CalqFramework.Cli.DataAccess.ClassMemberStores {
 
     internal class CliMethodExecutor<TValue> : MethodExecutorBase<string, TValue>, ICliFunctionExecutor<string, TValue, ParameterInfo> {
 
-        public CliMethodExecutor(MethodInfo method, object? obj, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier, ICompositeValueConverter<TValue> valueConverter) : base(method, obj) {
+        public CliMethodExecutor(MethodInfo method, object? obj, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier, ICompositeValueConverter<TValue> compositeValueConverter) : base(method, obj) {
             BindingFlags = bindingFlags;
             ClassMemberStringifier = classMemberStringifier;
-            ValueConverter = valueConverter;
+            CompositeValueConverter = compositeValueConverter;
             AccessorsByNames = GetAccessorsByNames();
         }
 
         protected BindingFlags BindingFlags { get; }
         protected IClassMemberStringifier ClassMemberStringifier { get; }
         private IDictionary<string, ParameterInfo> AccessorsByNames { get; }
-        private ICompositeValueConverter<TValue> ValueConverter { get; }
+        private ICompositeValueConverter<TValue> CompositeValueConverter { get; }
 
         public override bool ContainsAccessor(ParameterInfo accessor) {
             return accessor.Member == ParentMethod;
         }
 
-        public override Type GetDataType(ParameterInfo accessor) {
-            return ValueConverter.GetDataType(accessor.ParameterType);
+        public override Type GetValueType(ParameterInfo accessor) {
+            return CompositeValueConverter.GetValueType(accessor.ParameterType);
         }
 
         public IEnumerable<AccessorKeysPair<ParameterInfo>> GetAccessorKeysPairs() {
@@ -44,9 +44,9 @@ namespace CalqFramework.Cli.DataAccess.ClassMemberStores {
                 ));
         }
 
-        public bool IsCollection(string key) {
+        public bool IsMultiValue(string key) {
             ParameterInfo accessor = GetAccessor(key);
-            return ValueConverter.IsCollection(accessor.ParameterType);
+            return CompositeValueConverter.IsMultiValue(accessor.ParameterType);
         }
 
         public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out ParameterInfo result) {
@@ -54,18 +54,12 @@ namespace CalqFramework.Cli.DataAccess.ClassMemberStores {
         }
 
         protected override TValue ConvertFromInternalValue(object? value, ParameterInfo accessor) {
-            return ValueConverter.ConvertFrom(value, accessor.ParameterType);
+            return CompositeValueConverter.ConvertFrom(value, accessor.ParameterType);
         }
 
         protected override object? ConvertToInternalValue(TValue value, ParameterInfo accessor) {
-            object? currentValue;
-            try {
-                currentValue = GetValueOrInitialize(accessor);
-            } catch (MissingMethodException) {
-                currentValue = null;
-            }
-            
-            return ValueConverter.ConvertToOrUpdate(value, accessor.ParameterType, currentValue);
+            object? currentValue = GetValueOrInitialize(accessor);
+            return CompositeValueConverter.ConvertToOrUpdate(value, accessor.ParameterType, currentValue);
         }
 
         private IDictionary<string, ParameterInfo> GetAccessorsByNames() {

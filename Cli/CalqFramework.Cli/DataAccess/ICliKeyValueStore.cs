@@ -14,8 +14,8 @@ namespace CalqFramework.Cli.DataAccess {
         IEnumerable<AccessorKeysPair<TAccessor>> GetAccessorKeysPairs();
 
         /// <summary>
-        /// Determines whether the value associated with the specified key is a collection type.
+        /// Determines whether the value associated with the specified key is a multi-value type.
         /// </summary>
-        bool IsCollection(TKey key);
+        bool IsMultiValue(TKey key);
     }
 }

@@ -8,24 +8,114 @@ namespace CalqFramework.Extensions.System;
 public static class TypeExtensions {
 
     /// <summary>
-    /// Determines whether the specified type is a collection type.
+    /// Determines whether the specified type is an enumerable type.
     /// </summary>
-    public static bool IsCollection(this global::System.Type type) {
-        return type.GetInterface(nameof(global::System.Collections.ICollection)) != null;
+    public static bool IsEnumerable(this global::System.Type type) {
+        return type.GetInterface(nameof(global::System.Collections.IEnumerable)) != null;
     }
 
     /// <summary>
-    /// Gets the element type for a collection, or the type itself if not a collection.
-    /// For generic collections like List&lt;T&gt;, returns T. For non-collections, returns the type itself.
+    /// Gets the element type for an enumerable, or the type itself if not an enumerable.
+    /// For generic enumerables like List&lt;T&gt;, returns T. For non-enumerables, returns the type itself.
     /// </summary>
-    public static global::System.Type GetCollectionElementType(this global::System.Type type) {
-        if (!type.IsCollection()) {
+    public static global::System.Type GetEnumerableElementType(this global::System.Type type) {
+        if (!type.IsEnumerable()) {
             return type;
         }
         
         var genericArgs = type.GetGenericArguments();
-        return genericArgs.Length > 0 ? genericArgs[0] : type;
+        return genericArgs.Length > 0 ? genericArgs[0] : typeof(object);
     }
+
+    /// <summary>
+    /// Creates an instance of the specified type, with support for collection interfaces.
+    /// </summary>
+    /// <param name="type">The type to instantiate.</param>
+    /// <returns>A new instance of the type.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when the type cannot be instantiated.</exception>
+    public static object CreateInstance(this global::System.Type type) {
+        switch (Type.GetTypeCode(type)) {
+            case TypeCode.Boolean:
+                return false;
+            case TypeCode.Byte:
+                return (byte)0;
+            case TypeCode.SByte:
+                return (sbyte)0;
+            case TypeCode.Char:
+                return '\0';
+            case TypeCode.Decimal:
+                return 0m;
+            case TypeCode.Double:
+                return 0.0;
+            case TypeCode.Single:
+                return 0f;
+            case TypeCode.Int32:
+                return 0;
+            case TypeCode.UInt32:
+                return 0u;
+            case TypeCode.Int64:
+                return 0L;
+            case TypeCode.UInt64:
+                return 0ul;
+            case TypeCode.Int16:
+                return (short)0;
+            case TypeCode.UInt16:
+                return (ushort)0;
+            case TypeCode.DateTime:
+                return default(DateTime);
+            case TypeCode.String:
+                return string.Empty;
+        }
+        
+        return TryCreateInstance(type)
+            ?? TryCreateInstance(Nullable.GetUnderlyingType(type))
+            ?? TryCreateInstance(GetConcreteCollectionType(type))
+            ?? throw DataAccessErrors.CannotCreateInstance(type.FullName ?? type.Name);
+    }
+
+    private static object? TryCreateInstance(Type? type) {
+        if (type == null) return null;
+        
+        try {
+            return Activator.CreateInstance(type);
+        } catch {
+            return null;
+        }
+    }
+
+    private static Type? GetConcreteCollectionType(Type interfaceType) {
+        if (InterfaceToConcreteMap.TryGetValue(interfaceType, out var concreteType)) {
+            return concreteType;
+        }
+        
+        if (interfaceType.IsGenericType) {
+            var genericTypeDef = interfaceType.GetGenericTypeDefinition();
+            if (InterfaceToConcreteMap.TryGetValue(genericTypeDef, out var genericConcrete)) {
+                return genericConcrete.MakeGenericType(interfaceType.GetGenericArguments());
+            }
+        }
+        
+        return null;
+    }
+
+    private static readonly Dictionary<Type, Type> InterfaceToConcreteMap = new() {
+        // Generic collections
+        [typeof(IList<>)] = typeof(List<>),
+        [typeof(ICollection<>)] = typeof(List<>),
+        [typeof(IEnumerable<>)] = typeof(List<>),
+        [typeof(IReadOnlyList<>)] = typeof(List<>),
+        [typeof(IReadOnlyCollection<>)] = typeof(List<>),
+        [typeof(IDictionary<,>)] = typeof(Dictionary<,>),
+        [typeof(IReadOnlyDictionary<,>)] = typeof(Dictionary<,>),
+        [typeof(ISet<>)] = typeof(HashSet<>),
+        [typeof(IReadOnlySet<>)] = typeof(HashSet<>),
+        
+        // Non-generic collections
+        [typeof(global::System.Collections.IList)] = typeof(global::System.Collections.ArrayList),
+        [typeof(global::System.Collections.ICollection)] = typeof(global::System.Collections.ArrayList),
+        [typeof(global::System.Collections.IEnumerable)] = typeof(global::System.Collections.ArrayList),
+        [typeof(global::System.Collections.IDictionary)] = typeof(global::System.Collections.Hashtable),
+    };
 
     public static bool IsParsable(this global::System.Type type) {
         type = Nullable.GetUnderlyingType(type) ?? type;

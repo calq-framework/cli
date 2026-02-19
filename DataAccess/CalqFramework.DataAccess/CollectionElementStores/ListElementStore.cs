@@ -1,4 +1,5 @@
 using System.Collections;
+using CalqFramework.Extensions.System;
 
 namespace CalqFramework.DataAccess.CollectionElementStores;
 
@@ -22,22 +23,26 @@ public sealed class ListElementStore : ListElementStoreBase<string, object?> {
     }
 
     public override bool ContainsKey(string key) {
-        try {
-            int index = int.Parse(key);
-            return index >= 0 && index < List.Count;
-        } catch {
+        if (!int.TryParse(key, out int index)) {
             return false;
         }
+        return index >= 0 && index < List.Count;
     }
 
     public override object? GetValueOrInitialize(string key) {
         int index = int.Parse(key);
         object? element = List[index];
         if (element == null) {
-            element = Activator.CreateInstance(List.GetType().GetGenericArguments()[0]!) ??
-                Activator.CreateInstance(Nullable.GetUnderlyingType(List.GetType().GetGenericArguments()[0])!)!;
+            element = List.GetType().GetGenericArguments()[0].CreateInstance();
             List[index] = element;
         }
         return element;
+    }
+
+    public override void Remove(string key) {
+        if (!int.TryParse(key, out int index)) {
+            throw DataAccessErrors.InvalidListKey(key?.GetType().Name);
+        }
+        List.RemoveAt(index);
     }
 }

@@ -20,13 +20,13 @@ namespace CalqFramework.Cli.DataAccess.InterfaceComponentStores {
             return Store.ContainsKey(key);
         }
 
-        public Type GetDataType(string key) {
-            return Store.GetDataType(key);
+        public Type GetValueType(string key) {
+            return Store.GetValueType(key);
         }
 
         public IEnumerable<Subcommand> GetSubcommands(Func<MethodInfo, object?, ISubcommandExecutor> createSubcommandExecutor) {
             return Store.GetAccessorKeysPairs().Select(pair => new Subcommand() {
-                ReturnType = GetDataType(pair.Keys[0]),
+                ReturnType = GetValueType(pair.Keys[0]),
                 Keys = pair.Keys,
                 MethodInfo = pair.Accessor,
                 Parameters = createSubcommandExecutor(pair.Accessor, null).GetParameters()

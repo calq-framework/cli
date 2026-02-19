@@ -1,4 +1,5 @@
 using System.Reflection;
+using CalqFramework.Extensions.System;
 
 namespace CalqFramework.DataAccess.ClassMemberStores;
 
@@ -18,14 +19,13 @@ public abstract class FieldStoreBase<TKey, TValue> : ClassDataMemberStoreBase<TK
         }
     }
 
-    public override Type GetDataType(FieldInfo accessor) {
+    public override Type GetValueType(FieldInfo accessor) {
         return accessor.FieldType;
     }
 
     public override object? GetValueOrInitialize(FieldInfo accessor) {
         object value = accessor.GetValue(TargetObject) ??
-               Activator.CreateInstance(accessor.FieldType) ??
-               Activator.CreateInstance(Nullable.GetUnderlyingType(accessor.FieldType)!)!;
+               accessor.FieldType.CreateInstance();
         accessor.SetValue(TargetObject, value);
         return value;
     }

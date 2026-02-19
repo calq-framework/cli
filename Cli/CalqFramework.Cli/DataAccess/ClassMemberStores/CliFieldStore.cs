@@ -14,24 +14,24 @@ namespace CalqFramework.Cli.DataAccess.ClassMemberStores {
 
     internal class CliFieldStore<TValue> : FieldStoreBase<string, TValue>, ICliKeyValueStore<string, TValue, MemberInfo> {
 
-        public CliFieldStore(object targetObject, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier, IAccessValidator accessValidator, ICompositeValueConverter<TValue> valueConverter) : base(targetObject, bindingFlags) {
+        public CliFieldStore(object targetObject, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier, IAccessValidator accessValidator, ICompositeValueConverter<TValue> compositeValueConverter) : base(targetObject, bindingFlags) {
             ClassMemberStringifier = classMemberStringifier;
             AccessValidator = accessValidator;
-            ValueConverter = valueConverter;
+            CompositeValueConverter = compositeValueConverter;
             AccessorsByNames = GetAccessorsByNames();
         }
 
         private IDictionary<string, FieldInfo> AccessorsByNames { get; }
         private IAccessValidator AccessValidator { get; }
         private IClassMemberStringifier ClassMemberStringifier { get; }
-        private ICompositeValueConverter<TValue> ValueConverter { get; }
+        private ICompositeValueConverter<TValue> CompositeValueConverter { get; }
 
         public override bool ContainsAccessor(FieldInfo accessor) {
             return accessor.ReflectedType == TargetType && AccessValidator.IsValid(accessor);
         }
 
-        public override Type GetDataType(FieldInfo accessor) {
-            return ValueConverter.GetDataType(accessor.FieldType);
+        public override Type GetValueType(FieldInfo accessor) {
+            return CompositeValueConverter.GetValueType(accessor.FieldType);
         }
 
         public IEnumerable<AccessorKeysPair<MemberInfo>> GetAccessorKeysPairs() {
@@ -43,9 +43,9 @@ namespace CalqFramework.Cli.DataAccess.ClassMemberStores {
                 ));
         }
 
-        public bool IsCollection(string key) {
+        public bool IsMultiValue(string key) {
             FieldInfo accessor = GetAccessor(key);
-            return ValueConverter.IsCollection(accessor.FieldType);
+            return CompositeValueConverter.IsMultiValue(accessor.FieldType);
         }
 
         public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out FieldInfo result) {
@@ -53,18 +53,12 @@ namespace CalqFramework.Cli.DataAccess.ClassMemberStores {
         }
 
         protected override TValue ConvertFromInternalValue(object? value, FieldInfo accessor) {
-            return ValueConverter.ConvertFrom(value, accessor.FieldType);
+            return CompositeValueConverter.ConvertFrom(value, accessor.FieldType);
         }
 
         protected override object? ConvertToInternalValue(TValue value, FieldInfo accessor) {
-            object? currentValue;
-            try {
-                currentValue = GetValueOrInitialize(accessor);
-            } catch (MissingMethodException) {
-                currentValue = null;
-            }
-            
-            return ValueConverter.ConvertToOrUpdate(value, accessor.FieldType, currentValue);
+            object? currentValue = GetValueOrInitialize(accessor);
+            return CompositeValueConverter.ConvertToOrUpdate(value, accessor.FieldType, currentValue);
         }
 
         private IDictionary<string, FieldInfo> GetAccessorsByNames() {

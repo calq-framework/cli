@@ -29,7 +29,7 @@ namespace CalqFramework.DataAccess {
         /// <summary>
         /// Gets the data type of the value associated with the specified accessor.
         /// </summary>
-        protected internal Type GetDataType(TAccessor accessor);
+        protected internal Type GetValueType(TAccessor accessor);
 
         /// <summary>
         /// Gets the internal value for the specified accessor, or initializes it if not set.
