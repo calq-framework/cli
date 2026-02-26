@@ -14,6 +14,7 @@ namespace CalqFramework.Cli.Formatting {
     public class HelpPrinter : IHelpPrinter {
         
         private readonly TextWriter _out;
+        private readonly bool _supportsColor;
         
         /// <summary>
         /// Initializes a new instance of HelpPrinter with the specified output writer.
@@ -21,7 +22,97 @@ namespace CalqFramework.Cli.Formatting {
         /// <param name="output">TextWriter for output operations. If null, defaults to Console.Out.</param>
         public HelpPrinter(TextWriter? output = null) {
             _out = output ?? Console.Out;
+            _supportsColor = DetectColorSupport();
         }
+        
+        /// <summary>
+        /// Detects if the current terminal supports ANSI color codes.
+        /// </summary>
+        private static bool DetectColorSupport() {
+            // If output is redirected (to file, pipe, etc.), disable colors
+            if (Console.IsOutputRedirected) {
+                return false;
+            }
+            
+            try {
+                // Check for NO_COLOR environment variable (universal standard)
+                if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("NO_COLOR"))) {
+                    return false;
+                }
+                
+                // Check for COLORTERM environment variable (indicates truecolor support)
+                if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("COLORTERM"))) {
+                    return true;
+                }
+                
+                // Check for TERM environment variable
+                string? term = Environment.GetEnvironmentVariable("TERM");
+                if (!string.IsNullOrEmpty(term)) {
+                    // Explicitly disable for dumb terminals
+                    if (term == "dumb") {
+                        return false;
+                    }
+                    // Most modern terminals set TERM to something like "xterm-256color"
+                    if (term.Contains("color") || term.StartsWith("xterm") || 
+                        term.StartsWith("screen") || term.StartsWith("tmux") ||
+                        term == "linux" || term == "cygwin") {
+                        return true;
+                    }
+                }
+                
+                // Windows-specific checks
+                if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
+                    // Try to enable VT100 mode on Windows 10+
+                    var version = Environment.OSVersion.Version;
+                    if (version.Major >= 10) {
+                        return TryEnableWindowsVirtualTerminal();
+                    }
+                }
+                
+                // Default to true for interactive terminals on Unix-like systems
+                if (Environment.OSVersion.Platform == PlatformID.Unix || 
+                    Environment.OSVersion.Platform == PlatformID.MacOSX) {
+                    return true;
+                }
+            } catch {
+                // If any error occurs during detection, default to no color
+                return false;
+            }
+            
+            return false;
+        }
+        
+        /// <summary>
+        /// Attempts to enable Virtual Terminal processing on Windows 10+.
+        /// </summary>
+        private static bool TryEnableWindowsVirtualTerminal() {
+            try {
+                var handle = GetStdHandle(-11); // STD_OUTPUT_HANDLE
+                if (handle == IntPtr.Zero) {
+                    return false;
+                }
+                
+                if (!GetConsoleMode(handle, out uint mode)) {
+                    return false;
+                }
+                
+                // ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004
+                mode |= 0x0004;
+                
+                return SetConsoleMode(handle, mode);
+            } catch {
+                return false;
+            }
+        }
+        
+        [System.Runtime.InteropServices.DllImport("kernel32.dll", SetLastError = true)]
+        private static extern IntPtr GetStdHandle(int nStdHandle);
+        
+        [System.Runtime.InteropServices.DllImport("kernel32.dll")]
+        private static extern bool GetConsoleMode(IntPtr hConsoleHandle, out uint lpMode);
+        
+        [System.Runtime.InteropServices.DllImport("kernel32.dll")]
+        private static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
         
         public void PrintHelp(Type rootType, Submodule submodule, IEnumerable<Submodule> submodules, IEnumerable<Subcommand> subcommands, IEnumerable<Option> options) {
             string description = GetSummary(submodule.MemberInfo);
@@ -150,8 +241,16 @@ namespace CalqFramework.Cli.Formatting {
             return Path.ChangeExtension(assembly.Location, "xml");
         }
 
-        private static void SetConsoleColor(int red, int green, int blue) {
-            Console.Write($"\u001b[38;2;{red};{green};{blue}m");
+        private void SetConsoleColor(int red, int green, int blue) {
+            if (_supportsColor) {
+                Console.Write($"\u001b[38;2;{red};{green};{blue}m");
+            }
+        }
+        
+        private void ResetConsoleColor() {
+            if (_supportsColor) {
+                Console.Write("\u001b[0m");
+            }
         }
 
         private string GetDescription(Submodule item) {
@@ -271,9 +370,7 @@ namespace CalqFramework.Cli.Formatting {
                 if (section != firstSection) {
                     _out.WriteLine();
                 }
-                if (_out == Console.Out) {
-                    SetConsoleColor(80, 140, 240);
-                }
+                SetConsoleColor(80, 140, 240);
                 _out.WriteLine(section.Title);
                 foreach (ItemInfo item in section.ItemInfos) {
                     _out.Write("  "); // ident
@@ -286,20 +383,14 @@ namespace CalqFramework.Cli.Formatting {
                             parts[i] = keys[i].PadLeft(maxLengths[i]);
                         }
                     }
-                    if (_out == Console.Out) {
-                        SetConsoleColor(160, 200, 210);
-                    }
+                    SetConsoleColor(160, 200, 210);
                     _out.Write(string.Join(" ", parts));
-                    if (_out == Console.Out) {
-                        Console.ResetColor();
-                    }
+                    ResetConsoleColor();
                     _out.Write("  "); // keys and rootDescription space
                     _out.WriteLine(item.Description);
                 }
             }
-            if (_out == Console.Out) {
-                Console.ResetColor();
-            }
+            ResetConsoleColor();
         }
 
         private void PrintSubcommandDescription(Subcommand subcommand) {
