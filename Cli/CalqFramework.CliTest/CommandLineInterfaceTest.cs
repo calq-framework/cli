@@ -158,7 +158,7 @@ namespace CalqFramework.CliTest {
                 var tool = new SomeClassLibrary();
                 new CommandLineInterface().Execute(tool, $"{StringHelper.GetKebabCase(nameof(SomeClassLibrary.textField))}".Split(' '));
             });
-            Assert.Equal("Invalid command: text-field", ex.Message);
+            Assert.Equal("Invalid subcommand: text-field", ex.Message);
         }
 
         [Fact]
@@ -169,7 +169,7 @@ namespace CalqFramework.CliTest {
                     CliComponentStoreFactory = new CliComponentStoreFactory { BindingFlags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public }
                 }.Execute(tool, $"{StringHelper.GetKebabCase(nameof(SomeClassLibrary.Method)).ToUpper()}".Split(' '));
             });
-            Assert.Equal("Invalid command: METHOD", ex.Message);
+            Assert.Equal("Invalid subcommand: METHOD", ex.Message);
         }
 
         [Fact]
@@ -185,29 +185,29 @@ namespace CalqFramework.CliTest {
         }
 
         [Fact]
-        public void Execute_MethodWithInvalidParameterOrder_ThrowsArgumentException() {
-            ArgumentException ex = Assert.Throws<ArgumentException>(() => {
+        public void Execute_MethodWithInvalidParameterOrder_ThrowsCliException() {
+            CliException ex = Assert.Throws<CliException>(() => {
                 var tool = new SomeClassLibrary();
                 new CommandLineInterface().Execute(tool, $"{StringHelper.GetKebabCase(nameof(SomeClassLibrary.Method))} abc".Split(' '));
             });
         }
 
         [Fact]
-        public void Execute_MethodWithMissingRequiredParameter_ThrowsArgumentException() {
-            ArgumentException ex = Assert.Throws<ArgumentException>(() => {
+        public void Execute_MethodWithMissingRequiredParameter_ThrowsCliException() {
+            CliException ex = Assert.Throws<CliException>(() => {
                 var tool = new SomeClassLibrary();
                 new CommandLineInterface().Execute(tool, $"{StringHelper.GetKebabCase(nameof(SomeClassLibrary.MethodWithText))}".Split(' '));
             });
-            Assert.Equal("Unassigned parameter: text", ex.Message);
+            Assert.Equal("Failed to access data: Unassigned parameter: text", ex.Message);
         }
 
         [Fact]
-        public void Execute_UnknownCommand_ThrowsCliExceptionWithInvalidCommandMessage() {
+        public void Execute_UnknownCommand_ThrowsCliExceptionWithInvalidSubcommandMessage() {
             CliException ex = Assert.Throws<CliException>(() => {
                 var tool = new SomeClassLibrary();
                 new CommandLineInterface().Execute(tool, "Unknown".Split(' '));
             });
-            Assert.Equal("Invalid command: Unknown", ex.Message);
+            Assert.Equal("Invalid subcommand: Unknown", ex.Message);
         }
 
         [Fact]
