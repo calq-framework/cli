@@ -47,8 +47,8 @@ namespace CalqFramework.Cli {
         /// <summary>
         /// Creates an exception for when a command is invalid.
         /// </summary>
-        public static CliException InvalidCommand(string? command) =>
-            new CliException($"Invalid command: {command}");
+        public static CliException InvalidSubcommand(string? subcommand) =>
+            new CliException($"Invalid subcommand: {subcommand}");
 
         /// <summary>
         /// Creates an exception for CLI name collisions.

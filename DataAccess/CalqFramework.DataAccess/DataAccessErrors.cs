@@ -20,6 +20,18 @@ namespace CalqFramework.DataAccess {
             new DataAccessException($"Ambiguous key '{key}', enable shadowing to ignore this error");
 
         /// <summary>
+        /// Creates an exception for unexpected arguments in method execution.
+        /// </summary>
+        public static DataAccessException UnexpectedArgument(object? argument) =>
+            new DataAccessException($"Unexpected argument: {argument}");
+
+        /// <summary>
+        /// Creates an exception for unassigned required parameters.
+        /// </summary>
+        public static DataAccessException UnassignedParameter(string parameterName) =>
+            new DataAccessException($"Unassigned parameter: {parameterName}");
+
+        /// <summary>
         /// Creates an exception for when neither fields nor properties access is configured.
         /// </summary>
         public static ArgumentException NoAccessConfigured() =>
@@ -30,18 +42,6 @@ namespace CalqFramework.DataAccess {
         /// </summary>
         public static ArgumentException InvalidListKey(string? keyTypeName) =>
             new ArgumentException($"Key must be an integer or parsable string for list removal, got {keyTypeName ?? "null"}");
-
-        /// <summary>
-        /// Creates an exception for unexpected arguments in method execution.
-        /// </summary>
-        public static ArgumentException UnexpectedArgument(object? argument) =>
-            new ArgumentException($"Unexpected argument: {argument}");
-
-        /// <summary>
-        /// Creates an exception for unassigned required parameters.
-        /// </summary>
-        public static ArgumentException UnassignedParameter(string parameterName) =>
-            new ArgumentException($"Unassigned parameter: {parameterName}");
 
         /// <summary>
         /// Creates an exception for unparsable types.

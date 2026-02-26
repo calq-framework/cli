@@ -29,7 +29,7 @@ namespace CalqFramework.Cli.DataAccess.ClassMemberStores {
         public MethodInfo this[string key] {
             get {
                 if (!TryGetAccessor(key, out var result)) {
-                    throw CliErrors.InvalidCommand(key);
+                    throw CliErrors.InvalidSubcommand(key);
                 }
                 return result;
             }
