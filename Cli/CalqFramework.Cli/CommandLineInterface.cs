@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using CalqFramework.Cli.DataAccess;
@@ -20,10 +21,11 @@ namespace CalqFramework.Cli {
 
         private ICompletionHandler? _completionHandler;
         private IDotnetSuggestHandler? _dotnetSuggestHandler;
+        private TextWriter? _out;
+        private IHelpPrinter? _helpPrinter;
 
         public CommandLineInterface() {
             CliComponentStoreFactory = new CliComponentStoreFactory();
-            HelpPrinter = new HelpPrinter();
         }
 
         /// <summary>
@@ -34,7 +36,10 @@ namespace CalqFramework.Cli {
         /// <summary>
         /// Help printer for displaying CLI help information.
         /// </summary>
-        public IHelpPrinter HelpPrinter { get; init; }
+        public IHelpPrinter HelpPrinter { 
+            get => _helpPrinter ??= new HelpPrinter(Out);
+            init => _helpPrinter = value;
+        }
         
         public ICompletionHandler CompletionHandler { 
             get => _completionHandler ??= new CompletionHandler();
@@ -55,6 +60,14 @@ namespace CalqFramework.Cli {
         /// Include revision number in version output (4 digits instead of 3).
         /// </summary>
         public bool UseRevisionVersion { get; init; } = false;
+        
+        /// <summary>
+        /// TextWriter for output operations. Defaults to Console.Out if not specified.
+        /// </summary>
+        public TextWriter Out {
+            get => _out ?? Console.Out;
+            init => _out = value;
+        }
         
         /// <summary>
         /// Executes a CLI command using command-line arguments from the environment.

@@ -9,26 +9,15 @@ namespace CalqFramework.CliTest {
     [Collection("Completion Tests")]
     public class CommandLineInterfaceCompletionScriptTest {
 
-        private string CaptureConsoleOutput(Action action) {
-            var originalOut = Console.Out;
-            using var writer = new StringWriter();
-            Console.SetOut(writer);
-            try {
-                action();
-                return writer.ToString();
-            } finally {
-                Console.SetOut(originalOut);
-            }
-        }
-
         [Fact]
         public void ExecuteCompletionScript_Bash_GeneratesScript() {
             var tool = new SomeClassLibrary();
-            var output = CaptureConsoleOutput(() => {
-                var args = new List<string> { "completion", "bash" };
-                new CommandLineInterface().Execute(tool, args);
-            });
-
+            using var writer = new StringWriter();
+            var cli = new CommandLineInterface { Out = writer };
+            var args = new List<string> { "completion", "bash" };
+            cli.Execute(tool, args);
+            
+            var output = writer.ToString();
             Assert.Contains("_completion", output);
             Assert.Contains("complete -F", output);
             Assert.Contains("__complete", output); // Verify it uses __complete command
@@ -37,11 +26,12 @@ namespace CalqFramework.CliTest {
         [Fact]
         public void ExecuteCompletionScript_Zsh_GeneratesScript() {
             var tool = new SomeClassLibrary();
-            var output = CaptureConsoleOutput(() => {
-                var args = new List<string> { "completion", "zsh" };
-                new CommandLineInterface().Execute(tool, args);
-            });
-
+            using var writer = new StringWriter();
+            var cli = new CommandLineInterface { Out = writer };
+            var args = new List<string> { "completion", "zsh" };
+            cli.Execute(tool, args);
+            
+            var output = writer.ToString();
             Assert.Contains("#compdef", output);
             Assert.Contains("_completion", output);
             Assert.Contains("__complete", output); // Verify it uses __complete command
@@ -50,11 +40,12 @@ namespace CalqFramework.CliTest {
         [Fact]
         public void ExecuteCompletionScript_PowerShell_GeneratesScript() {
             var tool = new SomeClassLibrary();
-            var output = CaptureConsoleOutput(() => {
-                var args = new List<string> { "completion", "powershell" };
-                new CommandLineInterface().Execute(tool, args);
-            });
-
+            using var writer = new StringWriter();
+            var cli = new CommandLineInterface { Out = writer };
+            var args = new List<string> { "completion", "powershell" };
+            cli.Execute(tool, args);
+            
+            var output = writer.ToString();
             Assert.Contains("Register-ArgumentCompleter", output);
             Assert.Contains("__complete", output); // Verify it uses __complete command
         }
@@ -62,11 +53,12 @@ namespace CalqFramework.CliTest {
         [Fact]
         public void ExecuteCompletionScript_Fish_GeneratesScript() {
             var tool = new SomeClassLibrary();
-            var output = CaptureConsoleOutput(() => {
-                var args = new List<string> { "completion", "fish" };
-                new CommandLineInterface().Execute(tool, args);
-            });
-
+            using var writer = new StringWriter();
+            var cli = new CommandLineInterface { Out = writer };
+            var args = new List<string> { "completion", "fish" };
+            cli.Execute(tool, args);
+            
+            var output = writer.ToString();
             Assert.Contains("complete -c", output);
             Assert.Contains("__complete", output); // Verify it uses __complete command
         }
@@ -88,14 +80,14 @@ namespace CalqFramework.CliTest {
             // Note: This test would actually install the completion script
             // In a real scenario, you might want to mock the file system
             // For now, we just verify the command doesn't throw
-            var output = CaptureConsoleOutput(() => {
-                try {
-                    var args = new List<string> { "completion", "bash", "install" };
-                    new CommandLineInterface().Execute(tool, args);
-                } catch {
-                    // Ignore file system errors in test environment
-                }
-            });
+            using var writer = new StringWriter();
+            var cli = new CommandLineInterface { Out = writer };
+            try {
+                var args = new List<string> { "completion", "bash", "install" };
+                cli.Execute(tool, args);
+            } catch {
+                // Ignore file system errors in test environment
+            }
 
             // The output should contain installation information if successful
             // or be empty if there was a file system error (which we ignore in tests)
@@ -106,14 +98,14 @@ namespace CalqFramework.CliTest {
         public void ExecuteCompletionUninstall_OutputsUninstallationMessage() {
             var tool = new SomeClassLibrary();
             
-            var output = CaptureConsoleOutput(() => {
-                try {
-                    var args = new List<string> { "completion", "bash", "uninstall" };
-                    new CommandLineInterface().Execute(tool, args);
-                } catch {
-                    // Ignore file system errors in test environment
-                }
-            });
+            using var writer = new StringWriter();
+            var cli = new CommandLineInterface { Out = writer };
+            try {
+                var args = new List<string> { "completion", "bash", "uninstall" };
+                cli.Execute(tool, args);
+            } catch {
+                // Ignore file system errors in test environment
+            }
 
             // Test passes if no exception is thrown
             Assert.True(true);

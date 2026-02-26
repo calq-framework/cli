@@ -11,7 +11,7 @@ namespace CalqFramework.Cli.Completion {
     /// </summary>
     public class CompletionPrinter : ICompletionPrinter {
 
-        public void PrintSubmodules(IEnumerable<Submodule> submodules, string partialInput) {
+        public void PrintSubmodules(ICliContext context, IEnumerable<Submodule> submodules, string partialInput) {
             var completions = submodules
                 .Select(s => s.Keys[0])
                 .Where(k => k.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase))
@@ -19,12 +19,12 @@ namespace CalqFramework.Cli.Completion {
                 .OrderBy(k => k);
 
             foreach (var completion in completions) {
-                Console.WriteLine(completion);
+                context.Out.WriteLine(completion);
             }
-            Console.Out.Flush();
+            context.Out.Flush();
         }
 
-        public void PrintSubcommands(IEnumerable<Subcommand> subcommands, string partialInput) {
+        public void PrintSubcommands(ICliContext context, IEnumerable<Subcommand> subcommands, string partialInput) {
             var completions = subcommands
                 .Select(s => s.Keys[0])
                 .Where(k => k.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase))
@@ -32,12 +32,12 @@ namespace CalqFramework.Cli.Completion {
                 .OrderBy(k => k);
 
             foreach (var completion in completions) {
-                Console.WriteLine(completion);
+                context.Out.WriteLine(completion);
             }
-            Console.Out.Flush();
+            context.Out.Flush();
         }
 
-        public void PrintParametersAndOptions(IEnumerable<Parameter> parameters, IEnumerable<Option> options, string partialInput) {
+        public void PrintParametersAndOptions(ICliContext context, IEnumerable<Parameter> parameters, IEnumerable<Option> options, string partialInput) {
             // Strip leading dashes from partial input for matching
             string partialInputStripped = partialInput.TrimStart('-', '+');
             
@@ -50,27 +50,27 @@ namespace CalqFramework.Cli.Completion {
                 .OrderBy(k => k);
 
             foreach (var completion in completions) {
-                Console.WriteLine(completion);
+                context.Out.WriteLine(completion);
             }
-            Console.Out.Flush();
+            context.Out.Flush();
         }
 
-        public void PrintSubmoduleValue(Submodule submodule, string partialInput) {
+        public void PrintSubmoduleValue(ICliContext context, Submodule submodule, string partialInput) {
             // Submodules don't have values to complete
         }
 
-        public void PrintSubcommandValue(Subcommand subcommand, string partialInput) {
+        public void PrintSubcommandValue(ICliContext context, Subcommand subcommand, string partialInput) {
             // Subcommands don't have values to complete
         }
 
-        public void PrintOptionValue(Option option, string partialInput, object? submodule) {
+        public void PrintOptionValue(ICliContext context, Option option, string partialInput, object? submodule) {
             var completions = GetValueCompletions(option.ValueType, option.MemberInfo, partialInput, submodule);
-            PrintCompletions(completions);
+            PrintCompletions(context, completions);
         }
 
-        public void PrintParameterValue(Parameter parameter, string partialInput, object? submodule) {
+        public void PrintParameterValue(ICliContext context, Parameter parameter, string partialInput, object? submodule) {
             var completions = GetValueCompletions(parameter.ValueType, parameter.ParameterInfo, partialInput, submodule);
-            PrintCompletions(completions);
+            PrintCompletions(context, completions);
         }
 
         private IEnumerable<string> GetValueCompletions(Type type, System.Reflection.ICustomAttributeProvider attributeProvider, string partialInput, object? submodule) {
@@ -135,11 +135,11 @@ namespace CalqFramework.Cli.Completion {
             return Enumerable.Empty<string>();
         }
 
-        private void PrintCompletions(IEnumerable<string> completions) {
+        private void PrintCompletions(ICliContext context, IEnumerable<string> completions) {
             foreach (var completion in completions) {
-                Console.WriteLine(completion);
+                context.Out.WriteLine(completion);
             }
-            Console.Out.Flush();
+            context.Out.Flush();
         }
     }
 }
