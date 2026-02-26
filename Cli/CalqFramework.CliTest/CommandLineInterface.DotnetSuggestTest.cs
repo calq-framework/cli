@@ -10,25 +10,14 @@ namespace CalqFramework.CliTest {
     [Collection("DotnetSuggest Tests")]
     public class CommandLineInterfaceDotnetSuggestTest {
 
-        private string CaptureConsoleOutput(Action action) {
-            var originalOut = Console.Out;
-            using var writer = new StringWriter();
-            Console.SetOut(writer);
-            try {
-                action();
-                return writer.ToString();
-            } finally {
-                Console.SetOut(originalOut);
-            }
-        }
-
         private List<string> GetDotnetSuggestCompletions(string directive, string commandLine) {
             var tool = new SomeClassLibrary();
             
-            var output = CaptureConsoleOutput(() => {
-                // dotnet-suggest protocol: directive and full command line as single string
-                new CommandLineInterface().Execute(tool, new[] { directive, commandLine });
-            });
+            using var writer = new StringWriter();
+            var cli = new CommandLineInterface { Out = writer };
+            cli.Execute(tool, new[] { directive, commandLine });
+            
+            var output = writer.ToString();
             return new List<string>(output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
         }
 

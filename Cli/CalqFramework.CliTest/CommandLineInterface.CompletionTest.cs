@@ -10,18 +10,6 @@ namespace CalqFramework.CliTest {
     [Collection("Completion Tests")]
     public class CommandLineInterfaceCompletionTest {
 
-        private string CaptureConsoleOutput(Action action) {
-            var originalOut = Console.Out;
-            using var writer = new StringWriter();
-            Console.SetOut(writer);
-            try {
-                action();
-                return writer.ToString();
-            } finally {
-                Console.SetOut(originalOut);
-            }
-        }
-
         private List<string> GetCompletions(string commandLine) {
             var tool = new SomeClassLibrary();
             
@@ -32,9 +20,11 @@ namespace CalqFramework.CliTest {
             // If command line doesn't end with space and last part is not empty, that's what we're completing
             // If it ends with space, we're completing an empty string (already handled by split)
             
-            var output = CaptureConsoleOutput(() => {
-                new CommandLineInterface().Execute(tool, new[] { "__complete" }.Concat(args));
-            });
+            using var writer = new StringWriter();
+            var cli = new CommandLineInterface { Out = writer };
+            cli.Execute(tool, new[] { "__complete" }.Concat(args));
+            
+            var output = writer.ToString();
             return new List<string>(output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
         }
 

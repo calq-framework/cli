@@ -1,3 +1,4 @@
+using System.IO;
 using CalqFramework.Cli.DataAccess;
 
 namespace CalqFramework.Cli {
@@ -16,5 +17,10 @@ namespace CalqFramework.Cli {
         /// Skip unknown options instead of throwing an exception.
         /// </summary>
         bool SkipUnknown { get; }
+        
+        /// <summary>
+        /// TextWriter for output operations. Defaults to Console.Out if not specified.
+        /// </summary>
+        TextWriter Out { get; }
     }
 }

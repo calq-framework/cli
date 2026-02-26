@@ -62,17 +62,17 @@ namespace CalqFramework.Cli.Completion {
                 switch (action.ToLowerInvariant()) {
                     case "install":
                         if (isAllShells) {
-                            HandleCompletionInstallAll();
+                            HandleCompletionInstallAll(context);
                         } else {
-                            HandleCompletionInstall(shell);
+                            HandleCompletionInstall(context, shell);
                         }
                         return ResultVoid.Value;
                     
                     case "uninstall":
                         if (isAllShells) {
-                            HandleCompletionUninstallAll();
+                            HandleCompletionUninstallAll(context);
                         } else {
-                            HandleCompletionUninstall(shell);
+                            HandleCompletionUninstall(context, shell);
                         }
                         return ResultVoid.Value;
                     
@@ -82,9 +82,9 @@ namespace CalqFramework.Cli.Completion {
             }
             
             if (isAllShells) {
-                HandleCompletionScriptAll();
+                HandleCompletionScriptAll(context);
             } else {
-                HandleCompletionScript(shell);
+                HandleCompletionScript(context, shell);
             }
             return ResultVoid.Value;
         }
@@ -122,13 +122,13 @@ namespace CalqFramework.Cli.Completion {
                 
                 string effectivePartialInput = hasMatches ? toComplete : "";
                 
-                CompletionPrinter.PrintSubmodules(submodules, effectivePartialInput);
-                CompletionPrinter.PrintSubcommands(subcommands, effectivePartialInput);
+                CompletionPrinter.PrintSubmodules(context, submodules, effectivePartialInput);
+                CompletionPrinter.PrintSubcommands(context, subcommands, effectivePartialInput);
                 return;
             }
 
             if (!subcommandStore.ContainsKey(subcommandName)) {
-                CompletionPrinter.PrintSubcommands(subcommandStore.GetSubcommands(context.CliComponentStoreFactory.CreateSubcommandExecutor), subcommandName);
+                CompletionPrinter.PrintSubcommands(context, subcommandStore.GetSubcommands(context.CliComponentStoreFactory.CreateSubcommandExecutor), subcommandName);
                 return;
             }
 
@@ -147,24 +147,24 @@ namespace CalqFramework.Cli.Completion {
             if (toComplete.StartsWith("-")) {
                 var parameters = subcommandExecutorWithOptions.GetParameters();
                 var options = subcommandExecutorWithOptions.GetOptions();
-                CompletionPrinter.PrintParametersAndOptions(parameters, options, toComplete);
+                CompletionPrinter.PrintParametersAndOptions(context, parameters, options, toComplete);
             } else if (completingOptionValue && previousArg != null) {
                 string optionName = previousArg.TrimStart('-', '+');
                 
                 var parameter = subcommandExecutorWithOptions.GetParameters().FirstOrDefault(p => p.Keys.Contains(optionName));
                 if (parameter != null) {
-                    CompletionPrinter.PrintParameterValue(parameter, toComplete, submodule);
+                    CompletionPrinter.PrintParameterValue(context, parameter, toComplete, submodule);
                 } else {
                     var option = subcommandExecutorWithOptions.GetOptions().FirstOrDefault(o => o.Keys.Contains(optionName));
                     if (option != null) {
-                        CompletionPrinter.PrintOptionValue(option, toComplete, submodule);
+                        CompletionPrinter.PrintOptionValue(context, option, toComplete, submodule);
                     }
                 }
             } else {
                 var parameter = subcommandExecutorWithOptions.GetFirstUnassignedParameter();
                 
                 if (parameter != null) {
-                    CompletionPrinter.PrintParameterValue(parameter, toComplete, submodule);
+                    CompletionPrinter.PrintParameterValue(context, parameter, toComplete, submodule);
                 }
             }
         }
@@ -198,54 +198,54 @@ namespace CalqFramework.Cli.Completion {
             } while (en.MoveNext());
         }
 
-        private void HandleCompletionScript(string shell) {
+        private void HandleCompletionScript(ICliContext context, string shell) {
             var programName = Assembly.GetEntryAssembly()?.GetToolCommandName() ?? throw CliErrors.UnableToDetermineProgramName();
             var script = CompletionScriptGenerator.GenerateScript(shell, programName);
-            Console.WriteLine(script);
+            context.Out.WriteLine(script);
         }
 
-        private void HandleCompletionInstall(string shell) {
+        private void HandleCompletionInstall(ICliContext context, string shell) {
             var programName = Assembly.GetEntryAssembly()?.GetToolCommandName() ?? throw CliErrors.UnableToDetermineProgramName();
 
             try {
                 CompletionScriptGenerator.InstallScript(shell, programName);
                 var installPath = CompletionScriptGenerator.GetInstallPath(shell, programName);
-                Console.WriteLine($"Completion script installed to: {installPath}");
-                Console.WriteLine("Please restart your shell for changes to take effect.");
+                context.Out.WriteLine($"Completion script installed to: {installPath}");
+                context.Out.WriteLine("Please restart your shell for changes to take effect.");
             } catch (Exception ex) {
                 throw CliErrors.CompletionInstallFailed(shell, ex.Message, ex);
             }
         }
 
-        private void HandleCompletionUninstall(string shell) {
+        private void HandleCompletionUninstall(ICliContext context, string shell) {
             var programName = Assembly.GetEntryAssembly()?.GetToolCommandName() ?? throw CliErrors.UnableToDetermineProgramName();
 
             try {
                 var removed = CompletionScriptGenerator.UninstallScript(shell, programName);
                 
                 if (removed) {
-                    Console.WriteLine($"Completion script for {shell} has been uninstalled.");
+                    context.Out.WriteLine($"Completion script for {shell} has been uninstalled.");
                 } else {
-                    Console.WriteLine($"No completion script found for {shell}.");
+                    context.Out.WriteLine($"No completion script found for {shell}.");
                 }
             } catch (Exception ex) {
                 throw CliErrors.CompletionUninstallFailed(shell, ex.Message, ex);
             }
         }
 
-        private void HandleCompletionScriptAll() {
+        private void HandleCompletionScriptAll(ICliContext context) {
             var programName = Assembly.GetEntryAssembly()?.GetToolCommandName() ?? throw CliErrors.UnableToDetermineProgramName();
             
             foreach (var shell in CompletionScriptGenerator.SupportedShells) {
-                Console.WriteLine($"# Completion script for {shell}");
-                Console.WriteLine();
+                context.Out.WriteLine($"# Completion script for {shell}");
+                context.Out.WriteLine();
                 var script = CompletionScriptGenerator.GenerateScript(shell, programName);
-                Console.WriteLine(script);
-                Console.WriteLine();
+                context.Out.WriteLine(script);
+                context.Out.WriteLine();
             }
         }
 
-        private void HandleCompletionInstallAll() {
+        private void HandleCompletionInstallAll(ICliContext context) {
             var programName = Assembly.GetEntryAssembly()?.GetToolCommandName() ?? throw CliErrors.UnableToDetermineProgramName();
             
             foreach (var shell in CompletionScriptGenerator.SupportedShells) {
@@ -266,18 +266,18 @@ namespace CalqFramework.Cli.Completion {
                         var error = process.StandardError.ReadToEnd();
                         
                         if (process.ExitCode == 0) {
-                            Console.WriteLine($"[{shell}] {output}");
+                            context.Out.WriteLine($"[{shell}] {output}");
                         } else {
-                            Console.WriteLine($"[{shell}] Failed: {error}");
+                            context.Out.WriteLine($"[{shell}] Failed: {error}");
                         }
                     }
                 } catch (Exception ex) {
-                    Console.WriteLine($"[{shell}] Error: {ex.Message}");
+                    context.Out.WriteLine($"[{shell}] Error: {ex.Message}");
                 }
             }
         }
 
-        private void HandleCompletionUninstallAll() {
+        private void HandleCompletionUninstallAll(ICliContext context) {
             var programName = Assembly.GetEntryAssembly()?.GetToolCommandName() ?? throw CliErrors.UnableToDetermineProgramName();
             
             foreach (var shell in CompletionScriptGenerator.SupportedShells) {
@@ -285,12 +285,12 @@ namespace CalqFramework.Cli.Completion {
                     var removed = CompletionScriptGenerator.UninstallScript(shell, programName);
                     
                     if (removed) {
-                        Console.WriteLine($"[{shell}] Completion script has been uninstalled.");
+                        context.Out.WriteLine($"[{shell}] Completion script has been uninstalled.");
                     } else {
-                        Console.WriteLine($"[{shell}] No completion script found.");
+                        context.Out.WriteLine($"[{shell}] No completion script found.");
                     }
                 } catch (Exception ex) {
-                    Console.WriteLine($"[{shell}] Error: {ex.Message}");
+                    context.Out.WriteLine($"[{shell}] Error: {ex.Message}");
                 }
             }
         }

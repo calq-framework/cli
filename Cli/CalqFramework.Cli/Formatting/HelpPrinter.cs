@@ -12,11 +12,22 @@ namespace CalqFramework.Cli.Formatting {
     /// Prints formatted help information for CLI components using XML documentation.
     /// </summary>
     public class HelpPrinter : IHelpPrinter {
+        
+        private readonly TextWriter _out;
+        
+        /// <summary>
+        /// Initializes a new instance of HelpPrinter with the specified output writer.
+        /// </summary>
+        /// <param name="output">TextWriter for output operations. If null, defaults to Console.Out.</param>
+        public HelpPrinter(TextWriter? output = null) {
+            _out = output ?? Console.Out;
+        }
+        
         public void PrintHelp(Type rootType, Submodule submodule, IEnumerable<Submodule> submodules, IEnumerable<Subcommand> subcommands, IEnumerable<Option> options) {
             string description = GetSummary(submodule.MemberInfo);
             if (!string.IsNullOrEmpty(description)) {
-                Console.WriteLine(description);
-                Console.WriteLine();
+                _out.WriteLine(description);
+                _out.WriteLine();
             }
             PrintHelp(submodules, subcommands, options);
         }
@@ -24,8 +35,8 @@ namespace CalqFramework.Cli.Formatting {
         public void PrintHelp(Type rootType, IEnumerable<Submodule> submodules, IEnumerable<Subcommand> subcommands, IEnumerable<Option> options) {
             var rootDescription = GetSummary(rootType);
             if (!string.IsNullOrEmpty(rootDescription)) {
-                Console.WriteLine(rootDescription);
-                Console.WriteLine();
+                _out.WriteLine(rootDescription);
+                _out.WriteLine();
             }
             PrintHelp(submodules, subcommands, options);
         }
@@ -258,12 +269,14 @@ namespace CalqFramework.Cli.Formatting {
                     continue;
                 }
                 if (section != firstSection) {
-                    Console.WriteLine();
+                    _out.WriteLine();
                 }
-                SetConsoleColor(80, 140, 240);
-                Console.WriteLine(section.Title);
+                if (_out == Console.Out) {
+                    SetConsoleColor(80, 140, 240);
+                }
+                _out.WriteLine(section.Title);
                 foreach (ItemInfo item in section.ItemInfos) {
-                    Console.Write("  "); // ident
+                    _out.Write("  "); // ident
                     IList<string> keys = item.Keys;
                     string[] parts = new string[maxLengths.Count];
                     for (int i = 0; i < maxLengths.Count; i++) {
@@ -273,14 +286,20 @@ namespace CalqFramework.Cli.Formatting {
                             parts[i] = keys[i].PadLeft(maxLengths[i]);
                         }
                     }
-                    SetConsoleColor(160, 200, 210);
-                    Console.Write(string.Join(" ", parts));
-                    Console.ResetColor();
-                    Console.Write("  "); // keys and rootDescription space
-                    Console.WriteLine(item.Description);
+                    if (_out == Console.Out) {
+                        SetConsoleColor(160, 200, 210);
+                    }
+                    _out.Write(string.Join(" ", parts));
+                    if (_out == Console.Out) {
+                        Console.ResetColor();
+                    }
+                    _out.Write("  "); // keys and rootDescription space
+                    _out.WriteLine(item.Description);
                 }
             }
-            Console.ResetColor();
+            if (_out == Console.Out) {
+                Console.ResetColor();
+            }
         }
 
         private void PrintSubcommandDescription(Subcommand subcommand) {
@@ -295,8 +314,8 @@ namespace CalqFramework.Cli.Formatting {
             }
             string description = string.Join(Environment.NewLine, parts);
             if (!string.IsNullOrEmpty(description)) {
-                Console.WriteLine(description);
-                Console.WriteLine();
+                _out.WriteLine(description);
+                _out.WriteLine();
             }
         }
         private class ItemInfo {
