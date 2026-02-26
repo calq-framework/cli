@@ -1,6 +1,6 @@
 ﻿using CalqFramework.Extensions.System;
 
-namespace CalqFramework.DataAccessTest;
+namespace CalqFramework.DataAccess.Test;
 
 public class TypeExtensionsTest {
 

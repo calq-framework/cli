@@ -1,4 +1,4 @@
-namespace CalqFramework.CliTest {
+namespace CalqFramework.Cli.Test {
     
     public enum LogLevel {
         Debug,

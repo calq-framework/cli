@@ -5,7 +5,7 @@ VisualStudioVersion = 17.12.35506.116 d17.12
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalqFramework.Cli", "CalqFramework.Cli\CalqFramework.Cli.csproj", "{6ECAD2FC-9223-4935-9574-1F800AA0DC33}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalqFramework.CliTest", "CalqFramework.CliTest\CalqFramework.CliTest.csproj", "{D1D4EAD4-56D4-40B5-B6E1-235CBA147352}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalqFramework.Cli.Test", "CalqFramework.Cli.Test\CalqFramework.Cli.Test.csproj", "{D1D4EAD4-56D4-40B5-B6E1-235CBA147352}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalqFramework.DataAccess", "..\DataAccess\CalqFramework.DataAccess\CalqFramework.DataAccess.csproj", "{33E4EF02-5920-43B6-B229-5D9C77718E9B}"
 EndProject
