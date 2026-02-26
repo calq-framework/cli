@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.35325.158
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalqFramework.DataAccess", "CalqFramework.DataAccess\CalqFramework.DataAccess.csproj", "{A9F86FEE-8627-413C-A167-ADF4CA17103E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalqFramework.DataAccessTest", "CalqFramework.DataAccessTest\CalqFramework.DataAccessTest.csproj", "{D16ADE56-C5E8-4D8C-8B51-396E56B40A34}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CalqFramework.DataAccess.Test", "CalqFramework.DataAccess.Test\CalqFramework.DataAccess.Test.csproj", "{D16ADE56-C5E8-4D8C-8B51-396E56B40A34}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

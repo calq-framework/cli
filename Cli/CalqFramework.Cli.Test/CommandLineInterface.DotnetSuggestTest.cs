@@ -5,7 +5,7 @@ using System.Linq;
 using CalqFramework.Cli;
 using Xunit;
 
-namespace CalqFramework.CliTest {
+namespace CalqFramework.Cli.Test {
 
     [Collection("DotnetSuggest Tests")]
     public class CommandLineInterfaceDotnetSuggestTest {

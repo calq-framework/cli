@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using CalqFramework.Cli;
 using CalqFramework.Cli.Completion.Providers;
 
-namespace CalqFramework.CliTest {
+namespace CalqFramework.Cli.Test {
 
     /// <summary>
     /// Some summary.

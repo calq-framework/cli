@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CalqFramework.Cli.Completion.Providers;
 
-namespace CalqFramework.CliTest {
+namespace CalqFramework.Cli.Test {
     
     public class EnvironmentCompletionProvider : ICompletionProvider {
         public IEnumerable<string> GetCompletions(ICompletionProviderContext context) {

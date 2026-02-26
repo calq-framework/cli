@@ -3,7 +3,7 @@
 using System.Collections.Generic;
 using CalqFramework.Cli;
 
-namespace CalqFramework.CliTest {
+namespace CalqFramework.Cli.Test {
 
     internal class SomeConfiguration {
 
