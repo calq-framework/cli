@@ -370,7 +370,7 @@ namespace CalqFramework.Cli.Formatting {
                 if (section != firstSection) {
                     _out.WriteLine();
                 }
-                SetConsoleColor(80, 140, 240);
+                SetConsoleColor(90, 147, 241);
                 _out.WriteLine(section.Title);
                 foreach (ItemInfo item in section.ItemInfos) {
                     _out.Write("  "); // ident
@@ -383,7 +383,7 @@ namespace CalqFramework.Cli.Formatting {
                             parts[i] = keys[i].PadLeft(maxLengths[i]);
                         }
                     }
-                    SetConsoleColor(160, 200, 210);
+                    SetConsoleColor(149, 184, 204);
                     _out.Write(string.Join(" ", parts));
                     ResetConsoleColor();
                     _out.Write("  "); // keys and rootDescription space
