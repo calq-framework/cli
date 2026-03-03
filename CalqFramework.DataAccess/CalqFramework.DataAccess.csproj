@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <RootNamespace>CalqFramework.DataAccess</RootNamespace>
     <PackageId>CalqFramework.DataAccess</PackageId>
-    <Version>0.0.0</Version>
+    <Version>0.59.1</Version>
     <PackageProjectUrl>https://github.com/calq-framework</PackageProjectUrl>
     <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
   </PropertyGroup>
