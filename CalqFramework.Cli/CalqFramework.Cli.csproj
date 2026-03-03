@@ -15,6 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\DataAccess\CalqFramework.DataAccess\CalqFramework.DataAccess.csproj" />
+    <ProjectReference Include="..\CalqFramework.DataAccess\CalqFramework.DataAccess.csproj" />
   </ItemGroup>
 </Project>
