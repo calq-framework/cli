@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -99,6 +100,22 @@ namespace InterfaceCollectionsExample {
         /// <returns>Result message.</returns>
         public string FilterByStatus(List<TaskStatus> statuses) {
             return $"Filtering tasks by statuses: {string.Join(", ", statuses)}";
+        }
+
+        /// <summary>Archive tasks (non-generic IList interface).</summary>
+        /// <param name="taskNames">Non-generic list of task names to archive.</param>
+        /// <returns>Result message.</returns>
+        public string Archive(IList taskNames) {
+            var names = taskNames.Cast<object>().Select(n => n?.ToString() ?? "");
+            return $"Archived {taskNames.Count} tasks: {string.Join(", ", names)}";
+        }
+
+        /// <summary>Export tasks (non-generic IEnumerable interface).</summary>
+        /// <param name="taskNames">Non-generic enumerable of task names to export.</param>
+        /// <returns>Result message.</returns>
+        public string Export(IEnumerable taskNames) {
+            var names = taskNames.Cast<object>().Select(n => n?.ToString() ?? "").ToList();
+            return $"Exported {names.Count} tasks: {string.Join(", ", names)}";
         }
     }
 }
