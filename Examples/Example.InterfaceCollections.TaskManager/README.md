@@ -1,20 +1,20 @@
 # Example: Interface Collections Task Manager
 
-Demonstrates interface collection support with IList, ICollection, IEnumerable, and their read-only variants.
+Demonstrates collection interface support with both generic and non-generic interfaces.
 
 ## Features
 
-This example showcases how CalqFramework.Cli handles various collection interface types:
+This example shows various collection interface types:
 
-- `IList<T>` - Mutable list interface
-- `ICollection<T>` - Mutable collection interface  
-- `IEnumerable<T>` - Basic enumerable interface
-- `ISet<T>` - Mutable set interface (unique elements, automatically deduplicates)
-- `IReadOnlyList<T>` - Read-only list interface
-- `IReadOnlyCollection<T>` - Read-only collection interface
+- `IList<T>`, `ICollection<T>`, `IEnumerable<T>` - Generic collection interfaces
+- `ISet<T>` - Set interface (automatically deduplicates)
+- `IReadOnlyList<T>`, `IReadOnlyCollection<T>` - Read-only interfaces
 - `List<T>` - Concrete list type
+- `IList`, `IEnumerable` - Non-generic interfaces
 
-Note: Collection parameters require repeating the parameter name for each value (e.g., `--names task1 --names task2`).
+The framework supports list-like collection types from `System.Collections` and `System.Collections.Generic` (lists, sets, arrays, etc.). Dictionary types are not supported.
+
+Collection parameters require repeating the parameter name for each value (e.g., `--names task1 --names task2`).
 
 ## Install
 
@@ -64,6 +64,16 @@ taskmanager search --keywords bug --keywords urgent --keywords backend
 ### Filter by status with List of enums
 ```bash
 taskmanager filter-by-status --statuses Pending --statuses InProgress
+```
+
+### Archive tasks with non-generic IList
+```bash
+taskmanager archive --task-names task1 --task-names task2 --task-names task3
+```
+
+### Export tasks with non-generic IEnumerable
+```bash
+taskmanager export --task-names task1 --task-names task2
 ```
 
 ## Uninstall

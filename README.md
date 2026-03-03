@@ -6,27 +6,50 @@ Calq CLI automates development of command-line tools. It interprets CLI commands
 ## No programming required
 Calq CLI in its default configuration follows GNU (and POSIX) [conventions](https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html) and processes any classlib out of the box with comprehensive type support.
 
-Supports interface collections (`IList<T>`, `ICollection<T>`, `IEnumerable<T>`, `ISet<T>`, `IDictionary<K,V>`) with automatic concrete type mapping, overloaded methods, generic methods, and other advanced features.
+Supports list-like collection types from `System.Collections` and `System.Collections.Generic` namespaces with automatic concrete type mapping for collection interfaces. Dictionary types are not supported.
 
-## Why Calq CLI: Comparison with System.CommandLine
+## How Calq CLI Stacks Up
+
+### Calq CLI vs. System.CommandLine
+| Feature | Calq CLI | System.CommandLine |
+| :--- | :--- | :--- |
+| **CLI Definition** | Auto-generated from Classlib | Manual Command/Option Definition |
+| **Option Sources** | Parameters + Fields + Properties | Parameters Only |
+| **Default Values** | From Code | DefaultValueFactory |
+| **Help Documentation** | Auto-generated from XML Docs | Manual Descriptions |
+| **Custom Completion** | Delegate + Class-based | Delegate + Class-based |
+| **Shell Completion Setup** | Built-in Install Command | Requires dotnet-suggest Tool |
+| **Completion Protocols** | Cobra + dotnet-suggest | dotnet-suggest Only |
+| **Infer Subcommands from Methods** | ✅ | ❌ |
+| **Infer Options from Properties, Fields & Parameters** | ✅ | ❌ |
+| **Infer Multi-Value Options from Collections** | ✅ | ❌ |
+| **Enum Completion** | ✅ | ❌ |
+| **Method Parameters Override Properties** | ✅ | ❌ |
+| **Deserialize CLI Args to Objects** | ✅ | ❌ |
+| **Configure Public/Private Access** | ✅ | ❌ |
+| **Configurable Unknown Option Handling** | ✅ | ❌ |
+| **Learning Curve** | Low | Moderate |
+| **Development Time** | Very Fast | Moderate |
+
+## Why Calq CLI: Code Comparison with System.CommandLine
 Both examples implement CLI for the classlib from:  
-[https://github.com/calq-framework/cli/tree/main/Cli/Examples/Example.NestedSubmodules.CloudProvider](https://github.com/calq-framework/cli/tree/main/Cli/Examples/Example.NestedSubmodules.CloudProvider)
+[https://github.com/calq-framework/cli/tree/main/Examples/Example.NestedSubmodules.CloudProvider](https://github.com/calq-framework/cli/tree/main/Examples/Example.NestedSubmodules.CloudProvider)
 
 ### Calq CLI
 The following template is a complete implementation.
 ```csharp
 using CalqFramework.Cli;
-using CalqFramework.Cli.DataAccess.InterfaceComponents;
+using CalqFramework.Cli.DataAccess;
 using System;
 using System.Text.Json;
-using CloudProviderTool;
+using CloudProvider;
 
 try {
     var result = new CommandLineInterface() {
         CliComponentStoreFactory = new CliComponentStoreFactory() {
             EnableShadowing = true
         }
-    }.Execute(new CloudProvider());
+    }.Execute(new CloudManager());
 
     switch (result) {
         case ResultVoid:
@@ -57,7 +80,7 @@ static T CreateModule<T>(string? apiKey) where T : SubmoduleBase, new()
 {
     var module = new T();
     if (!string.IsNullOrEmpty(apiKey))
-// ... 132 lines of code
+// ... another 132 lines of code
 
 var rootCommand = new RootCommand("A CLI for managing cloud provider resources.");
 
@@ -66,28 +89,28 @@ var apiKeyOption = new Option<string>("--api-key", "API Key used for authenticat
 rootCommand.AddGlobalOption(apiKeyOption);
 
 var addCommand = new Command("add", "Permanently saves an API key for the CLI.")
-// ... 19 lines of code
+// ... another 19 lines of code
 
 // Compute Module
 var computeCommand = new Command("compute", "Manage compute resources.");
 AddComputeOptions(computeCommand);
 
 var computeRunCommand = new Command("run", "Runs a generic compute action.")
-// ... 50 lines of code
+// ... another 50 lines of code
 
 // Storage Module
 var storageCommand = new Command("storage", "Manage storage resources.");
 AddStorageOptions(storageCommand);
 
 var storageRunCommand = new Command("run", "Runs a generic storage action.") { new Argument<string>("action", () => "default", "The action to perform.") };
-// ... 61 lines of code
+// ... another 61 lines of code
 
 // Network Module
 var networkCommand = new Command("network", "Manage network resources.");
 AddNetworkOptions(networkCommand);
 
 var networkRunCommand = new Command("run", "Runs a generic network action.") { new Argument<string>("action", () => "default", "The action to perform.") };
-// ... 77 lines of code
+// ... another 77 lines of code
 
 return await rootCommand.InvokeAsync(args);
 ```
@@ -176,7 +199,7 @@ Completion works automatically for:
 - **Options and parameters** - All flags and their values
 - **Enums** - All enum values with case-insensitive matching
 - **Booleans** - `true` and `false` values
-- **Collections** - `List<T>`, `ICollection<T>`, `IEnumerable<T>`, `ISet<T>` with element type completion (enums, bools, etc.)
+- **Collections** - Collection types from `System.Collections` and `System.Collections.Generic` (lists, sets, arrays, etc.) with element type completion (enums, bools, etc.)
 - **File paths** - Files with optional extension filtering via `FileInfo` or `[CliCompletion(typeof(FileCompletionProvider), "*.json;*.yaml")]`
 - **Directory paths** - Directories via `DirectoryInfo` or `[CliCompletion(typeof(DirectoryCompletionProvider))]`
 - **File system paths** - Both files and directories via `FileSystemInfo` or `[CliCompletion(typeof(FileSystemCompletionProvider))]`
@@ -209,7 +232,6 @@ public string Region { get; set; }
 ```
 
 ### Shell Installation
-Generate and install completion scripts:
 
 ```bash
 # Generate script
@@ -238,7 +260,6 @@ mycli completion all uninstall
 After installation, restart your shell or source the profile.
 
 ### Completion Protocols
-Calq CLI supports multiple completion protocols:
 
 **Cobra-style** - `__complete` command (used by generated shell scripts):
 ```bash
@@ -251,12 +272,13 @@ dotnet tool install -g dotnet-suggest
 ```
 
 ### Demo Examples
-[Nested Submodules Example](https://github.com/calq-framework/cli/tree/main/Cli/Examples/Example.NestedSubmodules.CloudProvider)
+[Interface Collections Example](https://github.com/calq-framework/cli/tree/main/Examples/Example.InterfaceCollections.TaskManager)  
 
+[Autocomplete Example](https://github.com/calq-framework/cli/tree/main/Examples/Example.Autocomplete.CloudProvider)  
+
+[Nested Submodules Example](https://github.com/calq-framework/cli/tree/main/Examples/Example.NestedSubmodules.CloudProvider)  
 ![SubmoduleHelpExample](https://github.com/calq-framework/cli/blob/main/Cli/Examples/Example.NestedSubmodules.CloudProvider/SubmoduleHelpExample.png?raw=true)  
 ![SubcommandHelpExample](https://github.com/calq-framework/cli/blob/main/Cli/Examples/Example.NestedSubmodules.CloudProvider/SubcommandHelpExample.png?raw=true)
-
-[Autocomplete Example](https://github.com/calq-framework/cli/tree/main/Cli/Examples/Example.Autocomplete.CloudProvider)
 
 ### Quick Start
 ```bash
