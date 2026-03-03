@@ -8,7 +8,7 @@ Calq CLI in its default configuration follows GNU (and POSIX) [conventions](http
 
 Supports list-like collection types from `System.Collections` and `System.Collections.Generic` namespaces with automatic concrete type mapping for collection interfaces. Dictionary types are not supported.
 
-## How Calq CLI Stacks Up
+## A Radically Simpler Approach
 
 ### Calq CLI vs. System.CommandLine
 | Feature | Calq CLI | System.CommandLine |
@@ -31,7 +31,7 @@ Supports list-like collection types from `System.Collections` and `System.Collec
 | **Learning Curve** | Low | Moderate |
 | **Development Time** | Very Fast | Moderate |
 
-## Why Calq CLI: Code Comparison with System.CommandLine
+### Code Comparison
 Both examples implement CLI for the classlib from:  
 [https://github.com/calq-framework/cli/tree/main/Examples/Example.NestedSubmodules.CloudProvider](https://github.com/calq-framework/cli/tree/main/Examples/Example.NestedSubmodules.CloudProvider)
 
