@@ -32,10 +32,10 @@ public class FileSystemCompletionProvider : ICompletionProvider {
         }
 
         if (!Directory.Exists(directory)) {
-            return Enumerable.Empty<string>();
+            return [];
         }
 
-        List<string> results = new();
+        List<string> results = [];
 
         // Add all matching directories
         try {
@@ -50,7 +50,7 @@ public class FileSystemCompletionProvider : ICompletionProvider {
 
         // Add matching files (with filter applied)
         string[] patterns = string.IsNullOrEmpty(context.Filter)
-            ? new[] { "*" }
+            ? ["*"]
             : context.Filter.Split(';', StringSplitOptions.RemoveEmptyEntries);
 
         foreach (string pattern in patterns) {

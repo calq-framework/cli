@@ -12,18 +12,13 @@ namespace CalqFramework.Cli.Formatting;
 /// <summary>
 ///     Prints formatted help information for CLI components using XML documentation.
 /// </summary>
-public class HelpPrinter : IHelpPrinter {
-    private readonly TextWriter _out;
-    private readonly bool _supportsColor;
-
-    /// <summary>
-    ///     Initializes a new instance of HelpPrinter with the specified output writer.
-    /// </summary>
-    /// <param name="output">TextWriter for output operations. If null, defaults to Console.Out.</param>
-    public HelpPrinter(TextWriter? output = null) {
-        _out = output ?? Console.Out;
-        _supportsColor = DetectColorSupport();
-    }
+/// <remarks>
+///     Initializes a new instance of HelpPrinter with the specified output writer.
+/// </remarks>
+/// <param name="output">TextWriter for output operations. If null, defaults to Console.Out.</param>
+public class HelpPrinter(TextWriter? output = null) : IHelpPrinter {
+    private readonly TextWriter _out = output ?? Console.Out;
+    private readonly bool _supportsColor = DetectColorSupport();
 
     public void PrintHelp(Type rootType, Submodule submodule, IEnumerable<Submodule> submodules,
         IEnumerable<Subcommand> subcommands, IEnumerable<Option> options) {
@@ -49,18 +44,18 @@ public class HelpPrinter : IHelpPrinter {
 
     public void PrintSubcommandHelp(Type rootType, Subcommand subcommand, IEnumerable<Option> options) {
         PrintSubcommandDescription(subcommand);
-        SectionInfo[] sections = new SectionInfo[] {
+        SectionInfo[] sections = [
             new() {
                 Title = "Parameters",
-                ItemInfos = subcommand.Parameters.Select(x => new ItemInfo
-                    { Description = GetDescription(x), Keys = x.Keys.Select(x => GetOptionKey(x)).ToList() }).ToList()
+                ItemInfos = [.. subcommand.Parameters.Select(x => new ItemInfo
+                    { Description = GetDescription(x), Keys = [.. x.Keys.Select(x => GetOptionKey(x))] })]
             },
             new() {
                 Title = "Options",
-                ItemInfos = options.Select(x => new ItemInfo
-                    { Description = GetDescription(x), Keys = x.Keys.Select(x => GetOptionKey(x)).ToList() }).ToList()
+                ItemInfos = [.. options.Select(x => new ItemInfo
+                    { Description = GetDescription(x), Keys = [.. x.Keys.Select(x => GetOptionKey(x))] })]
             }
-        };
+        ];
         PrintSections(sections);
     }
 
@@ -273,7 +268,7 @@ public class HelpPrinter : IHelpPrinter {
 
     private string GetDescription(Type type, bool isMultiValue, string? defaultValue, bool hasDefaultValue,
         string? summary) {
-        List<string> parts = new();
+        List<string> parts = [];
 
         if (!hasDefaultValue) {
             string typeDescription = isMultiValue
@@ -284,7 +279,7 @@ public class HelpPrinter : IHelpPrinter {
 
         if (hasDefaultValue) {
             defaultValue = type == typeof(string) && defaultValue != null ? $"'{defaultValue}'" : defaultValue;
-            defaultValue = defaultValue == null ? "NULL" : defaultValue;
+            defaultValue ??= "NULL";
             parts.Add($"(Default: {defaultValue})");
         }
 
@@ -296,7 +291,7 @@ public class HelpPrinter : IHelpPrinter {
     }
 
     private IList<int> GetMaxKeyLengths(IEnumerable<SectionInfo> sections) {
-        List<int> maxLengths = new();
+        List<int> maxLengths = [];
         foreach (SectionInfo section in sections) {
             foreach (ItemInfo item in section.ItemInfos) {
                 IList<string> keys = item.Keys;
@@ -349,23 +344,23 @@ public class HelpPrinter : IHelpPrinter {
 
     private void PrintHelp(IEnumerable<Submodule> submodules, IEnumerable<Subcommand> subcommands,
         IEnumerable<Option> options) {
-        SectionInfo[] sections = new SectionInfo[] {
+        SectionInfo[] sections = [
             new() {
                 Title = "Submodules",
-                ItemInfos = submodules.Select(x => new ItemInfo
-                    { Description = GetDescription(x), Keys = x.Keys.ToList() }).ToList()
+                ItemInfos = [.. submodules.Select(x => new ItemInfo
+                    { Description = GetDescription(x), Keys = [.. x.Keys] })]
             },
             new() {
                 Title = "Subcommands",
-                ItemInfos = subcommands.Select(x => new ItemInfo
-                    { Description = GetDescription(x), Keys = x.Keys.ToList() }).ToList()
+                ItemInfos = [.. subcommands.Select(x => new ItemInfo
+                    { Description = GetDescription(x), Keys = [.. x.Keys] })]
             },
             new() {
                 Title = "Options",
-                ItemInfos = options.Select(x => new ItemInfo
-                    { Description = GetDescription(x), Keys = x.Keys.Select(x => GetOptionKey(x)).ToList() }).ToList()
+                ItemInfos = [.. options.Select(x => new ItemInfo
+                    { Description = GetDescription(x), Keys = [.. x.Keys.Select(x => GetOptionKey(x))] })]
             }
-        };
+        ];
         PrintSections(sections);
     }
 
@@ -408,7 +403,7 @@ public class HelpPrinter : IHelpPrinter {
     }
 
     private void PrintSubcommandDescription(Subcommand subcommand) {
-        List<string> parts = new();
+        List<string> parts = [];
         string summaryDescription = GetSummary(subcommand.MethodInfo);
         if (!string.IsNullOrEmpty(summaryDescription)) {
             parts.Add(summaryDescription);

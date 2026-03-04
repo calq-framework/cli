@@ -33,13 +33,13 @@ public static class AssemblyExtensions {
                 process.WaitForExit();
 
                 if (process.ExitCode == 0) {
-                    string[] lines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                    string[] lines = output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries);
                     foreach (string line in lines) {
                         if (line.Contains("Package Id") || line.Contains("---")) {
                             continue;
                         }
 
-                        string[] parts = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        string[] parts = line.Split([' '], StringSplitOptions.RemoveEmptyEntries);
                         if (parts.Length >= 3) {
                             string packageId = parts[0];
                             string commandName = parts[2];

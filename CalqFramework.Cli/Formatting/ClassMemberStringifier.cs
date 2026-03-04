@@ -10,7 +10,7 @@ namespace CalqFramework.Cli.Formatting;
 public class ClassMemberStringifier : ClassMemberStringifierBase {
     protected override IEnumerable<string> GetAlternativeNames(string name,
         IEnumerable<CliNameAttribute> cliNameAttributes) {
-        List<string> keys = new();
+        List<string> keys = [];
         if (cliNameAttributes.Count() == 1) {
             string cliName = cliNameAttributes.First().Name;
             if (cliName.Length != 1) {
@@ -31,7 +31,7 @@ public class ClassMemberStringifier : ClassMemberStringifierBase {
 
     protected override IEnumerable<string> GetRequiredNames(string name,
         IEnumerable<CliNameAttribute> cliNameAttributes) {
-        List<string> keys = new();
+        List<string> keys = [];
         foreach (CliNameAttribute cliNameAttribute in cliNameAttributes) {
             keys.Add(cliNameAttribute.Name);
         }

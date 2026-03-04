@@ -140,7 +140,7 @@ public class CompletionPrinter : ICompletionPrinter {
                 .Where(value => value.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase));
         }
 
-        return Enumerable.Empty<string>();
+        return [];
     }
 
     private void PrintCompletions(ICliContext context, IEnumerable<string> completions) {

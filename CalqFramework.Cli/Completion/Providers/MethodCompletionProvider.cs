@@ -10,27 +10,22 @@ namespace CalqFramework.Cli.Completion.Providers;
 public class MethodCompletionProvider : ICompletionProvider {
     public IEnumerable<string> GetCompletions(ICompletionProviderContext context) {
         if (context.Filter == null) {
-            return Enumerable.Empty<string>();
+            return [];
         }
 
         if (context.Submodule == null) {
-            return Enumerable.Empty<string>();
+            return [];
         }
 
         MethodInfo? method = context.Submodule.GetType().GetMethod(
             context.Filter,
-            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-
-        if (method == null) {
-            throw CliErrors.CompletionMethodNotFound(context.Filter, context.Submodule.GetType().Name);
-        }
-
+            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance) ?? throw CliErrors.CompletionMethodNotFound(context.Filter, context.Submodule.GetType().Name);
         ParameterInfo[] parameters = method.GetParameters();
         if (parameters.Length != 1 || parameters[0].ParameterType != typeof(string)) {
             throw CliErrors.InvalidCompletionMethodSignature(context.Filter, context.Submodule.GetType().Name);
         }
 
-        object? result = method.Invoke(context.Submodule, new object[] { context.PartialInput });
+        object? result = method.Invoke(context.Submodule, [context.PartialInput]);
 
         if (result is not IEnumerable<string> completions) {
             throw CliErrors.InvalidCompletionMethodReturnType(context.Filter, context.Submodule.GetType().Name);

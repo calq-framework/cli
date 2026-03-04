@@ -4,11 +4,8 @@ using CalqFramework.DataAccess;
 
 namespace CalqFramework.Cli.Parsing;
 
-internal class OptionReader : OptionReaderBase {
-    public OptionReader(IEnumerator<string> argsEnumerator, IKeyValueStore<string, string?> store) :
-        base(argsEnumerator) => Store = store;
-
-    public IKeyValueStore<string, string?> Store { get; }
+internal class OptionReader(IEnumerator<string> argsEnumerator, IKeyValueStore<string, string?> store) : OptionReaderBase(argsEnumerator) {
+    public IKeyValueStore<string, string?> Store { get; } = store;
 
     protected override Type GetOptionType(char option) => Store.GetValueType(option.ToString());
 

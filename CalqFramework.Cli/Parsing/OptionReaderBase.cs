@@ -5,10 +5,8 @@ using CalqFramework.DataAccess;
 
 namespace CalqFramework.Cli.Parsing;
 
-internal abstract class OptionReaderBase {
-    protected OptionReaderBase(IEnumerator<string> argsEnumerator) => ArgsEnumerator = argsEnumerator;
-
-    public IEnumerator<string> ArgsEnumerator { get; }
+internal abstract class OptionReaderBase(IEnumerator<string> argsEnumerator) {
+    public IEnumerator<string> ArgsEnumerator { get; } = argsEnumerator;
 
     public IEnumerable<(string option, string value, OptionFlags optionAttr)> Read() {
         bool IsNumber(string input) => BigInteger.TryParse(input, out _);

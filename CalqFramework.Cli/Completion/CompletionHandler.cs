@@ -26,22 +26,22 @@ public class CompletionHandler : ICompletionHandler {
     }
 
     public ResultVoid HandleComplete(ICliContext context, IEnumerable<string> args, object target) {
-        List<string> argsList = args.ToList();
+        List<string> argsList = [.. args];
 
         if (argsList.Count == 0) {
-            HandleComplete(context, target, new List<string>(), "");
+            HandleComplete(context, target, [], "");
             return ResultVoid.Value;
         }
 
         string toComplete = argsList[^1];
-        List<string> argsBeforeCursor = argsList.Take(argsList.Count - 1).ToList();
+        List<string> argsBeforeCursor = [.. argsList.Take(argsList.Count - 1)];
 
         HandleComplete(context, target, argsBeforeCursor, toComplete);
         return ResultVoid.Value;
     }
 
     public ResultVoid HandleCompletion(ICliContext context, IEnumerable<string> args, object target) {
-        List<string> argsList = args.ToList();
+        List<string> argsList = [.. args];
 
         if (argsList.Count == 0) {
             throw CliErrors.CompletionRequiresShell();
@@ -54,7 +54,7 @@ public class CompletionHandler : ICompletionHandler {
             throw CliErrors.UnsupportedShell(shell);
         }
 
-        List<string> remainingArgs = argsList.Skip(1).ToList();
+        List<string> remainingArgs = [.. argsList.Skip(1)];
 
         if (remainingArgs.Count > 0) {
             string action = remainingArgs[0];
@@ -117,9 +117,8 @@ public class CompletionHandler : ICompletionHandler {
         ISubcommandStore subcommandStore = context.CliComponentStoreFactory.CreateSubcommandStore(submodule);
 
         if (subcommandName == null) {
-            List<Submodule> submodules = submoduleStore.GetSubmodules().ToList();
-            List<Subcommand> subcommands = subcommandStore
-                .GetSubcommands(context.CliComponentStoreFactory.CreateSubcommandExecutor).ToList();
+            List<Submodule> submodules = [.. submoduleStore.GetSubmodules()];
+            List<Subcommand> subcommands = [.. subcommandStore.GetSubcommands(context.CliComponentStoreFactory.CreateSubcommandExecutor)];
 
             bool hasMatches =
                 submodules.Any(s => s.Keys.Any(k => k.StartsWith(toComplete, StringComparison.OrdinalIgnoreCase))) ||

@@ -31,15 +31,15 @@ public class FileCompletionProvider : ICompletionProvider {
         }
 
         if (!Directory.Exists(directory)) {
-            return Enumerable.Empty<string>();
+            return [];
         }
 
         // Get glob patterns from filter (semicolon-separated)
         string[] patterns = string.IsNullOrEmpty(context.Filter)
-            ? new[] { "*" }
+            ? ["*"]
             : context.Filter.Split(';', StringSplitOptions.RemoveEmptyEntries);
 
-        List<string> files = new();
+        List<string> files = [];
         foreach (string pattern in patterns) {
             try {
                 IEnumerable<string?> matchingFiles = Directory
