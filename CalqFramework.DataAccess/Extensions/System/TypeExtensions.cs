@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Reflection;
 using CalqFramework.DataAccess;
 
@@ -52,43 +52,27 @@ public static class TypeExtensions {
     /// <returns>A new instance of the type.</returns>
     /// <exception cref="InvalidOperationException">Thrown when the type cannot be instantiated.</exception>
     public static object CreateInstance(this Type type) {
-        switch (Type.GetTypeCode(type)) {
-            case TypeCode.Boolean:
-                return false;
-            case TypeCode.Byte:
-                return (byte)0;
-            case TypeCode.SByte:
-                return (sbyte)0;
-            case TypeCode.Char:
-                return '\0';
-            case TypeCode.Decimal:
-                return 0m;
-            case TypeCode.Double:
-                return 0.0;
-            case TypeCode.Single:
-                return 0f;
-            case TypeCode.Int32:
-                return 0;
-            case TypeCode.UInt32:
-                return 0u;
-            case TypeCode.Int64:
-                return 0L;
-            case TypeCode.UInt64:
-                return 0ul;
-            case TypeCode.Int16:
-                return (short)0;
-            case TypeCode.UInt16:
-                return (ushort)0;
-            case TypeCode.DateTime:
-                return default(DateTime);
-            case TypeCode.String:
-                return string.Empty;
-        }
-
-        return TryCreateInstance(type)
-               ?? TryCreateInstance(Nullable.GetUnderlyingType(type))
-               ?? TryCreateInstance(GetConcreteCollectionType(type))
-               ?? throw DataAccessErrors.CannotCreateInstance(type.FullName ?? type.Name);
+        return Type.GetTypeCode(type) switch {
+            TypeCode.Boolean => false,
+            TypeCode.Byte => (byte)0,
+            TypeCode.SByte => (sbyte)0,
+            TypeCode.Char => '\0',
+            TypeCode.Decimal => 0m,
+            TypeCode.Double => 0.0,
+            TypeCode.Single => 0f,
+            TypeCode.Int32 => 0,
+            TypeCode.UInt32 => 0u,
+            TypeCode.Int64 => 0L,
+            TypeCode.UInt64 => 0ul,
+            TypeCode.Int16 => (short)0,
+            TypeCode.UInt16 => (ushort)0,
+            TypeCode.DateTime => default(DateTime),
+            TypeCode.String => string.Empty,
+            _ => TryCreateInstance(type)
+                           ?? TryCreateInstance(Nullable.GetUnderlyingType(type))
+                           ?? TryCreateInstance(GetConcreteCollectionType(type))
+                           ?? throw DataAccessErrors.CannotCreateInstance(type.FullName ?? type.Name),
+        };
     }
 
     private static object? TryCreateInstance(Type? type) {
@@ -203,10 +187,10 @@ public static class TypeExtensions {
 
         Type? parsableInterface = targetType.GetInterface("IParsable`1");
         if (parsableInterface != null) {
-            MethodInfo? parseMethod = targetType.GetMethod("Parse", new[] { typeof(string) });
+            MethodInfo? parseMethod = targetType.GetMethod("Parse", [typeof(string)]);
             if (parseMethod != null) {
                 try {
-                    return parseMethod.Invoke(null, new object?[] { value })!;
+                    return parseMethod.Invoke(null, [value])!;
                 } catch (TargetInvocationException ex) {
                     throw ex.InnerException ?? ex;
                 }
@@ -226,11 +210,11 @@ public static class TypeExtensions {
         Type? parsableInterface = targetType.GetInterface("IParsable`1");
         if (parsableInterface != null) {
             MethodInfo? parseMethod = targetType.GetMethod("Parse",
-                new[] { typeof(string), typeof(IFormatProvider) });
+                [typeof(string), typeof(IFormatProvider)]);
 
             if (parseMethod != null) {
                 try {
-                    return parseMethod.Invoke(null, new object?[] { value, formatProvider })!;
+                    return parseMethod.Invoke(null, [value, formatProvider])!;
                 } catch (TargetInvocationException ex) {
                     throw ex.InnerException ?? ex;
                 }

@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using CalqFramework.Extensions.System;
 
 namespace CalqFramework.DataAccess.ClassMemberStores;

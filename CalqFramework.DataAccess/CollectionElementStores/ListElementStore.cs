@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using CalqFramework.Extensions.System;
 
 namespace CalqFramework.DataAccess.CollectionElementStores;
@@ -6,10 +6,7 @@ namespace CalqFramework.DataAccess.CollectionElementStores;
 /// <summary>
 ///     Provides key-value access to list elements by index.
 /// </summary>
-public sealed class ListElementStore : ListElementStoreBase<string, object?> {
-    public ListElementStore(IList list) : base(list) {
-    }
-
+public sealed class ListElementStore(IList list) : ListElementStoreBase<string, object?>(list) {
     public override object? this[string key] {
         get {
             int index = int.Parse(key);

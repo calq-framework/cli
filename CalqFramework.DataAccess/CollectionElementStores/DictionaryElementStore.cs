@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using CalqFramework.Extensions.System;
 
 namespace CalqFramework.DataAccess.CollectionElementStores;
@@ -6,10 +6,7 @@ namespace CalqFramework.DataAccess.CollectionElementStores;
 /// <summary>
 ///     Provides key-value access to dictionary elements.
 /// </summary>
-public sealed class DictionaryElementStore : DictionaryElementStoreBase<string, object?> {
-    public DictionaryElementStore(IDictionary dictionary) : base(dictionary) {
-    }
-
+public sealed class DictionaryElementStore(IDictionary dictionary) : DictionaryElementStoreBase<string, object?>(dictionary) {
     public override object? this[string key] {
         get {
             object parsedKey = Dictionary.GetType().GetGenericArguments()[0].Parse(key);

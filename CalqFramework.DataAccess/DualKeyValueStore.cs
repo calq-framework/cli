@@ -3,14 +3,9 @@
 /// <summary>
 ///     Combines two key-value stores with primary and secondary lookup priority.
 /// </summary>
-public class DualKeyValueStore<TKey, TValue> : DualKeyValueStoreBase<TKey, TValue> {
-    private readonly IKeyValueStore<TKey, TValue> _primaryStore;
-    private readonly IKeyValueStore<TKey, TValue> _secondaryStore;
-
-    public DualKeyValueStore(IKeyValueStore<TKey, TValue> primaryStore, IKeyValueStore<TKey, TValue> secondaryStore) {
-        _primaryStore = primaryStore;
-        _secondaryStore = secondaryStore;
-    }
+public class DualKeyValueStore<TKey, TValue>(IKeyValueStore<TKey, TValue> primaryStore, IKeyValueStore<TKey, TValue> secondaryStore) : DualKeyValueStoreBase<TKey, TValue> {
+    private readonly IKeyValueStore<TKey, TValue> _primaryStore = primaryStore;
+    private readonly IKeyValueStore<TKey, TValue> _secondaryStore = secondaryStore;
 
     protected override IKeyValueStore<TKey, TValue> PrimaryStore => _primaryStore;
 

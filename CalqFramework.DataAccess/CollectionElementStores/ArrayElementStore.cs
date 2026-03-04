@@ -1,14 +1,11 @@
-using CalqFramework.Extensions.System;
+﻿using CalqFramework.Extensions.System;
 
 namespace CalqFramework.DataAccess.CollectionElementStores;
 
 /// <summary>
 ///     Provides key-value access to array elements by index.
 /// </summary>
-public sealed class ArrayElementStore : ArrayElementStoreBase<string, object?> {
-    public ArrayElementStore(Array array) : base(array) {
-    }
-
+public sealed class ArrayElementStore(Array array) : ArrayElementStoreBase<string, object?>(array) {
     public override object? this[string key] {
         get {
             int index = int.Parse(key);

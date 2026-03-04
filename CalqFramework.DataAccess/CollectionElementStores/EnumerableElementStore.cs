@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using CalqFramework.Extensions.System;
 
 namespace CalqFramework.DataAccess.CollectionElementStores;
@@ -7,10 +7,8 @@ namespace CalqFramework.DataAccess.CollectionElementStores;
 ///     Provides element store for IEnumerable using immutable append operations.
 ///     Uses Enumerable.Append to create new enumerables rather than mutating.
 /// </summary>
-public sealed class EnumerableElementStore : CollectionElementStoreBase<string, object?> {
-    public EnumerableElementStore(IEnumerable enumerable) => TargetEnumerable = enumerable.Cast<object?>();
-
-    public IEnumerable<object?> TargetEnumerable { get; set; }
+public sealed class EnumerableElementStore(IEnumerable enumerable) : CollectionElementStoreBase<string, object?> {
+    public IEnumerable<object?> TargetEnumerable { get; set; } = enumerable.Cast<object?>();
 
     public override object? this[string key] {
         get {

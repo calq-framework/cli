@@ -1,12 +1,9 @@
-using System.Reflection;
+﻿using System.Reflection;
 using CalqFramework.Extensions.System;
 
 namespace CalqFramework.DataAccess.ClassMemberStores;
 
-public abstract class PropertyStoreBase<TKey, TValue> : ClassDataMemberStoreBase<TKey, TValue, PropertyInfo, object?> {
-    public PropertyStoreBase(object targetObject, BindingFlags bindingFlags) : base(targetObject, bindingFlags) {
-    }
-
+public abstract class PropertyStoreBase<TKey, TValue>(object targetObject, BindingFlags bindingFlags) : ClassDataMemberStoreBase<TKey, TValue, PropertyInfo, object?>(targetObject, bindingFlags) {
     public override IEnumerable<PropertyInfo> Accessors =>
         TargetType.GetProperties(BindingFlags).Where(ContainsAccessor);
 

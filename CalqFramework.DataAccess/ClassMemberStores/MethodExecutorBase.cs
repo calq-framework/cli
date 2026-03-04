@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace CalqFramework.DataAccess.ClassMemberStores;
 
@@ -6,7 +6,7 @@ public abstract class MethodExecutorBase<TParameterKey, TParameterValue> :
     ParameterStoreBase<TParameterKey, TParameterValue>, IFunctionExecutor<TParameterKey, TParameterValue> {
     protected MethodExecutorBase(MethodInfo method, object? targetObject) : base(method) {
         TargetObject = targetObject;
-        Arguments = new List<TParameterValue>();
+        Arguments = [];
         for (int j = 0; j < ParameterIndexByParameter.Count; j++) {
             ParameterValues[j] = DBNull.Value;
         }

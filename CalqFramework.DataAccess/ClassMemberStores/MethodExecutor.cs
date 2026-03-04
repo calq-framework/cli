@@ -1,4 +1,4 @@
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace CalqFramework.DataAccess.ClassMemberStores;
@@ -6,10 +6,7 @@ namespace CalqFramework.DataAccess.ClassMemberStores;
 /// <summary>
 ///     Executes methods with parameter assignment and invocation support.
 /// </summary>
-public class MethodExecutor : MethodExecutorBase<string, object?>, IKeyValueStore<string, object?, ParameterInfo> {
-    public MethodExecutor(MethodInfo method, object obj) : base(method, obj) {
-    }
-
+public class MethodExecutor(MethodInfo method, object obj) : MethodExecutorBase<string, object?>(method, obj), IKeyValueStore<string, object?, ParameterInfo> {
     public override bool ContainsAccessor(ParameterInfo accessor) => accessor.Member == ParentMethod;
 
     public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out ParameterInfo result) {

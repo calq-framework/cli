@@ -1,4 +1,4 @@
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace CalqFramework.DataAccess.ClassMemberStores;
@@ -6,10 +6,7 @@ namespace CalqFramework.DataAccess.ClassMemberStores;
 /// <summary>
 ///     Provides key-value access to object properties by name.
 /// </summary>
-public sealed class PropertyStore : PropertyStoreBase<string, object?>, IKeyValueStore<string, object?, PropertyInfo> {
-    public PropertyStore(object obj, BindingFlags bindingFlags) : base(obj, bindingFlags) {
-    }
-
+public sealed class PropertyStore(object obj, BindingFlags bindingFlags) : PropertyStoreBase<string, object?>(obj, bindingFlags), IKeyValueStore<string, object?, PropertyInfo> {
     public override bool ContainsAccessor(PropertyInfo accessor) => accessor.ReflectedType == TargetType;
 
     public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out PropertyInfo result) {
