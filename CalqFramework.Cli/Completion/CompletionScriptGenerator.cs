@@ -1,41 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
-namespace CalqFramework.Cli.Completion {
+namespace CalqFramework.Cli.Completion;
 
-    public class CompletionScriptGenerator : ICompletionScriptGenerator {
-
-        private record ShellConfig(string Template, Func<string, string> GetInstallPath);
-
-        private static readonly Dictionary<string, ShellConfig> _shellConfigs = new() {
-            ["bash"] = new(BashTemplate, GetBashInstallPath),
-            ["zsh"] = new(ZshTemplate, GetZshInstallPath),
-            ["powershell"] = new(PowerShellTemplate, GetPowerShell5InstallPath),
-            ["pwsh"] = new(PowerShellTemplate, GetPowerShell7InstallPath),
-            ["fish"] = new(FishTemplate, GetFishInstallPath)
-        };
-
-        public IReadOnlyCollection<string> SupportedShells => _shellConfigs.Keys;
-
-        public string GenerateScript(string shell, string programName) {
-            var normalized = shell.ToLowerInvariant();
-            if (!_shellConfigs.TryGetValue(normalized, out var config)) {
-                throw CliErrors.UnsupportedShell(shell);
-            }
-            return config.Template.Replace("__PROGRAM_NAME__", programName);
-        }
-
-        public string GetInstallPath(string shell, string programName) {
-            var normalized = shell.ToLowerInvariant();
-            if (!_shellConfigs.TryGetValue(normalized, out var config)) {
-                throw CliErrors.UnsupportedShell(shell);
-            }
-            return config.GetInstallPath(programName);
-        }
-
-        private const string BashTemplate = @"# Bash completion script for __PROGRAM_NAME__
+public class CompletionScriptGenerator : ICompletionScriptGenerator {
+    private const string BashTemplate = @"# Bash completion script for __PROGRAM_NAME__
 ___PROGRAM_NAME___completion() {
     local cur prev words cword
     _init_completion || return
@@ -47,7 +17,7 @@ ___PROGRAM_NAME___completion() {
 }
 complete -F ___PROGRAM_NAME___completion __PROGRAM_NAME__";
 
-        private const string ZshTemplate = @"#compdef __PROGRAM_NAME__
+    private const string ZshTemplate = @"#compdef __PROGRAM_NAME__
 ___PROGRAM_NAME___completion() {
     local -a completions
     local -a words
@@ -61,7 +31,7 @@ ___PROGRAM_NAME___completion() {
 }
 ___PROGRAM_NAME___completion ""$@""";
 
-        private const string PowerShellTemplate = @"# PowerShell completion script for __PROGRAM_NAME__
+    private const string PowerShellTemplate = @"# PowerShell completion script for __PROGRAM_NAME__
 Register-ArgumentCompleter -Native -CommandName __PROGRAM_NAME__ -ScriptBlock {
     param($wordToComplete, $commandAst, $cursorPosition)
     
@@ -73,7 +43,7 @@ Register-ArgumentCompleter -Native -CommandName __PROGRAM_NAME__ -ScriptBlock {
     }
 }";
 
-        private const string FishTemplate = @"# Fish completion script for __PROGRAM_NAME__
+    private const string FishTemplate = @"# Fish completion script for __PROGRAM_NAME__
 function ____PROGRAM_NAME___completion
     set -l tokens (commandline -opc)
     set -l args (string join ' ' $tokens[2..-1])
@@ -82,116 +52,156 @@ function ____PROGRAM_NAME___completion
 end
 complete -c __PROGRAM_NAME__ -f -a ""(____PROGRAM_NAME___completion)""";
 
-        private static string GetBashInstallPath(string programName) {
-            if (OperatingSystem.IsWindows()) {
-                return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".bash_completion.d", $"{programName}.bash");
+    private static readonly Dictionary<string, ShellConfig> _shellConfigs = new() {
+        ["bash"] = new ShellConfig(BashTemplate, GetBashInstallPath),
+        ["zsh"] = new ShellConfig(ZshTemplate, GetZshInstallPath),
+        ["powershell"] = new ShellConfig(PowerShellTemplate, GetPowerShell5InstallPath),
+        ["pwsh"] = new ShellConfig(PowerShellTemplate, GetPowerShell7InstallPath),
+        ["fish"] = new ShellConfig(FishTemplate, GetFishInstallPath)
+    };
+
+    public IReadOnlyCollection<string> SupportedShells => _shellConfigs.Keys;
+
+    public string GenerateScript(string shell, string programName) {
+        string normalized = shell.ToLowerInvariant();
+        if (!_shellConfigs.TryGetValue(normalized, out ShellConfig? config)) {
+            throw CliErrors.UnsupportedShell(shell);
+        }
+
+        return config.Template.Replace("__PROGRAM_NAME__", programName);
+    }
+
+    public string GetInstallPath(string shell, string programName) {
+        string normalized = shell.ToLowerInvariant();
+        if (!_shellConfigs.TryGetValue(normalized, out ShellConfig? config)) {
+            throw CliErrors.UnsupportedShell(shell);
+        }
+
+        return config.GetInstallPath(programName);
+    }
+
+    public void InstallScript(string shell, string programName) {
+        string script = GenerateScript(shell, programName);
+        string installPath = GetInstallPath(shell, programName);
+        string? directory = Path.GetDirectoryName(installPath);
+
+        if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory)) {
+            Directory.CreateDirectory(directory);
+        }
+
+        File.WriteAllText(installPath, script);
+
+        string normalizedShell = shell.ToLowerInvariant();
+        if (normalizedShell == "powershell" || normalizedShell == "pwsh") {
+            AddToPowerShellProfile(normalizedShell, installPath);
+        }
+    }
+
+    public bool UninstallScript(string shell, string programName) {
+        string installPath = GetInstallPath(shell, programName);
+
+        if (File.Exists(installPath)) {
+            File.Delete(installPath);
+
+            string normalizedShell = shell.ToLowerInvariant();
+            if (normalizedShell == "powershell" || normalizedShell == "pwsh") {
+                RemoveFromPowerShellProfile(normalizedShell, installPath);
             }
-            return $"/etc/bash_completion.d/{programName}";
+
+            return true;
         }
 
-        private static string GetZshInstallPath(string programName) {
-            if (OperatingSystem.IsWindows()) {
-                return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".zsh", "completion", $"_{programName}");
+        return false;
+    }
+
+    private static string GetBashInstallPath(string programName) {
+        if (OperatingSystem.IsWindows()) {
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".bash_completion.d",
+                $"{programName}.bash");
+        }
+
+        return $"/etc/bash_completion.d/{programName}";
+    }
+
+    private static string GetZshInstallPath(string programName) {
+        if (OperatingSystem.IsWindows()) {
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".zsh", "completion",
+                $"_{programName}");
+        }
+
+        return $"/usr/local/share/zsh/site-functions/_{programName}";
+    }
+
+    private static string GetPowerShell5InstallPath(string programName) {
+        string profileDir = Path.GetDirectoryName(GetPowerShell5ProfilePath()) ?? "";
+        return Path.Combine(profileDir, "Completions", $"{programName}.ps1");
+    }
+
+    private static string GetPowerShell7InstallPath(string programName) {
+        string profileDir = Path.GetDirectoryName(GetPowerShell7ProfilePath()) ?? "";
+        return Path.Combine(profileDir, "Completions", $"{programName}.ps1");
+    }
+
+    private static string GetFishInstallPath(string programName) {
+        if (OperatingSystem.IsWindows()) {
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "fish",
+                "completions", $"{programName}.fish");
+        }
+
+        return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", "fish",
+            "completions", $"{programName}.fish");
+    }
+
+    private static string GetPowerShell5ProfilePath() =>
+        // Windows PowerShell 5.1 (Windows only)
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "WindowsPowerShell",
+            "Microsoft.PowerShell_profile.ps1");
+
+    private static string GetPowerShell7ProfilePath() {
+        // PowerShell 7+ (cross-platform)
+        if (OperatingSystem.IsWindows()) {
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "PowerShell",
+                "Microsoft.PowerShell_profile.ps1");
+        }
+
+        return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", "powershell",
+            "Microsoft.PowerShell_profile.ps1");
+    }
+
+    private void AddToPowerShellProfile(string shell, string scriptPath) {
+        string profilePath = shell == "powershell" ? GetPowerShell5ProfilePath() : GetPowerShell7ProfilePath();
+        string sourceCommand = $". \"{scriptPath}\"";
+
+        if (File.Exists(profilePath)) {
+            string profileContent = File.ReadAllText(profilePath);
+            if (!profileContent.Contains(scriptPath)) {
+                File.AppendAllText(profilePath, Environment.NewLine + sourceCommand + Environment.NewLine);
             }
-            return $"/usr/local/share/zsh/site-functions/_{programName}";
-        }
-
-        private static string GetPowerShell5InstallPath(string programName) {
-            var profileDir = Path.GetDirectoryName(GetPowerShell5ProfilePath()) ?? "";
-            return Path.Combine(profileDir, "Completions", $"{programName}.ps1");
-        }
-
-        private static string GetPowerShell7InstallPath(string programName) {
-            var profileDir = Path.GetDirectoryName(GetPowerShell7ProfilePath()) ?? "";
-            return Path.Combine(profileDir, "Completions", $"{programName}.ps1");
-        }
-
-        private static string GetFishInstallPath(string programName) {
-            if (OperatingSystem.IsWindows()) {
-                return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "fish", "completions", $"{programName}.fish");
-            }
-            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", "fish", "completions", $"{programName}.fish");
-        }
-
-        private static string GetPowerShell5ProfilePath() {
-            // Windows PowerShell 5.1 (Windows only)
-            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "WindowsPowerShell", "Microsoft.PowerShell_profile.ps1");
-        }
-
-        private static string GetPowerShell7ProfilePath() {
-            // PowerShell 7+ (cross-platform)
-            if (OperatingSystem.IsWindows()) {
-                return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "PowerShell", "Microsoft.PowerShell_profile.ps1");
-            }
-            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", "powershell", "Microsoft.PowerShell_profile.ps1");
-        }
-
-        public void InstallScript(string shell, string programName) {
-            var script = GenerateScript(shell, programName);
-            var installPath = GetInstallPath(shell, programName);
-            var directory = Path.GetDirectoryName(installPath);
-            
+        } else {
+            string? directory = Path.GetDirectoryName(profilePath);
             if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory)) {
                 Directory.CreateDirectory(directory);
             }
 
-            File.WriteAllText(installPath, script);
-
-            var normalizedShell = shell.ToLowerInvariant();
-            if (normalizedShell == "powershell" || normalizedShell == "pwsh") {
-                AddToPowerShellProfile(normalizedShell, installPath);
-            }
+            File.WriteAllText(profilePath, sourceCommand + Environment.NewLine);
         }
+    }
 
-        private void AddToPowerShellProfile(string shell, string scriptPath) {
-            var profilePath = shell == "powershell" ? GetPowerShell5ProfilePath() : GetPowerShell7ProfilePath();
-            var sourceCommand = $". \"{scriptPath}\"";
+    private void RemoveFromPowerShellProfile(string shell, string scriptPath) {
+        string profilePath = shell == "powershell" ? GetPowerShell5ProfilePath() : GetPowerShell7ProfilePath();
 
-            if (File.Exists(profilePath)) {
-                var profileContent = File.ReadAllText(profilePath);
-                if (!profileContent.Contains(scriptPath)) {
-                    File.AppendAllText(profilePath, Environment.NewLine + sourceCommand + Environment.NewLine);
-                }
-            } else {
-                var directory = Path.GetDirectoryName(profilePath);
-                if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory)) {
-                    Directory.CreateDirectory(directory);
-                }
-                File.WriteAllText(profilePath, sourceCommand + Environment.NewLine);
-            }
-        }
+        if (File.Exists(profilePath)) {
+            string profileContent = File.ReadAllText(profilePath);
+            string sourceCommand = $". \"{scriptPath}\"";
 
-        public bool UninstallScript(string shell, string programName) {
-            var installPath = GetInstallPath(shell, programName);
-            
-            if (File.Exists(installPath)) {
-                File.Delete(installPath);
-
-                var normalizedShell = shell.ToLowerInvariant();
-                if (normalizedShell == "powershell" || normalizedShell == "pwsh") {
-                    RemoveFromPowerShellProfile(normalizedShell, installPath);
-                }
-
-                return true;
-            }
-
-            return false;
-        }
-
-        private void RemoveFromPowerShellProfile(string shell, string scriptPath) {
-            var profilePath = shell == "powershell" ? GetPowerShell5ProfilePath() : GetPowerShell7ProfilePath();
-            
-            if (File.Exists(profilePath)) {
-                var profileContent = File.ReadAllText(profilePath);
-                var sourceCommand = $". \"{scriptPath}\"";
-                
-                if (profileContent.Contains(sourceCommand)) {
-                    profileContent = profileContent.Replace(sourceCommand + Environment.NewLine, "");
-                    profileContent = profileContent.Replace(Environment.NewLine + sourceCommand, "");
-                    profileContent = profileContent.Replace(sourceCommand, "");
-                    File.WriteAllText(profilePath, profileContent);
-                }
+            if (profileContent.Contains(sourceCommand)) {
+                profileContent = profileContent.Replace(sourceCommand + Environment.NewLine, "");
+                profileContent = profileContent.Replace(Environment.NewLine + sourceCommand, "");
+                profileContent = profileContent.Replace(sourceCommand, "");
+                File.WriteAllText(profilePath, profileContent);
             }
         }
     }
+
+    private record ShellConfig(string Template, Func<string, string> GetInstallPath);
 }

@@ -1,36 +1,34 @@
 ﻿#pragma warning disable CS0649
 
 using System.Collections.Generic;
-using CalqFramework.Cli;
 
-namespace CalqFramework.Cli.Test {
+namespace CalqFramework.Cli.Test;
 
-    internal class SomeConfiguration {
+internal class SomeConfiguration {
+    public byte aByteNumber;
+    public bool boolean;
 
-        public class Inner { }
+    public List<bool> initializedBoolList = new() { true, false };
 
-        public Inner inner;
-        public int integer;
-        public byte aByteNumber;
-        public bool boolean;
-        public bool xtrueBoolean = true;
-        public string text;
-        public LogLevel logLevel;
-        public LogLevel? nullableLogLevel;
+    public Inner inner;
+    public int integer;
+    public LogLevel logLevel;
 
-        [CliName("customname")]
-        public bool longOption;
+    [CliName("customname")] public bool longOption;
 
-        [CliName("shadowedfield")]
-        public bool usableOption;
+    public LogLevel? nullableLogLevel;
 
-        [CliName("s")]
-        public bool shadowedfield;
+    [CliName("s")] public bool shadowedfield;
 
-        [CliName("differentname")]
-        [CliName("y")]
-        public bool shortOption;
+    [CliName("differentname")] [CliName("y")]
+    public bool shortOption;
 
-        public List<bool> initializedBoolList = new() { true, false };
+    public string text;
+
+    [CliName("shadowedfield")] public bool usableOption;
+
+    public bool xtrueBoolean = true;
+
+    public class Inner {
     }
 }

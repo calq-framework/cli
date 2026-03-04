@@ -1,13 +1,11 @@
-using System.Collections;
 using CalqFramework.Extensions.System;
 
 namespace CalqFramework.DataAccess.CollectionElementStores;
 
 /// <summary>
-/// Provides key-value access to array elements by index.
+///     Provides key-value access to array elements by index.
 /// </summary>
 public sealed class ArrayElementStore : ArrayElementStoreBase<string, object?> {
-
     public ArrayElementStore(Array array) : base(array) {
     }
 
@@ -26,6 +24,7 @@ public sealed class ArrayElementStore : ArrayElementStoreBase<string, object?> {
         if (!int.TryParse(key, out int index)) {
             return false;
         }
+
         return index >= 0 && index < Array.Length;
     }
 
@@ -36,6 +35,7 @@ public sealed class ArrayElementStore : ArrayElementStoreBase<string, object?> {
             element = Array.GetType().GetElementType()!.CreateInstance();
             Array.SetValue(element, index);
         }
+
         return element;
     }
 }

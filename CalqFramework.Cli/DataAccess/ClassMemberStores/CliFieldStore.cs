@@ -1,100 +1,90 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
-using CalqFramework.Cli.DataAccess;
 using CalqFramework.Cli.Formatting;
 using CalqFramework.DataAccess.ClassMemberStores;
-using CalqFramework.DataAccess.CollectionElementStores;
-using CalqFramework.Extensions.System;
 
-namespace CalqFramework.Cli.DataAccess.ClassMemberStores {
+namespace CalqFramework.Cli.DataAccess.ClassMemberStores;
 
-    internal class CliFieldStore<TValue> : FieldStoreBase<string, TValue>, ICliKeyValueStore<string, TValue, MemberInfo> {
+internal class CliFieldStore<TValue> : FieldStoreBase<string, TValue>, ICliKeyValueStore<string, TValue, MemberInfo> {
+    public CliFieldStore(object targetObject, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier,
+        IAccessValidator accessValidator, ICompositeValueConverter<TValue> compositeValueConverter) : base(targetObject,
+        bindingFlags) {
+        ClassMemberStringifier = classMemberStringifier;
+        AccessValidator = accessValidator;
+        CompositeValueConverter = compositeValueConverter;
+        AccessorsByNames = GetAccessorsByNames();
+    }
 
-        public CliFieldStore(object targetObject, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier, IAccessValidator accessValidator, ICompositeValueConverter<TValue> compositeValueConverter) : base(targetObject, bindingFlags) {
-            ClassMemberStringifier = classMemberStringifier;
-            AccessValidator = accessValidator;
-            CompositeValueConverter = compositeValueConverter;
-            AccessorsByNames = GetAccessorsByNames();
-        }
+    private IDictionary<string, FieldInfo> AccessorsByNames { get; }
+    private IAccessValidator AccessValidator { get; }
+    private IClassMemberStringifier ClassMemberStringifier { get; }
+    private ICompositeValueConverter<TValue> CompositeValueConverter { get; }
 
-        private IDictionary<string, FieldInfo> AccessorsByNames { get; }
-        private IAccessValidator AccessValidator { get; }
-        private IClassMemberStringifier ClassMemberStringifier { get; }
-        private ICompositeValueConverter<TValue> CompositeValueConverter { get; }
+    public IEnumerable<AccessorKeysPair<MemberInfo>> GetAccessorKeysPairs() =>
+        AccessorsByNames
+            .GroupBy(kv => kv.Value)
+            .Select(g => new AccessorKeysPair<MemberInfo>(
+                g.Key,
+                g.Select(kv => kv.Key).ToArray()
+            ));
 
-        public override bool ContainsAccessor(FieldInfo accessor) {
-            return accessor.ReflectedType == TargetType && AccessValidator.IsValid(accessor);
-        }
+    public bool IsMultiValue(string key) {
+        FieldInfo accessor = GetAccessor(key);
+        return CompositeValueConverter.IsMultiValue(accessor.FieldType);
+    }
 
-        public override Type GetValueType(FieldInfo accessor) {
-            return CompositeValueConverter.GetValueType(accessor.FieldType);
-        }
+    public override bool ContainsAccessor(FieldInfo accessor) =>
+        accessor.ReflectedType == TargetType && AccessValidator.IsValid(accessor);
 
-        public IEnumerable<AccessorKeysPair<MemberInfo>> GetAccessorKeysPairs() {
-            return AccessorsByNames
-                .GroupBy(kv => kv.Value)
-                .Select(g => new AccessorKeysPair<MemberInfo>(
-                    (MemberInfo)g.Key,
-                    g.Select(kv => kv.Key).ToArray()
-                ));
-        }
+    public override Type GetValueType(FieldInfo accessor) => CompositeValueConverter.GetValueType(accessor.FieldType);
 
-        public bool IsMultiValue(string key) {
-            FieldInfo accessor = GetAccessor(key);
-            return CompositeValueConverter.IsMultiValue(accessor.FieldType);
-        }
+    public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out FieldInfo result) =>
+        AccessorsByNames.TryGetValue(key, out result);
 
-        public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out FieldInfo result) {
-            return AccessorsByNames.TryGetValue(key, out result);
-        }
+    protected override TValue ConvertFromInternalValue(object? value, FieldInfo accessor) =>
+        CompositeValueConverter.ConvertFrom(value, accessor.FieldType);
 
-        protected override TValue ConvertFromInternalValue(object? value, FieldInfo accessor) {
-            return CompositeValueConverter.ConvertFrom(value, accessor.FieldType);
-        }
+    protected override object? ConvertToInternalValue(TValue value, FieldInfo accessor) {
+        object? currentValue = GetValueOrInitialize(accessor);
+        return CompositeValueConverter.ConvertToOrUpdate(value, accessor.FieldType, currentValue);
+    }
 
-        protected override object? ConvertToInternalValue(TValue value, FieldInfo accessor) {
-            object? currentValue = GetValueOrInitialize(accessor);
-            return CompositeValueConverter.ConvertToOrUpdate(value, accessor.FieldType, currentValue);
-        }
+    private IDictionary<string, FieldInfo> GetAccessorsByNames() {
+        StringComparer stringComparer = BindingFlags.HasFlag(BindingFlags.IgnoreCase)
+            ? StringComparer.OrdinalIgnoreCase
+            : StringComparer.Ordinal;
 
-        private IDictionary<string, FieldInfo> GetAccessorsByNames() {
-            var stringComparer = BindingFlags.HasFlag(BindingFlags.IgnoreCase) ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
-
-            var accessorsByRequiredNames = new Dictionary<string, FieldInfo>(stringComparer);
-            foreach (var accessor in Accessors) {
-                foreach (var name in ClassMemberStringifier.GetRequiredNames(accessor)) {
-                    if (!accessorsByRequiredNames.TryAdd(name, accessor)) {
-                        throw CliErrors.NameCollision(accessor.Name, accessorsByRequiredNames[name].Name);
-                    }
-
+        Dictionary<string, FieldInfo> accessorsByRequiredNames = new(stringComparer);
+        foreach (FieldInfo accessor in Accessors) {
+            foreach (string name in ClassMemberStringifier.GetRequiredNames(accessor)) {
+                if (!accessorsByRequiredNames.TryAdd(name, accessor)) {
+                    throw CliErrors.NameCollision(accessor.Name, accessorsByRequiredNames[name].Name);
                 }
             }
+        }
 
-            var accessorsByAlternativeNames = new Dictionary<string, FieldInfo>(stringComparer);
-            var collidingAlternativeNames = new HashSet<string>();
-            foreach (var accessor in Accessors) {
-                foreach (var name in ClassMemberStringifier.GetAlternativeNames(accessor)) {
-                    if (!accessorsByAlternativeNames.TryAdd(name, accessor)) {
-                        collidingAlternativeNames.Add(name);
-                    }
-
+        Dictionary<string, FieldInfo> accessorsByAlternativeNames = new(stringComparer);
+        HashSet<string> collidingAlternativeNames = new();
+        foreach (FieldInfo accessor in Accessors) {
+            foreach (string name in ClassMemberStringifier.GetAlternativeNames(accessor)) {
+                if (!accessorsByAlternativeNames.TryAdd(name, accessor)) {
+                    collidingAlternativeNames.Add(name);
                 }
             }
-
-            foreach (var name in collidingAlternativeNames) {
-                accessorsByAlternativeNames.Remove(name);
-            }
-
-            var accessorsByNames = accessorsByRequiredNames;
-            foreach (var name in accessorsByAlternativeNames.Keys) {
-                accessorsByNames.TryAdd(name, accessorsByAlternativeNames[name]);
-            }
-
-            return accessorsByNames;
         }
+
+        foreach (string name in collidingAlternativeNames) {
+            accessorsByAlternativeNames.Remove(name);
+        }
+
+        Dictionary<string, FieldInfo> accessorsByNames = accessorsByRequiredNames;
+        foreach (string name in accessorsByAlternativeNames.Keys) {
+            accessorsByNames.TryAdd(name, accessorsByAlternativeNames[name]);
+        }
+
+        return accessorsByNames;
     }
 }

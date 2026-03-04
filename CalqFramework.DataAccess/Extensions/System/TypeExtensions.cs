@@ -1,39 +1,57 @@
+using System.Collections;
+using System.Reflection;
 using CalqFramework.DataAccess;
 
 namespace CalqFramework.Extensions.System;
 
 /// <summary>
-/// Extension methods for parsing string values to typed objects.
+///     Extension methods for parsing string values to typed objects.
 /// </summary>
 public static class TypeExtensions {
+    private static readonly Dictionary<Type, Type> InterfaceToConcreteMap = new() {
+        // Generic collections
+        [typeof(IList<>)] = typeof(List<>),
+        [typeof(ICollection<>)] = typeof(List<>),
+        [typeof(IEnumerable<>)] = typeof(List<>),
+        [typeof(IReadOnlyList<>)] = typeof(List<>),
+        [typeof(IReadOnlyCollection<>)] = typeof(List<>),
+        [typeof(IDictionary<,>)] = typeof(Dictionary<,>),
+        [typeof(IReadOnlyDictionary<,>)] = typeof(Dictionary<,>),
+        [typeof(ISet<>)] = typeof(HashSet<>),
+        [typeof(IReadOnlySet<>)] = typeof(HashSet<>),
+
+        // Non-generic collections
+        [typeof(IList)] = typeof(ArrayList),
+        [typeof(ICollection)] = typeof(ArrayList),
+        [typeof(IEnumerable)] = typeof(ArrayList),
+        [typeof(IDictionary)] = typeof(Hashtable)
+    };
 
     /// <summary>
-    /// Determines whether the specified type is an enumerable type.
+    ///     Determines whether the specified type is an enumerable type.
     /// </summary>
-    public static bool IsEnumerable(this global::System.Type type) {
-        return type.GetInterface(nameof(global::System.Collections.IEnumerable)) != null;
-    }
+    public static bool IsEnumerable(this Type type) => type.GetInterface(nameof(IEnumerable)) != null;
 
     /// <summary>
-    /// Gets the element type for an enumerable, or the type itself if not an enumerable.
-    /// For generic enumerables like List&lt;T&gt;, returns T. For non-enumerables, returns the type itself.
+    ///     Gets the element type for an enumerable, or the type itself if not an enumerable.
+    ///     For generic enumerables like List&lt;T&gt;, returns T. For non-enumerables, returns the type itself.
     /// </summary>
-    public static global::System.Type GetEnumerableElementType(this global::System.Type type) {
+    public static Type GetEnumerableElementType(this Type type) {
         if (!type.IsEnumerable()) {
             return type;
         }
-        
-        var genericArgs = type.GetGenericArguments();
+
+        Type[] genericArgs = type.GetGenericArguments();
         return genericArgs.Length > 0 ? genericArgs[0] : typeof(object);
     }
 
     /// <summary>
-    /// Creates an instance of the specified type, with support for collection interfaces.
+    ///     Creates an instance of the specified type, with support for collection interfaces.
     /// </summary>
     /// <param name="type">The type to instantiate.</param>
     /// <returns>A new instance of the type.</returns>
     /// <exception cref="InvalidOperationException">Thrown when the type cannot be instantiated.</exception>
-    public static object CreateInstance(this global::System.Type type) {
+    public static object CreateInstance(this Type type) {
         switch (Type.GetTypeCode(type)) {
             case TypeCode.Boolean:
                 return false;
@@ -66,16 +84,18 @@ public static class TypeExtensions {
             case TypeCode.String:
                 return string.Empty;
         }
-        
+
         return TryCreateInstance(type)
-            ?? TryCreateInstance(Nullable.GetUnderlyingType(type))
-            ?? TryCreateInstance(GetConcreteCollectionType(type))
-            ?? throw DataAccessErrors.CannotCreateInstance(type.FullName ?? type.Name);
+               ?? TryCreateInstance(Nullable.GetUnderlyingType(type))
+               ?? TryCreateInstance(GetConcreteCollectionType(type))
+               ?? throw DataAccessErrors.CannotCreateInstance(type.FullName ?? type.Name);
     }
 
     private static object? TryCreateInstance(Type? type) {
-        if (type == null) return null;
-        
+        if (type == null) {
+            return null;
+        }
+
         try {
             return Activator.CreateInstance(type);
         } catch {
@@ -84,42 +104,23 @@ public static class TypeExtensions {
     }
 
     private static Type? GetConcreteCollectionType(Type interfaceType) {
-        if (InterfaceToConcreteMap.TryGetValue(interfaceType, out var concreteType)) {
+        if (InterfaceToConcreteMap.TryGetValue(interfaceType, out Type? concreteType)) {
             return concreteType;
         }
-        
+
         if (interfaceType.IsGenericType) {
-            var genericTypeDef = interfaceType.GetGenericTypeDefinition();
-            if (InterfaceToConcreteMap.TryGetValue(genericTypeDef, out var genericConcrete)) {
+            Type genericTypeDef = interfaceType.GetGenericTypeDefinition();
+            if (InterfaceToConcreteMap.TryGetValue(genericTypeDef, out Type? genericConcrete)) {
                 return genericConcrete.MakeGenericType(interfaceType.GetGenericArguments());
             }
         }
-        
+
         return null;
     }
 
-    private static readonly Dictionary<Type, Type> InterfaceToConcreteMap = new() {
-        // Generic collections
-        [typeof(IList<>)] = typeof(List<>),
-        [typeof(ICollection<>)] = typeof(List<>),
-        [typeof(IEnumerable<>)] = typeof(List<>),
-        [typeof(IReadOnlyList<>)] = typeof(List<>),
-        [typeof(IReadOnlyCollection<>)] = typeof(List<>),
-        [typeof(IDictionary<,>)] = typeof(Dictionary<,>),
-        [typeof(IReadOnlyDictionary<,>)] = typeof(Dictionary<,>),
-        [typeof(ISet<>)] = typeof(HashSet<>),
-        [typeof(IReadOnlySet<>)] = typeof(HashSet<>),
-        
-        // Non-generic collections
-        [typeof(global::System.Collections.IList)] = typeof(global::System.Collections.ArrayList),
-        [typeof(global::System.Collections.ICollection)] = typeof(global::System.Collections.ArrayList),
-        [typeof(global::System.Collections.IEnumerable)] = typeof(global::System.Collections.ArrayList),
-        [typeof(global::System.Collections.IDictionary)] = typeof(global::System.Collections.Hashtable),
-    };
-
-    public static bool IsParsable(this global::System.Type type) {
+    public static bool IsParsable(this Type type) {
         type = Nullable.GetUnderlyingType(type) ?? type;
-        
+
         switch (Type.GetTypeCode(type)) {
             case TypeCode.Boolean:
             case TypeCode.Byte:
@@ -138,18 +139,15 @@ public static class TypeExtensions {
             case TypeCode.String:
                 return true;
             default:
-                var parsableInterface = type.GetInterface("IParsable`1");
+                Type? parsableInterface = type.GetInterface("IParsable`1");
                 return parsableInterface != null;
         }
     }
 
-    public static T Parse<T>(this Type type, string value) {
-        return (T)type.Parse(value);
-    }
+    public static T Parse<T>(this Type type, string value) => (T)type.Parse(value);
 
-    public static T Parse<T>(this Type type, string value, IFormatProvider formatProvider) {
-        return (T)type.Parse(value, formatProvider);
-    }
+    public static T Parse<T>(this Type type, string value, IFormatProvider formatProvider) =>
+        (T)type.Parse(value, formatProvider);
 
     public static object Parse(this Type targetType, string value) {
         object objValue = Type.GetTypeCode(targetType) switch {
@@ -170,7 +168,7 @@ public static class TypeExtensions {
             TypeCode.String => value,
             _ => TryParseParsable(targetType, value)
         };
-        
+
         return objValue;
     }
 
@@ -193,51 +191,52 @@ public static class TypeExtensions {
             TypeCode.String => value,
             _ => TryParseParsableWithFormatProvider(targetType, value, formatProvider)
         };
-        
+
         return objValue;
     }
 
     private static object TryParseParsable(Type targetType, string value) {
         if (Nullable.GetUnderlyingType(targetType) != null) {
             targetType = Nullable.GetUnderlyingType(targetType)!;
-            return Parse(targetType, value);
+            return targetType.Parse(value);
         }
 
-        var parsableInterface = targetType.GetInterface("IParsable`1");
+        Type? parsableInterface = targetType.GetInterface("IParsable`1");
         if (parsableInterface != null) {
-            var parseMethod = targetType.GetMethod("Parse", new[] { typeof(string) });
+            MethodInfo? parseMethod = targetType.GetMethod("Parse", new[] { typeof(string) });
             if (parseMethod != null) {
                 try {
                     return parseMethod.Invoke(null, new object?[] { value })!;
-                } catch (global::System.Reflection.TargetInvocationException ex) {
+                } catch (TargetInvocationException ex) {
                     throw ex.InnerException ?? ex;
                 }
             }
         }
-        
+
         throw DataAccessErrors.TypeCannotBeParsed(targetType.Name);
     }
 
-    private static object TryParseParsableWithFormatProvider(Type targetType, string value, IFormatProvider formatProvider) {
+    private static object TryParseParsableWithFormatProvider(Type targetType, string value,
+        IFormatProvider formatProvider) {
         if (Nullable.GetUnderlyingType(targetType) != null) {
             targetType = Nullable.GetUnderlyingType(targetType)!;
-            return Parse(targetType, value, formatProvider);
+            return targetType.Parse(value, formatProvider);
         }
 
-        var parsableInterface = targetType.GetInterface("IParsable`1");
+        Type? parsableInterface = targetType.GetInterface("IParsable`1");
         if (parsableInterface != null) {
-            var parseMethod = targetType.GetMethod("Parse", 
+            MethodInfo? parseMethod = targetType.GetMethod("Parse",
                 new[] { typeof(string), typeof(IFormatProvider) });
-            
+
             if (parseMethod != null) {
                 try {
                     return parseMethod.Invoke(null, new object?[] { value, formatProvider })!;
-                } catch (global::System.Reflection.TargetInvocationException ex) {
+                } catch (TargetInvocationException ex) {
                     throw ex.InnerException ?? ex;
                 }
             }
         }
-        
+
         throw DataAccessErrors.TypeCannotBeParsed(targetType.Name);
     }
 }

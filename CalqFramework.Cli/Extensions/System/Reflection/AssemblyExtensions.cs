@@ -1,60 +1,59 @@
+using System;
+using System.Diagnostics;
 using System.Reflection;
 
-namespace CalqFramework.Cli.Extensions.System.Reflection {
+namespace CalqFramework.Cli.Extensions.System.Reflection;
 
-    public static class AssemblyExtensions {
+public static class AssemblyExtensions {
+    /// <summary>
+    ///     Gets the tool command name for a .NET global tool.
+    ///     First tries to find the actual tool command name using 'dotnet tool list --global',
+    ///     then falls back to the assembly name.
+    /// </summary>
+    public static string GetToolCommandName(this Assembly assembly) {
+        string? assemblyName = assembly?.GetName().Name;
 
-        /// <summary>
-        /// Gets the tool command name for a .NET global tool.
-        /// First tries to find the actual tool command name using 'dotnet tool list --global',
-        /// then falls back to the assembly name.
-        /// </summary>
-        public static string GetToolCommandName(this Assembly assembly) {
-            var assemblyName = assembly?.GetName().Name;
-            
-            if (string.IsNullOrEmpty(assemblyName)) {
-                throw new global::System.InvalidOperationException("Unable to determine assembly name");
-            }
+        if (string.IsNullOrEmpty(assemblyName)) {
+            throw new InvalidOperationException("Unable to determine assembly name");
+        }
 
-            try {
-                var processStartInfo = new global::System.Diagnostics.ProcessStartInfo {
-                    FileName = "dotnet",
-                    Arguments = "tool list --global",
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
+        try {
+            ProcessStartInfo processStartInfo = new() {
+                FileName = "dotnet",
+                Arguments = "tool list --global",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
 
-                using var process = global::System.Diagnostics.Process.Start(processStartInfo);
-                if (process != null) {
-                    var output = process.StandardOutput.ReadToEnd();
-                    process.WaitForExit();
+            using Process? process = Process.Start(processStartInfo);
+            if (process != null) {
+                string output = process.StandardOutput.ReadToEnd();
+                process.WaitForExit();
 
-                    if (process.ExitCode == 0) {
-                        var lines = output.Split(new[] { '\r', '\n' }, global::System.StringSplitOptions.RemoveEmptyEntries);
-                        foreach (var line in lines) {
-                            if (line.Contains("Package Id") || line.Contains("---")) {
-                                continue;
-                            }
+                if (process.ExitCode == 0) {
+                    string[] lines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (string line in lines) {
+                        if (line.Contains("Package Id") || line.Contains("---")) {
+                            continue;
+                        }
 
-                            var parts = line.Split(new[] { ' ' }, global::System.StringSplitOptions.RemoveEmptyEntries);
-                            if (parts.Length >= 3) {
-                                var packageId = parts[0];
-                                var commandName = parts[2];
+                        string[] parts = line.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        if (parts.Length >= 3) {
+                            string packageId = parts[0];
+                            string commandName = parts[2];
 
-                                if (packageId.Equals(assemblyName, global::System.StringComparison.OrdinalIgnoreCase)) {
-                                    return commandName;
-                                }
+                            if (packageId.Equals(assemblyName, StringComparison.OrdinalIgnoreCase)) {
+                                return commandName;
                             }
                         }
                     }
                 }
             }
-            catch {
-            }
-
-            return assemblyName;
+        } catch {
         }
+
+        return assemblyName;
     }
 }
