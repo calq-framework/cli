@@ -1,23 +1,19 @@
-﻿using System.Reflection;
-using CalqFramework.Extensions.System;
+﻿using System;
+using System.Reflection;
 using CalqFramework.Extensions.System.Reflection;
 
-namespace CalqFramework.Cli.DataAccess {
+namespace CalqFramework.Cli.DataAccess;
 
-    /// <summary>
-    /// Validates whether a member is a valid CLI submodule (must be non-convertible type).
-    /// </summary>
-    public class SubmoduleAccessValidator : IAccessValidator {
+/// <summary>
+///     Validates whether a member is a valid CLI submodule (must be non-convertible type).
+/// </summary>
+public class SubmoduleAccessValidator : IAccessValidator {
+    private readonly IValueConverter<string?> _valueConverter;
 
-        private readonly IValueConverter<string?> _valueConverter;
+    public SubmoduleAccessValidator(IValueConverter<string?> valueConverter) => _valueConverter = valueConverter;
 
-        public SubmoduleAccessValidator(IValueConverter<string?> valueConverter) {
-            _valueConverter = valueConverter;
-        }
-
-        public bool IsValid(MemberInfo accessor) {
-            var type = accessor.GetUnderlyingType();
-            return !_valueConverter.CanConvert(type);
-        }
+    public bool IsValid(MemberInfo accessor) {
+        Type type = accessor.GetUnderlyingType();
+        return !_valueConverter.CanConvert(type);
     }
 }

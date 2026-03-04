@@ -1,120 +1,111 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
-using CalqFramework.Cli.DataAccess;
 using CalqFramework.Cli.Formatting;
+using CalqFramework.DataAccess;
 using CalqFramework.DataAccess.ClassMemberStores;
-using CalqFramework.DataAccess.CollectionElementStores;
-using CalqFramework.Extensions.System;
 
-namespace CalqFramework.Cli.DataAccess.ClassMemberStores {
+namespace CalqFramework.Cli.DataAccess.ClassMemberStores;
 
-    internal class CliMethodExecutor<TValue> : MethodExecutorBase<string, TValue>, ICliFunctionExecutor<string, TValue, ParameterInfo> {
+internal class CliMethodExecutor<TValue> : MethodExecutorBase<string, TValue>,
+    ICliFunctionExecutor<string, TValue, ParameterInfo> {
+    public CliMethodExecutor(MethodInfo method, object? obj, BindingFlags bindingFlags,
+        IClassMemberStringifier classMemberStringifier,
+        ICompositeValueConverter<TValue> compositeValueConverter) : base(method, obj) {
+        BindingFlags = bindingFlags;
+        ClassMemberStringifier = classMemberStringifier;
+        CompositeValueConverter = compositeValueConverter;
+        AccessorsByNames = GetAccessorsByNames();
+    }
 
-        public CliMethodExecutor(MethodInfo method, object? obj, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier, ICompositeValueConverter<TValue> compositeValueConverter) : base(method, obj) {
-            BindingFlags = bindingFlags;
-            ClassMemberStringifier = classMemberStringifier;
-            CompositeValueConverter = compositeValueConverter;
-            AccessorsByNames = GetAccessorsByNames();
-        }
+    protected BindingFlags BindingFlags { get; }
+    protected IClassMemberStringifier ClassMemberStringifier { get; }
+    private IDictionary<string, ParameterInfo> AccessorsByNames { get; }
+    private ICompositeValueConverter<TValue> CompositeValueConverter { get; }
 
-        protected BindingFlags BindingFlags { get; }
-        protected IClassMemberStringifier ClassMemberStringifier { get; }
-        private IDictionary<string, ParameterInfo> AccessorsByNames { get; }
-        private ICompositeValueConverter<TValue> CompositeValueConverter { get; }
+    public IEnumerable<AccessorKeysPair<ParameterInfo>> GetAccessorKeysPairs() =>
+        AccessorsByNames
+            .GroupBy(kv => kv.Value)
+            .OrderBy(g => ((ParameterInfo)g.Key).Position)
+            .Select(g => new AccessorKeysPair<ParameterInfo>(
+                (ParameterInfo)g.Key,
+                g.Select(kv => kv.Key).ToArray()
+            ));
 
-        public override bool ContainsAccessor(ParameterInfo accessor) {
-            return accessor.Member == ParentMethod;
-        }
+    public bool IsMultiValue(string key) {
+        ParameterInfo accessor = GetAccessor(key);
+        return CompositeValueConverter.IsMultiValue(accessor.ParameterType);
+    }
 
-        public override Type GetValueType(ParameterInfo accessor) {
-            return CompositeValueConverter.GetValueType(accessor.ParameterType);
-        }
+    public void SetParameterValues() {
+        bool IsAssigned(int i) => ParameterValues[i] != DBNull.Value;
 
-        public IEnumerable<AccessorKeysPair<ParameterInfo>> GetAccessorKeysPairs() {
-            return AccessorsByNames
-                .GroupBy(kv => kv.Value)
-                .OrderBy(g => ((ParameterInfo)g.Key).Position)
-                .Select(g => new AccessorKeysPair<ParameterInfo>(
-                    (ParameterInfo)g.Key,
-                    g.Select(kv => kv.Key).ToArray()
-                ));
-        }
-
-        public bool IsMultiValue(string key) {
-            ParameterInfo accessor = GetAccessor(key);
-            return CompositeValueConverter.IsMultiValue(accessor.ParameterType);
-        }
-
-        public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out ParameterInfo result) {
-            return AccessorsByNames.TryGetValue(key, out result);
-        }
-
-        protected override TValue ConvertFromInternalValue(object? value, ParameterInfo accessor) {
-            return CompositeValueConverter.ConvertFrom(value, accessor.ParameterType);
-        }
-
-        protected override object? ConvertToInternalValue(TValue value, ParameterInfo accessor) {
-            object? currentValue = GetValueOrInitialize(accessor);
-            return CompositeValueConverter.ConvertToOrUpdate(value, accessor.ParameterType, currentValue);
-        }
-
-        private IDictionary<string, ParameterInfo> GetAccessorsByNames() {
-            var stringComparer = BindingFlags.HasFlag(BindingFlags.IgnoreCase) ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
-
-            var accessorsByRequiredNames = new Dictionary<string, ParameterInfo>(stringComparer);
-            foreach (var accessor in Accessors) {
-                foreach (var name in ClassMemberStringifier.GetRequiredNames(accessor)) {
-                    if (!accessorsByRequiredNames.TryAdd(name, accessor)) {
-                        throw CliErrors.NameCollision(accessor.Name!, accessorsByRequiredNames[name].Name!);
-                    }
-
+        int argumentIndex = 0;
+        for (int parameterIndex = 0; parameterIndex < ParameterValues.Length; ++parameterIndex) {
+            if (!IsAssigned(parameterIndex)) {
+                if (argumentIndex < Arguments.Count) {
+                    object? value = ConvertToInternalValue(Arguments[argumentIndex++], ParameterInfos[parameterIndex]);
+                    ParameterValues[parameterIndex] = value;
                 }
             }
-
-            var accessorsByAlternativeNames = new Dictionary<string, ParameterInfo>(stringComparer);
-            var collidingAlternativeNames = new HashSet<string>();
-            foreach (var accessor in Accessors) {
-                foreach (var name in ClassMemberStringifier.GetAlternativeNames(accessor)) {
-                    if (!accessorsByAlternativeNames.TryAdd(name, accessor)) {
-                        collidingAlternativeNames.Add(name);
-                    }
-
-                }
-            }
-
-            foreach (var name in collidingAlternativeNames) {
-                accessorsByAlternativeNames.Remove(name);
-            }
-
-            var accessorsByNames = accessorsByRequiredNames;
-            foreach (var name in accessorsByAlternativeNames.Keys) {
-                accessorsByNames.TryAdd(name, accessorsByAlternativeNames[name]);
-            }
-
-            return accessorsByNames;
         }
 
-        public void SetParameterValues() {
-            bool IsAssigned(int i) {
-                return ParameterValues[i] != DBNull.Value;
-            }
+        if (argumentIndex < Arguments.Count) {
+            throw DataAccessErrors.UnexpectedArgument(Arguments[argumentIndex]);
+        }
+    }
 
-            int argumentIndex = 0;
-            for (int parameterIndex = 0; parameterIndex < ParameterValues.Length; ++parameterIndex) {
-                if (!IsAssigned(parameterIndex)) {
-                    if (argumentIndex < Arguments.Count) {
-                        object? value = ConvertToInternalValue(Arguments[argumentIndex++], ParameterInfos[parameterIndex]);
-                        ParameterValues[parameterIndex] = value;
-                    }
+    public override bool ContainsAccessor(ParameterInfo accessor) => accessor.Member == ParentMethod;
+
+    public override Type GetValueType(ParameterInfo accessor) =>
+        CompositeValueConverter.GetValueType(accessor.ParameterType);
+
+    public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out ParameterInfo result) =>
+        AccessorsByNames.TryGetValue(key, out result);
+
+    protected override TValue ConvertFromInternalValue(object? value, ParameterInfo accessor) =>
+        CompositeValueConverter.ConvertFrom(value, accessor.ParameterType);
+
+    protected override object? ConvertToInternalValue(TValue value, ParameterInfo accessor) {
+        object? currentValue = GetValueOrInitialize(accessor);
+        return CompositeValueConverter.ConvertToOrUpdate(value, accessor.ParameterType, currentValue);
+    }
+
+    private IDictionary<string, ParameterInfo> GetAccessorsByNames() {
+        StringComparer stringComparer = BindingFlags.HasFlag(BindingFlags.IgnoreCase)
+            ? StringComparer.OrdinalIgnoreCase
+            : StringComparer.Ordinal;
+
+        Dictionary<string, ParameterInfo> accessorsByRequiredNames = new(stringComparer);
+        foreach (ParameterInfo accessor in Accessors) {
+            foreach (string name in ClassMemberStringifier.GetRequiredNames(accessor)) {
+                if (!accessorsByRequiredNames.TryAdd(name, accessor)) {
+                    throw CliErrors.NameCollision(accessor.Name!, accessorsByRequiredNames[name].Name!);
                 }
             }
-            if (argumentIndex < Arguments.Count) {
-                throw CalqFramework.DataAccess.DataAccessErrors.UnexpectedArgument(Arguments[argumentIndex]);
+        }
+
+        Dictionary<string, ParameterInfo> accessorsByAlternativeNames = new(stringComparer);
+        HashSet<string> collidingAlternativeNames = new();
+        foreach (ParameterInfo accessor in Accessors) {
+            foreach (string name in ClassMemberStringifier.GetAlternativeNames(accessor)) {
+                if (!accessorsByAlternativeNames.TryAdd(name, accessor)) {
+                    collidingAlternativeNames.Add(name);
+                }
             }
         }
+
+        foreach (string name in collidingAlternativeNames) {
+            accessorsByAlternativeNames.Remove(name);
+        }
+
+        Dictionary<string, ParameterInfo> accessorsByNames = accessorsByRequiredNames;
+        foreach (string name in accessorsByAlternativeNames.Keys) {
+            accessorsByNames.TryAdd(name, accessorsByAlternativeNames[name]);
+        }
+
+        return accessorsByNames;
     }
 }

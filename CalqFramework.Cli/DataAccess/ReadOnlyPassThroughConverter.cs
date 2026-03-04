@@ -1,26 +1,17 @@
 ﻿using System;
 using CalqFramework.Extensions.System;
 
-namespace CalqFramework.Cli.DataAccess {
+namespace CalqFramework.Cli.DataAccess;
 
-    internal class ReadOnlyPassThroughConverter<TValue> : ICompositeValueConverter<TValue> {
+internal class ReadOnlyPassThroughConverter<TValue> : ICompositeValueConverter<TValue> {
+    public bool CanConvert(Type targetType) => true;
 
-        public bool CanConvert(Type targetType) {
-            return true;
-        }
+    public TValue ConvertFrom(object? value, Type targetType) => (TValue)value!;
 
-        public TValue ConvertFrom(object? value, Type targetType) {
-            return (TValue)value!;
-        }
+    public object? ConvertToOrUpdate(TValue value, Type targetType, object? currentValue) =>
+        throw new NotSupportedException();
 
-        public object? ConvertToOrUpdate(TValue value, Type targetType, object? currentValue) => throw new NotSupportedException();
+    public bool IsMultiValue(Type type) => type.IsEnumerable();
 
-        public bool IsMultiValue(Type type) {
-            return type.IsEnumerable();
-        }
-
-        public Type GetValueType(Type type) {
-            return type.GetEnumerableElementType();
-        }
-    }
+    public Type GetValueType(Type type) => type.GetEnumerableElementType();
 }

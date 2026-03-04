@@ -1,161 +1,162 @@
 using System;
 using CalqFramework.Cli.Completion.Providers;
+using CalqFramework.DataAccess;
 
-namespace CalqFramework.Cli {
+namespace CalqFramework.Cli;
+
+/// <summary>
+///     Factory class for creating common CliException instances with consistent messaging.
+/// </summary>
+public static class CliErrors {
+    /// <summary>
+    ///     Creates an exception for when an argument is not recognized as an option.
+    /// </summary>
+    public static CliException NotAnOption(string option) =>
+        new($"Not an option: {option}");
 
     /// <summary>
-    /// Factory class for creating common CliException instances with consistent messaging.
+    ///     Creates an exception for when an option is not recognized.
     /// </summary>
-    public static class CliErrors {
+    public static CliException UnknownOption(string option) =>
+        new($"Unknown option: {option}");
 
-        /// <summary>
-        /// Creates an exception for when an argument is not recognized as an option.
-        /// </summary>
-        public static CliException NotAnOption(string option) =>
-            new CliException($"Not an option: {option}");
+    /// <summary>
+    ///     Creates an exception for when an option requires a value but none was provided.
+    /// </summary>
+    public static CliException OptionRequiresValue(string option) =>
+        new($"Option '{option}' requires a value");
 
-        /// <summary>
-        /// Creates an exception for when an option is not recognized.
-        /// </summary>
-        public static CliException UnknownOption(string option) =>
-            new CliException($"Unknown option: {option}");
+    /// <summary>
+    ///     Creates an exception for when a value is unexpected.
+    /// </summary>
+    public static CliException UnexpectedValue(string value) =>
+        new($"Unexpected value: {value}");
 
-        /// <summary>
-        /// Creates an exception for when an option requires a value but none was provided.
-        /// </summary>
-        public static CliException OptionRequiresValue(string option) =>
-            new CliException($"Option '{option}' requires a value");
+    /// <summary>
+    ///     Creates an exception for ambiguous syntax around an option.
+    /// </summary>
+    public static CliException AmbiguousSyntax(string option) =>
+        new($"Ambiguous syntax around '{option}' (try using --)");
 
-        /// <summary>
-        /// Creates an exception for when a value is unexpected.
-        /// </summary>
-        public static CliException UnexpectedValue(string value) =>
-            new CliException($"Unexpected value: {value}");
+    /// <summary>
+    ///     Creates an exception for ambiguous values that could be options.
+    /// </summary>
+    public static CliException AmbiguousValue(string value, string option) =>
+        new($"Ambiguous value '{value}' for '{option}', use option=value format for values starting with '-' or '+'");
 
-        /// <summary>
-        /// Creates an exception for ambiguous syntax around an option.
-        /// </summary>
-        public static CliException AmbiguousSyntax(string option) =>
-            new CliException($"Ambiguous syntax around '{option}' (try using --)");
+    /// <summary>
+    ///     Creates an exception for when a command is invalid.
+    /// </summary>
+    public static CliException InvalidSubcommand(string? subcommand) =>
+        new($"Invalid subcommand: {subcommand}");
 
-        /// <summary>
-        /// Creates an exception for ambiguous values that could be options.
-        /// </summary>
-        public static CliException AmbiguousValue(string value, string option) =>
-            new CliException($"Ambiguous value '{value}' for '{option}', use option=value format for values starting with '-' or '+'");
+    /// <summary>
+    ///     Creates an exception for CLI name collisions.
+    /// </summary>
+    public static CliException NameCollision(string name1, string name2) =>
+        new($"CLI name of '{name1}' collides with '{name2}'");
 
-        /// <summary>
-        /// Creates an exception for when a command is invalid.
-        /// </summary>
-        public static CliException InvalidSubcommand(string? subcommand) =>
-            new CliException($"Invalid subcommand: {subcommand}");
+    /// <summary>
+    ///     Creates an exception wrapping an argument parsing failure.
+    /// </summary>
+    public static CliException FailedToParseArgument(string message, Exception innerException) =>
+        new($"Failed to parse argument: {message}", innerException);
 
-        /// <summary>
-        /// Creates an exception for CLI name collisions.
-        /// </summary>
-        public static CliException NameCollision(string name1, string name2) =>
-            new CliException($"CLI name of '{name1}' collides with '{name2}'");
+    /// <summary>
+    ///     Creates an exception wrapping a data access failure.
+    /// </summary>
+    public static CliException FailedToAccessData(string message, Exception innerException) =>
+        new($"Failed to access data: {message}", innerException);
 
-        /// <summary>
-        /// Creates an exception wrapping an argument parsing failure.
-        /// </summary>
-        public static CliException FailedToParseArgument(string message, Exception innerException) =>
-            new CliException($"Failed to parse argument: {message}", innerException);
+    /// <summary>
+    ///     Creates an exception for option parsing errors with inner exception.
+    /// </summary>
+    public static CliException OptionError(string option, string message, Exception innerException) =>
+        new(option, message, innerException);
 
-        /// <summary>
-        /// Creates an exception wrapping a data access failure.
-        /// </summary>
-        public static CliException FailedToAccessData(string message, Exception innerException) =>
-            new CliException($"Failed to access data: {message}", innerException);
+    /// <summary>
+    ///     Creates an exception for option=value parsing errors with inner exception.
+    /// </summary>
+    public static CliException
+        OptionValueError(string option, string value, string message, Exception innerException) =>
+        new(option, value, message, innerException);
 
-        /// <summary>
-        /// Creates an exception for option parsing errors with inner exception.
-        /// </summary>
-        public static CliException OptionError(string option, string message, Exception innerException) =>
-            new CliException(option, message, innerException);
+    /// <summary>
+    ///     Creates an exception for empty argument strings.
+    /// </summary>
+    public static CliException EmptyArgument() =>
+        new("Argument cannot be empty");
 
-        /// <summary>
-        /// Creates an exception for option=value parsing errors with inner exception.
-        /// </summary>
-        public static CliException OptionValueError(string option, string value, string message, Exception innerException) =>
-            new CliException(option, value, message, innerException);
+    /// <summary>
+    ///     Creates an exception for unsupported member types.
+    /// </summary>
+    public static CliException UnsupportedMemberType(string memberTypeName) =>
+        new($"Unsupported member type: {memberTypeName}");
 
-        /// <summary>
-        /// Creates an exception for empty argument strings.
-        /// </summary>
-        public static CliException EmptyArgument() =>
-            new CliException("Argument cannot be empty");
+    /// <summary>
+    ///     Creates an exception for invalid completion provider types.
+    /// </summary>
+    public static CliException InvalidCompletionProvider(string providerTypeName) =>
+        new($"Provider type '{providerTypeName}' must implement {nameof(ICompletionProvider)}");
 
-        /// <summary>
-        /// Creates an exception for unsupported member types.
-        /// </summary>
-        public static CliException UnsupportedMemberType(string memberTypeName) =>
-            new CliException($"Unsupported member type: {memberTypeName}");
+    /// <summary>
+    ///     Creates an exception for unsupported shell types.
+    /// </summary>
+    public static CliException UnsupportedShell(string shell) =>
+        new($"Unsupported shell: {shell}. Supported shells: bash, zsh, powershell, fish");
 
-        /// <summary>
-        /// Creates an exception for invalid completion provider types.
-        /// </summary>
-        public static CliException InvalidCompletionProvider(string providerTypeName) =>
-            new CliException($"Provider type '{providerTypeName}' must implement {nameof(ICompletionProvider)}");
+    public static CliException UnknownCompletionAction(string action) =>
+        new($"Unknown completion action: {action}. Valid actions: install, uninstall");
 
-        /// <summary>
-        /// Creates an exception for unsupported shell types.
-        /// </summary>
-        public static CliException UnsupportedShell(string shell) =>
-            new CliException($"Unsupported shell: {shell}. Supported shells: bash, zsh, powershell, fish");
+    /// <summary>
+    ///     Creates an exception for when completion command is called without a shell parameter.
+    /// </summary>
+    public static CliException CompletionRequiresShell() =>
+        new("Completion command requires a shell parameter. Usage: completion <shell> [install|uninstall]");
 
-        public static CliException UnknownCompletionAction(string action) =>
-            new CliException($"Unknown completion action: {action}. Valid actions: install, uninstall");
+    public static CliException CompletionInstallFailed(string shell, string message, Exception innerException) =>
+        new($"Failed to install completion script for {shell}: {message}", innerException);
 
-        /// <summary>
-        /// Creates an exception for when completion command is called without a shell parameter.
-        /// </summary>
-        public static CliException CompletionRequiresShell() =>
-            new CliException("Completion command requires a shell parameter. Usage: completion <shell> [install|uninstall]");
+    /// <summary>
+    ///     Creates an exception for completion uninstallation failures.
+    /// </summary>
+    public static CliException CompletionUninstallFailed(string shell, string message, Exception innerException) =>
+        new($"Failed to uninstall completion script for {shell}: {message}", innerException);
 
-        public static CliException CompletionInstallFailed(string shell, string message, Exception innerException) =>
-            new CliException($"Failed to install completion script for {shell}: {message}", innerException);
+    /// <summary>
+    ///     Creates an exception for when the program name cannot be determined.
+    /// </summary>
+    public static CliException UnableToDetermineProgramName() =>
+        new("Unable to determine program name from entry assembly");
 
-        /// <summary>
-        /// Creates an exception for completion uninstallation failures.
-        /// </summary>
-        public static CliException CompletionUninstallFailed(string shell, string message, Exception innerException) =>
-            new CliException($"Failed to uninstall completion script for {shell}: {message}", innerException);
+    /// <summary>
+    ///     Creates an exception for when a completion method is not found.
+    /// </summary>
+    public static CliException CompletionMethodNotFound(string methodName, string typeName) =>
+        new($"Completion method '{methodName}' not found on type '{typeName}'");
 
-        /// <summary>
-        /// Creates an exception for when the program name cannot be determined.
-        /// </summary>
-        public static CliException UnableToDetermineProgramName() =>
-            new CliException("Unable to determine program name from entry assembly");
+    /// <summary>
+    ///     Creates an exception for invalid completion method signature.
+    /// </summary>
+    public static CliException InvalidCompletionMethodSignature(string methodName, string typeName) =>
+        new(
+            $"Completion method '{methodName}' on type '{typeName}' must have signature: IEnumerable<string> {methodName}(string partialInput)");
 
-        /// <summary>
-        /// Creates an exception for when a completion method is not found.
-        /// </summary>
-        public static CliException CompletionMethodNotFound(string methodName, string typeName) =>
-            new CliException($"Completion method '{methodName}' not found on type '{typeName}'");
+    /// <summary>
+    ///     Creates an exception for invalid completion method return type.
+    /// </summary>
+    public static CliException InvalidCompletionMethodReturnType(string methodName, string typeName) =>
+        new($"Completion method '{methodName}' on type '{typeName}' must return IEnumerable<string>");
 
-        /// <summary>
-        /// Creates an exception for invalid completion method signature.
-        /// </summary>
-        public static CliException InvalidCompletionMethodSignature(string methodName, string typeName) =>
-            new CliException($"Completion method '{methodName}' on type '{typeName}' must have signature: IEnumerable<string> {methodName}(string partialInput)");
+    /// <summary>
+    ///     Creates a DataAccessException for out of range values during value conversion.
+    /// </summary>
+    public static DataAccessException ValueOutOfRange(object? min, object? max, Exception innerException) =>
+        new($"Out of range ({min}-{max})", innerException);
 
-        /// <summary>
-        /// Creates an exception for invalid completion method return type.
-        /// </summary>
-        public static CliException InvalidCompletionMethodReturnType(string methodName, string typeName) =>
-            new CliException($"Completion method '{methodName}' on type '{typeName}' must return IEnumerable<string>");
-
-        /// <summary>
-        /// Creates a DataAccessException for out of range values during value conversion.
-        /// </summary>
-        public static CalqFramework.DataAccess.DataAccessException ValueOutOfRange(object? min, object? max, Exception innerException) =>
-            new CalqFramework.DataAccess.DataAccessException($"Out of range ({min}-{max})", innerException);
-
-        /// <summary>
-        /// Creates a DataAccessException for invalid format during value conversion.
-        /// </summary>
-        public static CalqFramework.DataAccess.DataAccessException InvalidValueFormat(string expectedTypeName, Exception innerException) =>
-            new CalqFramework.DataAccess.DataAccessException($"Invalid format (expected {expectedTypeName})", innerException);
-    }
+    /// <summary>
+    ///     Creates a DataAccessException for invalid format during value conversion.
+    /// </summary>
+    public static DataAccessException InvalidValueFormat(string expectedTypeName, Exception innerException) =>
+        new($"Invalid format (expected {expectedTypeName})", innerException);
 }

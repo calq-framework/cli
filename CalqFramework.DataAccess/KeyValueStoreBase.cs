@@ -1,62 +1,56 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace CalqFramework.DataAccess {
+namespace CalqFramework.DataAccess;
 
-    public abstract class KeyValueStoreBase<TKey, TValue, TAccessor> : KeyValueStoreBase<TKey, TValue, TAccessor, TValue>, IKeyValueStore<TKey, TValue, TAccessor> {
+public abstract class KeyValueStoreBase<TKey, TValue, TAccessor> : KeyValueStoreBase<TKey, TValue, TAccessor, TValue>,
+    IKeyValueStore<TKey, TValue, TAccessor> {
+    protected override TValue ConvertFromInternalValue(TValue value, TAccessor accessor) => value;
 
-        protected override TValue ConvertFromInternalValue(TValue value, TAccessor accessor) {
-            return value;
+    protected override TValue ConvertToInternalValue(TValue value, TAccessor accessor) => value;
+}
+
+public abstract class
+    KeyValueStoreBase<TKey, TValue, TAccessor,
+        TInternalValue> : IKeyValueStore<TKey, TValue, TAccessor, TInternalValue> {
+    public abstract IEnumerable<TAccessor> Accessors { get; }
+
+    public TValue this[TKey key] {
+        get {
+            TAccessor? accessor = GetAccessor(key);
+            return ConvertFromInternalValue(this[accessor], accessor);
         }
-
-        protected override TValue ConvertToInternalValue(TValue value, TAccessor accessor) {
-            return value;
+        set {
+            TAccessor? accessor = GetAccessor(key);
+            this[accessor] = ConvertToInternalValue(value, accessor);
         }
     }
 
-    public abstract class KeyValueStoreBase<TKey, TValue, TAccessor, TInternalValue> : IKeyValueStore<TKey, TValue, TAccessor, TInternalValue> {
-        public abstract IEnumerable<TAccessor> Accessors { get; }
+    public abstract TInternalValue this[TAccessor accessor] { get; set; }
 
-        public TValue this[TKey key] {
-            get {
-                TAccessor? accessor = GetAccessor(key);
-                return ConvertFromInternalValue(this[accessor], accessor);
-            }
-            set {
-                TAccessor? accessor = GetAccessor(key);
-                this[accessor] = ConvertToInternalValue(value, accessor);
-            }
-        }
+    public abstract bool ContainsAccessor(TAccessor accessor);
 
-        public abstract TInternalValue this[TAccessor accessor] { get; set; }
+    public bool ContainsKey(TKey key) => TryGetAccessor(key, out TAccessor? _);
 
-        public abstract bool ContainsAccessor(TAccessor accessor);
+    public TAccessor GetAccessor(TKey key) =>
+        TryGetAccessor(key, out TAccessor? result) ? result : throw DataAccessErrors.KeyNotFound(key);
 
-        public bool ContainsKey(TKey key) {
-            return TryGetAccessor(key, out TAccessor? _);
-        }
-
-        public TAccessor GetAccessor(TKey key) {
-            return TryGetAccessor(key, out TAccessor? result) ? result : throw DataAccessErrors.KeyNotFound(key);
-        }
-
-        public Type GetValueType(TKey key) {
-            TAccessor? accessor = GetAccessor(key);
-            return GetValueType(accessor);
-        }
-
-        public abstract Type GetValueType(TAccessor accessor);
-
-        public TValue GetValueOrInitialize(TKey key) {
-            TAccessor? accessor = GetAccessor(key);
-            return ConvertFromInternalValue(GetValueOrInitialize(accessor), accessor);
-        }
-
-        public abstract TInternalValue GetValueOrInitialize(TAccessor accessor);
-
-        public abstract bool TryGetAccessor(TKey key, [MaybeNullWhen(false)] out TAccessor result);
-
-        protected abstract TValue ConvertFromInternalValue(TInternalValue value, TAccessor accessor);
-
-        protected abstract TInternalValue ConvertToInternalValue(TValue value, TAccessor accessor);
+    public Type GetValueType(TKey key) {
+        TAccessor? accessor = GetAccessor(key);
+        return GetValueType(accessor);
     }
+
+    public abstract Type GetValueType(TAccessor accessor);
+
+    public TValue GetValueOrInitialize(TKey key) {
+        TAccessor? accessor = GetAccessor(key);
+        return ConvertFromInternalValue(GetValueOrInitialize(accessor), accessor);
+    }
+
+    public abstract TInternalValue GetValueOrInitialize(TAccessor accessor);
+
+    public abstract bool TryGetAccessor(TKey key, [MaybeNullWhen(false)] out TAccessor result);
+
+    protected abstract TValue ConvertFromInternalValue(TInternalValue value, TAccessor accessor);
+
+    protected abstract TInternalValue ConvertToInternalValue(TValue value, TAccessor accessor);
 }

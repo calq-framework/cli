@@ -4,16 +4,14 @@ using System.Reflection;
 using CalqFramework.Cli.InterfaceComponents;
 using CalqFramework.DataAccess;
 
-namespace CalqFramework.Cli.DataAccess.InterfaceComponentStores {
+namespace CalqFramework.Cli.DataAccess.InterfaceComponentStores;
 
+/// <summary>
+///     Provides read-only access to CLI subcommands (methods) available on an object.
+/// </summary>
+public interface ISubcommandStore : IReadOnlyKeyValueStore<string, MethodInfo?> {
     /// <summary>
-    /// Provides read-only access to CLI subcommands (methods) available on an object.
+    ///     Gets all available subcommands with their metadata for help generation.
     /// </summary>
-    public interface ISubcommandStore : IReadOnlyKeyValueStore<string, MethodInfo?> {
-
-        /// <summary>
-        /// Gets all available subcommands with their metadata for help generation.
-        /// </summary>
-        IEnumerable<Subcommand> GetSubcommands(Func<MethodInfo, object?, ISubcommandExecutor> createSubcommandExecutor);
-    }
+    IEnumerable<Subcommand> GetSubcommands(Func<MethodInfo, object?, ISubcommandExecutor> createSubcommandExecutor);
 }

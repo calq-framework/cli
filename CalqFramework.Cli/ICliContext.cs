@@ -1,26 +1,24 @@
 using System.IO;
 using CalqFramework.Cli.DataAccess;
 
-namespace CalqFramework.Cli {
+namespace CalqFramework.Cli;
+
+/// <summary>
+///     Provides context and configuration for CLI operations.
+/// </summary>
+public interface ICliContext {
+    /// <summary>
+    ///     Factory for creating CLI component stores (options, subcommands, submodules).
+    /// </summary>
+    ICliComponentStoreFactory CliComponentStoreFactory { get; }
 
     /// <summary>
-    /// Provides context and configuration for CLI operations.
+    ///     Skip unknown options instead of throwing an exception.
     /// </summary>
-    public interface ICliContext {
-        
-        /// <summary>
-        /// Factory for creating CLI component stores (options, subcommands, submodules).
-        /// </summary>
-        ICliComponentStoreFactory CliComponentStoreFactory { get; }
-        
-        /// <summary>
-        /// Skip unknown options instead of throwing an exception.
-        /// </summary>
-        bool SkipUnknown { get; }
-        
-        /// <summary>
-        /// TextWriter for output operations. Defaults to Console.Out if not specified.
-        /// </summary>
-        TextWriter Out { get; }
-    }
+    bool SkipUnknown { get; }
+
+    /// <summary>
+    ///     TextWriter for output operations. Defaults to Console.Out if not specified.
+    /// </summary>
+    TextWriter Out { get; }
 }

@@ -1,22 +1,26 @@
 ﻿using System.Reflection;
 using CalqFramework.DataAccess;
 
-namespace CalqFramework.Extensions.System.Reflection {
+namespace CalqFramework.Extensions.System.Reflection;
 
-    public static class MemberInfoExtensions {
-
-        public static Type GetUnderlyingType(this MemberInfo memberInfo) {
-            if (memberInfo is FieldInfo fieldInfo) {
-                return fieldInfo.FieldType;
-            } else if (memberInfo is PropertyInfo propertyInfo) {
-                return propertyInfo.PropertyType;
-            } else if (memberInfo is MethodInfo methodInfo) {
-                return methodInfo.ReturnType;
-            } else if (memberInfo is EventInfo eventInfo) {
-                return eventInfo.EventHandlerType ?? typeof(void);
-            }
-
-            throw DataAccessErrors.UnrecognizedMemberType();
+public static class MemberInfoExtensions {
+    public static Type GetUnderlyingType(this MemberInfo memberInfo) {
+        if (memberInfo is FieldInfo fieldInfo) {
+            return fieldInfo.FieldType;
         }
+
+        if (memberInfo is PropertyInfo propertyInfo) {
+            return propertyInfo.PropertyType;
+        }
+
+        if (memberInfo is MethodInfo methodInfo) {
+            return methodInfo.ReturnType;
+        }
+
+        if (memberInfo is EventInfo eventInfo) {
+            return eventInfo.EventHandlerType ?? typeof(void);
+        }
+
+        throw DataAccessErrors.UnrecognizedMemberType();
     }
 }

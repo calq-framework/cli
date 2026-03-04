@@ -1,8 +1,7 @@
 ﻿#pragma warning disable CS0649
 
-namespace CalqFramework.Cli.Test {
+namespace CalqFramework.Cli.Test;
 
-    internal class ConfigurationWithXUnitCommandLineArgs {
-        public ushort port;
-    }
+internal class ConfigurationWithXUnitCommandLineArgs {
+    public ushort port;
 }

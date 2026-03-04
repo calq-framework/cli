@@ -1,17 +1,13 @@
 using System;
 
-namespace CalqFramework.Cli {
+namespace CalqFramework.Cli;
 
-    /// <summary>
-    /// Attribute to specify custom CLI names for class members (supports multiple aliases).
-    /// </summary>
-    [AttributeUsage(AttributeTargets.All, AllowMultiple = true)]
-    public class CliNameAttribute : Attribute {
+/// <summary>
+///     Attribute to specify custom CLI names for class members (supports multiple aliases).
+/// </summary>
+[AttributeUsage(AttributeTargets.All, AllowMultiple = true)]
+public class CliNameAttribute : Attribute {
+    public CliNameAttribute(string name) => Name = name;
 
-        public CliNameAttribute(string name) {
-            Name = name;
-        }
-
-        public string Name { get; }
-    }
+    public string Name { get; }
 }
