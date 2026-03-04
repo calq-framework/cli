@@ -290,6 +290,7 @@ dotnet tool install -g dotnet-suggest
 [Autocomplete Example](https://github.com/calq-framework/cli/tree/main/Examples/Example.Autocomplete.CloudProvider)  
 
 [Nested Submodules Example](https://github.com/calq-framework/cli/tree/main/Examples/Example.NestedSubmodules.CloudProvider)  
+
 ![SubmoduleHelpExample](https://github.com/calq-framework/cli/blob/main/Examples/Example.NestedSubmodules.CloudProvider/SubmoduleHelpExample.png?raw=true)  
 ![SubcommandHelpExample](https://github.com/calq-framework/cli/blob/main/Examples/Example.NestedSubmodules.CloudProvider/SubcommandHelpExample.png?raw=true)
 
@@ -330,3 +331,4 @@ public record QuickResult(string s, int a, int b);
 
 ## License
 Calq CLI is dual-licensed under GNU AGPLv3 and the Calq Commercial License.
+
