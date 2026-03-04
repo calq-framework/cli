@@ -13,21 +13,16 @@ Supports list-like collection types from `System.Collections` and `System.Collec
 ### Calq CLI vs. System.CommandLine
 | Feature | Calq CLI | System.CommandLine |
 | :--- | :--- | :--- |
-| **CLI Definition** | Auto-generated from Classlib | Manual Command/Option Definition |
-| **Option Sources** | Parameters + Fields + Properties | Parameters Only |
-| **Default Values** | From Code | DefaultValueFactory |
-| **Help Documentation** | Auto-generated from XML Docs | Manual Descriptions |
+| **CLI Definition** | Auto-generated from Classlib | Fluent API |
+| **Option Sources** | Fields + Properties + Method Parameters | Method Parameters |
+| **Help Documentation** | XML Docs + Code | Code |
+| **Completion Protocols** | Cobra + dotnet-suggest | dotnet-suggest |
 | **Custom Completion** | Delegate + Class-based | Delegate + Class-based |
-| **Shell Completion Setup** | Built-in Install Command | Requires dotnet-suggest Tool |
-| **Completion Protocols** | Cobra + dotnet-suggest | dotnet-suggest Only |
-| **Infer Subcommands from Methods** | ✅ | ❌ |
-| **Infer Options from Properties, Fields & Parameters** | ✅ | ❌ |
-| **Infer Multi-Value Options from Collections** | ✅ | ❌ |
 | **Enum Completion** | ✅ | ❌ |
-| **Method Parameters Override Properties** | ✅ | ❌ |
+| **Infer Subcommands from Methods** | ✅ | ❌ |
+| **Infer Options from Properties/Fields/Parameters** | ✅ | ❌ |
+| **Infer Multi-Value Options from Collections** | ✅ | ❌ |
 | **Deserialize CLI Args to Objects** | ✅ | ❌ |
-| **Configure Public/Private Access** | ✅ | ❌ |
-| **Configurable Unknown Option Handling** | ✅ | ❌ |
 | **Learning Curve** | Low | Moderate |
 | **Development Time** | Very Fast | Moderate |
 
@@ -200,14 +195,15 @@ Completion works automatically for:
 - **Enums** - All enum values with case-insensitive matching
 - **Booleans** - `true` and `false` values
 - **Collections** - Collection types from `System.Collections` and `System.Collections.Generic` (lists, sets, arrays, etc.) with element type completion (enums, bools, etc.)
-- **File paths** - Files with optional extension filtering via `FileInfo` or `[CliCompletion(typeof(FileCompletionProvider), "*.json;*.yaml")]`
-- **Directory paths** - Directories via `DirectoryInfo` or `[CliCompletion(typeof(DirectoryCompletionProvider))]`
-- **File system paths** - Both files and directories via `FileSystemInfo` or `[CliCompletion(typeof(FileSystemCompletionProvider))]`
+- **File paths** - Files via `FileInfo`
+- **Directory paths** - Directories via `DirectoryInfo`
+- **File system paths** - Both files and directories via `FileSystemInfo`
 
 ### Custom Completion
 Use `[CliCompletion]` attribute for custom completion providers:
 
 **Method-based completion** - Call an instance method:
+
 ```csharp
 [CliCompletion("GetRegions")]
 public string Region { get; set; } = "us-east-1";
@@ -229,6 +225,21 @@ public class RegionCompletionProvider : ICompletionProvider {
 
 [CliCompletion(typeof(RegionCompletionProvider))]
 public string Region { get; set; }
+```
+
+**Built-in providers** - Use framework-provided completion providers:
+```csharp
+// File completion with extension filtering
+[CliCompletion(typeof(FileCompletionProvider), "*.json;*.yaml")]
+public string ConfigFile { get; set; }
+
+// Directory completion
+[CliCompletion(typeof(DirectoryCompletionProvider))]
+public string OutputDir { get; set; }
+
+// File system completion (files and directories)
+[CliCompletion(typeof(FileSystemCompletionProvider))]
+public string Path { get; set; }
 ```
 
 ### Shell Installation
@@ -277,8 +288,8 @@ dotnet tool install -g dotnet-suggest
 [Autocomplete Example](https://github.com/calq-framework/cli/tree/main/Examples/Example.Autocomplete.CloudProvider)  
 
 [Nested Submodules Example](https://github.com/calq-framework/cli/tree/main/Examples/Example.NestedSubmodules.CloudProvider)  
-![SubmoduleHelpExample](https://github.com/calq-framework/cli/blob/main/Cli/Examples/Example.NestedSubmodules.CloudProvider/SubmoduleHelpExample.png?raw=true)  
-![SubcommandHelpExample](https://github.com/calq-framework/cli/blob/main/Cli/Examples/Example.NestedSubmodules.CloudProvider/SubcommandHelpExample.png?raw=true)
+![SubmoduleHelpExample](https://github.com/calq-framework/cli/blob/main/Examples/Example.NestedSubmodules.CloudProvider/SubmoduleHelpExample.png?raw=true)  
+![SubcommandHelpExample](https://github.com/calq-framework/cli/blob/main/Examples/Example.NestedSubmodules.CloudProvider/SubcommandHelpExample.png?raw=true)
 
 ### Quick Start
 ```bash
@@ -317,6 +328,3 @@ public record QuickResult(string s, int a, int b);
 
 ## License
 Calq CLI is dual-licensed under the GNU AGPLv3 and a commercial license.
-
-
-
