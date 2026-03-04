@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using CalqFramework.DataAccess;
 
-namespace CalqFramework.Extensions.System.Reflection;
+namespace CalqFramework.DataAccess.Extensions.System.Reflection;
 
 public static class MemberInfoExtensions {
     public static Type GetUnderlyingType(this MemberInfo memberInfo) {

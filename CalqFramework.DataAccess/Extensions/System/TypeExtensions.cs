@@ -2,13 +2,13 @@
 using System.Reflection;
 using CalqFramework.DataAccess;
 
-namespace CalqFramework.Extensions.System;
+namespace CalqFramework.DataAccess.Extensions.System;
 
 /// <summary>
 ///     Extension methods for parsing string values to typed objects.
 /// </summary>
 public static class TypeExtensions {
-    private static readonly Dictionary<Type, Type> InterfaceToConcreteMap = new() {
+    private static readonly Dictionary<Type, Type> s_interfaceToConcreteMap = new() {
         // Generic collections
         [typeof(IList<>)] = typeof(List<>),
         [typeof(ICollection<>)] = typeof(List<>),
@@ -88,13 +88,13 @@ public static class TypeExtensions {
     }
 
     private static Type? GetConcreteCollectionType(Type interfaceType) {
-        if (InterfaceToConcreteMap.TryGetValue(interfaceType, out Type? concreteType)) {
+        if (s_interfaceToConcreteMap.TryGetValue(interfaceType, out Type? concreteType)) {
             return concreteType;
         }
 
         if (interfaceType.IsGenericType) {
             Type genericTypeDef = interfaceType.GetGenericTypeDefinition();
-            if (InterfaceToConcreteMap.TryGetValue(genericTypeDef, out Type? genericConcrete)) {
+            if (s_interfaceToConcreteMap.TryGetValue(genericTypeDef, out Type? genericConcrete)) {
                 return genericConcrete.MakeGenericType(interfaceType.GetGenericArguments());
             }
         }

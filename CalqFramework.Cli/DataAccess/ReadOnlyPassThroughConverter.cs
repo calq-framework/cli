@@ -1,5 +1,5 @@
 ﻿using System;
-using CalqFramework.Extensions.System;
+using CalqFramework.DataAccess.Extensions.System;
 
 namespace CalqFramework.Cli.DataAccess;
 
