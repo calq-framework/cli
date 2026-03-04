@@ -52,7 +52,7 @@ function ____PROGRAM_NAME___completion
 end
 complete -c __PROGRAM_NAME__ -f -a ""(____PROGRAM_NAME___completion)""";
 
-    private static readonly Dictionary<string, ShellConfig> _shellConfigs = new() {
+    private static readonly Dictionary<string, ShellConfig> s_shellConfigs = new() {
         ["bash"] = new ShellConfig(BashTemplate, GetBashInstallPath),
         ["zsh"] = new ShellConfig(ZshTemplate, GetZshInstallPath),
         ["powershell"] = new ShellConfig(PowerShellTemplate, GetPowerShell5InstallPath),
@@ -60,11 +60,11 @@ complete -c __PROGRAM_NAME__ -f -a ""(____PROGRAM_NAME___completion)""";
         ["fish"] = new ShellConfig(FishTemplate, GetFishInstallPath)
     };
 
-    public IReadOnlyCollection<string> SupportedShells => _shellConfigs.Keys;
+    public IReadOnlyCollection<string> SupportedShells => s_shellConfigs.Keys;
 
     public string GenerateScript(string shell, string programName) {
         string normalized = shell.ToLowerInvariant();
-        if (!_shellConfigs.TryGetValue(normalized, out ShellConfig? config)) {
+        if (!s_shellConfigs.TryGetValue(normalized, out ShellConfig? config)) {
             throw CliErrors.UnsupportedShell(shell);
         }
 
@@ -73,7 +73,7 @@ complete -c __PROGRAM_NAME__ -f -a ""(____PROGRAM_NAME___completion)""";
 
     public string GetInstallPath(string shell, string programName) {
         string normalized = shell.ToLowerInvariant();
-        if (!_shellConfigs.TryGetValue(normalized, out ShellConfig? config)) {
+        if (!s_shellConfigs.TryGetValue(normalized, out ShellConfig? config)) {
             throw CliErrors.UnsupportedShell(shell);
         }
 

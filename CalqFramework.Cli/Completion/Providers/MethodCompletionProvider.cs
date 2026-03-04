@@ -19,7 +19,7 @@ public class MethodCompletionProvider : ICompletionProvider {
 
         MethodInfo? method = context.Submodule.GetType().GetMethod(
             context.Filter,
-            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance) ?? throw CliErrors.CompletionMethodNotFound(context.Filter, context.Submodule.GetType().Name);
+            BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static) ?? throw CliErrors.CompletionMethodNotFound(context.Filter, context.Submodule.GetType().Name);
         ParameterInfo[] parameters = method.GetParameters();
         if (parameters.Length != 1 || parameters[0].ParameterType != typeof(string)) {
             throw CliErrors.InvalidCompletionMethodSignature(context.Filter, context.Submodule.GetType().Name);

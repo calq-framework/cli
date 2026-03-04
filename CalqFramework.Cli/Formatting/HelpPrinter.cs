@@ -290,7 +290,7 @@ public class HelpPrinter(TextWriter? output = null) : IHelpPrinter {
         return string.Join(" ", parts);
     }
 
-    private static IList<int> GetMaxKeyLengths(IEnumerable<SectionInfo> sections) {
+    private static List<int> GetMaxKeyLengths(IEnumerable<SectionInfo> sections) {
         List<int> maxLengths = [];
         foreach (SectionInfo section in sections) {
             foreach (ItemInfo item in section.ItemInfos) {
@@ -324,8 +324,8 @@ public class HelpPrinter(TextWriter? output = null) : IHelpPrinter {
         return type.Name;
     }
 
-    private static IList<int> NormalizeKeyCounts(IEnumerable<SectionInfo> sections) {
-        IList<int> maxLengths = GetMaxKeyLengths(sections);
+    private static List<int> NormalizeKeyCounts(IEnumerable<SectionInfo> sections) {
+        List<int> maxLengths = GetMaxKeyLengths(sections);
 
         foreach (SectionInfo section in sections) {
             foreach (ItemInfo item in section.ItemInfos) {
@@ -365,7 +365,7 @@ public class HelpPrinter(TextWriter? output = null) : IHelpPrinter {
     }
 
     private void PrintSections(IEnumerable<SectionInfo> sections) {
-        IList<int> maxLengths = NormalizeKeyCounts(sections);
+        List<int> maxLengths = NormalizeKeyCounts(sections);
 
         SectionInfo firstSection = sections.SkipWhile(x => x.ItemInfos.Count == 0).First();
         foreach (SectionInfo section in sections) {

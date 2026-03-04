@@ -18,7 +18,7 @@ internal class CliFieldStore<TValue> : FieldStoreBase<string, TValue>, ICliKeyVa
         AccessorsByNames = GetAccessorsByNames();
     }
 
-    private IDictionary<string, FieldInfo> AccessorsByNames { get; }
+    private Dictionary<string, FieldInfo> AccessorsByNames { get; }
     private IAccessValidator AccessValidator { get; }
     private IClassMemberStringifier ClassMemberStringifier { get; }
     private ICompositeValueConverter<TValue> CompositeValueConverter { get; }
@@ -52,7 +52,7 @@ internal class CliFieldStore<TValue> : FieldStoreBase<string, TValue>, ICliKeyVa
         return CompositeValueConverter.ConvertToOrUpdate(value, accessor.FieldType, currentValue);
     }
 
-    private IDictionary<string, FieldInfo> GetAccessorsByNames() {
+    private Dictionary<string, FieldInfo> GetAccessorsByNames() {
         StringComparer stringComparer = BindingFlags.HasFlag(BindingFlags.IgnoreCase)
             ? StringComparer.OrdinalIgnoreCase
             : StringComparer.Ordinal;

@@ -24,7 +24,7 @@ internal class MethodInfoStore : ICliReadOnlyKeyValueStore<string, MethodInfo, M
     protected IClassMemberStringifier ClassMemberStringifier { get; }
     protected object TargetObject { get; }
     protected Type TargetType { get; }
-    private IDictionary<string, MethodInfo> AccessorsByNames { get; }
+    private Dictionary<string, MethodInfo> AccessorsByNames { get; }
 
     public MethodInfo this[string key] {
         get {
@@ -54,7 +54,7 @@ internal class MethodInfoStore : ICliReadOnlyKeyValueStore<string, MethodInfo, M
     private bool ContainsAccessor(MethodInfo accessor) =>
         accessor.ReflectedType == TargetType && AccessValidator.IsValid(accessor);
 
-    private IDictionary<string, MethodInfo> GetAccessorsByNames() {
+    private Dictionary<string, MethodInfo> GetAccessorsByNames() {
         StringComparer stringComparer = BindingFlags.HasFlag(BindingFlags.IgnoreCase)
             ? StringComparer.OrdinalIgnoreCase
             : StringComparer.Ordinal;

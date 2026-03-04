@@ -57,7 +57,7 @@ public class CommandLineInterfaceTest {
         Assert.False(((List<bool>)result)[0]);
         Assert.True(((List<bool>)result)[1]);
     }
-    private static readonly bool[] expected = [false, true];
+    private static readonly bool[] s_expected = [false, true];
 
     [Fact]
     public void Execute_MethodWithEnumerableParameter_AcceptsMultipleValues() {
@@ -66,7 +66,7 @@ public class CommandLineInterfaceTest {
             $"{StringHelper.GetKebabCase(nameof(SomeClassLibrary.MethodWithEnumerable))} --param-enumerable false --param-enumerable true"
                 .Split(' '));
         IEnumerable<bool> enumerable = (IEnumerable<bool>)result;
-        Assert.Equal(expected, enumerable);
+        Assert.Equal(s_expected, enumerable);
     }
 
     [Fact]

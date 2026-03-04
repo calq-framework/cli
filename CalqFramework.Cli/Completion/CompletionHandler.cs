@@ -93,7 +93,7 @@ public class CompletionHandler : ICompletionHandler {
     }
 
     private void HandleComplete(ICliContext context, object target, List<string> args, string toComplete) {
-        using IEnumerator<string> en = args.GetEnumerator();
+        using List<string>.Enumerator en = args.GetEnumerator();
 
         object? parentSubmodule = null;
         object submodule = target;
@@ -149,9 +149,9 @@ public class CompletionHandler : ICompletionHandler {
         }
 
         string? previousArg = args.Count > 0 ? args[^1] : null;
-        bool completingOptionValue = previousArg != null && previousArg.StartsWith("-") && !toComplete.StartsWith("-");
+        bool completingOptionValue = previousArg != null && previousArg.StartsWith('-') && !toComplete.StartsWith('-');
 
-        if (toComplete.StartsWith("-")) {
+        if (toComplete.StartsWith('-')) {
             IEnumerable<Parameter> parameters = subcommandExecutorWithOptions.GetParameters();
             IEnumerable<Option> options = subcommandExecutorWithOptions.GetOptions();
             CompletionPrinter.PrintParametersAndOptions(context, parameters, options, toComplete);
@@ -202,7 +202,7 @@ public class CompletionHandler : ICompletionHandler {
         }
     }
 
-    private static IEnumerable<string> GetSkippedEnumerator(IEnumerator<string> en) {
+    private static IEnumerable<string> GetSkippedEnumerator(List<string>.Enumerator en) {
         do {
             yield return en.Current;
         } while (en.MoveNext());

@@ -31,7 +31,7 @@ public class DotnetSuggestHandler : IDotnetSuggestHandler {
 
         // Check for [suggest] or [suggest:N] directive
         string directive = argsList[0];
-        if (!directive.StartsWith("[suggest") || !directive.EndsWith("]")) {
+        if (!directive.StartsWith("[suggest") || !directive.EndsWith(']')) {
             return ResultVoid.Value;
         }
 

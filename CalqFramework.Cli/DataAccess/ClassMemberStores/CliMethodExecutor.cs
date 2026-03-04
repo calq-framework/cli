@@ -22,7 +22,7 @@ internal class CliMethodExecutor<TValue> : MethodExecutorBase<string, TValue>,
 
     protected BindingFlags BindingFlags { get; }
     protected IClassMemberStringifier ClassMemberStringifier { get; }
-    private IDictionary<string, ParameterInfo> AccessorsByNames { get; }
+    private Dictionary<string, ParameterInfo> AccessorsByNames { get; }
     private ICompositeValueConverter<TValue> CompositeValueConverter { get; }
 
     public IEnumerable<AccessorKeysPair<ParameterInfo>> GetAccessorKeysPairs() =>
@@ -73,7 +73,7 @@ internal class CliMethodExecutor<TValue> : MethodExecutorBase<string, TValue>,
         return CompositeValueConverter.ConvertToOrUpdate(value, accessor.ParameterType, currentValue);
     }
 
-    private IDictionary<string, ParameterInfo> GetAccessorsByNames() {
+    private Dictionary<string, ParameterInfo> GetAccessorsByNames() {
         StringComparer stringComparer = BindingFlags.HasFlag(BindingFlags.IgnoreCase)
             ? StringComparer.OrdinalIgnoreCase
             : StringComparer.Ordinal;

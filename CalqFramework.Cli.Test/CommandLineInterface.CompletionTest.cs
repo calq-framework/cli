@@ -8,7 +8,7 @@ namespace CalqFramework.Cli.Test;
 
 [Collection("Completion Tests")]
 public class CommandLineInterfaceCompletionTest {
-    private static readonly string[] first = ["__complete"];
+    private static readonly string[] s_first = ["__complete"];
 
     private static List<string> GetCompletions(string commandLine) {
         SomeClassLibrary tool = new();
@@ -22,7 +22,7 @@ public class CommandLineInterfaceCompletionTest {
 
         using StringWriter writer = new();
         CommandLineInterface cli = new() { Out = writer };
-        cli.Execute(tool, first.Concat(args));
+        cli.Execute(tool, s_first.Concat(args));
 
         string output = writer.ToString();
         return [.. output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)];

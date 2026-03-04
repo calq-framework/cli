@@ -1,4 +1,5 @@
 ﻿#pragma warning disable CS0649
+#pragma warning disable IDE0060
 
 using System;
 using System.Collections.Generic;

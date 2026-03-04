@@ -78,12 +78,12 @@ public class CommandLineInterfaceDotnetSuggestTest {
         Assert.Contains("true", completions);
         Assert.Contains("false", completions);
     }
-    private static readonly string[] args = ["[suggest]"];
+    private static readonly string[] s_args = ["[suggest]"];
 
     [Fact]
     public void HandleDotnetSuggest_EmptyArgs_ReturnsVoid() {
         SomeClassLibrary tool = new();
-        object result = new CommandLineInterface().Execute(tool, args);
+        object result = new CommandLineInterface().Execute(tool, s_args);
 
         Assert.IsType<ResultVoid>(result);
     }

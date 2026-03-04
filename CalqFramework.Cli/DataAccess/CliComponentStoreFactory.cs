@@ -163,16 +163,16 @@ public class CliComponentStoreFactory : ICliComponentStoreFactory {
         return new SubmoduleStore(store);
     }
 
-    private ICliKeyValueStore<string, TValue, MemberInfo> CreateFieldAndPropertyStore<TValue>(object obj,
+    private CliDualKeyValueStore<TValue> CreateFieldAndPropertyStore<TValue>(object obj,
         IAccessValidator cliValidator, ICompositeValueConverter<TValue> compositeValueConverter) =>
-        new CliDualKeyValueStore<TValue>(CreateFieldStore(obj, cliValidator, compositeValueConverter),
+        new(CreateFieldStore(obj, cliValidator, compositeValueConverter),
             CreatePropertyStore(obj, cliValidator, compositeValueConverter));
 
-    private ICliKeyValueStore<string, TValue, MemberInfo> CreateFieldStore<TValue>(object obj,
+    private CliFieldStore<TValue> CreateFieldStore<TValue>(object obj,
         IAccessValidator cliValidator, ICompositeValueConverter<TValue> compositeValueConverter) =>
-        new CliFieldStore<TValue>(obj, BindingFlags, ClassMemberStringifier, cliValidator, compositeValueConverter);
+        new(obj, BindingFlags, ClassMemberStringifier, cliValidator, compositeValueConverter);
 
-    private ICliKeyValueStore<string, TValue, MemberInfo> CreatePropertyStore<TValue>(object obj,
+    private CliPropertyStore<TValue> CreatePropertyStore<TValue>(object obj,
         IAccessValidator cliValidator, ICompositeValueConverter<TValue> compositeValueConverter) =>
-        new CliPropertyStore<TValue>(obj, BindingFlags, ClassMemberStringifier, cliValidator, compositeValueConverter);
+        new(obj, BindingFlags, ClassMemberStringifier, cliValidator, compositeValueConverter);
 }

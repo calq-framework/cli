@@ -60,17 +60,17 @@ public class DirectoryCompletionProvider : ICompletionProvider {
             return true;
         }
 
-        if (pattern.StartsWith("*") && pattern.EndsWith("*")) {
+        if (pattern.StartsWith('*') && pattern.EndsWith('*')) {
             string middle = pattern.Trim('*');
             return name.Contains(middle, StringComparison.OrdinalIgnoreCase);
         }
 
-        if (pattern.StartsWith("*")) {
+        if (pattern.StartsWith('*')) {
             string suffix = pattern.TrimStart('*');
             return name.EndsWith(suffix, StringComparison.OrdinalIgnoreCase);
         }
 
-        if (pattern.EndsWith("*")) {
+        if (pattern.EndsWith('*')) {
             string prefix = pattern.TrimEnd('*');
             return name.StartsWith(prefix, StringComparison.OrdinalIgnoreCase);
         }
