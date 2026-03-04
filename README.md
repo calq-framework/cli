@@ -120,6 +120,11 @@ The following will interpret the command-line arguments, execute any underlying 
 var result = new CommandLineInterface().Execute(new Classlib());
 ```
 
+With custom arguments instead of environment args:
+```csharp
+var result = new CommandLineInterface().Execute(new Classlib(), new[] { "subcommand", "--option", "value" });
+```
+
 ### Built-in Help and Version
 Help is automatically available with `--help` or `-h` at any level (root, submodule, or subcommand).
 Version is automatically available with `--version` or `-v`.
@@ -149,12 +154,14 @@ var result = new CommandLineInterface() {
 }.Execute(new Classlib());
 ```
 
-**Custom Arguments** - Execute with custom arguments instead of environment args:
+**Custom Output** - Redirect output to a custom TextWriter:
 ```csharp
-var result = new CommandLineInterface().Execute(new Classlib(), new[] { "subcommand", "--option", "value" });
+var result = new CommandLineInterface() {
+    Out = new StringWriter()  // Or any TextWriter
+}.Execute(new Classlib());
 ```
 
-**Access Control** - Control which members are exposed:
+**Member Access Control** - Control which members are exposed as CLI components:
 ```csharp
 var result = new CommandLineInterface() {
     CliComponentStoreFactory = new CliComponentStoreFactory() {
@@ -164,7 +171,7 @@ var result = new CommandLineInterface() {
 }.Execute(new Classlib());
 ```
 
-**Custom Binding Flags** - Control member visibility and case sensitivity:
+**Binding Flags** - Control member visibility and case sensitivity:
 ```csharp
 var result = new CommandLineInterface() {
     CliComponentStoreFactory = new CliComponentStoreFactory() {
@@ -172,6 +179,91 @@ var result = new CommandLineInterface() {
         MethodBindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase
     }
 }.Execute(new Classlib());
+```
+
+**Access Validators** - Fine-grained control over which members are exposed as options, subcommands, or submodules:
+```csharp
+var result = new CommandLineInterface() {
+    CliComponentStoreFactory = new CliComponentStoreFactory() {
+        OptionAccessValidator = new CustomOptionValidator(),
+        SubcommandAccessValidator = new CustomSubcommandValidator(),
+        SubmoduleAccessValidator = new CustomSubmoduleValidator()
+    }
+}.Execute(new Classlib());
+```
+
+**Name Stringification** - Customize how member names map to CLI names (default: kebab-case):
+```csharp
+var result = new CommandLineInterface() {
+    CliComponentStoreFactory = new CliComponentStoreFactory() {
+        ClassMemberStringifier = new CustomStringifier()
+    }
+}.Execute(new Classlib());
+```
+
+**Value Conversion** - Customize parsing and validation of argument values:
+```csharp
+var result = new CommandLineInterface() {
+    CliComponentStoreFactory = new CliComponentStoreFactory() {
+        CompositeValueConverter = new CustomConverter(),
+        FormatProvider = CultureInfo.CurrentCulture
+    }
+}.Execute(new Classlib());
+```
+
+**Custom Help Formatting** - Implement IHelpPrinter for custom help output:
+```csharp
+var result = new CommandLineInterface() {
+    HelpPrinter = new CustomHelpPrinter()
+}.Execute(new Classlib());
+```
+
+Custom Help Menu Example:
+```csharp
+// CLI components include metadata such as Keys, MemberInfo, and Values
+public class CustomHelpPrinter : IHelpPrinter {
+    public void PrintHelp(Type rootSubmoduleType, Submodule submodule, IEnumerable<Submodule> submodules, 
+        IEnumerable<Subcommand> subcommands, IEnumerable<Option> options) {
+        PrintHelp(submodules, subcommands, options);
+    }
+
+    public void PrintHelp(Type rootSubmoduleType, IEnumerable<Submodule> submodules, 
+        IEnumerable<Subcommand> subcommands, IEnumerable<Option> options) {
+        PrintHelp(submodules, subcommands, options);
+    }
+
+    private void PrintHelp(IEnumerable<Submodule> submodules, IEnumerable<Subcommand> subcommands, 
+        IEnumerable<Option> options) {
+        var sections = new SectionInfo[] {
+            new("Submodules", submodules.Select(x => new ItemInfo(x.Keys))),
+            new("Subcommands", subcommands.Select(x => new ItemInfo(x.Keys))),
+            new("Options", options.Select(x => new ItemInfo(x.Keys.Select(GetOptionName))))
+        };
+        PrintSections(sections);
+    }
+
+    public void PrintSubcommandHelp(Type rootSubmoduleType, Subcommand subcommand, IEnumerable<Option> options) {
+        var sections = new SectionInfo[] {
+            new("Parameters", subcommand.Parameters.Select(x => new ItemInfo(x.Keys.Select(GetOptionName)))),
+            new("Options", options.Select(x => new ItemInfo(x.Keys.Select(GetOptionName))))
+        };
+        PrintSections(sections);
+    }
+
+    private void PrintSections(IEnumerable<SectionInfo> sections) {
+        foreach (var section in sections) {
+            Console.WriteLine(section.Title);
+            foreach (var item in section.ItemInfos) {
+                Console.WriteLine(string.Join(" ", item.Keys));
+            }
+        }
+    }
+
+    private static string GetOptionName(string key) => key.Length > 1 ? $"--{key}" : $"-{key}";
+
+    private record ItemInfo(IEnumerable<string> Keys);
+    private record SectionInfo(string Title, IEnumerable<ItemInfo> ItemInfos);
+}
 ```
 
 ### OptionDeserializer
@@ -204,7 +296,7 @@ Completion works automatically for:
 ### Custom Completion
 Use `[CliCompletion]` attribute for custom completion providers:
 
-**Method-based completion** - Call an instance method:
+**Method-based completion**
 
 ```csharp
 [CliCompletion("GetRegions")]
@@ -216,7 +308,7 @@ private IEnumerable<string> GetRegions(string partialInput) {
 }
 ```
 
-**Custom provider** - Implement `ICompletionProvider`:
+**Custom provider**
 ```csharp
 public class RegionCompletionProvider : ICompletionProvider {
     public IEnumerable<string> GetCompletions(ICompletionProviderContext context) {
@@ -229,7 +321,7 @@ public class RegionCompletionProvider : ICompletionProvider {
 public string Region { get; set; }
 ```
 
-**Built-in providers** - Use framework-provided completion providers:
+**Built-in providers**
 ```csharp
 // File completion with extension filtering
 [CliCompletion(typeof(FileCompletionProvider), "*.json;*.yaml")]
