@@ -329,4 +329,4 @@ public record QuickResult(string s, int a, int b);
 ```
 
 ## License
-Calq CLI is dual-licensed under the PolyForm-Noncommercial and a commercial license.
+Calq CLI is dual-licensed under PolyForm Noncommercial (with Evaluation Grant) and the Calq Commercial License.
