@@ -9,7 +9,7 @@ namespace CalqFramework.Cli.Completion;
 /// <summary>
 ///     Handles dotnet-suggest protocol for shell completion integration.
 /// </summary>
-public sealed class DotnetSuggestHandler : IDotnetSuggestHandler {
+internal sealed class DotnetSuggestHandler : IDotnetSuggestHandler {
     /// <summary>
     ///     Handles dotnet-suggest completion protocol.
     ///     Converts [suggest] or [suggest:N] format to __complete format and delegates to CompletionHandler.

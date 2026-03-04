@@ -11,7 +11,7 @@ namespace CalqFramework.Cli.Completion;
 /// <summary>
 ///     Prints completion suggestions based on CLI state and metadata.
 /// </summary>
-public sealed class CompletionPrinter : ICompletionPrinter {
+internal sealed class CompletionPrinter : ICompletionPrinter {
     public void PrintSubmodules(ICliContext context, IEnumerable<Submodule> submodules, string partialInput) {
         IOrderedEnumerable<string> completions = submodules
             .Select(s => s.Keys[0])
