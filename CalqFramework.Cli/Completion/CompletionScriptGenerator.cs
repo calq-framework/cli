@@ -4,7 +4,7 @@ using System.IO;
 
 namespace CalqFramework.Cli.Completion;
 
-public sealed class CompletionScriptGenerator : ICompletionScriptGenerator {
+internal sealed class CompletionScriptGenerator : ICompletionScriptGenerator {
     private const string BashTemplate = @"# Bash completion script for __PROGRAM_NAME__
 ___PROGRAM_NAME___completion() {
     local cur prev words cword

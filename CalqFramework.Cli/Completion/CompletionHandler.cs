@@ -11,7 +11,7 @@ using static CalqFramework.Cli.Parsing.OptionReaderBase;
 
 namespace CalqFramework.Cli.Completion;
 
-public sealed class CompletionHandler : ICompletionHandler {
+internal sealed class CompletionHandler : ICompletionHandler {
     private ICompletionPrinter? _completionPrinter;
     private ICompletionScriptGenerator? _completionScriptGenerator;
 
