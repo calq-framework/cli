@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using CalqFramework.DataAccess;
 
 namespace CalqFramework.Extensions.System.Reflection;

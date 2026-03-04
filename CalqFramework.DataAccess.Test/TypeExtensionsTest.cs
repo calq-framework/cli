@@ -1,4 +1,4 @@
-﻿using CalqFramework.Extensions.System;
+using CalqFramework.Extensions.System;
 
 namespace CalqFramework.DataAccess.Test;
 
