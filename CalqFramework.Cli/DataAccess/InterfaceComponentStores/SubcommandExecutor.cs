@@ -6,10 +6,8 @@ using CalqFramework.Cli.InterfaceComponents;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponentStores;
 
-internal class SubcommandExecutor : ISubcommandExecutor {
-    public SubcommandExecutor(ICliFunctionExecutor<string, string?, ParameterInfo> executor) => Executor = executor;
-
-    private ICliFunctionExecutor<string, string?, ParameterInfo> Executor { get; }
+internal class SubcommandExecutor(ICliFunctionExecutor<string, string?, ParameterInfo> executor) : ISubcommandExecutor {
+    private ICliFunctionExecutor<string, string?, ParameterInfo> Executor { get; } = executor;
 
     public string? this[string key] {
         get => Executor[key];

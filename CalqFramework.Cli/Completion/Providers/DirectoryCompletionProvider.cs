@@ -31,7 +31,7 @@ public class DirectoryCompletionProvider : ICompletionProvider {
         }
 
         if (!Directory.Exists(directory)) {
-            return Enumerable.Empty<string>();
+            return [];
         }
 
         try {
@@ -50,7 +50,7 @@ public class DirectoryCompletionProvider : ICompletionProvider {
             return directories.OrderBy(d => d);
         } catch {
             // Ignore errors (permission denied, etc.)
-            return Enumerable.Empty<string>();
+            return [];
         }
     }
 

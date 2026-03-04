@@ -12,21 +12,16 @@ namespace CalqFramework.Cli.DataAccess;
 ///     Decorator that adds multi-value handling to a base value converter.
 ///     Uses composition to delegate simple type conversions while handling enumerables specially.
 /// </summary>
-public sealed class CompositeValueConverter : ICompositeValueConverter<string?> {
-    private readonly IValueConverter<string?> _baseConverter;
-    private readonly ICollectionElementStoreFactory<string, object?> _collectionElementStoreFactory;
-
-    /// <summary>
-    ///     Creates a new composite value converter that wraps a base converter.
-    /// </summary>
-    /// <param name="baseConverter">The converter to use for simple types and enumerable elements.</param>
-    /// <param name="collectionStoreFactory">Factory for creating enumerable stores.</param>
-    public CompositeValueConverter(
-        IValueConverter<string?> baseConverter,
-        ICollectionElementStoreFactory<string, object?> collectionStoreFactory) {
-        _baseConverter = baseConverter;
-        _collectionElementStoreFactory = collectionStoreFactory;
-    }
+/// <remarks>
+///     Creates a new composite value converter that wraps a base converter.
+/// </remarks>
+/// <param name="baseConverter">The converter to use for simple types and enumerable elements.</param>
+/// <param name="collectionStoreFactory">Factory for creating enumerable stores.</param>
+public sealed class CompositeValueConverter(
+    IValueConverter<string?> baseConverter,
+    ICollectionElementStoreFactory<string, object?> collectionStoreFactory) : ICompositeValueConverter<string?> {
+    private readonly IValueConverter<string?> _baseConverter = baseConverter;
+    private readonly ICollectionElementStoreFactory<string, object?> _collectionElementStoreFactory = collectionStoreFactory;
 
     public bool CanConvert(Type targetType) => _baseConverter.CanConvert(targetType) ||
                                                (IsMultiValue(targetType) &&

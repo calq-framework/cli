@@ -23,7 +23,7 @@ public class DotnetSuggestHandler : IDotnetSuggestHandler {
         ICompletionHandler completionHandler,
         IEnumerable<string> args,
         object target) {
-        List<string> argsList = args.ToList();
+        List<string> argsList = [.. args];
 
         if (argsList.Count < 2) {
             return ResultVoid.Value;
@@ -57,14 +57,14 @@ public class DotnetSuggestHandler : IDotnetSuggestHandler {
             commandLine = fullCommandLine.Substring(0, cursorPosition.Value);
         }
 
-        List<string> tokens = commandLine.Split(new[] { ' ' }, StringSplitOptions.None).ToList();
+        List<string> tokens = [.. commandLine.Split([' '], StringSplitOptions.None)];
 
         // dotnet-suggest includes the executable name in the command line
         // Skip it if present
         if (tokens.Count > 0) {
             string exeName = Path.GetFileNameWithoutExtension(Environment.ProcessPath ?? "");
             if (tokens[0].Equals(exeName, StringComparison.OrdinalIgnoreCase)) {
-                tokens = tokens.Skip(1).ToList();
+                tokens = [.. tokens.Skip(1)];
             }
         }
 

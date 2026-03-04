@@ -67,7 +67,7 @@ internal class CliFieldStore<TValue> : FieldStoreBase<string, TValue>, ICliKeyVa
         }
 
         Dictionary<string, FieldInfo> accessorsByAlternativeNames = new(stringComparer);
-        HashSet<string> collidingAlternativeNames = new();
+        HashSet<string> collidingAlternativeNames = [];
         foreach (FieldInfo accessor in Accessors) {
             foreach (string name in ClassMemberStringifier.GetAlternativeNames(accessor)) {
                 if (!accessorsByAlternativeNames.TryAdd(name, accessor)) {

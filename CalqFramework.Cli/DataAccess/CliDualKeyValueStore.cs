@@ -5,16 +5,11 @@ using CalqFramework.DataAccess;
 
 namespace CalqFramework.Cli.DataAccess;
 
-internal class CliDualKeyValueStore<TValue> : DualKeyValueStoreBase<string, TValue>,
+internal class CliDualKeyValueStore<TValue>(ICliKeyValueStore<string, TValue, MemberInfo> primaryStore,
+    ICliKeyValueStore<string, TValue, MemberInfo> secondaryStore) : DualKeyValueStoreBase<string, TValue>,
     ICliKeyValueStore<string, TValue, MemberInfo> {
-    private readonly ICliKeyValueStore<string, TValue, MemberInfo> _primaryStore;
-    private readonly ICliKeyValueStore<string, TValue, MemberInfo> _secondaryStore;
-
-    public CliDualKeyValueStore(ICliKeyValueStore<string, TValue, MemberInfo> primaryStore,
-        ICliKeyValueStore<string, TValue, MemberInfo> secondaryStore) {
-        _primaryStore = primaryStore;
-        _secondaryStore = secondaryStore;
-    }
+    private readonly ICliKeyValueStore<string, TValue, MemberInfo> _primaryStore = primaryStore;
+    private readonly ICliKeyValueStore<string, TValue, MemberInfo> _secondaryStore = secondaryStore;
 
     protected override IKeyValueStore<string, TValue> PrimaryStore => _primaryStore;
 

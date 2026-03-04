@@ -76,7 +76,7 @@ public class CommandLineInterface : ICliContext {
     ///     Executes a CLI command using the provided arguments.
     /// </summary>
     public object? Execute(object target, IEnumerable<string> args) {
-        List<string> argsList = args.ToList();
+        List<string> argsList = [.. args];
 
         // Check if this is the dotnet-suggest protocol ([suggest] or [suggest:N] where N is cursor position)
         if (argsList.Count > 0 && argsList[0].StartsWith("[suggest")) {

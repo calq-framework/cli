@@ -4,15 +4,10 @@ using CalqFramework.DataAccess;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponentStores;
 
-internal class SubcommandExecutorWithOptions : DistinctDualKeyValueStoreBase<string, string?>,
+internal class SubcommandExecutorWithOptions(ISubcommandExecutor subcommandExecutor, IOptionStore optionStore) : DistinctDualKeyValueStoreBase<string, string?>,
     ISubcommandExecutorWithOptions {
-    private readonly IOptionStore _optionStore;
-    private readonly ISubcommandExecutor _subcommandExecutor;
-
-    public SubcommandExecutorWithOptions(ISubcommandExecutor subcommandExecutor, IOptionStore optionStore) {
-        _subcommandExecutor = subcommandExecutor;
-        _optionStore = optionStore;
-    }
+    private readonly IOptionStore _optionStore = optionStore;
+    private readonly ISubcommandExecutor _subcommandExecutor = subcommandExecutor;
 
     protected override IKeyValueStore<string, string?> PrimaryStore => _subcommandExecutor;
 

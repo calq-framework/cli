@@ -69,7 +69,7 @@ internal class MethodInfoStore : ICliReadOnlyKeyValueStore<string, MethodInfo, M
         }
 
         Dictionary<string, MethodInfo> accessorsByAlternativeNames = new(stringComparer);
-        HashSet<string> collidingAlternativeNames = new();
+        HashSet<string> collidingAlternativeNames = [];
         foreach (MethodInfo accessor in Accessors) {
             foreach (string name in ClassMemberStringifier.GetAlternativeNames(accessor)) {
                 if (!accessorsByAlternativeNames.TryAdd(name, accessor)) {
