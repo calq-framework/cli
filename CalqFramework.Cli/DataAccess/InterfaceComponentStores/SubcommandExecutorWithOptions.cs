@@ -4,7 +4,7 @@ using CalqFramework.DataAccess;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponentStores;
 
-internal class SubcommandExecutorWithOptions(ISubcommandExecutor subcommandExecutor, IOptionStore optionStore) : DistinctDualKeyValueStoreBase<string, string?>,
+internal sealed class SubcommandExecutorWithOptions(ISubcommandExecutor subcommandExecutor, IOptionStore optionStore) : DistinctDualKeyValueStoreBase<string, string?>,
     ISubcommandExecutorWithOptions {
     private readonly IOptionStore _optionStore = optionStore;
     private readonly ISubcommandExecutor _subcommandExecutor = subcommandExecutor;

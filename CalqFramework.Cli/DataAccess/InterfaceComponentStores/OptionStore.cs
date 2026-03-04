@@ -6,7 +6,7 @@ using CalqFramework.Cli.InterfaceComponents;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponentStores;
 
-internal class OptionStore(ICliKeyValueStore<string, string?, MemberInfo> store) : IOptionStore {
+internal sealed class OptionStore(ICliKeyValueStore<string, string?, MemberInfo> store) : IOptionStore {
     private ICliKeyValueStore<string, string?, MemberInfo> Store { get; } = store;
 
     public string? this[string key] {

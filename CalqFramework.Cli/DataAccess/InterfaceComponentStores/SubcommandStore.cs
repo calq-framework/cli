@@ -6,7 +6,7 @@ using CalqFramework.Cli.InterfaceComponents;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponentStores;
 
-internal class SubcommandStore(ICliReadOnlyKeyValueStore<string, MethodInfo, MethodInfo> store) : ISubcommandStore {
+internal sealed class SubcommandStore(ICliReadOnlyKeyValueStore<string, MethodInfo, MethodInfo> store) : ISubcommandStore {
     private ICliReadOnlyKeyValueStore<string, MethodInfo, MethodInfo> Store { get; } = store;
 
     public MethodInfo? this[string key] => Store[key];

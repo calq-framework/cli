@@ -8,7 +8,7 @@ namespace CalqFramework.Cli.DataAccess;
 /// <summary>
 ///     Validates whether a member is a valid CLI submodule (must be non-convertible type).
 /// </summary>
-public class SubmoduleAccessValidator(IValueConverter<string?> valueConverter) : IAccessValidator {
+public sealed class SubmoduleAccessValidator(IValueConverter<string?> valueConverter) : IAccessValidator {
     private readonly IValueConverter<string?> _valueConverter = valueConverter;
 
     public bool IsValid(MemberInfo accessor) {

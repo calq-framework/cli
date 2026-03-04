@@ -8,7 +8,7 @@ using CalqFramework.DataAccess.ClassMemberStores;
 
 namespace CalqFramework.Cli.DataAccess.ClassMemberStores;
 
-internal class CliPropertyStore<TValue> : PropertyStoreBase<string, TValue>,
+internal sealed class CliPropertyStore<TValue> : PropertyStoreBase<string, TValue>,
     ICliKeyValueStore<string, TValue, MemberInfo> {
     public CliPropertyStore(object targetObject, BindingFlags bindingFlags,
         IClassMemberStringifier classMemberStringifier, IAccessValidator accessValidator,
@@ -19,7 +19,7 @@ internal class CliPropertyStore<TValue> : PropertyStoreBase<string, TValue>,
         AccessorsByNames = GetAccessorsByNames();
     }
 
-    protected IClassMemberStringifier ClassMemberStringifier { get; }
+    private IClassMemberStringifier ClassMemberStringifier { get; }
     private Dictionary<string, PropertyInfo> AccessorsByNames { get; }
     private IAccessValidator AccessValidator { get; }
     private ICompositeValueConverter<TValue> CompositeValueConverter { get; }

@@ -5,7 +5,7 @@ using CalqFramework.DataAccess;
 
 namespace CalqFramework.Cli.DataAccess;
 
-internal class CliDualKeyValueStore<TValue>(ICliKeyValueStore<string, TValue, MemberInfo> primaryStore,
+internal sealed class CliDualKeyValueStore<TValue>(ICliKeyValueStore<string, TValue, MemberInfo> primaryStore,
     ICliKeyValueStore<string, TValue, MemberInfo> secondaryStore) : DualKeyValueStoreBase<string, TValue>,
     ICliKeyValueStore<string, TValue, MemberInfo> {
     private readonly ICliKeyValueStore<string, TValue, MemberInfo> _primaryStore = primaryStore;

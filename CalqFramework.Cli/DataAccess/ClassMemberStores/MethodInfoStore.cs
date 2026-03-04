@@ -7,7 +7,7 @@ using CalqFramework.Cli.Formatting;
 
 namespace CalqFramework.Cli.DataAccess.ClassMemberStores;
 
-internal class MethodInfoStore : ICliReadOnlyKeyValueStore<string, MethodInfo, MethodInfo> {
+internal sealed class MethodInfoStore : ICliReadOnlyKeyValueStore<string, MethodInfo, MethodInfo> {
     public MethodInfoStore(object targetObject, BindingFlags bindingFlags,
         IClassMemberStringifier classMemberStringifier, IAccessValidator accessValidator) {
         TargetObject = targetObject;
@@ -20,10 +20,10 @@ internal class MethodInfoStore : ICliReadOnlyKeyValueStore<string, MethodInfo, M
 
     public IEnumerable<MethodInfo> Accessors => TargetType.GetMethods(BindingFlags).Where(ContainsAccessor);
     public IAccessValidator AccessValidator { get; }
-    protected BindingFlags BindingFlags { get; }
-    protected IClassMemberStringifier ClassMemberStringifier { get; }
-    protected object TargetObject { get; }
-    protected Type TargetType { get; }
+    private BindingFlags BindingFlags { get; }
+    private IClassMemberStringifier ClassMemberStringifier { get; }
+    private object TargetObject { get; }
+    private Type TargetType { get; }
     private Dictionary<string, MethodInfo> AccessorsByNames { get; }
 
     public MethodInfo this[string key] {

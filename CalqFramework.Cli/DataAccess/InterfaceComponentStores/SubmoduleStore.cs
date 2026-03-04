@@ -6,7 +6,7 @@ using CalqFramework.Cli.InterfaceComponents;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponentStores;
 
-internal class SubmoduleStore(ICliKeyValueStore<string, object?, MemberInfo> store) : ISubmoduleStore {
+internal sealed class SubmoduleStore(ICliKeyValueStore<string, object?, MemberInfo> store) : ISubmoduleStore {
     private ICliKeyValueStore<string, object?, MemberInfo> Store { get; } = store;
 
     public object? this[string key] {
