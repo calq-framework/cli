@@ -142,8 +142,7 @@ public class CliComponentStoreFactory : ICliComponentStoreFactory {
         new CliMethodExecutor<string?>(method, obj, BindingFlags, ClassMemberStringifier, CompositeValueConverter));
 
     public ISubcommandExecutorWithOptions CreateSubcommandExecutorWithOptions(MethodInfo method, object obj) =>
-        new SubcommandExecutorWithOptions(CreateSubcommandExecutor(method, obj), CreateOptionStore(obj))
-            { EnableShadowing = EnableShadowing };
+        new SubcommandExecutorWithOptions(CreateSubcommandExecutor(method, obj), CreateOptionStore(obj)) { EnableShadowing = EnableShadowing };
 
     public ISubcommandStore CreateSubcommandStore(object obj) => new SubcommandStore(
         new MethodInfoStore(obj, MethodBindingFlags, ClassMemberStringifier, SubcommandAccessValidator));
