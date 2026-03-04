@@ -79,7 +79,7 @@ public class CompletionPrinter : ICompletionPrinter {
             GetValueCompletions(parameter.ValueType, parameter.ParameterInfo, partialInput, submodule);
         PrintCompletions(context, completions);
     }
-    private static readonly string[] sourceArray = ["true", "false"];
+    private static readonly string[] s_sourceArray = ["true", "false"];
 
     private static IEnumerable<string> GetValueCompletions(Type type, ICustomAttributeProvider attributeProvider,
         string partialInput, object? submodule) {
@@ -137,7 +137,7 @@ public class CompletionPrinter : ICompletionPrinter {
         }
 
         if (type == typeof(bool)) {
-            return sourceArray.Where(value => value.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase));
+            return s_sourceArray.Where(value => value.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase));
         }
 
         return [];

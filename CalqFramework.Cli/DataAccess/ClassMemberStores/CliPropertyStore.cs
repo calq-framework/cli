@@ -20,7 +20,7 @@ internal class CliPropertyStore<TValue> : PropertyStoreBase<string, TValue>,
     }
 
     protected IClassMemberStringifier ClassMemberStringifier { get; }
-    private IDictionary<string, PropertyInfo> AccessorsByNames { get; }
+    private Dictionary<string, PropertyInfo> AccessorsByNames { get; }
     private IAccessValidator AccessValidator { get; }
     private ICompositeValueConverter<TValue> CompositeValueConverter { get; }
 
@@ -54,7 +54,7 @@ internal class CliPropertyStore<TValue> : PropertyStoreBase<string, TValue>,
         return CompositeValueConverter.ConvertToOrUpdate(value, accessor.PropertyType, currentValue);
     }
 
-    private IDictionary<string, PropertyInfo> GetAccessorsByNames() {
+    private Dictionary<string, PropertyInfo> GetAccessorsByNames() {
         StringComparer stringComparer = BindingFlags.HasFlag(BindingFlags.IgnoreCase)
             ? StringComparer.OrdinalIgnoreCase
             : StringComparer.Ordinal;
