@@ -3,7 +3,7 @@ using CalqFramework.DataAccess.Extensions.System;
 
 namespace CalqFramework.Cli.DataAccess;
 
-internal class ReadOnlyPassThroughConverter<TValue> : ICompositeValueConverter<TValue> {
+internal sealed class ReadOnlyPassThroughConverter<TValue> : ICompositeValueConverter<TValue> {
     public bool CanConvert(Type targetType) => true;
 
     public TValue ConvertFrom(object? value, Type targetType) => (TValue)value!;

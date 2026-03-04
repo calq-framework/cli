@@ -2,6 +2,6 @@
 
 namespace CalqFramework.Cli.Test;
 
-internal class ConfigurationWithXUnitCommandLineArgs {
+internal sealed class ConfigurationWithXUnitCommandLineArgs {
     public ushort port;
 }

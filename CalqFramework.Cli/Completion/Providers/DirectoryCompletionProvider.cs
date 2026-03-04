@@ -8,7 +8,7 @@ namespace CalqFramework.Cli.Completion.Providers;
 /// <summary>
 ///     Built-in completion provider for directory paths.
 /// </summary>
-public class DirectoryCompletionProvider : ICompletionProvider {
+public sealed class DirectoryCompletionProvider : ICompletionProvider {
     public IEnumerable<string> GetCompletions(ICompletionProviderContext context) {
         string partialPath = context.PartialInput ?? string.Empty;
 

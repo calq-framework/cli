@@ -12,7 +12,7 @@ namespace CalqFramework.Cli.Test;
 /// <summary>
 ///     Some summary.
 /// </summary>
-internal class SomeClassLibrary {
+internal sealed class SomeClassLibrary {
     public bool booleanConflict;
     public bool booleanField;
 

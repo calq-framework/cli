@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace CalqFramework.Cli.Test;
 
-internal class SomeConfiguration {
+internal sealed class SomeConfiguration {
     public byte aByteNumber;
     public bool boolean;
 

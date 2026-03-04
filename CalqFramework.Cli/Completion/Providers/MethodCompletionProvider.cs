@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -7,7 +7,7 @@ namespace CalqFramework.Cli.Completion.Providers;
 /// <summary>
 ///     Built-in completion provider that invokes an instance method.
 /// </summary>
-public class MethodCompletionProvider : ICompletionProvider {
+public sealed class MethodCompletionProvider : ICompletionProvider {
     public IEnumerable<string> GetCompletions(ICompletionProviderContext context) {
         if (context.Filter == null) {
             return [];

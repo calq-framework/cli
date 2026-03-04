@@ -9,7 +9,7 @@ namespace CalqFramework.Cli.Completion.Providers;
 ///     Built-in completion provider for both file and directory paths.
 ///     Filter applies only to files; all directories are included.
 /// </summary>
-public class FileSystemCompletionProvider : ICompletionProvider {
+public sealed class FileSystemCompletionProvider : ICompletionProvider {
     public IEnumerable<string> GetCompletions(ICompletionProviderContext context) {
         string partialPath = context.PartialInput ?? string.Empty;
 

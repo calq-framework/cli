@@ -8,7 +8,7 @@ using CalqFramework.DataAccess.ClassMemberStores;
 
 namespace CalqFramework.Cli.DataAccess.ClassMemberStores;
 
-internal class CliFieldStore<TValue> : FieldStoreBase<string, TValue>, ICliKeyValueStore<string, TValue, MemberInfo> {
+internal sealed class CliFieldStore<TValue> : FieldStoreBase<string, TValue>, ICliKeyValueStore<string, TValue, MemberInfo> {
     public CliFieldStore(object targetObject, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier,
         IAccessValidator accessValidator, ICompositeValueConverter<TValue> compositeValueConverter) : base(targetObject,
         bindingFlags) {

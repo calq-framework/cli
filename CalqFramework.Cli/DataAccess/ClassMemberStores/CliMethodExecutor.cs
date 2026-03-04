@@ -9,7 +9,7 @@ using CalqFramework.DataAccess.ClassMemberStores;
 
 namespace CalqFramework.Cli.DataAccess.ClassMemberStores;
 
-internal class CliMethodExecutor<TValue> : MethodExecutorBase<string, TValue>,
+internal sealed class CliMethodExecutor<TValue> : MethodExecutorBase<string, TValue>,
     ICliFunctionExecutor<string, TValue, ParameterInfo> {
     public CliMethodExecutor(MethodInfo method, object? obj, BindingFlags bindingFlags,
         IClassMemberStringifier classMemberStringifier,
@@ -20,8 +20,8 @@ internal class CliMethodExecutor<TValue> : MethodExecutorBase<string, TValue>,
         AccessorsByNames = GetAccessorsByNames();
     }
 
-    protected BindingFlags BindingFlags { get; }
-    protected IClassMemberStringifier ClassMemberStringifier { get; }
+    private BindingFlags BindingFlags { get; }
+    private IClassMemberStringifier ClassMemberStringifier { get; }
     private Dictionary<string, ParameterInfo> AccessorsByNames { get; }
     private ICompositeValueConverter<TValue> CompositeValueConverter { get; }
 
