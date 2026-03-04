@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.Cli;
+namespace CalqFramework.Cli;
 
 /// <summary>
 ///     Represents a void return value for CLI commands that don't return data.
