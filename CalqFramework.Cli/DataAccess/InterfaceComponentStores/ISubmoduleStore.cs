@@ -2,14 +2,14 @@
 using CalqFramework.Cli.InterfaceComponents;
 using CalqFramework.DataAccess;
 
-namespace CalqFramework.Cli.DataAccess.InterfaceComponentStores {
+namespace CalqFramework.Cli.DataAccess.InterfaceComponentStores;
+
+/// <summary>
+///     Provides access to CLI submodules (nested objects) available on an object.
+/// </summary>
+public interface ISubmoduleStore : IKeyValueStore<string, object?> {
     /// <summary>
-    /// Provides access to CLI submodules (nested objects) available on an object.
+    ///     Gets all available submodules with their metadata for help generation.
     /// </summary>
-    public interface ISubmoduleStore : IKeyValueStore<string, object?> {
-        /// <summary>
-        /// Gets all available submodules with their metadata for help generation.
-        /// </summary>
-        IEnumerable<Submodule> GetSubmodules();
-    }
+    IEnumerable<Submodule> GetSubmodules();
 }

@@ -1,120 +1,109 @@
-﻿﻿#pragma warning disable CS0649
+﻿#pragma warning disable CS0649
 
+using System;
 using System.Collections.Generic;
-using CalqFramework.Cli;
+using System.IO;
+using System.Linq;
 using CalqFramework.Cli.Completion.Providers;
 
-namespace CalqFramework.Cli.Test {
+namespace CalqFramework.Cli.Test;
+
+/// <summary>
+///     Some summary.
+/// </summary>
+internal class SomeClassLibrary {
+    public bool booleanConflict;
+    public bool booleanField;
+
+    public List<bool> initializedBoolList = new() { true, false };
+    public int integerField;
+    public Nested nullObjectField;
+
+    public Nested objectField = new();
+
+    public string textField;
 
     /// <summary>
-    /// Some summary.
+    ///     Does nothing.
     /// </summary>
-    internal class SomeClassLibrary {
+    public static void Method() {
+    }
 
-        public class Nested {
+    public static void MethodWithOptionalParam(bool optional = true) {
+    }
 
-            public static void NestedMethod() {
-            }
-        }
+    public static List<bool> MethodWithList(List<bool> paramList) => paramList;
 
-        public string textField;
-        public int integerField;
-        public bool booleanField;
-        public bool booleanConflict;
+    public static IEnumerable<bool> MethodWithEnumerable(IEnumerable<bool> paramEnumerable) => paramEnumerable;
 
-        public Nested objectField = new();
-        public Nested nullObjectField;
+    public static string MethodWithText(string text) => text;
 
-        public List<bool> initializedBoolList = new() { true, false };
+    public static int MethodWithInteger(int integer) => integer;
 
-        /// <summary>
-        /// Does nothing.
-        /// </summary>
-        public static void Method() { }
+    public void MethodWithTextAndInteger(string text, int integer) {
+        textField = text;
+        integerField = integer;
+    }
 
-        public static void MethodWithOptionalParam(bool optional = true) {
-        }
+    public void MethodWithIntegerAndText(int integer, string text) {
+        integerField = integer;
+        textField = text;
+    }
 
-        public static List<bool> MethodWithList(List<bool> paramList) {
-            return paramList;
-        }
+    public void MethodWithTextAndBoolean(string text, bool boolean = false) {
+        textField = text;
+        booleanField = boolean;
+    }
 
-        public static IEnumerable<bool> MethodWithEnumerable(IEnumerable<bool> paramEnumerable) {
-            return paramEnumerable;
-        }
+    public void MethodWithTextAndBooleanError(string text, bool booleanConflict = false) {
+        textField = text;
+        this.booleanConflict = booleanConflict;
+    }
 
-        public static string MethodWithText(string text) {
-            return text;
-        }
+    public static void MethodWithEnum(LogLevel level) {
+    }
 
-        public static int MethodWithInteger(int integer) {
-            return integer;
-        }
+    public static void MethodWithCustomCompletion(
+        [CliCompletion(typeof(EnvironmentCompletionProvider))] string environment) {
+    }
 
-        public void MethodWithTextAndInteger(string text, int integer) {
-            textField = text;
-            integerField = integer;
-        }
+    public static void MethodWithThreeParameters(string first, int second, bool third) {
+    }
 
-        public void MethodWithIntegerAndText(int integer, string text) {
-            integerField = integer;
-            textField = text;
-        }
+    // Instance method for providing completions
+    private IEnumerable<string> GetRegionNames(string partialInput) {
+        string[] regions = new[] { "us-east-1", "us-west-2", "eu-west-1", "ap-southeast-1" };
+        return Enumerable.Where(regions, r => r.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase));
+    }
 
-        public void MethodWithTextAndBoolean(string text, bool boolean = false) {
-            textField = text;
-            booleanField = boolean;
-        }
+    // Command using method-based completion
+    public void MethodWithMethodCompletion([CliCompletion("GetRegionNames")] string region) => textField = region;
 
-        public void MethodWithTextAndBooleanError(string text, bool booleanConflict = false) {
-            textField = text;
-            this.booleanConflict = booleanConflict;
-        }
+    // Command using CompletionProviders.Method with filter
+    public void MethodWithCompletionProvidersMethod(
+        [CliCompletion(typeof(MethodCompletionProvider), "GetRegionNames")] string region) => textField = region;
 
-        public static void MethodWithEnum(LogLevel level) {
-        }
+    // Commands using FileInfo, DirectoryInfo, and FileSystemInfo for auto-completion
+    public static void MethodWithFileInfo(FileInfo file) {
+    }
 
-        public static void MethodWithCustomCompletion([CliCompletion(typeof(EnvironmentCompletionProvider))] string environment) {
-        }
+    public static void MethodWithDirectoryInfo(DirectoryInfo directory) {
+    }
 
-        public static void MethodWithThreeParameters(string first, int second, bool third) {
-        }
+    public static void MethodWithFileSystemInfo(FileSystemInfo path) {
+    }
 
-        // Instance method for providing completions
-        private IEnumerable<string> GetRegionNames(string partialInput) {
-            var regions = new[] { "us-east-1", "us-west-2", "eu-west-1", "ap-southeast-1" };
-            return System.Linq.Enumerable.Where(regions, r => r.StartsWith(partialInput, System.StringComparison.OrdinalIgnoreCase));
-        }
+    // Commands using ICollection types for completion
+    public static void MethodWithEnumList(List<LogLevel> levels) {
+    }
 
-        // Command using method-based completion
-        public void MethodWithMethodCompletion([CliCompletion("GetRegionNames")] string region) {
-            textField = region;
-        }
+    public static void MethodWithBoolList(List<bool> flags) {
+    }
 
-        // Command using CompletionProviders.Method with filter
-        public void MethodWithCompletionProvidersMethod([CliCompletion(typeof(MethodCompletionProvider), "GetRegionNames")] string region) {
-            textField = region;
-        }
+    public static ISet<string> MethodWithSet(ISet<string> tags) => tags;
 
-        // Commands using FileInfo, DirectoryInfo, and FileSystemInfo for auto-completion
-        public static void MethodWithFileInfo(System.IO.FileInfo file) {
-        }
-
-        public static void MethodWithDirectoryInfo(System.IO.DirectoryInfo directory) {
-        }
-
-        public static void MethodWithFileSystemInfo(System.IO.FileSystemInfo path) {
-        }
-
-        // Commands using ICollection types for completion
-        public static void MethodWithEnumList(List<LogLevel> levels) {
-        }
-
-        public static void MethodWithBoolList(List<bool> flags) {
-        }
-
-        public static ISet<string> MethodWithSet(ISet<string> tags) {
-            return tags;
+    public class Nested {
+        public static void NestedMethod() {
         }
     }
 }

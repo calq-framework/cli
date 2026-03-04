@@ -4,7 +4,6 @@ using CalqFramework.Extensions.System;
 namespace CalqFramework.DataAccess.ClassMemberStores;
 
 public abstract class ParameterStoreBase<TKey, TValue> : KeyValueStoreBase<TKey, TValue, ParameterInfo, object?> {
-
     protected ParameterStoreBase(MethodInfo method) {
         ParentMethod = method;
         int i = 0;
@@ -24,17 +23,11 @@ public abstract class ParameterStoreBase<TKey, TValue> : KeyValueStoreBase<TKey,
     protected MethodInfo ParentMethod { get; }
 
     public override object? this[ParameterInfo accessor] {
-        get {
-            return ParameterValues[ParameterIndexByParameter[accessor]];
-        }
-        set {
-            ParameterValues[ParameterIndexByParameter[accessor]] = value;
-        }
+        get => ParameterValues[ParameterIndexByParameter[accessor]];
+        set => ParameterValues[ParameterIndexByParameter[accessor]] = value;
     }
 
-    public override Type GetValueType(ParameterInfo accessor) {
-        return accessor.ParameterType;
-    }
+    public override Type GetValueType(ParameterInfo accessor) => accessor.ParameterType;
 
     public override object? GetValueOrInitialize(ParameterInfo accessor) {
         object? value = ParameterValues[ParameterIndexByParameter[accessor]];

@@ -4,27 +4,20 @@ using System.Reflection;
 namespace CalqFramework.DataAccess.ClassMemberStores;
 
 /// <summary>
-/// Provides key-value access to object properties by name.
+///     Provides key-value access to object properties by name.
 /// </summary>
 public sealed class PropertyStore : PropertyStoreBase<string, object?>, IKeyValueStore<string, object?, PropertyInfo> {
-
     public PropertyStore(object obj, BindingFlags bindingFlags) : base(obj, bindingFlags) {
     }
 
-    public override bool ContainsAccessor(PropertyInfo accessor) {
-        return accessor.ReflectedType == TargetType;
-    }
+    public override bool ContainsAccessor(PropertyInfo accessor) => accessor.ReflectedType == TargetType;
 
     public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out PropertyInfo result) {
         result = TargetType.GetProperty(key, BindingFlags);
         return result != null;
     }
 
-    protected override object? ConvertFromInternalValue(object? value, PropertyInfo accessor) {
-        return value;
-    }
+    protected override object? ConvertFromInternalValue(object? value, PropertyInfo accessor) => value;
 
-    protected override object? ConvertToInternalValue(object? value, PropertyInfo accessor) {
-        return value;
-    }
+    protected override object? ConvertToInternalValue(object? value, PropertyInfo accessor) => value;
 }

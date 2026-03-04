@@ -2,8 +2,8 @@ using System.Reflection;
 
 namespace CalqFramework.DataAccess.ClassMemberStores;
 
-public abstract class MethodExecutorBase<TParameterKey, TParameterValue> : ParameterStoreBase<TParameterKey, TParameterValue>, IFunctionExecutor<TParameterKey, TParameterValue> {
-
+public abstract class MethodExecutorBase<TParameterKey, TParameterValue> :
+    ParameterStoreBase<TParameterKey, TParameterValue>, IFunctionExecutor<TParameterKey, TParameterValue> {
     protected MethodExecutorBase(MethodInfo method, object? targetObject) : base(method) {
         TargetObject = targetObject;
         Arguments = new List<TParameterValue>();
@@ -11,13 +11,14 @@ public abstract class MethodExecutorBase<TParameterKey, TParameterValue> : Param
             ParameterValues[j] = DBNull.Value;
         }
     }
+
     public object? TargetObject { get; }
 
     protected List<TParameterValue> Arguments { get; }
 
     public override object? this[ParameterInfo accessor] {
         get {
-            var result = base[accessor];
+            object? result = base[accessor];
             if (result != null && result is DBNull) {
                 if (accessor.HasDefaultValue) {
                     result = accessor.DefaultValue;
@@ -25,20 +26,16 @@ public abstract class MethodExecutorBase<TParameterKey, TParameterValue> : Param
                     result = null;
                 }
             }
+
             return result;
         }
-        set {
-            base[accessor] = value;
-        }
-    }
-    public void AddArgument(TParameterValue value) {
-        Arguments.Add(value);
+        set => base[accessor] = value;
     }
 
+    public void AddArgument(TParameterValue value) => Arguments.Add(value);
+
     public object? Invoke() {
-        bool IsAssigned(int i) {
-            return ParameterValues[i] == DBNull.Value;
-        }
+        bool IsAssigned(int i) => ParameterValues[i] == DBNull.Value;
 
         int argumentIndex = 0;
         for (int parameterIndex = 0; parameterIndex < ParameterValues.Length; ++parameterIndex) {
@@ -47,13 +44,17 @@ public abstract class MethodExecutorBase<TParameterKey, TParameterValue> : Param
                     object? value = ConvertToInternalValue(Arguments[argumentIndex++], ParameterInfos[parameterIndex]);
                     ParameterValues[parameterIndex] = value;
                 } else {
-                    ParameterValues[parameterIndex] = ParameterInfos[parameterIndex].HasDefaultValue ? ParameterInfos[parameterIndex].DefaultValue : throw DataAccessErrors.UnassignedParameter(ParameterInfos[parameterIndex].Name!);
+                    ParameterValues[parameterIndex] = ParameterInfos[parameterIndex].HasDefaultValue
+                        ? ParameterInfos[parameterIndex].DefaultValue
+                        : throw DataAccessErrors.UnassignedParameter(ParameterInfos[parameterIndex].Name!);
                 }
             }
         }
+
         if (argumentIndex < Arguments.Count) {
             throw DataAccessErrors.UnexpectedArgument(Arguments[argumentIndex]);
         }
+
         return ParentMethod.Invoke(TargetObject, ParameterValues);
     }
 }

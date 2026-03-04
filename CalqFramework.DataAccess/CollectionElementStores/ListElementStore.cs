@@ -4,10 +4,9 @@ using CalqFramework.Extensions.System;
 namespace CalqFramework.DataAccess.CollectionElementStores;
 
 /// <summary>
-/// Provides key-value access to list elements by index.
+///     Provides key-value access to list elements by index.
 /// </summary>
 public sealed class ListElementStore : ListElementStoreBase<string, object?> {
-
     public ListElementStore(IList list) : base(list) {
     }
 
@@ -26,6 +25,7 @@ public sealed class ListElementStore : ListElementStoreBase<string, object?> {
         if (!int.TryParse(key, out int index)) {
             return false;
         }
+
         return index >= 0 && index < List.Count;
     }
 
@@ -36,6 +36,7 @@ public sealed class ListElementStore : ListElementStoreBase<string, object?> {
             element = List.GetType().GetGenericArguments()[0].CreateInstance();
             List[index] = element;
         }
+
         return element;
     }
 
@@ -43,6 +44,7 @@ public sealed class ListElementStore : ListElementStoreBase<string, object?> {
         if (!int.TryParse(key, out int index)) {
             throw DataAccessErrors.InvalidListKey(key?.GetType().Name);
         }
+
         List.RemoveAt(index);
     }
 }

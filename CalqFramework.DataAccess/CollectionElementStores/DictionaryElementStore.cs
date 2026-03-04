@@ -4,10 +4,9 @@ using CalqFramework.Extensions.System;
 namespace CalqFramework.DataAccess.CollectionElementStores;
 
 /// <summary>
-/// Provides key-value access to dictionary elements.
+///     Provides key-value access to dictionary elements.
 /// </summary>
 public sealed class DictionaryElementStore : DictionaryElementStoreBase<string, object?> {
-
     public DictionaryElementStore(IDictionary dictionary) : base(dictionary) {
     }
 
@@ -40,6 +39,7 @@ public sealed class DictionaryElementStore : DictionaryElementStoreBase<string, 
             element = Dictionary.GetType().GetGenericArguments()[1].CreateInstance();
             Dictionary[parsedKey] = element;
         }
+
         return element;
     }
 }
