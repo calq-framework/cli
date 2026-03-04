@@ -1,4 +1,4 @@
-namespace CalqFramework.Cli.Completion.Providers;
+﻿namespace CalqFramework.Cli.Completion.Providers;
 
 /// <summary>
 ///     Context information for completion providers.
