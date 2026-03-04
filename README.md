@@ -296,6 +296,9 @@ dotnet tool install -g dotnet-suggest
 
 ### Quick Start
 ```bash
+git clone --branch latest https://github.com/calq-framework/cli docs/cli
+dotnet new console -n QuickStart
+cd QuickStart
 dotnet add package CalqFramework.Cli
 ```
 
@@ -331,4 +334,3 @@ public record QuickResult(string s, int a, int b);
 
 ## License
 Calq CLI is dual-licensed under GNU AGPLv3 and the Calq Commercial License.
-
