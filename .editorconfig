@@ -214,3 +214,9 @@ dotnet_naming_rule.camel_case_for_private_internal_fields.severity = error
 
 # CA1051: Do not declare visible instance fields
 dotnet_diagnostic.CA1051.severity = error
+
+# SYSLIB1045: Use GeneratedRegex (requires source generators - changes compilation)
+dotnet_diagnostic.SYSLIB1045.severity = none
+
+# SYSLIB1054: Use LibraryImport (requires source generators - changes compilation)
+dotnet_diagnostic.SYSLIB1054.severity = none
