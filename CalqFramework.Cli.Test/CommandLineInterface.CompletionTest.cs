@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,22 +8,24 @@ namespace CalqFramework.Cli.Test;
 
 [Collection("Completion Tests")]
 public class CommandLineInterfaceCompletionTest {
-    private List<string> GetCompletions(string commandLine) {
+    private static readonly string[] first = ["__complete"];
+
+    private static List<string> GetCompletions(string commandLine) {
         SomeClassLibrary tool = new();
 
         // Split preserving empty entries to handle trailing spaces
         string[] parts = commandLine.Split(' ');
-        List<string> args = parts.Skip(1).ToList();
+        List<string> args = [.. parts.Skip(1)];
 
         // If command line doesn't end with space and last part is not empty, that's what we're completing
         // If it ends with space, we're completing an empty string (already handled by split)
 
         using StringWriter writer = new();
         CommandLineInterface cli = new() { Out = writer };
-        cli.Execute(tool, new[] { "__complete" }.Concat(args));
+        cli.Execute(tool, first.Concat(args));
 
         string output = writer.ToString();
-        return new List<string>(output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
+        return [.. output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)];
     }
 
     [Fact]

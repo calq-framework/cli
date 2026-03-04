@@ -138,7 +138,7 @@ public class CommandLineInterface : ICliContext {
 
             ISubmoduleStore parentSubmoduleStore = CliComponentStoreFactory.CreateSubmoduleStore(parentSubmodule!);
             Submodule submoduleInfo = parentSubmoduleStore.GetSubmodules()
-                .Where(x => parentSubmoduleStore[x.Keys.First()] == submodule)
+                .Where(x => parentSubmoduleStore[x.Keys[0]] == submodule)
                 .First(); // use the store to check for the key to comply with case sensitivity
             HelpPrinter.PrintHelp(target.GetType(), submoduleInfo, submoduleStore.GetSubmodules(),
                 subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor),

@@ -8,7 +8,7 @@ internal class SomeConfiguration {
     public byte aByteNumber;
     public bool boolean;
 
-    public List<bool> initializedBoolList = new() { true, false };
+    public List<bool> initializedBoolList = [true, false];
 
     public Inner inner;
     public int integer;
@@ -20,7 +20,8 @@ internal class SomeConfiguration {
 
     [CliName("s")] public bool shadowedfield;
 
-    [CliName("differentname")] [CliName("y")]
+    [CliName("differentname")]
+    [CliName("y")]
     public bool shortOption;
 
     public string text;

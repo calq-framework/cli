@@ -15,7 +15,7 @@ internal class SomeClassLibrary {
     public bool booleanConflict;
     public bool booleanField;
 
-    public List<bool> initializedBoolList = new() { true, false };
+    public List<bool> initializedBoolList = [true, false];
     public int integerField;
     public Nested nullObjectField;
 
@@ -71,8 +71,8 @@ internal class SomeClassLibrary {
     }
 
     // Instance method for providing completions
-    private IEnumerable<string> GetRegionNames(string partialInput) {
-        string[] regions = new[] { "us-east-1", "us-west-2", "eu-west-1", "ap-southeast-1" };
+    private static IEnumerable<string> GetRegionNames(string partialInput) {
+        string[] regions = ["us-east-1", "us-west-2", "eu-west-1", "ap-southeast-1"];
         return Enumerable.Where(regions, r => r.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase));
     }
 

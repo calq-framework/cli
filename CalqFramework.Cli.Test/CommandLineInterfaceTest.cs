@@ -57,6 +57,7 @@ public class CommandLineInterfaceTest {
         Assert.False(((List<bool>)result)[0]);
         Assert.True(((List<bool>)result)[1]);
     }
+    private static readonly bool[] expected = [false, true];
 
     [Fact]
     public void Execute_MethodWithEnumerableParameter_AcceptsMultipleValues() {
@@ -65,7 +66,7 @@ public class CommandLineInterfaceTest {
             $"{StringHelper.GetKebabCase(nameof(SomeClassLibrary.MethodWithEnumerable))} --param-enumerable false --param-enumerable true"
                 .Split(' '));
         IEnumerable<bool> enumerable = (IEnumerable<bool>)result;
-        Assert.Equal(new[] { false, true }, enumerable);
+        Assert.Equal(expected, enumerable);
     }
 
     [Fact]
@@ -190,8 +191,7 @@ public class CommandLineInterfaceTest {
         CliException ex = Assert.Throws<CliException>(() => {
             SomeClassLibrary tool = new();
             new CommandLineInterface {
-                CliComponentStoreFactory = new CliComponentStoreFactory
-                    { BindingFlags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public }
+                CliComponentStoreFactory = new CliComponentStoreFactory { BindingFlags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public }
             }.Execute(tool, $"{StringHelper.GetKebabCase(nameof(SomeClassLibrary.Method)).ToUpper()}".Split(' '));
         });
         Assert.Equal("Invalid subcommand: METHOD", ex.Message);
