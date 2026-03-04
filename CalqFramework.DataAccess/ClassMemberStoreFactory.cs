@@ -1,4 +1,4 @@
-using CalqFramework.DataAccess.ClassMemberStores;
+﻿using CalqFramework.DataAccess.ClassMemberStores;
 
 namespace CalqFramework.DataAccess;
 

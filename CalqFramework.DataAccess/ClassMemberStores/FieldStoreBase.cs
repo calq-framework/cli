@@ -1,12 +1,9 @@
-using System.Reflection;
+﻿using System.Reflection;
 using CalqFramework.Extensions.System;
 
 namespace CalqFramework.DataAccess.ClassMemberStores;
 
-public abstract class FieldStoreBase<TKey, TValue> : ClassDataMemberStoreBase<TKey, TValue, FieldInfo, object?> {
-    public FieldStoreBase(object targetObject, BindingFlags bindingFlags) : base(targetObject, bindingFlags) {
-    }
-
+public abstract class FieldStoreBase<TKey, TValue>(object targetObject, BindingFlags bindingFlags) : ClassDataMemberStoreBase<TKey, TValue, FieldInfo, object?>(targetObject, bindingFlags) {
     public override IEnumerable<FieldInfo> Accessors => TargetType.GetFields(BindingFlags).Where(ContainsAccessor);
 
     public override object? this[FieldInfo accessor] {

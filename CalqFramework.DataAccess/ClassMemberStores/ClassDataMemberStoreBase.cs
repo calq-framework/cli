@@ -1,17 +1,11 @@
-using System.Reflection;
+﻿using System.Reflection;
 
 namespace CalqFramework.DataAccess.ClassMemberStores;
 
 public abstract class
-    ClassDataMemberStoreBase<TKey, TValue, TAccessor, TInternalValue> : KeyValueStoreBase<TKey, TValue, TAccessor,
+    ClassDataMemberStoreBase<TKey, TValue, TAccessor, TInternalValue>(object targetObject, BindingFlags bindingFlags) : KeyValueStoreBase<TKey, TValue, TAccessor,
     TInternalValue> {
-    protected ClassDataMemberStoreBase(object targetObject, BindingFlags bindingFlags) {
-        TargetObject = targetObject;
-        BindingFlags = bindingFlags;
-        TargetType = targetObject.GetType();
-    }
-
-    protected BindingFlags BindingFlags { get; }
-    protected object TargetObject { get; }
-    protected Type TargetType { get; }
+    protected BindingFlags BindingFlags { get; } = bindingFlags;
+    protected object TargetObject { get; } = targetObject;
+    protected Type TargetType { get; } = targetObject.GetType();
 }

@@ -1,4 +1,4 @@
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace CalqFramework.DataAccess.ClassMemberStores;
@@ -6,10 +6,7 @@ namespace CalqFramework.DataAccess.ClassMemberStores;
 /// <summary>
 ///     Provides key-value access to method parameters by name.
 /// </summary>
-public class ParameterStore : ParameterStoreBase<string, object?>, IKeyValueStore<string, object?, ParameterInfo> {
-    public ParameterStore(MethodInfo method) : base(method) {
-    }
-
+public class ParameterStore(MethodInfo method) : ParameterStoreBase<string, object?>(method), IKeyValueStore<string, object?, ParameterInfo> {
     public override bool ContainsAccessor(ParameterInfo accessor) => accessor.Member == ParentMethod;
 
     public override bool TryGetAccessor(string key, [MaybeNullWhen(false)] out ParameterInfo result) {

@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Reflection;
 using CalqFramework.Extensions.System;
 
@@ -33,7 +33,7 @@ public abstract class GenericCollectionElementStoreBase<TKey, TValue> : Collecti
         return elementType;
     }
 
-    public override void Add(TValue value) => _addMethod?.Invoke(Collection, new object?[] { value });
+    public override void Add(TValue value) => _addMethod?.Invoke(Collection, [value]);
 
     public override IEnumerable Append(TValue value) {
         Add(value);
@@ -49,7 +49,7 @@ public abstract class GenericCollectionElementStoreBase<TKey, TValue> : Collecti
 
     protected bool Contains(object? item) {
         if (_containsMethod != null && item != null) {
-            object? result = _containsMethod.Invoke(Collection, new[] { item });
+            object? result = _containsMethod.Invoke(Collection, [item]);
             return result is bool b && b;
         }
 
@@ -58,7 +58,7 @@ public abstract class GenericCollectionElementStoreBase<TKey, TValue> : Collecti
 
     protected bool Remove(object? item) {
         if (_removeMethod != null && item != null) {
-            object? result = _removeMethod.Invoke(Collection, new[] { item });
+            object? result = _removeMethod.Invoke(Collection, [item]);
             return result is bool b && b;
         }
 

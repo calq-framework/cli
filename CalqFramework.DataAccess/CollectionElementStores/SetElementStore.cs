@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 
 namespace CalqFramework.DataAccess.CollectionElementStores;
 
@@ -6,10 +6,7 @@ namespace CalqFramework.DataAccess.CollectionElementStores;
 ///     Provides key-value access to set elements.
 ///     For sets, the key and value are the same - the element itself.
 /// </summary>
-public sealed class SetElementStore : GenericCollectionElementStoreBase<string, object?> {
-    public SetElementStore(IEnumerable set) : base(set) {
-    }
-
+public sealed class SetElementStore(IEnumerable set) : GenericCollectionElementStoreBase<string, object?>(set) {
     public override object? this[string key] {
         get {
             // For sets, we need to find and return the actual element
