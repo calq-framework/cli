@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CalqFramework.DataAccess;
 using CalqFramework.DataAccess.CollectionElementStores;
-using CalqFramework.Extensions.System;
+using CalqFramework.DataAccess.Extensions.System;
 
 namespace CalqFramework.Cli.DataAccess;
 

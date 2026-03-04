@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using System.Reflection;
-using CalqFramework.Extensions.System;
+using CalqFramework.DataAccess.Extensions.System;
 
 namespace CalqFramework.DataAccess.CollectionElementStores;
 

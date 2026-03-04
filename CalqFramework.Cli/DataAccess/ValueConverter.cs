@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Reflection;
-using CalqFramework.Extensions.System;
+using CalqFramework.DataAccess.Extensions.System;
 
 namespace CalqFramework.Cli.DataAccess;
 

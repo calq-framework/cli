@@ -1,5 +1,5 @@
 ﻿using System.Collections;
-using CalqFramework.Extensions.System;
+using CalqFramework.DataAccess.Extensions.System;
 
 namespace CalqFramework.DataAccess.CollectionElementStores;
 

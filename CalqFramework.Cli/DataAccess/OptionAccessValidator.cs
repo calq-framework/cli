@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
-using CalqFramework.Extensions.System.Reflection;
+using CalqFramework.Cli.Extensions.System.Reflection;
+using CalqFramework.DataAccess.Extensions.System.Reflection;
 
 namespace CalqFramework.Cli.DataAccess;
 
