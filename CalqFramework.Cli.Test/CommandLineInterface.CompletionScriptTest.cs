@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using Xunit;
 
@@ -11,7 +11,7 @@ public class CommandLineInterfaceCompletionScriptTest {
         SomeClassLibrary tool = new();
         using StringWriter writer = new();
         CommandLineInterface cli = new() { Out = writer };
-        List<string> args = new() { "completion", "bash" };
+        List<string> args = ["completion", "bash"];
         cli.Execute(tool, args);
 
         string output = writer.ToString();
@@ -25,7 +25,7 @@ public class CommandLineInterfaceCompletionScriptTest {
         SomeClassLibrary tool = new();
         using StringWriter writer = new();
         CommandLineInterface cli = new() { Out = writer };
-        List<string> args = new() { "completion", "zsh" };
+        List<string> args = ["completion", "zsh"];
         cli.Execute(tool, args);
 
         string output = writer.ToString();
@@ -39,7 +39,7 @@ public class CommandLineInterfaceCompletionScriptTest {
         SomeClassLibrary tool = new();
         using StringWriter writer = new();
         CommandLineInterface cli = new() { Out = writer };
-        List<string> args = new() { "completion", "powershell" };
+        List<string> args = ["completion", "powershell"];
         cli.Execute(tool, args);
 
         string output = writer.ToString();
@@ -52,7 +52,7 @@ public class CommandLineInterfaceCompletionScriptTest {
         SomeClassLibrary tool = new();
         using StringWriter writer = new();
         CommandLineInterface cli = new() { Out = writer };
-        List<string> args = new() { "completion", "fish" };
+        List<string> args = ["completion", "fish"];
         cli.Execute(tool, args);
 
         string output = writer.ToString();
@@ -65,7 +65,7 @@ public class CommandLineInterfaceCompletionScriptTest {
         SomeClassLibrary tool = new();
 
         Assert.Throws<CliException>(() => {
-            List<string> args = new() { "completion", "invalid" };
+            List<string> args = ["completion", "invalid"];
             new CommandLineInterface().Execute(tool, args);
         });
     }
@@ -80,7 +80,7 @@ public class CommandLineInterfaceCompletionScriptTest {
         using StringWriter writer = new();
         CommandLineInterface cli = new() { Out = writer };
         try {
-            List<string> args = new() { "completion", "bash", "install" };
+            List<string> args = ["completion", "bash", "install"];
             cli.Execute(tool, args);
         } catch {
             // Ignore file system errors in test environment
@@ -98,7 +98,7 @@ public class CommandLineInterfaceCompletionScriptTest {
         using StringWriter writer = new();
         CommandLineInterface cli = new() { Out = writer };
         try {
-            List<string> args = new() { "completion", "bash", "uninstall" };
+            List<string> args = ["completion", "bash", "uninstall"];
             cli.Execute(tool, args);
         } catch {
             // Ignore file system errors in test environment

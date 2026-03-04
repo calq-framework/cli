@@ -168,7 +168,7 @@ complete -c __PROGRAM_NAME__ -f -a ""(____PROGRAM_NAME___completion)""";
             "Microsoft.PowerShell_profile.ps1");
     }
 
-    private void AddToPowerShellProfile(string shell, string scriptPath) {
+    private static void AddToPowerShellProfile(string shell, string scriptPath) {
         string profilePath = shell == "powershell" ? GetPowerShell5ProfilePath() : GetPowerShell7ProfilePath();
         string sourceCommand = $". \"{scriptPath}\"";
 
@@ -187,7 +187,7 @@ complete -c __PROGRAM_NAME__ -f -a ""(____PROGRAM_NAME___completion)""";
         }
     }
 
-    private void RemoveFromPowerShellProfile(string shell, string scriptPath) {
+    private static void RemoveFromPowerShellProfile(string shell, string scriptPath) {
         string profilePath = shell == "powershell" ? GetPowerShell5ProfilePath() : GetPowerShell7ProfilePath();
 
         if (File.Exists(profilePath)) {

@@ -36,14 +36,14 @@ public class ClassMemberStringifier : ClassMemberStringifierBase {
             keys.Add(cliNameAttribute.Name);
         }
 
-        if (!keys.Any()) {
+        if (keys.Count == 0) {
             keys.Add(GetKebabCase(name));
         }
 
         return keys;
     }
 
-    protected string GetKebabCase(string value) {
+    protected static string GetKebabCase(string value) {
         value = Regex.Replace(value, "([a-z0-9])([A-Z])", "$1-$2");
         value = Regex.Replace(value, "([a-zA-Z0-9])([A-Z][a-z])", "$1-$2");
         value = Regex.Replace(value, "[. ]", "-");

@@ -178,7 +178,7 @@ public class CompletionHandler : ICompletionHandler {
         }
     }
 
-    private void ReadParametersAndOptionsForCompletion(ICliContext context, IEnumerator<string> args,
+    private static void ReadParametersAndOptionsForCompletion(ICliContext context, IEnumerator<string> args,
         ISubcommandExecutorWithOptions subcommandExecutorWithOptions) {
         OptionReader optionReader = new(args, subcommandExecutorWithOptions);
 

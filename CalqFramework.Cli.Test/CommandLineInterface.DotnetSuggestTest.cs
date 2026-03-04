@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using Xunit;
@@ -7,7 +7,7 @@ namespace CalqFramework.Cli.Test;
 
 [Collection("DotnetSuggest Tests")]
 public class CommandLineInterfaceDotnetSuggestTest {
-    private List<string> GetDotnetSuggestCompletions(string directive, string commandLine) {
+    private static List<string> GetDotnetSuggestCompletions(string directive, string commandLine) {
         SomeClassLibrary tool = new();
 
         using StringWriter writer = new();
@@ -15,7 +15,7 @@ public class CommandLineInterfaceDotnetSuggestTest {
         cli.Execute(tool, new[] { directive, commandLine });
 
         string output = writer.ToString();
-        return new List<string>(output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries));
+        return [.. output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)];
     }
 
     [Fact]
@@ -78,11 +78,12 @@ public class CommandLineInterfaceDotnetSuggestTest {
         Assert.Contains("true", completions);
         Assert.Contains("false", completions);
     }
+    private static readonly string[] args = ["[suggest]"];
 
     [Fact]
     public void HandleDotnetSuggest_EmptyArgs_ReturnsVoid() {
         SomeClassLibrary tool = new();
-        object result = new CommandLineInterface().Execute(tool, new[] { "[suggest]" });
+        object result = new CommandLineInterface().Execute(tool, args);
 
         Assert.IsType<ResultVoid>(result);
     }

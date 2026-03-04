@@ -256,17 +256,17 @@ public class HelpPrinter(TextWriter? output = null) : IHelpPrinter {
         }
     }
 
-    private string GetDescription(Submodule item) => GetSummary(item.MemberInfo);
+    private static string GetDescription(Submodule item) => GetSummary(item.MemberInfo);
 
-    private string GetDescription(Subcommand item) => GetSummary(item.MethodInfo);
+    private static string GetDescription(Subcommand item) => GetSummary(item.MethodInfo);
 
-    private string GetDescription(Parameter item) => GetDescription(item.ValueType, item.IsMultiValue, item.Value,
+    private static string GetDescription(Parameter item) => GetDescription(item.ValueType, item.IsMultiValue, item.Value,
         item.HasDefaultValue, GetSummary(item.ParameterInfo));
 
-    private string GetDescription(Option item) => GetDescription(item.ValueType, item.IsMultiValue, item.Value, true,
+    private static string GetDescription(Option item) => GetDescription(item.ValueType, item.IsMultiValue, item.Value, true,
         GetSummary(item.MemberInfo));
 
-    private string GetDescription(Type type, bool isMultiValue, string? defaultValue, bool hasDefaultValue,
+    private static string GetDescription(Type type, bool isMultiValue, string? defaultValue, bool hasDefaultValue,
         string? summary) {
         List<string> parts = [];
 
@@ -290,7 +290,7 @@ public class HelpPrinter(TextWriter? output = null) : IHelpPrinter {
         return string.Join(" ", parts);
     }
 
-    private IList<int> GetMaxKeyLengths(IEnumerable<SectionInfo> sections) {
+    private static IList<int> GetMaxKeyLengths(IEnumerable<SectionInfo> sections) {
         List<int> maxLengths = [];
         foreach (SectionInfo section in sections) {
             foreach (ItemInfo item in section.ItemInfos) {
@@ -311,7 +311,7 @@ public class HelpPrinter(TextWriter? output = null) : IHelpPrinter {
         return maxLengths;
     }
 
-    private string GetTypeDescription(Type type) {
+    private static string GetTypeDescription(Type type) {
         if (type.IsPrimitive) {
             return type.Name.ToLowerInvariant();
         }
@@ -324,7 +324,7 @@ public class HelpPrinter(TextWriter? output = null) : IHelpPrinter {
         return type.Name;
     }
 
-    private IList<int> NormalizeKeyCounts(IEnumerable<SectionInfo> sections) {
+    private static IList<int> NormalizeKeyCounts(IEnumerable<SectionInfo> sections) {
         IList<int> maxLengths = GetMaxKeyLengths(sections);
 
         foreach (SectionInfo section in sections) {

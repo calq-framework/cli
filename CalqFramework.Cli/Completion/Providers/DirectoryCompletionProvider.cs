@@ -54,7 +54,7 @@ public class DirectoryCompletionProvider : ICompletionProvider {
         }
     }
 
-    private bool MatchesGlob(string name, string pattern) {
+    private static bool MatchesGlob(string name, string pattern) {
         // Simple glob matching: * matches any characters
         if (pattern == "*") {
             return true;

@@ -79,8 +79,9 @@ public class CompletionPrinter : ICompletionPrinter {
             GetValueCompletions(parameter.ValueType, parameter.ParameterInfo, partialInput, submodule);
         PrintCompletions(context, completions);
     }
+    private static readonly string[] sourceArray = ["true", "false"];
 
-    private IEnumerable<string> GetValueCompletions(Type type, ICustomAttributeProvider attributeProvider,
+    private static IEnumerable<string> GetValueCompletions(Type type, ICustomAttributeProvider attributeProvider,
         string partialInput, object? submodule) {
         CliCompletionAttribute? completionAttr = attributeProvider
             .GetCustomAttributes(typeof(CliCompletionAttribute), false)
@@ -136,14 +137,13 @@ public class CompletionPrinter : ICompletionPrinter {
         }
 
         if (type == typeof(bool)) {
-            return new[] { "true", "false" }
-                .Where(value => value.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase));
+            return sourceArray.Where(value => value.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase));
         }
 
         return [];
     }
 
-    private void PrintCompletions(ICliContext context, IEnumerable<string> completions) {
+    private static void PrintCompletions(ICliContext context, IEnumerable<string> completions) {
         foreach (string completion in completions) {
             context.Out.WriteLine(completion);
         }
