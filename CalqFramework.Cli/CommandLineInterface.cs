@@ -40,7 +40,7 @@ public class CommandLineInterface : ICliContext {
     }
 
     public IDotnetSuggestHandler DotnetSuggestHandler {
-        get => _dotnetSuggestHandler ??= new DotnetSuggestHandler();
+        get => _dotnetSuggestHandler ??= new DotnetSuggestHandler(CompletionHandler);
         init => _dotnetSuggestHandler = value;
     }
 
@@ -83,15 +83,15 @@ public class CommandLineInterface : ICliContext {
 
             switch (firstArg) {
                 case "__complete":
-                    CompletionHandler.HandleComplete(this, argsList.Skip(1), target);
+                    CompletionHandler.HandleComplete(this, argsList, target);
                     break;
 
                 case "completion":
-                    CompletionHandler.HandleCompletion(this, argsList.Skip(1), target);
+                    CompletionHandler.HandleCompletion(this, argsList, target);
                     break;
 
                 case string s when s.StartsWith("[suggest"):
-                    DotnetSuggestHandler.HandleDotnetSuggest(this, CompletionHandler, argsList, target);
+                    DotnetSuggestHandler.HandleDotnetSuggest(this, argsList, target);
                     break;
 
                 default:

@@ -10,17 +10,21 @@ namespace CalqFramework.Cli.Completion;
 ///     Handles dotnet-suggest protocol for shell completion integration.
 /// </summary>
 internal sealed class DotnetSuggestHandler : IDotnetSuggestHandler {
+    private readonly ICompletionHandler _completionHandler;
+
+    public DotnetSuggestHandler(ICompletionHandler completionHandler) {
+        _completionHandler = completionHandler;
+    }
+
     /// <summary>
     ///     Handles dotnet-suggest completion protocol.
     ///     Converts [suggest] or [suggest:N] format to __complete format and delegates to CompletionHandler.
     /// </summary>
     /// <param name="context">CLI context.</param>
-    /// <param name="completionHandler">Completion handler to delegate to.</param>
     /// <param name="args">Arguments in dotnet-suggest format: [suggest] "command line" or [suggest:30] "command line".</param>
     /// <param name="target">Target instance.</param>
     public void HandleDotnetSuggest(
         ICliContext context,
-        ICompletionHandler completionHandler,
         IEnumerable<string> args,
         object target) {
         List<string> argsList = [.. args];
@@ -74,7 +78,8 @@ internal sealed class DotnetSuggestHandler : IDotnetSuggestHandler {
             tokens.Add(string.Empty);
         }
 
-        completionHandler.HandleComplete(context, tokens, target);
+        List<string> completeArgs = ["__complete", .. tokens];
+        _completionHandler.HandleComplete(context, completeArgs, target);
     }
 
     /// <summary>

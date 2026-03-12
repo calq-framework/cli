@@ -26,7 +26,7 @@ internal sealed class CompletionHandler : ICompletionHandler {
     }
 
     public void HandleComplete(ICliContext context, IEnumerable<string> args, object target) {
-        List<string> argsList = [.. args];
+        List<string> argsList = [.. args.Skip(1)];
 
         if (argsList.Count == 0) {
             HandleComplete(context, target, [], "");
@@ -40,7 +40,7 @@ internal sealed class CompletionHandler : ICompletionHandler {
     }
 
     public void HandleCompletion(ICliContext context, IEnumerable<string> args, object target) {
-        List<string> argsList = [.. args];
+        List<string> argsList = [.. args.Skip(1)];
 
         if (argsList.Count == 0) {
             throw CliErrors.CompletionRequiresShell();
