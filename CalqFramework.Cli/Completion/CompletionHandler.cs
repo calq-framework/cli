@@ -25,22 +25,21 @@ internal sealed class CompletionHandler : ICompletionHandler {
         init => _completionScriptGenerator = value;
     }
 
-    public ResultVoid HandleComplete(ICliContext context, IEnumerable<string> args, object target) {
+    public void HandleComplete(ICliContext context, IEnumerable<string> args, object target) {
         List<string> argsList = [.. args];
 
         if (argsList.Count == 0) {
             HandleComplete(context, target, [], "");
-            return ResultVoid.Value;
+            return;
         }
 
         string toComplete = argsList[^1];
         List<string> argsBeforeCursor = [.. argsList.Take(argsList.Count - 1)];
 
         HandleComplete(context, target, argsBeforeCursor, toComplete);
-        return ResultVoid.Value;
     }
 
-    public ResultVoid HandleCompletion(ICliContext context, IEnumerable<string> args, object target) {
+    public void HandleCompletion(ICliContext context, IEnumerable<string> args, object target) {
         List<string> argsList = [.. args];
 
         if (argsList.Count == 0) {
@@ -67,7 +66,7 @@ internal sealed class CompletionHandler : ICompletionHandler {
                         HandleCompletionInstall(context, shell);
                     }
 
-                    return ResultVoid.Value;
+                    return;
 
                 case "uninstall":
                     if (isAllShells) {
@@ -76,7 +75,7 @@ internal sealed class CompletionHandler : ICompletionHandler {
                         HandleCompletionUninstall(context, shell);
                     }
 
-                    return ResultVoid.Value;
+                    return;
 
                 default:
                     throw CliErrors.UnknownCompletionAction(action);
@@ -88,8 +87,6 @@ internal sealed class CompletionHandler : ICompletionHandler {
         } else {
             HandleCompletionScript(context, shell);
         }
-
-        return ResultVoid.Value;
     }
 
     private void HandleComplete(ICliContext context, object target, List<string> args, string toComplete) {

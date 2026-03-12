@@ -18,7 +18,7 @@ internal sealed class DotnetSuggestHandler : IDotnetSuggestHandler {
     /// <param name="completionHandler">Completion handler to delegate to.</param>
     /// <param name="args">Arguments in dotnet-suggest format: [suggest] "command line" or [suggest:30] "command line".</param>
     /// <param name="target">Target instance.</param>
-    public ResultVoid HandleDotnetSuggest(
+    public void HandleDotnetSuggest(
         ICliContext context,
         ICompletionHandler completionHandler,
         IEnumerable<string> args,
@@ -26,13 +26,13 @@ internal sealed class DotnetSuggestHandler : IDotnetSuggestHandler {
         List<string> argsList = [.. args];
 
         if (argsList.Count < 2) {
-            return ResultVoid.Value;
+            return;
         }
 
         // Check for [suggest] or [suggest:N] directive
         string directive = argsList[0];
         if (!directive.StartsWith("[suggest") || !directive.EndsWith(']')) {
-            return ResultVoid.Value;
+            return;
         }
 
         // args[0] = "[suggest]" or "[suggest:30]"
@@ -74,7 +74,7 @@ internal sealed class DotnetSuggestHandler : IDotnetSuggestHandler {
             tokens.Add(string.Empty);
         }
 
-        return completionHandler.HandleComplete(context, tokens, target);
+        completionHandler.HandleComplete(context, tokens, target);
     }
 
     /// <summary>
