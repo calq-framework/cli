@@ -12,38 +12,33 @@ namespace CalqFramework.Cli.Formatting;
 /// <summary>
 ///     Prints formatted help information for CLI components using XML documentation.
 /// </summary>
-/// <remarks>
-///     Initializes a new instance of HelpPrinter with the specified output writer.
-/// </remarks>
-/// <param name="output">TextWriter for output operations. If null, defaults to Console.Out.</param>
-public class HelpPrinter(TextWriter? output = null) : IHelpPrinter {
-    private readonly TextWriter _out = output ?? Console.Out;
+public class HelpPrinter : IHelpPrinter {
     private readonly bool _supportsColor = DetectColorSupport();
 
-    public void PrintHelp(Type rootType, Submodule submodule, IEnumerable<Submodule> submodules,
+    public void PrintHelp(ICliContext context, Type rootType, Submodule submodule, IEnumerable<Submodule> submodules,
         IEnumerable<Subcommand> subcommands, IEnumerable<Option> options) {
         string description = GetSummary(submodule.MemberInfo);
         if (!string.IsNullOrEmpty(description)) {
-            _out.WriteLine(description);
-            _out.WriteLine();
+            context.Out.WriteLine(description);
+            context.Out.WriteLine();
         }
 
-        PrintHelp(submodules, subcommands, options);
+        PrintHelp(context, submodules, subcommands, options);
     }
 
-    public void PrintHelp(Type rootType, IEnumerable<Submodule> submodules, IEnumerable<Subcommand> subcommands,
+    public void PrintHelp(ICliContext context, Type rootType, IEnumerable<Submodule> submodules, IEnumerable<Subcommand> subcommands,
         IEnumerable<Option> options) {
         string rootDescription = GetSummary(rootType);
         if (!string.IsNullOrEmpty(rootDescription)) {
-            _out.WriteLine(rootDescription);
-            _out.WriteLine();
+            context.Out.WriteLine(rootDescription);
+            context.Out.WriteLine();
         }
 
-        PrintHelp(submodules, subcommands, options);
+        PrintHelp(context, submodules, subcommands, options);
     }
 
-    public void PrintSubcommandHelp(Type rootType, Subcommand subcommand, IEnumerable<Option> options) {
-        PrintSubcommandDescription(subcommand);
+    public void PrintSubcommandHelp(ICliContext context, Type rootType, Subcommand subcommand, IEnumerable<Option> options) {
+        PrintSubcommandDescription(context, subcommand);
         SectionInfo[] sections = [
             new() {
                 Title = "Parameters",
@@ -56,7 +51,7 @@ public class HelpPrinter(TextWriter? output = null) : IHelpPrinter {
                     { Description = GetDescription(x), Keys = [.. x.Keys.Select(x => GetOptionKey(x))] })]
             }
         ];
-        PrintSections(sections);
+        PrintSections(context, sections);
     }
 
     /// <summary>
@@ -342,7 +337,7 @@ public class HelpPrinter(TextWriter? output = null) : IHelpPrinter {
         return GetMaxKeyLengths(sections);
     }
 
-    private void PrintHelp(IEnumerable<Submodule> submodules, IEnumerable<Subcommand> subcommands,
+    private void PrintHelp(ICliContext context, IEnumerable<Submodule> submodules, IEnumerable<Subcommand> subcommands,
         IEnumerable<Option> options) {
         SectionInfo[] sections = [
             new() {
@@ -361,10 +356,10 @@ public class HelpPrinter(TextWriter? output = null) : IHelpPrinter {
                     { Description = GetDescription(x), Keys = [.. x.Keys.Select(x => GetOptionKey(x))] })]
             }
         ];
-        PrintSections(sections);
+        PrintSections(context, sections);
     }
 
-    private void PrintSections(IEnumerable<SectionInfo> sections) {
+    private void PrintSections(ICliContext context, IEnumerable<SectionInfo> sections) {
         List<int> maxLengths = NormalizeKeyCounts(sections);
 
         SectionInfo firstSection = sections.SkipWhile(x => x.ItemInfos.Count == 0).First();
@@ -374,13 +369,13 @@ public class HelpPrinter(TextWriter? output = null) : IHelpPrinter {
             }
 
             if (section != firstSection) {
-                _out.WriteLine();
+                context.Out.WriteLine();
             }
 
             SetConsoleColor(90, 147, 241);
-            _out.WriteLine(section.Title);
+            context.Out.WriteLine(section.Title);
             foreach (ItemInfo item in section.ItemInfos) {
-                _out.Write("  "); // ident
+                context.Out.Write("  "); // ident
                 IList<string> keys = item.Keys;
                 string[] parts = new string[maxLengths.Count];
                 for (int i = 0; i < maxLengths.Count; i++) {
@@ -392,17 +387,17 @@ public class HelpPrinter(TextWriter? output = null) : IHelpPrinter {
                 }
 
                 SetConsoleColor(149, 184, 204);
-                _out.Write(string.Join(" ", parts));
+                context.Out.Write(string.Join(" ", parts));
                 ResetConsoleColor();
-                _out.Write("  "); // keys and rootDescription space
-                _out.WriteLine(item.Description);
+                context.Out.Write("  "); // keys and rootDescription space
+                context.Out.WriteLine(item.Description);
             }
         }
 
         ResetConsoleColor();
     }
 
-    private void PrintSubcommandDescription(Subcommand subcommand) {
+    private void PrintSubcommandDescription(ICliContext context, Subcommand subcommand) {
         List<string> parts = [];
         string summaryDescription = GetSummary(subcommand.MethodInfo);
         if (!string.IsNullOrEmpty(summaryDescription)) {
@@ -416,8 +411,8 @@ public class HelpPrinter(TextWriter? output = null) : IHelpPrinter {
 
         string description = string.Join(Environment.NewLine, parts);
         if (!string.IsNullOrEmpty(description)) {
-            _out.WriteLine(description);
-            _out.WriteLine();
+            context.Out.WriteLine(description);
+            context.Out.WriteLine();
         }
     }
 
