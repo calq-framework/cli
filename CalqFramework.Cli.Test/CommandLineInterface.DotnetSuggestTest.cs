@@ -11,7 +11,7 @@ public class CommandLineInterfaceDotnetSuggestTest {
         SomeClassLibrary tool = new();
 
         using StringWriter writer = new();
-        CommandLineInterface cli = new() { Out = writer };
+        CommandLineInterface cli = new() { InterfaceOut = writer };
         cli.Execute(tool, new[] { directive, commandLine });
 
         string output = writer.ToString();

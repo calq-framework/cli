@@ -60,9 +60,10 @@ public class CommandLineInterface : ICliContext {
     public bool SkipUnknown { get; init; } = false;
 
     /// <summary>
-    ///     TextWriter for output operations. Defaults to Console.Out if not specified.
+    ///     TextWriter for interface description output (help, completions, framework messages).
+    ///     Defaults to Console.Out if not specified.
     /// </summary>
-    public TextWriter Out {
+    public TextWriter InterfaceOut {
         get => _out ?? Console.Out;
         init => _out = value;
     }

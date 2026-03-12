@@ -19,8 +19,8 @@ public class HelpPrinter : IHelpPrinter {
         IEnumerable<Subcommand> subcommands, IEnumerable<Option> options) {
         string description = GetSummary(submodule.MemberInfo);
         if (!string.IsNullOrEmpty(description)) {
-            context.Out.WriteLine(description);
-            context.Out.WriteLine();
+            context.InterfaceOut.WriteLine(description);
+            context.InterfaceOut.WriteLine();
         }
 
         PrintHelp(context, submodules, subcommands, options);
@@ -30,8 +30,8 @@ public class HelpPrinter : IHelpPrinter {
         IEnumerable<Option> options) {
         string rootDescription = GetSummary(rootType);
         if (!string.IsNullOrEmpty(rootDescription)) {
-            context.Out.WriteLine(rootDescription);
-            context.Out.WriteLine();
+            context.InterfaceOut.WriteLine(rootDescription);
+            context.InterfaceOut.WriteLine();
         }
 
         PrintHelp(context, submodules, subcommands, options);
@@ -369,13 +369,13 @@ public class HelpPrinter : IHelpPrinter {
             }
 
             if (section != firstSection) {
-                context.Out.WriteLine();
+                context.InterfaceOut.WriteLine();
             }
 
             SetConsoleColor(90, 147, 241);
-            context.Out.WriteLine(section.Title);
+            context.InterfaceOut.WriteLine(section.Title);
             foreach (ItemInfo item in section.ItemInfos) {
-                context.Out.Write("  "); // ident
+                context.InterfaceOut.Write("  "); // ident
                 IList<string> keys = item.Keys;
                 string[] parts = new string[maxLengths.Count];
                 for (int i = 0; i < maxLengths.Count; i++) {
@@ -387,10 +387,10 @@ public class HelpPrinter : IHelpPrinter {
                 }
 
                 SetConsoleColor(149, 184, 204);
-                context.Out.Write(string.Join(" ", parts));
+                context.InterfaceOut.Write(string.Join(" ", parts));
                 ResetConsoleColor();
-                context.Out.Write("  "); // keys and rootDescription space
-                context.Out.WriteLine(item.Description);
+                context.InterfaceOut.Write("  "); // keys and rootDescription space
+                context.InterfaceOut.WriteLine(item.Description);
             }
         }
 
@@ -411,8 +411,8 @@ public class HelpPrinter : IHelpPrinter {
 
         string description = string.Join(Environment.NewLine, parts);
         if (!string.IsNullOrEmpty(description)) {
-            context.Out.WriteLine(description);
-            context.Out.WriteLine();
+            context.InterfaceOut.WriteLine(description);
+            context.InterfaceOut.WriteLine();
         }
     }
 
