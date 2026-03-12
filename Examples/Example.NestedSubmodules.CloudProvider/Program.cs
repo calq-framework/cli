@@ -12,7 +12,7 @@ try {
     }.Execute(new CloudManager());
 
     switch (result) {
-        case ResultVoid:
+        case ValueTuple:
             break;
         case string str:
             Console.WriteLine(str);

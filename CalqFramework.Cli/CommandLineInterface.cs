@@ -71,11 +71,19 @@ public class CommandLineInterface : ICliContext {
     /// <summary>
     ///     Executes a CLI command using command-line arguments from the environment.
     /// </summary>
+    /// <returns>
+    ///     The result of the executed command, or <see cref="ValueTuple"/> if the command returns void
+    ///     or handles completion/help requests.
+    /// </returns>
     public object? Execute(object target) => Execute(target, Environment.GetCommandLineArgs().Skip(1));
 
     /// <summary>
     ///     Executes a CLI command using the provided arguments.
     /// </summary>
+    /// <returns>
+    ///     The result of the executed command, or <see cref="ValueTuple"/> if the command returns void
+    ///     or handles completion/help requests.
+    /// </returns>
     public object? Execute(object target, IEnumerable<string> args) {
         List<string> argsList = [.. args];
 
@@ -100,7 +108,7 @@ public class CommandLineInterface : ICliContext {
             }
         }
 
-        return ResultVoid.Value;
+        return default(ValueTuple);
     }
 
     /// <summary>
@@ -140,7 +148,7 @@ public class CommandLineInterface : ICliContext {
                 HelpPrinter.PrintHelp(this, target.GetType(), submoduleStore.GetSubmodules(),
                     subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor),
                     optionStore.GetOptions());
-                return ResultVoid.Value;
+                return default(ValueTuple);
             }
 
             ISubmoduleStore parentSubmoduleStore = CliComponentStoreFactory.CreateSubmoduleStore(parentSubmodule!);
@@ -150,7 +158,7 @@ public class CommandLineInterface : ICliContext {
             HelpPrinter.PrintHelp(this, target.GetType(), submoduleInfo, submoduleStore.GetSubmodules(),
                 subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor),
                 optionStore.GetOptions());
-            return ResultVoid.Value;
+            return default(ValueTuple);
         }
 
         MethodInfo subcommand = subcommandStore[subcommandName!]!;
@@ -165,7 +173,7 @@ public class CommandLineInterface : ICliContext {
                 HelpPrinter.PrintSubcommandHelp(this, target.GetType(),
                     subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor)
                         .Where(x => x.MethodInfo == subcommand).First(), subcommandExecutorWithOptions.GetOptions());
-                return ResultVoid.Value;
+                return default(ValueTuple);
             }
 
             IEnumerator<string> skippedEn = GetSkippedEnumerator(en).GetEnumerator();
@@ -180,7 +188,7 @@ public class CommandLineInterface : ICliContext {
         }
 
         if (subcommand.ReturnType == typeof(void)) {
-            return ResultVoid.Value;
+            return default(ValueTuple);
         }
 
         return result;
