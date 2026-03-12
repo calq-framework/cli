@@ -78,22 +78,28 @@ public class CommandLineInterface : ICliContext {
     public object? Execute(object target, IEnumerable<string> args) {
         List<string> argsList = [.. args];
 
-        // Check if this is the dotnet-suggest protocol ([suggest] or [suggest:N] where N is cursor position)
-        if (argsList.Count > 0 && argsList[0].StartsWith("[suggest")) {
-            return DotnetSuggestHandler.HandleDotnetSuggest(this, CompletionHandler, argsList, target);
+        if (argsList.Count > 0) {
+            string firstArg = argsList[0];
+
+            switch (firstArg) {
+                case "__complete":
+                    CompletionHandler.HandleComplete(this, argsList.Skip(1), target);
+                    break;
+
+                case "completion":
+                    CompletionHandler.HandleCompletion(this, argsList.Skip(1), target);
+                    break;
+
+                case string s when s.StartsWith("[suggest"):
+                    DotnetSuggestHandler.HandleDotnetSuggest(this, CompletionHandler, argsList, target);
+                    break;
+
+                default:
+                    return ExecuteInvoke(target, argsList);
+            }
         }
 
-        // Check if this is the __complete command (Cobra-style completion)
-        if (argsList.Count > 0 && argsList[0] == "__complete") {
-            return CompletionHandler.HandleComplete(this, argsList.Skip(1), target);
-        }
-
-        // Check if this is a completion management command
-        if (argsList.Count > 0 && argsList[0] == "completion") {
-            return CompletionHandler.HandleCompletion(this, argsList.Skip(1), target);
-        }
-
-        return ExecuteInvoke(target, argsList);
+        return ResultVoid.Value;
     }
 
     /// <summary>

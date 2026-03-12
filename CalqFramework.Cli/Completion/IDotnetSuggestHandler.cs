@@ -7,7 +7,7 @@ public interface IDotnetSuggestHandler {
     ///     Handles dotnet-suggest completion protocol.
     ///     Converts [suggest] or [suggest:N] format to __complete format and delegates to CompletionHandler.
     /// </summary>
-    ResultVoid HandleDotnetSuggest(ICliContext context, ICompletionHandler completionHandler, IEnumerable<string> args,
+    void HandleDotnetSuggest(ICliContext context, ICompletionHandler completionHandler, IEnumerable<string> args,
         object target);
 
     /// <summary>
