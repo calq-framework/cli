@@ -20,10 +20,10 @@ internal sealed class CompletionPrinter : ICompletionPrinter {
             .OrderBy(k => k);
 
         foreach (string completion in completions) {
-            context.Out.WriteLine(completion);
+            context.InterfaceOut.WriteLine(completion);
         }
 
-        context.Out.Flush();
+        context.InterfaceOut.Flush();
     }
 
     public void PrintSubcommands(ICliContext context, IEnumerable<Subcommand> subcommands, string partialInput) {
@@ -34,10 +34,10 @@ internal sealed class CompletionPrinter : ICompletionPrinter {
             .OrderBy(k => k);
 
         foreach (string completion in completions) {
-            context.Out.WriteLine(completion);
+            context.InterfaceOut.WriteLine(completion);
         }
 
-        context.Out.Flush();
+        context.InterfaceOut.Flush();
     }
 
     public void PrintParametersAndOptions(ICliContext context, IEnumerable<Parameter> parameters,
@@ -54,10 +54,10 @@ internal sealed class CompletionPrinter : ICompletionPrinter {
             .OrderBy(k => k);
 
         foreach (string completion in completions) {
-            context.Out.WriteLine(completion);
+            context.InterfaceOut.WriteLine(completion);
         }
 
-        context.Out.Flush();
+        context.InterfaceOut.Flush();
     }
 
     public void PrintSubmoduleValue(ICliContext context, Submodule submodule, string partialInput) {
@@ -145,9 +145,9 @@ internal sealed class CompletionPrinter : ICompletionPrinter {
 
     private static void PrintCompletions(ICliContext context, IEnumerable<string> completions) {
         foreach (string completion in completions) {
-            context.Out.WriteLine(completion);
+            context.InterfaceOut.WriteLine(completion);
         }
 
-        context.Out.Flush();
+        context.InterfaceOut.Flush();
     }
 }

@@ -157,7 +157,7 @@ var result = new CommandLineInterface() {
 **Custom Output** - Redirect output to a custom TextWriter:
 ```csharp
 var result = new CommandLineInterface() {
-    Out = new StringWriter()  // Or any TextWriter
+    InterfaceOut = new StringWriter()  // Or any TextWriter
 }.Execute(new Classlib());
 ```
 

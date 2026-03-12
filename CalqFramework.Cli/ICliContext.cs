@@ -18,7 +18,8 @@ public interface ICliContext {
     bool SkipUnknown { get; }
 
     /// <summary>
-    ///     TextWriter for output operations. Defaults to Console.Out if not specified.
+    ///     TextWriter for interface description output (help, completions, framework messages).
+    ///     Defaults to Console.Out if not specified.
     /// </summary>
-    TextWriter Out { get; }
+    TextWriter InterfaceOut { get; }
 }

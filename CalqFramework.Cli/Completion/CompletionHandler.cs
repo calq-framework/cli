@@ -209,7 +209,7 @@ internal sealed class CompletionHandler : ICompletionHandler {
         string programName = Assembly.GetEntryAssembly()?.GetToolCommandName() ??
                              throw CliErrors.UnableToDetermineProgramName();
         string script = CompletionScriptGenerator.GenerateScript(shell, programName);
-        context.Out.WriteLine(script);
+        context.InterfaceOut.WriteLine(script);
     }
 
     private void HandleCompletionInstall(ICliContext context, string shell) {
@@ -219,8 +219,8 @@ internal sealed class CompletionHandler : ICompletionHandler {
         try {
             CompletionScriptGenerator.InstallScript(shell, programName);
             string installPath = CompletionScriptGenerator.GetInstallPath(shell, programName);
-            context.Out.WriteLine($"Completion script installed to: {installPath}");
-            context.Out.WriteLine("Please restart your shell for changes to take effect.");
+            context.InterfaceOut.WriteLine($"Completion script installed to: {installPath}");
+            context.InterfaceOut.WriteLine("Please restart your shell for changes to take effect.");
         } catch (Exception ex) {
             throw CliErrors.CompletionInstallFailed(shell, ex.Message, ex);
         }
@@ -234,9 +234,9 @@ internal sealed class CompletionHandler : ICompletionHandler {
             bool removed = CompletionScriptGenerator.UninstallScript(shell, programName);
 
             if (removed) {
-                context.Out.WriteLine($"Completion script for {shell} has been uninstalled.");
+                context.InterfaceOut.WriteLine($"Completion script for {shell} has been uninstalled.");
             } else {
-                context.Out.WriteLine($"No completion script found for {shell}.");
+                context.InterfaceOut.WriteLine($"No completion script found for {shell}.");
             }
         } catch (Exception ex) {
             throw CliErrors.CompletionUninstallFailed(shell, ex.Message, ex);
@@ -248,11 +248,11 @@ internal sealed class CompletionHandler : ICompletionHandler {
                              throw CliErrors.UnableToDetermineProgramName();
 
         foreach (string shell in CompletionScriptGenerator.SupportedShells) {
-            context.Out.WriteLine($"# Completion script for {shell}");
-            context.Out.WriteLine();
+            context.InterfaceOut.WriteLine($"# Completion script for {shell}");
+            context.InterfaceOut.WriteLine();
             string script = CompletionScriptGenerator.GenerateScript(shell, programName);
-            context.Out.WriteLine(script);
-            context.Out.WriteLine();
+            context.InterfaceOut.WriteLine(script);
+            context.InterfaceOut.WriteLine();
         }
     }
 
@@ -278,13 +278,13 @@ internal sealed class CompletionHandler : ICompletionHandler {
                     string error = process.StandardError.ReadToEnd();
 
                     if (process.ExitCode == 0) {
-                        context.Out.WriteLine($"[{shell}] {output}");
+                        context.InterfaceOut.WriteLine($"[{shell}] {output}");
                     } else {
-                        context.Out.WriteLine($"[{shell}] Failed: {error}");
+                        context.InterfaceOut.WriteLine($"[{shell}] Failed: {error}");
                     }
                 }
             } catch (Exception ex) {
-                context.Out.WriteLine($"[{shell}] Error: {ex.Message}");
+                context.InterfaceOut.WriteLine($"[{shell}] Error: {ex.Message}");
             }
         }
     }
@@ -298,12 +298,12 @@ internal sealed class CompletionHandler : ICompletionHandler {
                 bool removed = CompletionScriptGenerator.UninstallScript(shell, programName);
 
                 if (removed) {
-                    context.Out.WriteLine($"[{shell}] Completion script has been uninstalled.");
+                    context.InterfaceOut.WriteLine($"[{shell}] Completion script has been uninstalled.");
                 } else {
-                    context.Out.WriteLine($"[{shell}] No completion script found.");
+                    context.InterfaceOut.WriteLine($"[{shell}] No completion script found.");
                 }
             } catch (Exception ex) {
-                context.Out.WriteLine($"[{shell}] Error: {ex.Message}");
+                context.InterfaceOut.WriteLine($"[{shell}] Error: {ex.Message}");
             }
         }
     }

@@ -21,7 +21,7 @@ public class CommandLineInterfaceCompletionTest {
         // If it ends with space, we're completing an empty string (already handled by split)
 
         using StringWriter writer = new();
-        CommandLineInterface cli = new() { Out = writer };
+        CommandLineInterface cli = new() { InterfaceOut = writer };
         cli.Execute(tool, s_first.Concat(args));
 
         string output = writer.ToString();
