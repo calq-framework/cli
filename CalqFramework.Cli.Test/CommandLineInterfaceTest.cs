@@ -98,7 +98,7 @@ public class CommandLineInterfaceTest {
         object result = new CommandLineInterface().Execute(tool,
             $"{StringHelper.GetKebabCase(nameof(SomeClassLibrary.MethodWithIntegerAndText))} --integer 1 --text abc"
                 .Split(' '));
-        Assert.IsType<ResultVoid>(result);
+        Assert.IsType<ValueTuple>(result);
         Assert.Equal(1, tool.integerField);
         Assert.Equal("abc", tool.textField);
     }
@@ -124,7 +124,7 @@ public class CommandLineInterfaceTest {
         SomeClassLibrary tool = new();
         object result = new CommandLineInterface().Execute(tool,
             $"{StringHelper.GetKebabCase(nameof(SomeClassLibrary.MethodWithTextAndBoolean))} abc --boolean".Split(' '));
-        Assert.IsType<ResultVoid>(result);
+        Assert.IsType<ValueTuple>(result);
         Assert.Equal("abc", tool.textField);
         Assert.True(tool.booleanField);
     }
@@ -135,7 +135,7 @@ public class CommandLineInterfaceTest {
         object result = new CommandLineInterface().Execute(tool,
             $"{StringHelper.GetKebabCase(nameof(SomeClassLibrary.MethodWithTextAndInteger))} abc --integer 1"
                 .Split(' '));
-        Assert.IsType<ResultVoid>(result);
+        Assert.IsType<ValueTuple>(result);
         Assert.Equal("abc", tool.textField);
         Assert.Equal(1, tool.integerField);
     }
@@ -145,7 +145,7 @@ public class CommandLineInterfaceTest {
         SomeClassLibrary tool = new();
         object result = new CommandLineInterface().Execute(tool,
             $"{StringHelper.GetKebabCase(nameof(SomeClassLibrary.MethodWithTextAndInteger))} -- --text -1".Split(' '));
-        Assert.IsType<ResultVoid>(result);
+        Assert.IsType<ValueTuple>(result);
         Assert.Equal("--text", tool.textField);
         Assert.Equal(-1, tool.integerField);
     }

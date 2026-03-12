@@ -7,7 +7,7 @@ try {
     var result = new CommandLineInterface().Execute(new TaskManagerCli());
 
     switch (result) {
-        case ResultVoid:
+        case ValueTuple:
             break;
         case string str:
             Console.WriteLine(str);

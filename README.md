@@ -49,7 +49,7 @@ try {
     }.Execute(new CloudManager());
 
     switch (result) {
-        case ResultVoid:
+        case ValueTuple:
             break;
         case string str:
             Console.WriteLine(str);
@@ -401,7 +401,7 @@ using System.Text.Json;
 
 try {
     var result = new CommandLineInterface().Execute(new QuickStart());
-    if (result is not ResultVoid) Console.WriteLine(JsonSerializer.Serialize(result));
+    if (result is not ValueTuple) Console.WriteLine(JsonSerializer.Serialize(result));
 }
 catch (CliException ex) {
     Console.Error.WriteLine(ex.Message);

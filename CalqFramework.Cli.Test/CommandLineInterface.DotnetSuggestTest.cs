@@ -85,7 +85,7 @@ public class CommandLineInterfaceDotnetSuggestTest {
         SomeClassLibrary tool = new();
         object result = new CommandLineInterface().Execute(tool, s_args);
 
-        Assert.IsType<ResultVoid>(result);
+        Assert.IsType<ValueTuple>(result);
     }
 
     [Fact]
@@ -94,6 +94,6 @@ public class CommandLineInterfaceDotnetSuggestTest {
         string exeName = Path.GetFileNameWithoutExtension(Environment.ProcessPath ?? "testhost");
         object result = new CommandLineInterface().Execute(tool, new[] { "[suggest", $"{exeName} " });
 
-        Assert.IsType<ResultVoid>(result);
+        Assert.IsType<ValueTuple>(result);
     }
 }
