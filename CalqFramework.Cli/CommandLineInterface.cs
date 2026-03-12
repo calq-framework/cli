@@ -30,7 +30,7 @@ public class CommandLineInterface : ICliContext {
     ///     Help printer for displaying CLI help information.
     /// </summary>
     public IHelpPrinter HelpPrinter {
-        get => _helpPrinter ??= new HelpPrinter(Out);
+        get => _helpPrinter ??= new HelpPrinter();
         init => _helpPrinter = value;
     }
 
@@ -136,7 +136,7 @@ public class CommandLineInterface : ICliContext {
             IOptionStore optionStore = CliComponentStoreFactory.CreateOptionStore(submodule);
             bool isRoot = submodule == target;
             if (isRoot) {
-                HelpPrinter.PrintHelp(target.GetType(), submoduleStore.GetSubmodules(),
+                HelpPrinter.PrintHelp(this, target.GetType(), submoduleStore.GetSubmodules(),
                     subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor),
                     optionStore.GetOptions());
                 return ResultVoid.Value;
@@ -146,7 +146,7 @@ public class CommandLineInterface : ICliContext {
             Submodule submoduleInfo = parentSubmoduleStore.GetSubmodules()
                 .Where(x => parentSubmoduleStore[x.Keys[0]] == submodule)
                 .First(); // use the store to check for the key to comply with case sensitivity
-            HelpPrinter.PrintHelp(target.GetType(), submoduleInfo, submoduleStore.GetSubmodules(),
+            HelpPrinter.PrintHelp(this, target.GetType(), submoduleInfo, submoduleStore.GetSubmodules(),
                 subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor),
                 optionStore.GetOptions());
             return ResultVoid.Value;
@@ -161,7 +161,7 @@ public class CommandLineInterface : ICliContext {
             string firstArg = en.Current;
 
             if (firstArg == "--help" || firstArg == "-h") {
-                HelpPrinter.PrintSubcommandHelp(target.GetType(),
+                HelpPrinter.PrintSubcommandHelp(this, target.GetType(),
                     subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor)
                         .Where(x => x.MethodInfo == subcommand).First(), subcommandExecutorWithOptions.GetOptions());
                 return ResultVoid.Value;
