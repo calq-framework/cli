@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
     <TargetFramework>net9.0</TargetFramework>
     <RootNamespace>CalqFramework.Cli</RootNamespace>
     <PackageId>CalqFramework.Cli</PackageId>

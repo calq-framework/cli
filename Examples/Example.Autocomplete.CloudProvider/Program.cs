@@ -1,5 +1,6 @@
-using AutocompleteExample;
+using Example.Autocomplete.CloudProvider;
 using CalqFramework.Cli;
+using System.Text.Json;
 
 try {
     object result = new CommandLineInterface().Execute(new CloudProviderCli());
