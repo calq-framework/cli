@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.DataAccess.ClassMemberStores;
+namespace CalqFramework.DataAccess.ClassMemberStores;
 
 public abstract class MethodExecutorBase<TParameterKey, TParameterValue> : ParameterStoreBase<TParameterKey, TParameterValue>, IFunctionExecutor<TParameterKey, TParameterValue> {
     protected MethodExecutorBase(MethodInfo method, object? targetObject) : base(method) {

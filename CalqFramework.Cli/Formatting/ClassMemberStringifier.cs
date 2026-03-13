@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.Cli.Formatting;
+namespace CalqFramework.Cli.Formatting;
 
 /// <summary>
 ///     Converts class member names to CLI-friendly kebab-case format.

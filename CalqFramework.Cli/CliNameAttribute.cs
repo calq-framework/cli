@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.Cli;
+namespace CalqFramework.Cli;
 
 /// <summary>
 ///     Attribute to specify custom CLI names for class members (supports multiple aliases).

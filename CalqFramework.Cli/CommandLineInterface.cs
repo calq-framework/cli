@@ -1,4 +1,4 @@
-﻿using CalqFramework.Cli.Completion;
+using CalqFramework.Cli.Completion;
 using CalqFramework.Cli.DataAccess;
 using CalqFramework.Cli.DataAccess.InterfaceComponentStores;
 using CalqFramework.Cli.Formatting;

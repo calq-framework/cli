@@ -1,4 +1,4 @@
-﻿using CalqFramework.Cli.InterfaceComponents;
+using CalqFramework.Cli.InterfaceComponents;
 using CalqFramework.DataAccess;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponentStores;

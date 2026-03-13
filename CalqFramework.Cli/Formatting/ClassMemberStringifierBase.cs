@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.Cli.Formatting;
+namespace CalqFramework.Cli.Formatting;
 
 public abstract class ClassMemberStringifierBase : IClassMemberStringifier {
     public IEnumerable<string> GetAlternativeNames(FieldInfo info) =>

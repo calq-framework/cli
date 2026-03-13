@@ -3,10 +3,8 @@
 /// <summary>
 ///     Handles dotnet-suggest protocol for shell completion integration.
 /// </summary>
-internal sealed class DotnetSuggestHandler : IDotnetSuggestHandler {
-    private readonly ICompletionHandler _completionHandler;
-
-    public DotnetSuggestHandler(ICompletionHandler completionHandler) => _completionHandler = completionHandler;
+internal sealed class DotnetSuggestHandler(ICompletionHandler completionHandler) : IDotnetSuggestHandler {
+    private readonly ICompletionHandler _completionHandler = completionHandler;
 
     /// <summary>
     ///     Handles dotnet-suggest completion protocol.

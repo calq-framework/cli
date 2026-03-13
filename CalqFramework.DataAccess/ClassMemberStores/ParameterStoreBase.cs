@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.DataAccess.ClassMemberStores;
+namespace CalqFramework.DataAccess.ClassMemberStores;
 
 public abstract class ParameterStoreBase<TKey, TValue> : KeyValueStoreBase<TKey, TValue, ParameterInfo, object?> {
     protected ParameterStoreBase(MethodInfo method) {

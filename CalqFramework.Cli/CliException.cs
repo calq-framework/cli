@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.Cli;
+namespace CalqFramework.Cli;
 
 /// <summary>
 ///     Exception thrown when CLI command parsing or execution fails.

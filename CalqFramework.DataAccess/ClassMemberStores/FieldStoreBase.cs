@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.DataAccess.ClassMemberStores;
+namespace CalqFramework.DataAccess.ClassMemberStores;
 
 public abstract class FieldStoreBase<TKey, TValue>(object targetObject, BindingFlags bindingFlags) : ClassDataMemberStoreBase<TKey, TValue, FieldInfo, object?>(targetObject, bindingFlags) {
     public override IEnumerable<FieldInfo> Accessors => TargetType.GetFields(BindingFlags)

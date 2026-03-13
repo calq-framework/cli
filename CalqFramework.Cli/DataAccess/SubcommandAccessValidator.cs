@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.Cli.DataAccess;
+namespace CalqFramework.Cli.DataAccess;
 
 /// <summary>
 ///     Validates whether a method is a valid CLI subcommand (excludes .NET-specific methods).

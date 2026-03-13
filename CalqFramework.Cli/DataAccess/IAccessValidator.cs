@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.Cli.DataAccess;
+namespace CalqFramework.Cli.DataAccess;
 
 /// <summary>
 ///     Validates whether a class member should be accessible in the CLI.

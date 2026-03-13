@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.Cli.InterfaceComponents;
+namespace CalqFramework.Cli.InterfaceComponents;
 
 /// <summary>
 ///     Represents a CLI subcommand (method) with its metadata.

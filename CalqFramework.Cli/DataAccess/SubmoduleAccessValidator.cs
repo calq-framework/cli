@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.Cli.DataAccess;
+namespace CalqFramework.Cli.DataAccess;
 
 /// <summary>
 ///     Validates whether a member is a valid CLI submodule (must be non-convertible type).

@@ -1,4 +1,4 @@
-﻿using CalqFramework.DataAccess;
+using CalqFramework.DataAccess;
 
 namespace CalqFramework.Cli.DataAccess;
 

@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.Cli.Test;
+namespace CalqFramework.Cli.Test;
 
 public class OptionsDeserializerTest {
     [Fact]

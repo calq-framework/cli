@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.Cli.Extensions.System.Reflection;
+namespace CalqFramework.Cli.Extensions.System.Reflection;
 
 public static class AssemblyExtensions {
     /// <summary>

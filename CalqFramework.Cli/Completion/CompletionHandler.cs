@@ -1,4 +1,4 @@
-﻿using CalqFramework.Cli.DataAccess.InterfaceComponentStores;
+using CalqFramework.Cli.DataAccess.InterfaceComponentStores;
 using CalqFramework.Cli.InterfaceComponents;
 using CalqFramework.Cli.Parsing;
 using static CalqFramework.Cli.Parsing.OptionReaderBase;

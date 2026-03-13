@@ -1,4 +1,4 @@
-﻿using CalqFramework.Cli.InterfaceComponents;
+using CalqFramework.Cli.InterfaceComponents;
 
 namespace CalqFramework.Cli.Completion;
 

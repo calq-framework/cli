@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.DataAccess;
+namespace CalqFramework.DataAccess;
 
 /// <summary>
 ///     Exception thrown when data access operations fail.

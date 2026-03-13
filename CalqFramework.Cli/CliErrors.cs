@@ -1,4 +1,4 @@
-﻿using CalqFramework.Cli.Completion.Providers;
+using CalqFramework.Cli.Completion.Providers;
 using CalqFramework.DataAccess;
 
 namespace CalqFramework.Cli;

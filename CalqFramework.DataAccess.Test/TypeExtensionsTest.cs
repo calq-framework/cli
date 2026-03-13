@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.DataAccess.Test;
+namespace CalqFramework.DataAccess.Test;
 
 public class TypeExtensionsTest {
     [Fact]

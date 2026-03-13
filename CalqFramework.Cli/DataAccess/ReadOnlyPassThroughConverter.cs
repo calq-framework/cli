@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.Cli.DataAccess;
+namespace CalqFramework.Cli.DataAccess;
 
 internal sealed class ReadOnlyPassThroughConverter<TValue> : ICompositeValueConverter<TValue> {
     public bool CanConvert(Type targetType) => true;

@@ -1,4 +1,4 @@
-﻿using CalqFramework.Cli.Formatting;
+using CalqFramework.Cli.Formatting;
 using CalqFramework.DataAccess;
 using CalqFramework.DataAccess.ClassMemberStores;
 

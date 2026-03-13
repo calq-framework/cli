@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.Cli.DataAccess;
+namespace CalqFramework.Cli.DataAccess;
 
 /// <summary>
 ///     Represents a pairing of a reflection accessor with its associated CLI key names.
