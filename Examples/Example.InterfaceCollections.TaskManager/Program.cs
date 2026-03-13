@@ -1,5 +1,6 @@
 using CalqFramework.Cli;
-using InterfaceCollectionsExample;
+using Example.InterfaceCollections.TaskManager;
+using System.Text.Json;
 
 try {
     object result = new CommandLineInterface().Execute(new TaskManagerCli());

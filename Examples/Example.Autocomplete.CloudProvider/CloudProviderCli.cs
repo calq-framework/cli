@@ -21,7 +21,7 @@ public enum VerbosityLevel {
 
 /// <summary>Custom completion provider for region strings.</summary>
 public class RegionCompletionProvider : ICompletionProvider {
-    public static IEnumerable<string> GetCompletions(ICompletionProviderContext context) {
+    public IEnumerable<string> GetCompletions(ICompletionProviderContext context) {
         string[] regions = new[] {
             "us-east-1",
             "us-west-1",
@@ -37,7 +37,7 @@ public class RegionCompletionProvider : ICompletionProvider {
 
 /// <summary>Custom completion provider for output format strings.</summary>
 public class FormatCompletionProvider : ICompletionProvider {
-    public static IEnumerable<string> GetCompletions(ICompletionProviderContext context) {
+    public IEnumerable<string> GetCompletions(ICompletionProviderContext context) {
         string[] formats = new[] {
             "json",
             "yaml",
