@@ -2,7 +2,7 @@ using CalqFramework.Cli;
 using InterfaceCollectionsExample;
 
 try {
-    var result = new CommandLineInterface().Execute(new TaskManagerCli());
+    object result = new CommandLineInterface().Execute(new TaskManagerCli());
 
     switch (result) {
         case ValueTuple:

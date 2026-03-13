@@ -3,7 +3,7 @@ using CalqFramework.Cli.DataAccess;
 using Example.NestedSubmodules.CloudProvider;
 
 try {
-    var result = new CommandLineInterface {
+    object? result = new CommandLineInterface {
         CliComponentStoreFactory = new CliComponentStoreFactory {
             EnableShadowing = true
         }

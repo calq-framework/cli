@@ -54,10 +54,10 @@ public class CloudManager : ManagerBase {
 
     /// <summary>Permanently saves api key into calq.cli.example.txt in the user dir.</summary>
     /// <param name="ApiKey">Without shadowing enabled, throws error on use</param>
-    public void Add(string ApiKey) => System.IO.File.WriteAllText(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "calq.cli.example.txt"), ApiKey);
+    public static void Add(string ApiKey) => System.IO.File.WriteAllText(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "calq.cli.example.txt"), ApiKey);
 
     /// <summary>Removes calq.cli.example.txt</summary>
-    public void Remove() => System.IO.File.Delete(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "calq.cli.example.txt"));
+    public static void Remove() => System.IO.File.Delete(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "calq.cli.example.txt"));
 }
 
 /// <summary>Abstract compute submodule.</summary>
@@ -92,12 +92,12 @@ public abstract class AbstractComputeManager : ManagerBase {
     /// <summary>Lists all compute instances.</summary>
     /// <returns>ListInstancesResult record.</returns>
     public virtual ListInstancesResult ListInstances() =>
-        new ListInstancesResult(
+        new(
             $"Listing all instances in {ComputeRegion}",
-            new[] {
+            [
                 "instance1",
                 "instance2"
-            });
+            ]);
 
     /// <summary>Gets the status of compute resources.</summary>
     /// <returns>ComputeStatusResult record.</returns>
@@ -216,7 +216,7 @@ public class ComputeManager : AbstractComputeManager {
     /// <summary>Runs a compute action.</summary>
     /// <param name="action">Action to perform.</param>
     /// <returns>Result of compute action.</returns>
-    public string Run(string action = "default") => $"Compute executing {action}.";
+    public static string Run(string action = "default") => $"Compute executing {action}.";
 }
 
 /// <summary>Virtual Machine module for compute operations.</summary>
@@ -227,12 +227,12 @@ public class VirtualMachineManager : AbstractComputeManager {
     /// <summary>Deploys a virtual machine.</summary>
     /// <param name="vmName">Name of the virtual machine.</param>
     /// <returns>Deployment result string.</returns>
-    public string Deploy(string vmName = "defaultVM") => $"Deploying VM: {vmName}.";
+    public static string Deploy(string vmName = "defaultVM") => $"Deploying VM: {vmName}.";
 
     /// <summary>Gets the status of a virtual machine.</summary>
     /// <param name="vmId">ID of the virtual machine.</param>
     /// <returns>Status string.</returns>
-    public string Status(string vmId = "vm-001") => $"Status for {vmId}: Running.";
+    public static string Status(string vmId = "vm-001") => $"Status for {vmId}: Running.";
 }
 
 /// <summary>Container module for compute operations.</summary>
@@ -243,12 +243,12 @@ public class ContainerManager : AbstractComputeManager {
     /// <summary>Deploys a container.</summary>
     /// <param name="containerName">Name of the container.</param>
     /// <returns>Deployment result string.</returns>
-    public string Deploy(string containerName = "defaultContainer") => $"Deploying container: {containerName}.";
+    public static string Deploy(string containerName = "defaultContainer") => $"Deploying container: {containerName}.";
 
     /// <summary>Gets the status of a container.</summary>
     /// <param name="containerId">ID of the container.</param>
     /// <returns>Status string.</returns>
-    public string Status(string containerId = "container-001") => $"Status for {containerId}: Running.";
+    public static string Status(string containerId = "container-001") => $"Status for {containerId}: Running.";
 }
 
 /// <summary>Storage module for cloud operations.</summary>
@@ -265,7 +265,7 @@ public class StorageManager : AbstractStorageManager {
     /// <summary>Runs a storage action.</summary>
     /// <param name="action">Action to perform.</param>
     /// <returns>Result of storage action.</returns>
-    public string Run(string action = "default") => $"Storage executing {action}.";
+    public static string Run(string action = "default") => $"Storage executing {action}.";
 }
 
 /// <summary>Blob module for storage operations.</summary>
@@ -281,7 +281,7 @@ public class BlobManager : AbstractStorageManager {
     /// <summary>Downloads a blob from the container.</summary>
     /// <param name="blobName">Name of the blob to download.</param>
     /// <returns>Download result string.</returns>
-    public string Download(string blobName = "defaultBlob") => $"Downloading blob: {blobName}.";
+    public static string Download(string blobName = "defaultBlob") => $"Downloading blob: {blobName}.";
 }
 
 /// <summary>File module for storage operations.</summary>
@@ -297,7 +297,7 @@ public class FileManager : AbstractStorageManager {
     /// <summary>Downloads a file from the directory.</summary>
     /// <param name="fileName">Name of the file to download.</param>
     /// <returns>Download result string.</returns>
-    public string Download(string fileName = "defaultFile") => $"Downloading file: {fileName}.";
+    public static string Download(string fileName = "defaultFile") => $"Downloading file: {fileName}.";
 }
 
 /// <summary>Network module for cloud operations.</summary>
@@ -317,7 +317,7 @@ public class NetworkManager : AbstractNetworkManager {
     /// <summary>Runs a network action.</summary>
     /// <param name="action">Action to perform.</param>
     /// <returns>Result of network action.</returns>
-    public string Run(string action = "default") => $"Network executing {action}.";
+    public static string Run(string action = "default") => $"Network executing {action}.";
 }
 
 /// <summary>Virtual network module for network operations.</summary>
@@ -328,12 +328,12 @@ public class VirtualNetworkManager : AbstractNetworkManager {
     /// <summary>Creates a virtual network.</summary>
     /// <param name="networkName">Name of the virtual network.</param>
     /// <returns>Creation result string.</returns>
-    public string Create(string networkName = "defaultVNet") => $"Creating virtual network: {networkName}.";
+    public static string Create(string networkName = "defaultVNet") => $"Creating virtual network: {networkName}.";
 
     /// <summary>Deletes a virtual network.</summary>
     /// <param name="networkName">Name of the virtual network.</param>
     /// <returns>Deletion result string.</returns>
-    public string Delete(string networkName = "defaultVNet") => $"Deleting virtual network: {networkName}.";
+    public static string Delete(string networkName = "defaultVNet") => $"Deleting virtual network: {networkName}.";
 }
 
 /// <summary>Load balancer module for network operations.</summary>
@@ -344,12 +344,12 @@ public class LoadBalancerManager : AbstractNetworkManager {
     /// <summary>Creates a load balancer.</summary>
     /// <param name="lbName">Name of the load balancer.</param>
     /// <returns>Creation result string.</returns>
-    public string Create(string lbName = "defaultLB") => $"Creating load balancer: {lbName}.";
+    public static string Create(string lbName = "defaultLB") => $"Creating load balancer: {lbName}.";
 
     /// <summary>Gets the status of the load balancer.</summary>
     /// <param name="lbId">ID of the load balancer.</param>
     /// <returns>Status result string.</returns>
-    public string Status(string lbId = "lb-001") => $"Load balancer {lbId} status: Active.";
+    public static string Status(string lbId = "lb-001") => $"Load balancer {lbId} status: Active.";
 }
 
 /// <summary>Firewall module for network operations.</summary>
@@ -360,10 +360,10 @@ public class FirewallManager : AbstractNetworkManager {
     /// <summary>Enables the firewall.</summary>
     /// <param name="firewallId">ID of the firewall.</param>
     /// <returns>Enable result string.</returns>
-    public string Enable(string firewallId = "fw-001") => $"Enabling firewall: {firewallId}.";
+    public static string Enable(string firewallId = "fw-001") => $"Enabling firewall: {firewallId}.";
 
     /// <summary>Disables the firewall.</summary>
     /// <param name="firewallId">ID of the firewall.</param>
     /// <returns>Disable result string.</returns>
-    public string Disable(string firewallId = "fw-001") => $"Disabling firewall: {firewallId}.";
+    public static string Disable(string firewallId = "fw-001") => $"Disabling firewall: {firewallId}.";
 }

@@ -21,8 +21,8 @@ public enum VerbosityLevel {
 
 /// <summary>Custom completion provider for region strings.</summary>
 public class RegionCompletionProvider : ICompletionProvider {
-    public IEnumerable<string> GetCompletions(ICompletionProviderContext context) {
-        var regions = new[] {
+    public static IEnumerable<string> GetCompletions(ICompletionProviderContext context) {
+        string[] regions = new[] {
             "us-east-1",
             "us-west-1",
             "us-west-2",
@@ -37,8 +37,8 @@ public class RegionCompletionProvider : ICompletionProvider {
 
 /// <summary>Custom completion provider for output format strings.</summary>
 public class FormatCompletionProvider : ICompletionProvider {
-    public IEnumerable<string> GetCompletions(ICompletionProviderContext context) {
-        var formats = new[] {
+    public static IEnumerable<string> GetCompletions(ICompletionProviderContext context) {
+        string[] formats = new[] {
             "json",
             "yaml",
             "xml",
@@ -67,8 +67,8 @@ public class CloudProviderCli {
     public string? ConfigFile { get; set; }
 
     /// <summary>Instance method providing profile name completions.</summary>
-    private IEnumerable<string> GetProfileNames(string partialInput) {
-        var profiles = new[] {
+    private static IEnumerable<string> GetProfileNames(string partialInput) {
+        string[] profiles = new[] {
             "default",
             "production",
             "staging",
@@ -82,7 +82,7 @@ public class CloudProviderCli {
     /// <param name="provider">The cloud provider to deploy to.</param>
     /// <returns>Deployment result message.</returns>
     public string Deploy(CloudProvider provider) {
-        var configInfo = ConfigFile != null ? $" (config: {ConfigFile})" : "";
+        string configInfo = ConfigFile != null ? $" (config: {ConfigFile})" : "";
         return $"[{Verbosity}] Deploying resources to {provider} using profile '{Profile}'...{configInfo} (format: {Format})";
     }
 
@@ -115,7 +115,7 @@ public class CloudProviderCli {
     /// <param name="target">The file or directory to process.</param>
     /// <returns>Processing result.</returns>
     public string Process(System.IO.FileSystemInfo target) {
-        var type = target is System.IO.DirectoryInfo ? "directory" : "file";
+        string type = target is System.IO.DirectoryInfo ? "directory" : "file";
         return $"[{Verbosity}] Processing {type}: {target.FullName} (format: {Format})";
     }
 
@@ -123,7 +123,7 @@ public class CloudProviderCli {
     /// <param name="providers">The cloud providers to enable features for.</param>
     /// <returns>Feature enablement result.</returns>
     public string EnableFeatures(List<CloudProvider> providers) {
-        var providerList = string.Join(", ", providers);
+        string providerList = string.Join(", ", providers);
         return $"[{Verbosity}] Enabled features for providers: {providerList} (format: {Format})";
     }
 }

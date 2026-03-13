@@ -2,7 +2,7 @@ using AutocompleteExample;
 using CalqFramework.Cli;
 
 try {
-    var result = new CommandLineInterface().Execute(new CloudProviderCli());
+    object result = new CommandLineInterface().Execute(new CloudProviderCli());
 
     switch (result) {
         case ValueTuple:
