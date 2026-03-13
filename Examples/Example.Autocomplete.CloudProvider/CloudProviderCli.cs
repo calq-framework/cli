@@ -1,6 +1,6 @@
 using CalqFramework.Cli.Completion.Providers;
 
-namespace AutocompleteExample;
+namespace Example.Autocomplete.CloudProvider;
 
 /// <summary>Cloud provider enum for testing autocomplete.</summary>
 public enum CloudProvider {

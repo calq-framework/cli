@@ -1,4 +1,4 @@
-namespace CloudProvider;
+namespace Example.NestedSubmodules.CloudProvider;
 
 // Compute-specific result records
 public record StartInstanceResult(string Message, int StatusCode);

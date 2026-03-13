@@ -1,4 +1,4 @@
-namespace InterfaceCollectionsExample;
+namespace Example.InterfaceCollections.TaskManager;
 
 /// <summary>Task priority enum.</summary>
 public enum TaskPriority {
