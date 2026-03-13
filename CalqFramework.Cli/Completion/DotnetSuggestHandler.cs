@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-
-namespace CalqFramework.Cli.Completion;
+﻿namespace CalqFramework.Cli.Completion;
 
 /// <summary>
 ///     Handles dotnet-suggest protocol for shell completion integration.
@@ -12,9 +6,7 @@ namespace CalqFramework.Cli.Completion;
 internal sealed class DotnetSuggestHandler : IDotnetSuggestHandler {
     private readonly ICompletionHandler _completionHandler;
 
-    public DotnetSuggestHandler(ICompletionHandler completionHandler) {
-        _completionHandler = completionHandler;
-    }
+    public DotnetSuggestHandler(ICompletionHandler completionHandler) => _completionHandler = completionHandler;
 
     /// <summary>
     ///     Handles dotnet-suggest completion protocol.
@@ -23,10 +15,7 @@ internal sealed class DotnetSuggestHandler : IDotnetSuggestHandler {
     /// <param name="context">CLI context.</param>
     /// <param name="args">Arguments in dotnet-suggest format: [suggest] "command line" or [suggest:30] "command line".</param>
     /// <param name="target">Target instance.</param>
-    public void HandleDotnetSuggest(
-        ICliContext context,
-        IEnumerable<string> args,
-        object target) {
+    public void HandleDotnetSuggest(ICliContext context, IEnumerable<string> args, object target) {
         List<string> argsList = [.. args];
 
         if (argsList.Count < 2) {
@@ -67,7 +56,8 @@ internal sealed class DotnetSuggestHandler : IDotnetSuggestHandler {
         // Skip it if present
         if (tokens.Count > 0) {
             string exeName = Path.GetFileNameWithoutExtension(Environment.ProcessPath ?? "");
-            if (tokens[0].Equals(exeName, StringComparison.OrdinalIgnoreCase)) {
+            if (tokens[0]
+                .Equals(exeName, StringComparison.OrdinalIgnoreCase)) {
                 tokens = [.. tokens.Skip(1)];
             }
         }

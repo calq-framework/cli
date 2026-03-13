@@ -1,7 +1,4 @@
-﻿using System;
-using System.Globalization;
-using System.Reflection;
-using CalqFramework.Cli.DataAccess.ClassMemberStores;
+﻿using CalqFramework.Cli.DataAccess.ClassMemberStores;
 using CalqFramework.Cli.DataAccess.InterfaceComponentStores;
 using CalqFramework.Cli.Formatting;
 using CalqFramework.DataAccess;
@@ -15,8 +12,7 @@ public class CliComponentStoreFactory : ICliComponentStoreFactory {
     /// <summary>
     ///     Default binding flags for member lookup (Instance, Static, Public, IgnoreCase).
     /// </summary>
-    public const BindingFlags DefaultLookup =
-        BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.IgnoreCase;
+    public const BindingFlags DefaultLookup = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.IgnoreCase;
 
     private readonly BindingFlags? _methodBindingFlags;
     private readonly IAccessValidator? _optionAccessValidator;
@@ -114,7 +110,9 @@ public class CliComponentStoreFactory : ICliComponentStoreFactory {
     public ICompositeValueConverter<string?> CompositeValueConverter {
         get {
             if (_compositeValueConverter == null) {
-                ValueConverter baseConverter = new() { FormatProvider = FormatProvider };
+                ValueConverter baseConverter = new() {
+                    FormatProvider = FormatProvider
+                };
                 _compositeValueConverter = new CompositeValueConverter(baseConverter, CollectionStoreFactory);
             }
 
@@ -138,14 +136,14 @@ public class CliComponentStoreFactory : ICliComponentStoreFactory {
         return new OptionStore(store);
     }
 
-    public ISubcommandExecutor CreateSubcommandExecutor(MethodInfo method, object? obj) => new SubcommandExecutor(
-        new CliMethodExecutor<string?>(method, obj, BindingFlags, ClassMemberStringifier, CompositeValueConverter));
+    public ISubcommandExecutor CreateSubcommandExecutor(MethodInfo method, object? obj) => new SubcommandExecutor(new CliMethodExecutor<string?>(method, obj, BindingFlags, ClassMemberStringifier, CompositeValueConverter));
 
     public ISubcommandExecutorWithOptions CreateSubcommandExecutorWithOptions(MethodInfo method, object obj) =>
-        new SubcommandExecutorWithOptions(CreateSubcommandExecutor(method, obj), CreateOptionStore(obj)) { EnableShadowing = EnableShadowing };
+        new SubcommandExecutorWithOptions(CreateSubcommandExecutor(method, obj), CreateOptionStore(obj)) {
+            EnableShadowing = EnableShadowing
+        };
 
-    public ISubcommandStore CreateSubcommandStore(object obj) => new SubcommandStore(
-        new MethodInfoStore(obj, MethodBindingFlags, ClassMemberStringifier, SubcommandAccessValidator));
+    public ISubcommandStore CreateSubcommandStore(object obj) => new SubcommandStore(new MethodInfoStore(obj, MethodBindingFlags, ClassMemberStringifier, SubcommandAccessValidator));
 
     public ISubmoduleStore CreateSubmoduleStore(object obj) {
         ReadOnlyPassThroughConverter<object?> converter = new();
@@ -163,16 +161,12 @@ public class CliComponentStoreFactory : ICliComponentStoreFactory {
         return new SubmoduleStore(store);
     }
 
-    private CliDualKeyValueStore<TValue> CreateFieldAndPropertyStore<TValue>(object obj,
-        IAccessValidator cliValidator, ICompositeValueConverter<TValue> compositeValueConverter) =>
-        new(CreateFieldStore(obj, cliValidator, compositeValueConverter),
-            CreatePropertyStore(obj, cliValidator, compositeValueConverter));
+    private CliDualKeyValueStore<TValue> CreateFieldAndPropertyStore<TValue>(object obj, IAccessValidator cliValidator, ICompositeValueConverter<TValue> compositeValueConverter) =>
+        new(CreateFieldStore(obj, cliValidator, compositeValueConverter), CreatePropertyStore(obj, cliValidator, compositeValueConverter));
 
-    private CliFieldStore<TValue> CreateFieldStore<TValue>(object obj,
-        IAccessValidator cliValidator, ICompositeValueConverter<TValue> compositeValueConverter) =>
+    private CliFieldStore<TValue> CreateFieldStore<TValue>(object obj, IAccessValidator cliValidator, ICompositeValueConverter<TValue> compositeValueConverter) =>
         new(obj, BindingFlags, ClassMemberStringifier, cliValidator, compositeValueConverter);
 
-    private CliPropertyStore<TValue> CreatePropertyStore<TValue>(object obj,
-        IAccessValidator cliValidator, ICompositeValueConverter<TValue> compositeValueConverter) =>
+    private CliPropertyStore<TValue> CreatePropertyStore<TValue>(object obj, IAccessValidator cliValidator, ICompositeValueConverter<TValue> compositeValueConverter) =>
         new(obj, BindingFlags, ClassMemberStringifier, cliValidator, compositeValueConverter);
 }

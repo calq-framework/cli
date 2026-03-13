@@ -1,7 +1,5 @@
 ﻿#pragma warning disable CS0649
 
-using System.Collections.Generic;
-
 namespace CalqFramework.Cli.Test;
 
 internal sealed class SomeConfiguration {
@@ -20,8 +18,7 @@ internal sealed class SomeConfiguration {
 
     [CliName("s")] public bool shadowedfield;
 
-    [CliName("differentname")]
-    [CliName("y")]
+    [CliName("differentname")] [CliName("y")]
     public bool shortOption;
 
     public string text;

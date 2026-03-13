@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Reflection;
-using CalqFramework.DataAccess;
-
-namespace CalqFramework.DataAccess.Extensions.System;
+﻿namespace CalqFramework.DataAccess.Extensions.System;
 
 /// <summary>
 ///     Extension methods for parsing string values to typed objects.
@@ -51,8 +47,8 @@ public static class TypeExtensions {
     /// <param name="type">The type to instantiate.</param>
     /// <returns>A new instance of the type.</returns>
     /// <exception cref="InvalidOperationException">Thrown when the type cannot be instantiated.</exception>
-    public static object CreateInstance(this Type type) {
-        return Type.GetTypeCode(type) switch {
+    public static object CreateInstance(this Type type) =>
+        Type.GetTypeCode(type) switch {
             TypeCode.Boolean => false,
             TypeCode.Byte => (byte)0,
             TypeCode.SByte => (sbyte)0,
@@ -68,12 +64,8 @@ public static class TypeExtensions {
             TypeCode.UInt16 => (ushort)0,
             TypeCode.DateTime => default(DateTime),
             TypeCode.String => string.Empty,
-            _ => TryCreateInstance(type)
-                           ?? TryCreateInstance(Nullable.GetUnderlyingType(type))
-                           ?? TryCreateInstance(GetConcreteCollectionType(type))
-                           ?? throw DataAccessErrors.CannotCreateInstance(type.FullName ?? type.Name),
+            _ => TryCreateInstance(type) ?? TryCreateInstance(Nullable.GetUnderlyingType(type)) ?? TryCreateInstance(GetConcreteCollectionType(type)) ?? throw DataAccessErrors.CannotCreateInstance(type.FullName ?? type.Name)
         };
-    }
 
     private static object? TryCreateInstance(Type? type) {
         if (type == null) {
@@ -200,8 +192,7 @@ public static class TypeExtensions {
         throw DataAccessErrors.TypeCannotBeParsed(targetType.Name);
     }
 
-    private static object TryParseParsableWithFormatProvider(Type targetType, string value,
-        IFormatProvider formatProvider) {
+    private static object TryParseParsableWithFormatProvider(Type targetType, string value, IFormatProvider formatProvider) {
         if (Nullable.GetUnderlyingType(targetType) != null) {
             targetType = Nullable.GetUnderlyingType(targetType)!;
             return targetType.Parse(value, formatProvider);
@@ -209,8 +200,7 @@ public static class TypeExtensions {
 
         Type? parsableInterface = targetType.GetInterface("IParsable`1");
         if (parsableInterface != null) {
-            MethodInfo? parseMethod = targetType.GetMethod("Parse",
-                [typeof(string), typeof(IFormatProvider)]);
+            MethodInfo? parseMethod = targetType.GetMethod("Parse", [typeof(string), typeof(IFormatProvider)]);
 
             if (parseMethod != null) {
                 try {

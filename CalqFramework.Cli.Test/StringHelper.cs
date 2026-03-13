@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-
-namespace CalqFramework.Cli.Test;
+﻿namespace CalqFramework.Cli.Test;
 
 internal sealed class StringHelper {
     public static string GetKebabCase(string value) {

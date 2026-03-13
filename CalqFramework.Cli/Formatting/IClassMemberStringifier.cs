@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Reflection;
-
-namespace CalqFramework.Cli.Formatting;
+﻿namespace CalqFramework.Cli.Formatting;
 
 /// <summary>
 ///     Converts class member names to CLI-friendly string representations (e.g., kebab-case).

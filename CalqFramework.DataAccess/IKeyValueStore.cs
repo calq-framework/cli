@@ -18,8 +18,7 @@ public interface IKeyValueStore<TKey, TValue> : IReadOnlyKeyValueStore<TKey, TVa
 /// <summary>
 ///     Provides key-value store with mediated access through accessors and internal value conversion.
 /// </summary>
-public interface IKeyValueStore<TKey, TValue, TAccessor, TInternalValue> : IKeyValueStore<TKey, TValue>,
-    IMediatedKeyValueStore<TKey, TAccessor, TInternalValue> {
+public interface IKeyValueStore<TKey, TValue, TAccessor, TInternalValue> : IKeyValueStore<TKey, TValue>, IMediatedKeyValueStore<TKey, TAccessor, TInternalValue> {
 }
 
 /// <summary>

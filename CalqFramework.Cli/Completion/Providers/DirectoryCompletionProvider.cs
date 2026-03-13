@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
-namespace CalqFramework.Cli.Completion.Providers;
+﻿namespace CalqFramework.Cli.Completion.Providers;
 
 /// <summary>
 ///     Built-in completion provider for directory paths.
@@ -35,8 +30,7 @@ public sealed class DirectoryCompletionProvider : ICompletionProvider {
         }
 
         try {
-            IEnumerable<string> directories = Directory
-                .EnumerateDirectories(directory, "*", SearchOption.TopDirectoryOnly)
+            IEnumerable<string> directories = Directory.EnumerateDirectories(directory, "*", SearchOption.TopDirectoryOnly)
                 .Select(Path.GetFileName)
                 .Where(d => d != null && d.StartsWith(searchPrefix, StringComparison.OrdinalIgnoreCase))
                 .Select(d => d!);

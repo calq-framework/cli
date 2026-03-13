@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace CalqFramework.Cli.DataAccess;
+﻿namespace CalqFramework.Cli.DataAccess;
 
 /// <summary>
 ///     Represents a pairing of a reflection accessor with its associated CLI key names.
@@ -14,5 +12,4 @@ public record AccessorKeysPair<TAccessor>(
     /// <summary>
     /// The CLI key names that map to this accessor.
     /// </summary>
-    IReadOnlyList<string> Keys
-);
+    IReadOnlyList<string> Keys);

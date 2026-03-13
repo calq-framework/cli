@@ -1,8 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.Reflection;
-
-namespace CalqFramework.Cli.Extensions.System.Reflection;
+﻿namespace CalqFramework.Cli.Extensions.System.Reflection;
 
 public static class AssemblyExtensions {
     /// <summary>
@@ -11,7 +7,8 @@ public static class AssemblyExtensions {
     ///     then falls back to the assembly name.
     /// </summary>
     public static string GetToolCommandName(this Assembly assembly) {
-        string? assemblyName = assembly?.GetName().Name;
+        string? assemblyName = assembly?.GetName()
+            .Name;
 
         if (string.IsNullOrEmpty(assemblyName)) {
             throw new InvalidOperationException("Unable to determine assembly name");

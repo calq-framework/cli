@@ -1,6 +1,4 @@
-﻿using Xunit;
-
-namespace CalqFramework.Cli.Test;
+﻿namespace CalqFramework.Cli.Test;
 
 [CollectionDefinition("Completion Tests", DisableParallelization = true)]
 public class CompletionTestCollection {

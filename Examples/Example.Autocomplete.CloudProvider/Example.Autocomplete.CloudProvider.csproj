@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
-    
+
     <!-- .NET Tool Configuration -->
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>cloudprovider</ToolCommandName>

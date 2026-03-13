@@ -1,8 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using Xunit;
-
-namespace CalqFramework.Cli.Test;
+﻿namespace CalqFramework.Cli.Test;
 
 [Collection("Completion Tests")]
 public class CommandLineInterfaceCompletionScriptTest {
@@ -10,7 +6,9 @@ public class CommandLineInterfaceCompletionScriptTest {
     public void ExecuteCompletionScript_Bash_GeneratesScript() {
         SomeClassLibrary tool = new();
         using StringWriter writer = new();
-        CommandLineInterface cli = new() { InterfaceOut = writer };
+        CommandLineInterface cli = new() {
+            InterfaceOut = writer
+        };
         List<string> args = ["completion", "bash"];
         cli.Execute(tool, args);
 
@@ -24,7 +22,9 @@ public class CommandLineInterfaceCompletionScriptTest {
     public void ExecuteCompletionScript_Zsh_GeneratesScript() {
         SomeClassLibrary tool = new();
         using StringWriter writer = new();
-        CommandLineInterface cli = new() { InterfaceOut = writer };
+        CommandLineInterface cli = new() {
+            InterfaceOut = writer
+        };
         List<string> args = ["completion", "zsh"];
         cli.Execute(tool, args);
 
@@ -38,7 +38,9 @@ public class CommandLineInterfaceCompletionScriptTest {
     public void ExecuteCompletionScript_PowerShell_GeneratesScript() {
         SomeClassLibrary tool = new();
         using StringWriter writer = new();
-        CommandLineInterface cli = new() { InterfaceOut = writer };
+        CommandLineInterface cli = new() {
+            InterfaceOut = writer
+        };
         List<string> args = ["completion", "powershell"];
         cli.Execute(tool, args);
 
@@ -51,7 +53,9 @@ public class CommandLineInterfaceCompletionScriptTest {
     public void ExecuteCompletionScript_Fish_GeneratesScript() {
         SomeClassLibrary tool = new();
         using StringWriter writer = new();
-        CommandLineInterface cli = new() { InterfaceOut = writer };
+        CommandLineInterface cli = new() {
+            InterfaceOut = writer
+        };
         List<string> args = ["completion", "fish"];
         cli.Execute(tool, args);
 
@@ -78,7 +82,9 @@ public class CommandLineInterfaceCompletionScriptTest {
         // In a real scenario, you might want to mock the file system
         // For now, we just verify the command doesn't throw
         using StringWriter writer = new();
-        CommandLineInterface cli = new() { InterfaceOut = writer };
+        CommandLineInterface cli = new() {
+            InterfaceOut = writer
+        };
         try {
             List<string> args = ["completion", "bash", "install"];
             cli.Execute(tool, args);
@@ -96,7 +102,9 @@ public class CommandLineInterfaceCompletionScriptTest {
         SomeClassLibrary tool = new();
 
         using StringWriter writer = new();
-        CommandLineInterface cli = new() { InterfaceOut = writer };
+        CommandLineInterface cli = new() {
+            InterfaceOut = writer
+        };
         try {
             List<string> args = ["completion", "bash", "uninstall"];
             cli.Execute(tool, args);

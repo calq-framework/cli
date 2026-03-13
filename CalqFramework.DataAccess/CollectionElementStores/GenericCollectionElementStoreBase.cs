@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Reflection;
-using CalqFramework.DataAccess.Extensions.System;
-
-namespace CalqFramework.DataAccess.CollectionElementStores;
+﻿namespace CalqFramework.DataAccess.CollectionElementStores;
 
 /// <summary>
 ///     Base class for collection element stores that use reflection to access collection methods.
@@ -29,7 +25,8 @@ public abstract class GenericCollectionElementStoreBase<TKey, TValue> : Collecti
     protected int Count => (int?)_countProperty?.GetValue(Collection) ?? 0;
 
     public override Type GetValueType(TKey key) {
-        Type elementType = Collection.GetType().GetGenericArguments()[0];
+        Type elementType = Collection.GetType()
+            .GetGenericArguments()[0];
         return elementType;
     }
 

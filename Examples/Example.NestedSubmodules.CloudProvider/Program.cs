@@ -1,12 +1,10 @@
 using CalqFramework.Cli;
 using CalqFramework.Cli.DataAccess;
-using System;
-using System.Text.Json;
 using CloudProvider;
 
 try {
-    var result = new CommandLineInterface() {
-        CliComponentStoreFactory = new CliComponentStoreFactory() {
+    var result = new CommandLineInterface {
+        CliComponentStoreFactory = new CliComponentStoreFactory {
             EnableShadowing = true
         }
     }.Execute(new CloudManager());
@@ -21,8 +19,7 @@ try {
             Console.WriteLine(JsonSerializer.Serialize(obj));
             break;
     }
-}
-catch (CliException ex) {
+} catch (CliException ex) {
     Console.Error.WriteLine(ex.Message);
     Environment.Exit(1);
 }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
-using CalqFramework.DataAccess;
+﻿using CalqFramework.DataAccess;
 
 namespace CalqFramework.Cli.Parsing;
 
@@ -81,9 +78,7 @@ internal abstract class OptionReaderBase(IEnumerator<string> argsEnumerator) {
             if (!assigned) {
                 moved = ArgsEnumerator.MoveNext();
                 if (moved) {
-                    if (ArgsEnumerator.Current == "" ||
-                        (ArgsEnumerator.Current[0] != '-' && ArgsEnumerator.Current[0] != '+') ||
-                        IsNumber(ArgsEnumerator.Current)) {
+                    if (ArgsEnumerator.Current == "" || (ArgsEnumerator.Current[0] != '-' && ArgsEnumerator.Current[0] != '+') || IsNumber(ArgsEnumerator.Current)) {
                         value = ArgsEnumerator.Current;
                         moved = false;
                     } else {

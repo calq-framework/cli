@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-
-namespace CalqFramework.Cli.Completion;
+﻿namespace CalqFramework.Cli.Completion;
 
 internal sealed class CompletionScriptGenerator : ICompletionScriptGenerator {
     private const string BashTemplate = @"# Bash completion script for __PROGRAM_NAME__
@@ -116,8 +112,7 @@ complete -c __PROGRAM_NAME__ -f -a ""(____PROGRAM_NAME___completion)""";
 
     private static string GetBashInstallPath(string programName) {
         if (OperatingSystem.IsWindows()) {
-            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".bash_completion.d",
-                $"{programName}.bash");
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".bash_completion.d", $"{programName}.bash");
         }
 
         return $"/etc/bash_completion.d/{programName}";
@@ -125,8 +120,7 @@ complete -c __PROGRAM_NAME__ -f -a ""(____PROGRAM_NAME___completion)""";
 
     private static string GetZshInstallPath(string programName) {
         if (OperatingSystem.IsWindows()) {
-            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".zsh", "completion",
-                $"_{programName}");
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".zsh", "completion", $"_{programName}");
         }
 
         return $"/usr/local/share/zsh/site-functions/_{programName}";
@@ -144,28 +138,23 @@ complete -c __PROGRAM_NAME__ -f -a ""(____PROGRAM_NAME___completion)""";
 
     private static string GetFishInstallPath(string programName) {
         if (OperatingSystem.IsWindows()) {
-            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "fish",
-                "completions", $"{programName}.fish");
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "fish", "completions", $"{programName}.fish");
         }
 
-        return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", "fish",
-            "completions", $"{programName}.fish");
+        return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", "fish", "completions", $"{programName}.fish");
     }
 
     private static string GetPowerShell5ProfilePath() =>
         // Windows PowerShell 5.1 (Windows only)
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "WindowsPowerShell",
-            "Microsoft.PowerShell_profile.ps1");
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "WindowsPowerShell", "Microsoft.PowerShell_profile.ps1");
 
     private static string GetPowerShell7ProfilePath() {
         // PowerShell 7+ (cross-platform)
         if (OperatingSystem.IsWindows()) {
-            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "PowerShell",
-                "Microsoft.PowerShell_profile.ps1");
+            return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "PowerShell", "Microsoft.PowerShell_profile.ps1");
         }
 
-        return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", "powershell",
-            "Microsoft.PowerShell_profile.ps1");
+        return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config", "powershell", "Microsoft.PowerShell_profile.ps1");
     }
 
     private static void AddToPowerShellProfile(string shell, string scriptPath) {

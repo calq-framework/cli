@@ -1,6 +1,4 @@
 using CalqFramework.Cli;
-using System;
-using System.Text.Json;
 using InterfaceCollectionsExample;
 
 try {
@@ -16,8 +14,7 @@ try {
             Console.WriteLine(JsonSerializer.Serialize(obj));
             break;
     }
-}
-catch (CliException ex) {
+} catch (CliException ex) {
     Console.Error.WriteLine(ex.Message);
     Environment.Exit(1);
 }

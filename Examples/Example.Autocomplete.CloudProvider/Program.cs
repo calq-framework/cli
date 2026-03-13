@@ -1,7 +1,5 @@
-using CalqFramework.Cli;
-using System;
-using System.Text.Json;
 using AutocompleteExample;
+using CalqFramework.Cli;
 
 try {
     var result = new CommandLineInterface().Execute(new CloudProviderCli());
@@ -16,8 +14,7 @@ try {
             Console.WriteLine(JsonSerializer.Serialize(obj));
             break;
     }
-}
-catch (CliException ex) {
+} catch (CliException ex) {
     Console.Error.WriteLine(ex.Message);
     Environment.Exit(1);
 }

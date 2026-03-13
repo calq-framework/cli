@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using CalqFramework.DataAccess.CollectionElementStores;
+﻿using CalqFramework.DataAccess.CollectionElementStores;
 
 namespace CalqFramework.DataAccess;
 
@@ -18,14 +17,14 @@ public abstract class CollectionElementStoreFactoryBase<TKey, TValue> : ICollect
 
     private static bool IsGenericCollection(IEnumerable enumerable) {
         Type type = enumerable.GetType();
-        return type.GetInterfaces().Any(i =>
-            i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ICollection<>));
+        return type.GetInterfaces()
+            .Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ICollection<>));
     }
 
-    protected virtual ICollectionElementStore<TKey, TValue>
-        CreateGenericCollectionElementStore(IEnumerable collection) {
+    protected virtual ICollectionElementStore<TKey, TValue> CreateGenericCollectionElementStore(IEnumerable collection) {
         Type type = collection.GetType();
-        if (type.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ISet<>))) {
+        if (type.GetInterfaces()
+            .Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(ISet<>))) {
             return CreateSetGenericCollectionElementStore(collection);
         }
 
@@ -36,8 +35,7 @@ public abstract class CollectionElementStoreFactoryBase<TKey, TValue> : ICollect
     protected abstract ICollectionElementStore<TKey, TValue> CreateListElementStore(IList list);
     protected abstract ICollectionElementStore<TKey, TValue> CreateDictionaryElementStore(IDictionary dictionary);
 
-    protected abstract ICollectionElementStore<TKey, TValue> CreateSetGenericCollectionElementStore(
-        IEnumerable collection);
+    protected abstract ICollectionElementStore<TKey, TValue> CreateSetGenericCollectionElementStore(IEnumerable collection);
 
     protected abstract ICollectionElementStore<TKey, TValue> CreateEnumerableElementStore(IEnumerable enumerable);
 }

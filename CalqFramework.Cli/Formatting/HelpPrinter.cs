@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Xml.Linq;
-using CalqFramework.Cli.InterfaceComponents;
+﻿using CalqFramework.Cli.InterfaceComponents;
 
 namespace CalqFramework.Cli.Formatting;
 
@@ -15,8 +8,7 @@ namespace CalqFramework.Cli.Formatting;
 public class HelpPrinter : IHelpPrinter {
     private readonly bool _supportsColor = DetectColorSupport();
 
-    public void PrintHelp(ICliContext context, Type rootType, Submodule submodule, IEnumerable<Submodule> submodules,
-        IEnumerable<Subcommand> subcommands, IEnumerable<Option> options) {
+    public void PrintHelp(ICliContext context, Type rootType, Submodule submodule, IEnumerable<Submodule> submodules, IEnumerable<Subcommand> subcommands, IEnumerable<Option> options) {
         string description = GetSummary(submodule.MemberInfo);
         if (!string.IsNullOrEmpty(description)) {
             context.InterfaceOut.WriteLine(description);
@@ -26,8 +18,7 @@ public class HelpPrinter : IHelpPrinter {
         PrintHelp(context, submodules, subcommands, options);
     }
 
-    public void PrintHelp(ICliContext context, Type rootType, IEnumerable<Submodule> submodules, IEnumerable<Subcommand> subcommands,
-        IEnumerable<Option> options) {
+    public void PrintHelp(ICliContext context, Type rootType, IEnumerable<Submodule> submodules, IEnumerable<Subcommand> subcommands, IEnumerable<Option> options) {
         string rootDescription = GetSummary(rootType);
         if (!string.IsNullOrEmpty(rootDescription)) {
             context.InterfaceOut.WriteLine(rootDescription);
@@ -42,13 +33,21 @@ public class HelpPrinter : IHelpPrinter {
         SectionInfo[] sections = [
             new() {
                 Title = "Parameters",
-                ItemInfos = [.. subcommand.Parameters.Select(x => new ItemInfo
-                    { Description = GetDescription(x), Keys = [.. x.Keys.Select(x => GetOptionKey(x))] })]
+                ItemInfos = [
+                    .. subcommand.Parameters.Select(x => new ItemInfo {
+                        Description = GetDescription(x),
+                        Keys = [.. x.Keys.Select(x => GetOptionKey(x))]
+                    })
+                ]
             },
             new() {
                 Title = "Options",
-                ItemInfos = [.. options.Select(x => new ItemInfo
-                    { Description = GetDescription(x), Keys = [.. x.Keys.Select(x => GetOptionKey(x))] })]
+                ItemInfos = [
+                    .. options.Select(x => new ItemInfo {
+                        Description = GetDescription(x),
+                        Keys = [.. x.Keys.Select(x => GetOptionKey(x))]
+                    })
+                ]
             }
         ];
         PrintSections(context, sections);
@@ -83,9 +82,7 @@ public class HelpPrinter : IHelpPrinter {
                 }
 
                 // Most modern terminals set TERM to something like "xterm-256color"
-                if (term.Contains("color") || term.StartsWith("xterm") ||
-                    term.StartsWith("screen") || term.StartsWith("tmux") ||
-                    term == "linux" || term == "cygwin") {
+                if (term.Contains("color") || term.StartsWith("xterm") || term.StartsWith("screen") || term.StartsWith("tmux") || term == "linux" || term == "cygwin") {
                     return true;
                 }
             }
@@ -100,8 +97,7 @@ public class HelpPrinter : IHelpPrinter {
             }
 
             // Default to true for interactive terminals on Unix-like systems
-            if (Environment.OSVersion.Platform == PlatformID.Unix ||
-                Environment.OSVersion.Platform == PlatformID.MacOSX) {
+            if (Environment.OSVersion.Platform == PlatformID.Unix || Environment.OSVersion.Platform == PlatformID.MacOSX) {
                 return true;
             }
         } catch {
@@ -150,16 +146,16 @@ public class HelpPrinter : IHelpPrinter {
                 string methodName = methodBase is ConstructorInfo ? "#ctor" : methodBase.Name;
                 string declaringType = methodBase.DeclaringType?.FullName!;
                 ParameterInfo[] parameters = methodBase.GetParameters();
-                string paramsPart = parameters.Length > 0
-                    ? $"({string.Join(",", parameters.Select(p => p.ParameterType.FullName))})"
-                    : "";
+                string paramsPart = parameters.Length > 0 ? $"({string.Join(",", parameters.Select(p => p.ParameterType.FullName))})" : "";
                 return $"M:{declaringType}.{methodName}{paramsPart}";
             case PropertyInfo prop:
                 return $"P:{prop.DeclaringType?.FullName}.{prop.Name}";
             case FieldInfo field:
                 return $"F:{field.DeclaringType?.FullName}.{field.Name}";
             default:
-                throw CliErrors.UnsupportedMemberType(memberInfo.GetType().Name);
+                throw CliErrors.UnsupportedMemberType(
+                    memberInfo.GetType()
+                        .Name);
         }
     }
 
@@ -181,11 +177,7 @@ public class HelpPrinter : IHelpPrinter {
         };
 
         string summary = GetXmlDocumentation(xmlFilePath, memberName, "summary");
-        return !string.IsNullOrEmpty(summary)
-            ? summary
-            : underlyingType != null
-                ? GetSummary(underlyingType)
-                : "";
+        return !string.IsNullOrEmpty(summary) ? summary : underlyingType != null ? GetSummary(underlyingType) : "";
     }
 
     private static string GetSummary(ParameterInfo parameterInfo) {
@@ -194,9 +186,7 @@ public class HelpPrinter : IHelpPrinter {
         string memberName = GetMemberXMLName(memberInfo);
 
         string paramSummary = GetXmlDocumentation(xmlFilePath, memberName, "param", parameterInfo.Name);
-        return !string.IsNullOrEmpty(paramSummary)
-            ? paramSummary
-            : GetSummary(parameterInfo.ParameterType);
+        return !string.IsNullOrEmpty(paramSummary) ? paramSummary : GetSummary(parameterInfo.ParameterType);
     }
 
     private static string GetSummary(Type type) {
@@ -207,15 +197,15 @@ public class HelpPrinter : IHelpPrinter {
 
     private static string GetTypeMemberName(Type type) => $"T:{type.FullName}";
 
-    private static string GetXmlDocumentation(string xmlFilePath, string memberName, string elementName,
-        string? paramName = null) {
+    private static string GetXmlDocumentation(string xmlFilePath, string memberName, string elementName, string? paramName = null) {
         if (!File.Exists(xmlFilePath)) {
             return string.Empty;
         }
 
         XDocument doc = XDocument.Load(xmlFilePath);
         XElement? memberElement = doc.Descendants("member")
-            .FirstOrDefault(m => m.Attribute("name")?.Value == memberName);
+            .FirstOrDefault(m => m.Attribute("name")
+                ?.Value == memberName);
         if (memberElement == null) {
             return "";
         }
@@ -223,7 +213,8 @@ public class HelpPrinter : IHelpPrinter {
         XElement? targetElement = null;
         if (paramName != null) {
             targetElement = memberElement.Elements("param")
-                .FirstOrDefault(p => p.Attribute("name")?.Value == paramName);
+                .FirstOrDefault(p => p.Attribute("name")
+                    ?.Value == paramName);
         } else {
             targetElement = memberElement.Element(elementName);
         }
@@ -233,7 +224,10 @@ public class HelpPrinter : IHelpPrinter {
         }
 
         string value = targetElement.Value;
-        value = string.Join(Environment.NewLine, value.Split(Environment.NewLine).Select(x => x.Trim()));
+        value = string.Join(
+            Environment.NewLine,
+            value.Split(Environment.NewLine)
+                .Select(x => x.Trim()));
         return value;
     }
 
@@ -255,20 +249,15 @@ public class HelpPrinter : IHelpPrinter {
 
     private static string GetDescription(Subcommand item) => GetSummary(item.MethodInfo);
 
-    private static string GetDescription(Parameter item) => GetDescription(item.ValueType, item.IsMultiValue, item.Value,
-        item.HasDefaultValue, GetSummary(item.ParameterInfo));
+    private static string GetDescription(Parameter item) => GetDescription(item.ValueType, item.IsMultiValue, item.Value, item.HasDefaultValue, GetSummary(item.ParameterInfo));
 
-    private static string GetDescription(Option item) => GetDescription(item.ValueType, item.IsMultiValue, item.Value, true,
-        GetSummary(item.MemberInfo));
+    private static string GetDescription(Option item) => GetDescription(item.ValueType, item.IsMultiValue, item.Value, true, GetSummary(item.MemberInfo));
 
-    private static string GetDescription(Type type, bool isMultiValue, string? defaultValue, bool hasDefaultValue,
-        string? summary) {
+    private static string GetDescription(Type type, bool isMultiValue, string? defaultValue, bool hasDefaultValue, string? summary) {
         List<string> parts = [];
 
         if (!hasDefaultValue) {
-            string typeDescription = isMultiValue
-                ? "list of " + GetTypeDescription(type)
-                : GetTypeDescription(type);
+            string typeDescription = isMultiValue ? "list of " + GetTypeDescription(type) : GetTypeDescription(type);
             parts.Add($"(Requires: {typeDescription})");
         }
 
@@ -337,23 +326,34 @@ public class HelpPrinter : IHelpPrinter {
         return GetMaxKeyLengths(sections);
     }
 
-    private void PrintHelp(ICliContext context, IEnumerable<Submodule> submodules, IEnumerable<Subcommand> subcommands,
-        IEnumerable<Option> options) {
+    private void PrintHelp(ICliContext context, IEnumerable<Submodule> submodules, IEnumerable<Subcommand> subcommands, IEnumerable<Option> options) {
         SectionInfo[] sections = [
             new() {
                 Title = "Submodules",
-                ItemInfos = [.. submodules.Select(x => new ItemInfo
-                    { Description = GetDescription(x), Keys = [.. x.Keys] })]
+                ItemInfos = [
+                    .. submodules.Select(x => new ItemInfo {
+                        Description = GetDescription(x),
+                        Keys = [.. x.Keys]
+                    })
+                ]
             },
             new() {
                 Title = "Subcommands",
-                ItemInfos = [.. subcommands.Select(x => new ItemInfo
-                    { Description = GetDescription(x), Keys = [.. x.Keys] })]
+                ItemInfos = [
+                    .. subcommands.Select(x => new ItemInfo {
+                        Description = GetDescription(x),
+                        Keys = [.. x.Keys]
+                    })
+                ]
             },
             new() {
                 Title = "Options",
-                ItemInfos = [.. options.Select(x => new ItemInfo
-                    { Description = GetDescription(x), Keys = [.. x.Keys.Select(x => GetOptionKey(x))] })]
+                ItemInfos = [
+                    .. options.Select(x => new ItemInfo {
+                        Description = GetDescription(x),
+                        Keys = [.. x.Keys.Select(x => GetOptionKey(x))]
+                    })
+                ]
             }
         ];
         PrintSections(context, sections);
@@ -362,7 +362,8 @@ public class HelpPrinter : IHelpPrinter {
     private void PrintSections(ICliContext context, IEnumerable<SectionInfo> sections) {
         List<int> maxLengths = NormalizeKeyCounts(sections);
 
-        SectionInfo firstSection = sections.SkipWhile(x => x.ItemInfos.Count == 0).First();
+        SectionInfo firstSection = sections.SkipWhile(x => x.ItemInfos.Count == 0)
+            .First();
         foreach (SectionInfo section in sections) {
             if (section.ItemInfos.Count == 0) {
                 continue;
@@ -380,9 +381,11 @@ public class HelpPrinter : IHelpPrinter {
                 string[] parts = new string[maxLengths.Count];
                 for (int i = 0; i < maxLengths.Count; i++) {
                     if (i == 0) {
-                        parts[i] = keys[i].PadRight(maxLengths[i]);
+                        parts[i] = keys[i]
+                            .PadRight(maxLengths[i]);
                     } else {
-                        parts[i] = keys[i].PadLeft(maxLengths[i]);
+                        parts[i] = keys[i]
+                            .PadLeft(maxLengths[i]);
                     }
                 }
 

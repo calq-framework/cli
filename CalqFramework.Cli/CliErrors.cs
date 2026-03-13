@@ -1,5 +1,4 @@
-﻿using System;
-using CalqFramework.Cli.Completion.Providers;
+﻿using CalqFramework.Cli.Completion.Providers;
 using CalqFramework.DataAccess;
 
 namespace CalqFramework.Cli;
@@ -77,8 +76,7 @@ public static class CliErrors {
     /// <summary>
     ///     Creates an exception for option=value parsing errors with inner exception.
     /// </summary>
-    public static CliException
-        OptionValueError(string option, string value, string message, Exception innerException) =>
+    public static CliException OptionValueError(string option, string value, string message, Exception innerException) =>
         new(option, value, message, innerException);
 
     /// <summary>
@@ -139,8 +137,7 @@ public static class CliErrors {
     ///     Creates an exception for invalid completion method signature.
     /// </summary>
     public static CliException InvalidCompletionMethodSignature(string methodName, string typeName) =>
-        new(
-            $"Completion method '{methodName}' on type '{typeName}' must have signature: IEnumerable<string> {methodName}(string partialInput)");
+        new($"Completion method '{methodName}' on type '{typeName}' must have signature: IEnumerable<string> {methodName}(string partialInput)");
 
     /// <summary>
     ///     Creates an exception for invalid completion method return type.
