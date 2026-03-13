@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CalqFramework.Cli.DataAccess;
+﻿namespace CalqFramework.Cli.DataAccess;
 
 /// <summary>
 ///     Converts values between CLI string representation and internal object types.

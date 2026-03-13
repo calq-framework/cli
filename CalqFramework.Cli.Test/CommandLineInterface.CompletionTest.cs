@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using Xunit;
-
-namespace CalqFramework.Cli.Test;
+﻿namespace CalqFramework.Cli.Test;
 
 [Collection("Completion Tests")]
 public class CommandLineInterfaceCompletionTest {
@@ -21,7 +15,9 @@ public class CommandLineInterfaceCompletionTest {
         // If it ends with space, we're completing an empty string (already handled by split)
 
         using StringWriter writer = new();
-        CommandLineInterface cli = new() { InterfaceOut = writer };
+        CommandLineInterface cli = new() {
+            InterfaceOut = writer
+        };
         cli.Execute(tool, s_first.Concat(args));
 
         string output = writer.ToString();

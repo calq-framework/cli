@@ -1,6 +1,4 @@
-﻿using CalqFramework.DataAccess.Extensions.System;
-
-namespace CalqFramework.DataAccess.CollectionElementStores;
+﻿namespace CalqFramework.DataAccess.CollectionElementStores;
 
 /// <summary>
 ///     Provides key-value access to array elements by index.
@@ -29,7 +27,8 @@ public sealed class ArrayElementStore(Array array) : ArrayElementStoreBase<strin
         int index = int.Parse(key);
         object? element = Array.GetValue(index);
         if (element == null) {
-            element = Array.GetType().GetElementType()!.CreateInstance();
+            element = Array.GetType()
+                .GetElementType()!.CreateInstance();
             Array.SetValue(element, index);
         }
 

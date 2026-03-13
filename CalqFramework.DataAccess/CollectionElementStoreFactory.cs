@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using CalqFramework.DataAccess.CollectionElementStores;
+﻿using CalqFramework.DataAccess.CollectionElementStores;
 
 namespace CalqFramework.DataAccess;
 
@@ -16,8 +15,7 @@ public sealed class CollectionElementStoreFactory : CollectionElementStoreFactor
     protected override ICollectionElementStore<string, object?> CreateDictionaryElementStore(IDictionary dictionary) =>
         new DictionaryElementStore(dictionary);
 
-    protected override ICollectionElementStore<string, object?>
-        CreateSetGenericCollectionElementStore(IEnumerable collection) => new SetElementStore(collection);
+    protected override ICollectionElementStore<string, object?> CreateSetGenericCollectionElementStore(IEnumerable collection) => new SetElementStore(collection);
 
     protected override ICollectionElementStore<string, object?> CreateEnumerableElementStore(IEnumerable enumerable) =>
         new EnumerableElementStore(enumerable);

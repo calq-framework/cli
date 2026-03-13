@@ -1,6 +1,4 @@
-﻿using System.Collections;
-
-namespace CalqFramework.DataAccess.CollectionElementStores;
+﻿namespace CalqFramework.DataAccess.CollectionElementStores;
 
 /// <summary>
 ///     Provides key-value access to set elements.

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using CalqFramework.Cli.InterfaceComponents;
+﻿using CalqFramework.Cli.InterfaceComponents;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponentStores;
 
@@ -21,18 +17,20 @@ internal sealed class SubcommandExecutor(ICliFunctionExecutor<string, string?, P
     public Type GetValueType(string key) => Executor.GetValueType(key);
 
     public IEnumerable<Parameter> GetParameters() =>
-        Executor.GetAccessorKeysPairs().Select(pair => new Parameter {
-            ValueType = GetValueType(pair.Keys[0]),
-            IsMultiValue = Executor.IsMultiValue(pair.Keys[0]),
-            Keys = pair.Keys,
-            ParameterInfo = pair.Accessor,
-            Value = this[pair.Keys[0]],
-            HasDefaultValue = pair.Accessor.HasDefaultValue
-        });
+        Executor.GetAccessorKeysPairs()
+            .Select(pair => new Parameter {
+                ValueType = GetValueType(pair.Keys[0]),
+                IsMultiValue = Executor.IsMultiValue(pair.Keys[0]),
+                Keys = pair.Keys,
+                ParameterInfo = pair.Accessor,
+                Value = this[pair.Keys[0]],
+                HasDefaultValue = pair.Accessor.HasDefaultValue
+            });
 
     public Parameter? GetFirstUnassignedParameter() {
         Executor.SetParameterValues();
-        return GetParameters().FirstOrDefault(p => Equals(p.Value, null));
+        return GetParameters()
+            .FirstOrDefault(p => Equals(p.Value, null));
     }
 
     public string? GetValueOrInitialize(string key) => Executor.GetValueOrInitialize(key);

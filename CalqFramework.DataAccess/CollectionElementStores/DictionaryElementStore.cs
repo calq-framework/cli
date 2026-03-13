@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using CalqFramework.DataAccess.Extensions.System;
-
-namespace CalqFramework.DataAccess.CollectionElementStores;
+﻿namespace CalqFramework.DataAccess.CollectionElementStores;
 
 /// <summary>
 ///     Provides key-value access to dictionary elements.
@@ -9,18 +6,24 @@ namespace CalqFramework.DataAccess.CollectionElementStores;
 public sealed class DictionaryElementStore(IDictionary dictionary) : DictionaryElementStoreBase<string, object?>(dictionary) {
     public override object? this[string key] {
         get {
-            object parsedKey = Dictionary.GetType().GetGenericArguments()[0].Parse(key);
+            object parsedKey = Dictionary.GetType()
+                .GetGenericArguments()[0]
+                .Parse(key);
             return Dictionary[parsedKey];
         }
         set {
-            object parsedKey = Dictionary.GetType().GetGenericArguments()[0].Parse(key);
+            object parsedKey = Dictionary.GetType()
+                .GetGenericArguments()[0]
+                .Parse(key);
             Dictionary[parsedKey] = value;
         }
     }
 
     public override bool ContainsKey(string key) {
         try {
-            object parsedKey = Dictionary.GetType().GetGenericArguments()[0].Parse(key);
+            object parsedKey = Dictionary.GetType()
+                .GetGenericArguments()[0]
+                .Parse(key);
             return Dictionary.Contains(parsedKey);
         } catch (FormatException) {
             return false;
@@ -30,10 +33,14 @@ public sealed class DictionaryElementStore(IDictionary dictionary) : DictionaryE
     }
 
     public override object? GetValueOrInitialize(string key) {
-        object parsedKey = Dictionary.GetType().GetGenericArguments()[0].Parse(key);
+        object parsedKey = Dictionary.GetType()
+            .GetGenericArguments()[0]
+            .Parse(key);
         object? element = Dictionary[parsedKey];
         if (element == null) {
-            element = Dictionary.GetType().GetGenericArguments()[1].CreateInstance();
+            element = Dictionary.GetType()
+                .GetGenericArguments()[1]
+                .CreateInstance();
             Dictionary[parsedKey] = element;
         }
 

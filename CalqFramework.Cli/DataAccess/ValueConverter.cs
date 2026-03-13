@@ -1,9 +1,4 @@
-﻿using System;
-using System.Globalization;
-using System.Reflection;
-using CalqFramework.DataAccess.Extensions.System;
-
-namespace CalqFramework.Cli.DataAccess;
+﻿namespace CalqFramework.Cli.DataAccess;
 
 /// <summary>
 ///     Converts values between CLI string representation and internal object types.
@@ -14,8 +9,8 @@ public class ValueConverter : IValueConverter<string?> {
     /// </summary>
     public IFormatProvider FormatProvider { get; init; } = CultureInfo.InvariantCulture;
 
-    public bool CanConvert(Type targetType) => targetType.IsParsable() || targetType.IsEnum ||
-                                               (Nullable.GetUnderlyingType(targetType)?.IsEnum ?? false);
+    public bool CanConvert(Type targetType) => targetType.IsParsable() || targetType.IsEnum || (Nullable.GetUnderlyingType(targetType)
+        ?.IsEnum ?? false);
 
     public string? ConvertFrom(object? value, Type targetType) => value?.ToString();
 

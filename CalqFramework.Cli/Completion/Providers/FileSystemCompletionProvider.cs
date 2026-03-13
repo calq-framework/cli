@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
-namespace CalqFramework.Cli.Completion.Providers;
+﻿namespace CalqFramework.Cli.Completion.Providers;
 
 /// <summary>
 ///     Built-in completion provider for both file and directory paths.
@@ -39,8 +34,7 @@ public sealed class FileSystemCompletionProvider : ICompletionProvider {
 
         // Add all matching directories
         try {
-            IEnumerable<string?> directories = Directory
-                .EnumerateDirectories(directory, "*", SearchOption.TopDirectoryOnly)
+            IEnumerable<string?> directories = Directory.EnumerateDirectories(directory, "*", SearchOption.TopDirectoryOnly)
                 .Select(Path.GetFileName)
                 .Where(d => d != null && d.StartsWith(searchPrefix, StringComparison.OrdinalIgnoreCase));
             results.AddRange(directories!);
@@ -49,14 +43,11 @@ public sealed class FileSystemCompletionProvider : ICompletionProvider {
         }
 
         // Add matching files (with filter applied)
-        string[] patterns = string.IsNullOrEmpty(context.Filter)
-            ? ["*"]
-            : context.Filter.Split(';', StringSplitOptions.RemoveEmptyEntries);
+        string[] patterns = string.IsNullOrEmpty(context.Filter) ? ["*"] : context.Filter.Split(';', StringSplitOptions.RemoveEmptyEntries);
 
         foreach (string pattern in patterns) {
             try {
-                IEnumerable<string?> matchingFiles = Directory
-                    .EnumerateFiles(directory, pattern, SearchOption.TopDirectoryOnly)
+                IEnumerable<string?> matchingFiles = Directory.EnumerateFiles(directory, pattern, SearchOption.TopDirectoryOnly)
                     .Select(Path.GetFileName)
                     .Where(f => f != null && f.StartsWith(searchPrefix, StringComparison.OrdinalIgnoreCase));
                 results.AddRange(matchingFiles!);
@@ -65,6 +56,7 @@ public sealed class FileSystemCompletionProvider : ICompletionProvider {
             }
         }
 
-        return results.Distinct().OrderBy(item => item);
+        return results.Distinct()
+            .OrderBy(item => item);
     }
 }

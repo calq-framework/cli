@@ -1,9 +1,6 @@
-﻿using System.Reflection;
+﻿namespace CalqFramework.DataAccess.ClassMemberStores;
 
-namespace CalqFramework.DataAccess.ClassMemberStores;
-
-public abstract class MethodExecutorBase<TParameterKey, TParameterValue> :
-    ParameterStoreBase<TParameterKey, TParameterValue>, IFunctionExecutor<TParameterKey, TParameterValue> {
+public abstract class MethodExecutorBase<TParameterKey, TParameterValue> : ParameterStoreBase<TParameterKey, TParameterValue>, IFunctionExecutor<TParameterKey, TParameterValue> {
     protected MethodExecutorBase(MethodInfo method, object? targetObject) : base(method) {
         TargetObject = targetObject;
         Arguments = [];
@@ -44,9 +41,7 @@ public abstract class MethodExecutorBase<TParameterKey, TParameterValue> :
                     object? value = ConvertToInternalValue(Arguments[argumentIndex++], ParameterInfos[parameterIndex]);
                     ParameterValues[parameterIndex] = value;
                 } else {
-                    ParameterValues[parameterIndex] = ParameterInfos[parameterIndex].HasDefaultValue
-                        ? ParameterInfos[parameterIndex].DefaultValue
-                        : throw DataAccessErrors.UnassignedParameter(ParameterInfos[parameterIndex].Name!);
+                    ParameterValues[parameterIndex] = ParameterInfos[parameterIndex].HasDefaultValue ? ParameterInfos[parameterIndex].DefaultValue : throw DataAccessErrors.UnassignedParameter(ParameterInfos[parameterIndex].Name!);
                 }
             }
         }

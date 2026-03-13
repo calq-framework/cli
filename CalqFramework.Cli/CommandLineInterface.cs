@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using CalqFramework.Cli.Completion;
+﻿using CalqFramework.Cli.Completion;
 using CalqFramework.Cli.DataAccess;
 using CalqFramework.Cli.DataAccess.InterfaceComponentStores;
 using CalqFramework.Cli.Formatting;
@@ -72,16 +67,19 @@ public class CommandLineInterface : ICliContext {
     ///     Executes a CLI command using command-line arguments from the environment.
     /// </summary>
     /// <returns>
-    ///     The result of the executed command, or <see cref="ValueTuple"/> if the command returns void
+    ///     The result of the executed command, or <see cref="ValueTuple" /> if the command returns void
     ///     or handles completion/help requests.
     /// </returns>
-    public object? Execute(object target) => Execute(target, Environment.GetCommandLineArgs().Skip(1));
+    public object? Execute(object target) => Execute(
+        target,
+        Environment.GetCommandLineArgs()
+            .Skip(1));
 
     /// <summary>
     ///     Executes a CLI command using the provided arguments.
     /// </summary>
     /// <returns>
-    ///     The result of the executed command, or <see cref="ValueTuple"/> if the command returns void
+    ///     The result of the executed command, or <see cref="ValueTuple" /> if the command returns void
     ///     or handles completion/help requests.
     /// </returns>
     public object? Execute(object target, IEnumerable<string> args) {
@@ -136,7 +134,9 @@ public class CommandLineInterface : ICliContext {
         }
 
         if (subcommandName == "--version" || subcommandName == "-v") {
-            return Assembly.GetEntryAssembly()?.GetName().Version?.ToString(UseRevisionVersion ? 4 : 3);
+            return Assembly.GetEntryAssembly()
+                ?.GetName()
+                .Version?.ToString(UseRevisionVersion ? 4 : 3);
         }
 
         ISubcommandStore subcommandStore = CliComponentStoreFactory.CreateSubcommandStore(submodule);
@@ -145,9 +145,7 @@ public class CommandLineInterface : ICliContext {
             IOptionStore optionStore = CliComponentStoreFactory.CreateOptionStore(submodule);
             bool isRoot = submodule == target;
             if (isRoot) {
-                HelpPrinter.PrintHelp(this, target.GetType(), submoduleStore.GetSubmodules(),
-                    subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor),
-                    optionStore.GetOptions());
+                HelpPrinter.PrintHelp(this, target.GetType(), submoduleStore.GetSubmodules(), subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor), optionStore.GetOptions());
                 return default(ValueTuple);
             }
 
@@ -155,28 +153,30 @@ public class CommandLineInterface : ICliContext {
             Submodule submoduleInfo = parentSubmoduleStore.GetSubmodules()
                 .Where(x => parentSubmoduleStore[x.Keys[0]] == submodule)
                 .First(); // use the store to check for the key to comply with case sensitivity
-            HelpPrinter.PrintHelp(this, target.GetType(), submoduleInfo, submoduleStore.GetSubmodules(),
-                subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor),
-                optionStore.GetOptions());
+            HelpPrinter.PrintHelp(this, target.GetType(), submoduleInfo, submoduleStore.GetSubmodules(), subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor), optionStore.GetOptions());
             return default(ValueTuple);
         }
 
         MethodInfo subcommand = subcommandStore[subcommandName!]!;
-        ISubcommandExecutorWithOptions subcommandExecutorWithOptions =
-            CliComponentStoreFactory.CreateSubcommandExecutorWithOptions(subcommand, submodule);
+        ISubcommandExecutorWithOptions subcommandExecutorWithOptions = CliComponentStoreFactory.CreateSubcommandExecutorWithOptions(subcommand, submodule);
 
         bool hasArguments = en.MoveNext();
         if (hasArguments) {
             string firstArg = en.Current;
 
             if (firstArg == "--help" || firstArg == "-h") {
-                HelpPrinter.PrintSubcommandHelp(this, target.GetType(),
+                HelpPrinter.PrintSubcommandHelp(
+                    this,
+                    target.GetType(),
                     subcommandStore.GetSubcommands(CliComponentStoreFactory.CreateSubcommandExecutor)
-                        .Where(x => x.MethodInfo == subcommand).First(), subcommandExecutorWithOptions.GetOptions());
+                        .Where(x => x.MethodInfo == subcommand)
+                        .First(),
+                    subcommandExecutorWithOptions.GetOptions());
                 return default(ValueTuple);
             }
 
-            IEnumerator<string> skippedEn = GetSkippedEnumerator(en).GetEnumerator();
+            IEnumerator<string> skippedEn = GetSkippedEnumerator(en)
+                .GetEnumerator();
             ReadParametersAndOptions(skippedEn, subcommandExecutorWithOptions);
         }
 
@@ -200,8 +200,7 @@ public class CommandLineInterface : ICliContext {
         } while (en.MoveNext());
     }
 
-    private void ReadParametersAndOptions(IEnumerator<string> args,
-        ISubcommandExecutorWithOptions subcommandExecutorWithOptions) {
+    private void ReadParametersAndOptions(IEnumerator<string> args, ISubcommandExecutorWithOptions subcommandExecutorWithOptions) {
         OptionReader optionReader = new(args, subcommandExecutorWithOptions);
 
         foreach ((string option, string value, OptionFlags optionAttr) in optionReader.Read()) {

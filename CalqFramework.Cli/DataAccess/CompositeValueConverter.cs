@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using CalqFramework.DataAccess;
+﻿using CalqFramework.DataAccess;
 using CalqFramework.DataAccess.CollectionElementStores;
-using CalqFramework.DataAccess.Extensions.System;
 
 namespace CalqFramework.Cli.DataAccess;
 
@@ -17,15 +12,11 @@ namespace CalqFramework.Cli.DataAccess;
 /// </remarks>
 /// <param name="baseConverter">The converter to use for simple types and enumerable elements.</param>
 /// <param name="collectionStoreFactory">Factory for creating enumerable stores.</param>
-public sealed class CompositeValueConverter(
-    IValueConverter<string?> baseConverter,
-    ICollectionElementStoreFactory<string, object?> collectionStoreFactory) : ICompositeValueConverter<string?> {
+public sealed class CompositeValueConverter(IValueConverter<string?> baseConverter, ICollectionElementStoreFactory<string, object?> collectionStoreFactory) : ICompositeValueConverter<string?> {
     private readonly IValueConverter<string?> _baseConverter = baseConverter;
     private readonly ICollectionElementStoreFactory<string, object?> _collectionElementStoreFactory = collectionStoreFactory;
 
-    public bool CanConvert(Type targetType) => _baseConverter.CanConvert(targetType) ||
-                                               (IsMultiValue(targetType) &&
-                                                _baseConverter.CanConvert(targetType.GetEnumerableElementType()));
+    public bool CanConvert(Type targetType) => _baseConverter.CanConvert(targetType) || (IsMultiValue(targetType) && _baseConverter.CanConvert(targetType.GetEnumerableElementType()));
 
     public string? ConvertFrom(object? value, Type targetType) {
         if (IsMultiValue(targetType)) {
@@ -54,8 +45,8 @@ public sealed class CompositeValueConverter(
     private string? ConvertEnumerableToString(IEnumerable enumerable, Type targetType) {
         Type elementType = targetType.GetEnumerableElementType();
 
-        IEnumerable<string?> elements =
-            enumerable.Cast<object?>().Select(item => _baseConverter.ConvertFrom(item, elementType));
+        IEnumerable<string?> elements = enumerable.Cast<object?>()
+            .Select(item => _baseConverter.ConvertFrom(item, elementType));
         return "[" + string.Join(", ", elements) + "]";
     }
 

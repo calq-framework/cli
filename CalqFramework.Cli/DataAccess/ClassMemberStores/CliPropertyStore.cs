@@ -1,18 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Reflection;
-using CalqFramework.Cli.Formatting;
+﻿using CalqFramework.Cli.Formatting;
 using CalqFramework.DataAccess.ClassMemberStores;
 
 namespace CalqFramework.Cli.DataAccess.ClassMemberStores;
 
-internal sealed class CliPropertyStore<TValue> : PropertyStoreBase<string, TValue>,
-    ICliKeyValueStore<string, TValue, MemberInfo> {
-    public CliPropertyStore(object targetObject, BindingFlags bindingFlags,
-        IClassMemberStringifier classMemberStringifier, IAccessValidator accessValidator,
-        ICompositeValueConverter<TValue> compositeValueConverter) : base(targetObject, bindingFlags) {
+internal sealed class CliPropertyStore<TValue> : PropertyStoreBase<string, TValue>, ICliKeyValueStore<string, TValue, MemberInfo> {
+    public CliPropertyStore(object targetObject, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier, IAccessValidator accessValidator, ICompositeValueConverter<TValue> compositeValueConverter) : base(targetObject, bindingFlags) {
         ClassMemberStringifier = classMemberStringifier;
         AccessValidator = accessValidator;
         CompositeValueConverter = compositeValueConverter;
@@ -25,12 +17,11 @@ internal sealed class CliPropertyStore<TValue> : PropertyStoreBase<string, TValu
     private ICompositeValueConverter<TValue> CompositeValueConverter { get; }
 
     public IEnumerable<AccessorKeysPair<MemberInfo>> GetAccessorKeysPairs() =>
-        AccessorsByNames
-            .GroupBy(kv => kv.Value)
+        AccessorsByNames.GroupBy(kv => kv.Value)
             .Select(g => new AccessorKeysPair<MemberInfo>(
                 g.Key,
-                g.Select(kv => kv.Key).ToArray()
-            ));
+                g.Select(kv => kv.Key)
+                    .ToArray()));
 
     public bool IsMultiValue(string key) {
         PropertyInfo accessor = GetAccessor(key);
@@ -55,9 +46,7 @@ internal sealed class CliPropertyStore<TValue> : PropertyStoreBase<string, TValu
     }
 
     private Dictionary<string, PropertyInfo> GetAccessorsByNames() {
-        StringComparer stringComparer = BindingFlags.HasFlag(BindingFlags.IgnoreCase)
-            ? StringComparer.OrdinalIgnoreCase
-            : StringComparer.Ordinal;
+        StringComparer stringComparer = BindingFlags.HasFlag(BindingFlags.IgnoreCase) ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
 
         Dictionary<string, PropertyInfo> accessorsByRequiredNames = new(stringComparer);
         foreach (PropertyInfo accessor in Accessors) {

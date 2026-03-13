@@ -1,7 +1,4 @@
-﻿using System;
-using Xunit;
-
-namespace CalqFramework.Cli.Test;
+﻿namespace CalqFramework.Cli.Test;
 
 public class OptionsDeserializerTest {
     [Fact]
@@ -9,10 +6,10 @@ public class OptionsDeserializerTest {
         SomeConfiguration obj = new();
         OptionDeserializer.Deserialize(
             obj,
-            $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.integer))}=10 -- --{StringHelper.GetKebabCase(nameof(SomeConfiguration.text))}=abc xyz"
-                .Split(' '),
-            new OptionDeserializerConfiguration { SkipUnknown = true }
-        );
+            $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.integer))}=10 -- --{StringHelper.GetKebabCase(nameof(SomeConfiguration.text))}=abc xyz".Split(' '),
+            new OptionDeserializerConfiguration {
+                SkipUnknown = true
+            });
         Assert.Equal(10, obj.integer);
         Assert.Null(obj.text);
     }
@@ -21,7 +18,11 @@ public class OptionsDeserializerTest {
     public void Deserialize_UsingXUnitCommandLineArgsWithSkipUnknown_SetsPortToNonZero() {
         Assert.NotEmpty(Environment.GetCommandLineArgs());
         ConfigurationWithXUnitCommandLineArgs obj = new();
-        OptionDeserializer.Deserialize(obj, new OptionDeserializerConfiguration { SkipUnknown = true });
+        OptionDeserializer.Deserialize(
+            obj,
+            new OptionDeserializerConfiguration {
+                SkipUnknown = true
+            });
         Assert.NotEqual(0, obj.port);
     }
 
@@ -36,8 +37,7 @@ public class OptionsDeserializerTest {
     [Fact]
     public void Deserialize_LongBooleanFlagWithoutValue_SetsBooleanPropertyTrue() {
         SomeConfiguration obj = new();
-        OptionDeserializer.Deserialize(obj,
-            $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.boolean))}".Split(' '));
+        OptionDeserializer.Deserialize(obj, $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.boolean))}".Split(' '));
         Assert.True(obj.boolean);
     }
 
@@ -65,9 +65,7 @@ public class OptionsDeserializerTest {
     [Fact]
     public void Deserialize_MultipleBoolListValues_AppendsValuesToList() {
         SomeConfiguration obj = new();
-        OptionDeserializer.Deserialize(obj,
-            $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.initializedBoolList))} false --{StringHelper.GetKebabCase(nameof(SomeConfiguration.initializedBoolList))} true"
-                .Split(' '));
+        OptionDeserializer.Deserialize(obj, $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.initializedBoolList))} false --{StringHelper.GetKebabCase(nameof(SomeConfiguration.initializedBoolList))} true".Split(' '));
         Assert.False(obj.initializedBoolList[2]);
         Assert.True(obj.initializedBoolList[3]);
     }
@@ -75,9 +73,7 @@ public class OptionsDeserializerTest {
     [Fact]
     public void Deserialize_ValidArgumentsWithoutDelimiters_SetsAllPropertiesCorrectly() {
         SomeConfiguration obj = new();
-        OptionDeserializer.Deserialize(obj,
-            $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.integer))}=10\t--{StringHelper.GetKebabCase(nameof(SomeConfiguration.text))}=abc xyz"
-                .Split('\t')); // tab is used so that "abc xyz" is not split
+        OptionDeserializer.Deserialize(obj, $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.integer))}=10\t--{StringHelper.GetKebabCase(nameof(SomeConfiguration.text))}=abc xyz".Split('\t')); // tab is used so that "abc xyz" is not split
         Assert.Equal(10, obj.integer);
         Assert.Equal("abc xyz", obj.text);
     }
@@ -117,8 +113,9 @@ public class OptionsDeserializerTest {
         OptionDeserializer.Deserialize(
             obj,
             $"--unknown --{StringHelper.GetKebabCase(nameof(SomeConfiguration.text))}=abc".Split(' '),
-            new OptionDeserializerConfiguration { SkipUnknown = true }
-        );
+            new OptionDeserializerConfiguration {
+                SkipUnknown = true
+            });
         Assert.Equal("abc", obj.text);
     }
 
@@ -128,8 +125,9 @@ public class OptionsDeserializerTest {
         OptionDeserializer.Deserialize(
             obj,
             $"--unknown value --{StringHelper.GetKebabCase(nameof(SomeConfiguration.text))}=abc".Split(' '),
-            new OptionDeserializerConfiguration { SkipUnknown = true }
-        );
+            new OptionDeserializerConfiguration {
+                SkipUnknown = true
+            });
         Assert.Equal("abc", obj.text);
     }
 
@@ -139,8 +137,9 @@ public class OptionsDeserializerTest {
         OptionDeserializer.Deserialize(
             obj,
             $"--unknown -b --{StringHelper.GetKebabCase(nameof(SomeConfiguration.text))}=abc".Split(' '),
-            new OptionDeserializerConfiguration { SkipUnknown = true }
-        );
+            new OptionDeserializerConfiguration {
+                SkipUnknown = true
+            });
         Assert.Equal("abc", obj.text);
         Assert.True(obj.boolean);
     }
@@ -151,8 +150,9 @@ public class OptionsDeserializerTest {
         OptionDeserializer.Deserialize(
             obj,
             $"--unknown=-b --{StringHelper.GetKebabCase(nameof(SomeConfiguration.text))}=abc".Split(' '),
-            new OptionDeserializerConfiguration { SkipUnknown = true }
-        );
+            new OptionDeserializerConfiguration {
+                SkipUnknown = true
+            });
         Assert.Equal("abc", obj.text);
         Assert.False(obj.boolean);
     }
@@ -160,8 +160,7 @@ public class OptionsDeserializerTest {
     [Fact]
     public void Deserialize_ShadowedFieldOption_SetsUsableOptionNotOriginalField() {
         SomeConfiguration obj = new();
-        OptionDeserializer.Deserialize(obj,
-            $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.shadowedfield))}".Split(' '));
+        OptionDeserializer.Deserialize(obj, $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.shadowedfield))}".Split(' '));
         Assert.True(obj.usableOption);
         Assert.False(obj.shadowedfield);
     }
@@ -177,11 +176,7 @@ public class OptionsDeserializerTest {
     [Fact]
     public void Deserialize_InvalidOptionInArguments_ThrowsCliException() {
         SomeConfiguration obj = new();
-        Assert.Throws<CliException>(() => {
-            OptionDeserializer.Deserialize(obj,
-                $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.integer))}=10 notanoption --{StringHelper.GetKebabCase(nameof(SomeConfiguration.text))}=abc xyz"
-                    .Split(' '));
-        });
+        Assert.Throws<CliException>(() => { OptionDeserializer.Deserialize(obj, $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.integer))}=10 notanoption --{StringHelper.GetKebabCase(nameof(SomeConfiguration.text))}=abc xyz".Split(' ')); });
     }
 
     [Fact]
@@ -196,27 +191,21 @@ public class OptionsDeserializerTest {
     public void Deserialize_LongOptionWithoutValue_ThrowsCliException() {
         CliException ex = Assert.Throws<CliException>(() => {
             SomeConfiguration obj = new();
-            OptionDeserializer.Deserialize(obj,
-                $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.integer))}".Split(' '));
+            OptionDeserializer.Deserialize(obj, $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.integer))}".Split(' '));
         });
     }
 
     [Fact]
     public void Deserialize_UnexpectedPositionalValue_ThrowsCliException() {
         SomeConfiguration obj = new();
-        Assert.Throws<CliException>(() => {
-            OptionDeserializer.Deserialize(obj,
-                $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.integer))} 10 notanoption --{StringHelper.GetKebabCase(nameof(SomeConfiguration.text))}=abc xyz"
-                    .Split(' '));
-        });
+        Assert.Throws<CliException>(() => { OptionDeserializer.Deserialize(obj, $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.integer))} 10 notanoption --{StringHelper.GetKebabCase(nameof(SomeConfiguration.text))}=abc xyz".Split(' ')); });
     }
 
     [Fact]
     public void Deserialize_NonOptionProperty_ThrowsCliException() {
         CliException ex = Assert.Throws<CliException>(() => {
             SomeConfiguration obj = new();
-            OptionDeserializer.Deserialize(obj,
-                $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.inner))}=0".Split(' '));
+            OptionDeserializer.Deserialize(obj, $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.inner))}=0".Split(' '));
         });
         Assert.Equal("Not an option: inner", ex.Message);
     }
@@ -225,8 +214,7 @@ public class OptionsDeserializerTest {
     public void Deserialize_InvalidDecimalFormatForInteger_ThrowsTypeMismatchException() {
         CliException ex = Assert.Throws<CliException>(() => {
             SomeConfiguration obj = new();
-            OptionDeserializer.Deserialize(obj,
-                $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.integer))}=0.1".Split(' '));
+            OptionDeserializer.Deserialize(obj, $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.integer))}=0.1".Split(' '));
         });
         Assert.Equal("option 'integer=0.1': Invalid format (expected Int32)", ex.Message);
     }
@@ -235,8 +223,7 @@ public class OptionsDeserializerTest {
     public void Deserialize_InvalidNonNumericValueForInteger_ThrowsTypeMismatchException() {
         CliException ex = Assert.Throws<CliException>(() => {
             SomeConfiguration obj = new();
-            OptionDeserializer.Deserialize(obj,
-                $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.integer))}=a".Split(' '));
+            OptionDeserializer.Deserialize(obj, $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.integer))}=a".Split(' '));
         });
         Assert.Equal("option 'integer=a': Invalid format (expected Int32)", ex.Message);
     }
@@ -253,8 +240,7 @@ public class OptionsDeserializerTest {
     public void Deserialize_ByteValueExceedsMaximum_ThrowsOutOfRangeException() {
         CliException ex = Assert.Throws<CliException>(() => {
             SomeConfiguration obj = new();
-            OptionDeserializer.Deserialize(obj,
-                $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.aByteNumber))}=256".Split(' '));
+            OptionDeserializer.Deserialize(obj, $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.aByteNumber))}=256".Split(' '));
         });
         Assert.Equal("option 'a-byte-number=256': Out of range (0-255)", ex.Message);
     }
@@ -265,10 +251,10 @@ public class OptionsDeserializerTest {
         CliException ex = Assert.Throws<CliException>(() => {
             OptionDeserializer.Deserialize(
                 obj,
-                $"--{StringHelper.GetKebabCase(nameof(ConfigurationWithXUnitCommandLineArgs.port))} {int.MaxValue}"
-                    .Split(' '),
-                new OptionDeserializerConfiguration { SkipUnknown = true }
-            );
+                $"--{StringHelper.GetKebabCase(nameof(ConfigurationWithXUnitCommandLineArgs.port))} {int.MaxValue}".Split(' '),
+                new OptionDeserializerConfiguration {
+                    SkipUnknown = true
+                });
         });
         Assert.Equal("option 'port=2147483647': Out of range (0-65535)", ex.Message);
     }
@@ -304,8 +290,9 @@ public class OptionsDeserializerTest {
             OptionDeserializer.Deserialize(
                 obj,
                 $"unknown --{StringHelper.GetKebabCase(nameof(SomeConfiguration.text))}=abc".Split(' '),
-                new OptionDeserializerConfiguration { SkipUnknown = true }
-            );
+                new OptionDeserializerConfiguration {
+                    SkipUnknown = true
+                });
         });
         Assert.Equal("Unexpected value: unknown", ex.Message);
     }
@@ -313,33 +300,27 @@ public class OptionsDeserializerTest {
     [Fact]
     public void Deserialize_EnumValue_SetsEnumProperty() {
         SomeConfiguration obj = new();
-        OptionDeserializer.Deserialize(obj,
-            $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.logLevel))}=Info".Split(' '));
+        OptionDeserializer.Deserialize(obj, $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.logLevel))}=Info".Split(' '));
         Assert.Equal(LogLevel.Info, obj.logLevel);
     }
 
     [Fact]
     public void Deserialize_EnumValueCaseInsensitive_SetsEnumProperty() {
         SomeConfiguration obj = new();
-        OptionDeserializer.Deserialize(obj,
-            $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.logLevel))}=warning".Split(' '));
+        OptionDeserializer.Deserialize(obj, $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.logLevel))}=warning".Split(' '));
         Assert.Equal(LogLevel.Warning, obj.logLevel);
     }
 
     [Fact]
     public void Deserialize_NullableEnumValue_SetsNullableEnumProperty() {
         SomeConfiguration obj = new();
-        OptionDeserializer.Deserialize(obj,
-            $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.nullableLogLevel))}=Error".Split(' '));
+        OptionDeserializer.Deserialize(obj, $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.nullableLogLevel))}=Error".Split(' '));
         Assert.Equal(LogLevel.Error, obj.nullableLogLevel);
     }
 
     [Fact]
     public void Deserialize_InvalidEnumValue_ThrowsCliException() {
         SomeConfiguration obj = new();
-        CliException ex = Assert.Throws<CliException>(() => {
-            OptionDeserializer.Deserialize(obj,
-                $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.logLevel))}=InvalidValue".Split(' '));
-        });
+        CliException ex = Assert.Throws<CliException>(() => { OptionDeserializer.Deserialize(obj, $"--{StringHelper.GetKebabCase(nameof(SomeConfiguration.logLevel))}=InvalidValue".Split(' ')); });
     }
 }

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CalqFramework.Cli.DataAccess;
+﻿namespace CalqFramework.Cli.DataAccess;
 
 /// <summary>
 ///     Extends IValueConverter with multi-value metadata capabilities.

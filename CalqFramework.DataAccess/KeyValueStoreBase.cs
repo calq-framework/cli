@@ -1,17 +1,12 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿namespace CalqFramework.DataAccess;
 
-namespace CalqFramework.DataAccess;
-
-public abstract class KeyValueStoreBase<TKey, TValue, TAccessor> : KeyValueStoreBase<TKey, TValue, TAccessor, TValue>,
-    IKeyValueStore<TKey, TValue, TAccessor> {
+public abstract class KeyValueStoreBase<TKey, TValue, TAccessor> : KeyValueStoreBase<TKey, TValue, TAccessor, TValue>, IKeyValueStore<TKey, TValue, TAccessor> {
     protected override TValue ConvertFromInternalValue(TValue value, TAccessor accessor) => value;
 
     protected override TValue ConvertToInternalValue(TValue value, TAccessor accessor) => value;
 }
 
-public abstract class
-    KeyValueStoreBase<TKey, TValue, TAccessor,
-        TInternalValue> : IKeyValueStore<TKey, TValue, TAccessor, TInternalValue> {
+public abstract class KeyValueStoreBase<TKey, TValue, TAccessor, TInternalValue> : IKeyValueStore<TKey, TValue, TAccessor, TInternalValue> {
     public abstract IEnumerable<TAccessor> Accessors { get; }
 
     public TValue this[TKey key] {

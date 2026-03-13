@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using CalqFramework.Cli.InterfaceComponents;
+﻿using CalqFramework.Cli.InterfaceComponents;
 
 namespace CalqFramework.Cli.Completion;
 
@@ -20,8 +19,7 @@ public interface ICompletionPrinter {
     /// <summary>
     ///     Prints completion suggestions for both parameter and option keys (deduplicated).
     /// </summary>
-    void PrintParametersAndOptions(ICliContext context, IEnumerable<Parameter> parameters, IEnumerable<Option> options,
-        string partialInput);
+    void PrintParametersAndOptions(ICliContext context, IEnumerable<Parameter> parameters, IEnumerable<Option> options, string partialInput);
 
     /// <summary>
     ///     Prints completion suggestions for a submodule value.

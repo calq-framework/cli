@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using CalqFramework.Cli.DataAccess;
+﻿using CalqFramework.Cli.DataAccess;
 using CalqFramework.Cli.DataAccess.InterfaceComponentStores;
 using CalqFramework.Cli.Parsing;
 using CalqFramework.DataAccess;
@@ -17,13 +14,16 @@ public class OptionDeserializer {
     ///     Deserializes command-line arguments from the environment into the specified object.
     /// </summary>
     public static void Deserialize(object target, OptionDeserializerConfiguration? options = null) =>
-        Deserialize(target, Environment.GetCommandLineArgs().Skip(1), options);
+        Deserialize(
+            target,
+            Environment.GetCommandLineArgs()
+                .Skip(1),
+            options);
 
     /// <summary>
     ///     Deserializes the specified arguments into the object's properties and fields.
     /// </summary>
-    public static void Deserialize(object target, IEnumerable<string> args,
-        OptionDeserializerConfiguration? options = null) {
+    public static void Deserialize(object target, IEnumerable<string> args, OptionDeserializerConfiguration? options = null) {
         IOptionStore store = new CliComponentStoreFactory().CreateOptionStore(target);
         Deserialize(store, args, options);
     }
@@ -31,15 +31,17 @@ public class OptionDeserializer {
     /// <summary>
     ///     Deserializes command-line arguments from the environment into the specified store.
     /// </summary>
-    public static void Deserialize(IKeyValueStore<string, string?> store,
-        OptionDeserializerConfiguration? options = null) =>
-        Deserialize(store, Environment.GetCommandLineArgs().Skip(1), options);
+    public static void Deserialize(IKeyValueStore<string, string?> store, OptionDeserializerConfiguration? options = null) =>
+        Deserialize(
+            store,
+            Environment.GetCommandLineArgs()
+                .Skip(1),
+            options);
 
     /// <summary>
     ///     Deserializes the specified arguments into the key-value store.
     /// </summary>
-    public static void Deserialize(IKeyValueStore<string, string?> store, IEnumerable<string> args,
-        OptionDeserializerConfiguration? options = null) {
+    public static void Deserialize(IKeyValueStore<string, string?> store, IEnumerable<string> args, OptionDeserializerConfiguration? options = null) {
         using IEnumerator<string> argsEnumerator = args.GetEnumerator();
         OptionReader reader = new(argsEnumerator, store);
         Deserialize(reader, options);

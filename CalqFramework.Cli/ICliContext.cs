@@ -1,5 +1,4 @@
-﻿using System.IO;
-using CalqFramework.Cli.DataAccess;
+﻿using CalqFramework.Cli.DataAccess;
 
 namespace CalqFramework.Cli;
 

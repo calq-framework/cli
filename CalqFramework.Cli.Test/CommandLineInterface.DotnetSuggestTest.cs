@@ -1,18 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using Xunit;
-
-namespace CalqFramework.Cli.Test;
+﻿namespace CalqFramework.Cli.Test;
 
 [Collection("DotnetSuggest Tests")]
 public class CommandLineInterfaceDotnetSuggestTest {
+    private static readonly string[] s_args = ["[suggest]"];
+
     private static List<string> GetDotnetSuggestCompletions(string directive, string commandLine) {
         SomeClassLibrary tool = new();
 
         using StringWriter writer = new();
-        CommandLineInterface cli = new() { InterfaceOut = writer };
-        cli.Execute(tool, new[] { directive, commandLine });
+        CommandLineInterface cli = new() {
+            InterfaceOut = writer
+        };
+        cli.Execute(
+            tool,
+            new[] {
+                directive,
+                commandLine
+            });
 
         string output = writer.ToString();
         return [.. output.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries)];
@@ -72,13 +76,11 @@ public class CommandLineInterfaceDotnetSuggestTest {
     [Fact]
     public void HandleDotnetSuggest_BoolParameter_ReturnsTrueFalse() {
         string exeName = Path.GetFileNameWithoutExtension(Environment.ProcessPath ?? "testhost");
-        List<string> completions =
-            GetDotnetSuggestCompletions("[suggest]", $"{exeName} method-with-text-and-boolean abc --boolean ");
+        List<string> completions = GetDotnetSuggestCompletions("[suggest]", $"{exeName} method-with-text-and-boolean abc --boolean ");
 
         Assert.Contains("true", completions);
         Assert.Contains("false", completions);
     }
-    private static readonly string[] s_args = ["[suggest]"];
 
     [Fact]
     public void HandleDotnetSuggest_EmptyArgs_ReturnsVoid() {
@@ -92,7 +94,12 @@ public class CommandLineInterfaceDotnetSuggestTest {
     public void HandleDotnetSuggest_DirectiveWithoutClosingBracket_ReturnsVoid() {
         SomeClassLibrary tool = new();
         string exeName = Path.GetFileNameWithoutExtension(Environment.ProcessPath ?? "testhost");
-        object result = new CommandLineInterface().Execute(tool, new[] { "[suggest", $"{exeName} " });
+        object result = new CommandLineInterface().Execute(
+            tool,
+            new[] {
+                "[suggest",
+                $"{exeName} "
+            });
 
         Assert.IsType<ValueTuple>(result);
     }

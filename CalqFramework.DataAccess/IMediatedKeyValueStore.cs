@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
-
-namespace CalqFramework.DataAccess;
+﻿namespace CalqFramework.DataAccess;
 
 /// <summary>
 ///     Provides mediated access to a key-value store through accessors (e.g., FieldInfo, PropertyInfo) with internal value

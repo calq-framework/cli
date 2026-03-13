@@ -6,5 +6,6 @@
 public abstract class ArrayElementStoreBase<TKey, TValue>(Array targetArray) : CollectionElementStoreBase<TKey, TValue> {
     protected Array Array { get; } = targetArray;
 
-    public override Type GetValueType(TKey key) => Array.GetType().GetElementType()!;
+    public override Type GetValueType(TKey key) => Array.GetType()
+        .GetElementType()!;
 }

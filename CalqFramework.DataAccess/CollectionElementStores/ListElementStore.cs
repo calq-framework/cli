@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using CalqFramework.DataAccess.Extensions.System;
-
-namespace CalqFramework.DataAccess.CollectionElementStores;
+﻿namespace CalqFramework.DataAccess.CollectionElementStores;
 
 /// <summary>
 ///     Provides key-value access to list elements by index.
@@ -30,7 +27,9 @@ public sealed class ListElementStore(IList list) : ListElementStoreBase<string, 
         int index = int.Parse(key);
         object? element = List[index];
         if (element == null) {
-            element = List.GetType().GetGenericArguments()[0].CreateInstance();
+            element = List.GetType()
+                .GetGenericArguments()[0]
+                .CreateInstance();
             List[index] = element;
         }
 
@@ -39,7 +38,9 @@ public sealed class ListElementStore(IList list) : ListElementStoreBase<string, 
 
     public override void Remove(string key) {
         if (!int.TryParse(key, out int index)) {
-            throw DataAccessErrors.InvalidListKey(key?.GetType().Name);
+            throw DataAccessErrors.InvalidListKey(
+                key?.GetType()
+                    .Name);
         }
 
         List.RemoveAt(index);

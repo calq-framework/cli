@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using CalqFramework.Cli.DataAccess.InterfaceComponentStores;
-using CalqFramework.Cli.Extensions.System.Reflection;
+﻿using CalqFramework.Cli.DataAccess.InterfaceComponentStores;
 using CalqFramework.Cli.InterfaceComponents;
 using CalqFramework.Cli.Parsing;
 using static CalqFramework.Cli.Parsing.OptionReaderBase;
@@ -117,9 +111,7 @@ internal sealed class CompletionHandler : ICompletionHandler {
             List<Submodule> submodules = [.. submoduleStore.GetSubmodules()];
             List<Subcommand> subcommands = [.. subcommandStore.GetSubcommands(context.CliComponentStoreFactory.CreateSubcommandExecutor)];
 
-            bool hasMatches =
-                submodules.Any(s => s.Keys.Any(k => k.StartsWith(toComplete, StringComparison.OrdinalIgnoreCase))) ||
-                subcommands.Any(s => s.Keys.Any(k => k.StartsWith(toComplete, StringComparison.OrdinalIgnoreCase)));
+            bool hasMatches = submodules.Any(s => s.Keys.Any(k => k.StartsWith(toComplete, StringComparison.OrdinalIgnoreCase))) || subcommands.Any(s => s.Keys.Any(k => k.StartsWith(toComplete, StringComparison.OrdinalIgnoreCase)));
 
             string effectivePartialInput = hasMatches ? toComplete : "";
 
@@ -129,19 +121,17 @@ internal sealed class CompletionHandler : ICompletionHandler {
         }
 
         if (!subcommandStore.ContainsKey(subcommandName)) {
-            CompletionPrinter.PrintSubcommands(context,
-                subcommandStore.GetSubcommands(context.CliComponentStoreFactory.CreateSubcommandExecutor),
-                subcommandName);
+            CompletionPrinter.PrintSubcommands(context, subcommandStore.GetSubcommands(context.CliComponentStoreFactory.CreateSubcommandExecutor), subcommandName);
             return;
         }
 
         MethodInfo subcommand = subcommandStore[subcommandName]!;
-        ISubcommandExecutorWithOptions subcommandExecutorWithOptions =
-            context.CliComponentStoreFactory.CreateSubcommandExecutorWithOptions(subcommand, submodule);
+        ISubcommandExecutorWithOptions subcommandExecutorWithOptions = context.CliComponentStoreFactory.CreateSubcommandExecutorWithOptions(subcommand, submodule);
 
         bool hasArguments = en.MoveNext();
         if (hasArguments) {
-            IEnumerator<string> skippedEn = GetSkippedEnumerator(en).GetEnumerator();
+            IEnumerator<string> skippedEn = GetSkippedEnumerator(en)
+                .GetEnumerator();
             ReadParametersAndOptionsForCompletion(context, skippedEn, subcommandExecutorWithOptions);
         }
 
@@ -175,8 +165,7 @@ internal sealed class CompletionHandler : ICompletionHandler {
         }
     }
 
-    private static void ReadParametersAndOptionsForCompletion(ICliContext context, IEnumerator<string> args,
-        ISubcommandExecutorWithOptions subcommandExecutorWithOptions) {
+    private static void ReadParametersAndOptionsForCompletion(ICliContext context, IEnumerator<string> args, ISubcommandExecutorWithOptions subcommandExecutorWithOptions) {
         OptionReader optionReader = new(args, subcommandExecutorWithOptions);
 
         foreach ((string option, string value, OptionFlags optionAttr) in optionReader.Read()) {
@@ -206,15 +195,15 @@ internal sealed class CompletionHandler : ICompletionHandler {
     }
 
     private void HandleCompletionScript(ICliContext context, string shell) {
-        string programName = Assembly.GetEntryAssembly()?.GetToolCommandName() ??
-                             throw CliErrors.UnableToDetermineProgramName();
+        string programName = Assembly.GetEntryAssembly()
+            ?.GetToolCommandName() ?? throw CliErrors.UnableToDetermineProgramName();
         string script = CompletionScriptGenerator.GenerateScript(shell, programName);
         context.InterfaceOut.WriteLine(script);
     }
 
     private void HandleCompletionInstall(ICliContext context, string shell) {
-        string programName = Assembly.GetEntryAssembly()?.GetToolCommandName() ??
-                             throw CliErrors.UnableToDetermineProgramName();
+        string programName = Assembly.GetEntryAssembly()
+            ?.GetToolCommandName() ?? throw CliErrors.UnableToDetermineProgramName();
 
         try {
             CompletionScriptGenerator.InstallScript(shell, programName);
@@ -227,8 +216,8 @@ internal sealed class CompletionHandler : ICompletionHandler {
     }
 
     private void HandleCompletionUninstall(ICliContext context, string shell) {
-        string programName = Assembly.GetEntryAssembly()?.GetToolCommandName() ??
-                             throw CliErrors.UnableToDetermineProgramName();
+        string programName = Assembly.GetEntryAssembly()
+            ?.GetToolCommandName() ?? throw CliErrors.UnableToDetermineProgramName();
 
         try {
             bool removed = CompletionScriptGenerator.UninstallScript(shell, programName);
@@ -244,8 +233,8 @@ internal sealed class CompletionHandler : ICompletionHandler {
     }
 
     private void HandleCompletionScriptAll(ICliContext context) {
-        string programName = Assembly.GetEntryAssembly()?.GetToolCommandName() ??
-                             throw CliErrors.UnableToDetermineProgramName();
+        string programName = Assembly.GetEntryAssembly()
+            ?.GetToolCommandName() ?? throw CliErrors.UnableToDetermineProgramName();
 
         foreach (string shell in CompletionScriptGenerator.SupportedShells) {
             context.InterfaceOut.WriteLine($"# Completion script for {shell}");
@@ -257,8 +246,8 @@ internal sealed class CompletionHandler : ICompletionHandler {
     }
 
     private void HandleCompletionInstallAll(ICliContext context) {
-        string programName = Assembly.GetEntryAssembly()?.GetToolCommandName() ??
-                             throw CliErrors.UnableToDetermineProgramName();
+        string programName = Assembly.GetEntryAssembly()
+            ?.GetToolCommandName() ?? throw CliErrors.UnableToDetermineProgramName();
 
         foreach (string shell in CompletionScriptGenerator.SupportedShells) {
             ProcessStartInfo processStartInfo = new() {
@@ -290,8 +279,8 @@ internal sealed class CompletionHandler : ICompletionHandler {
     }
 
     private void HandleCompletionUninstallAll(ICliContext context) {
-        string programName = Assembly.GetEntryAssembly()?.GetToolCommandName() ??
-                             throw CliErrors.UnableToDetermineProgramName();
+        string programName = Assembly.GetEntryAssembly()
+            ?.GetToolCommandName() ?? throw CliErrors.UnableToDetermineProgramName();
 
         foreach (string shell in CompletionScriptGenerator.SupportedShells) {
             try {

@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Reflection;
-using CalqFramework.Cli.Formatting;
+﻿using CalqFramework.Cli.Formatting;
 
 namespace CalqFramework.Cli.DataAccess.ClassMemberStores;
 
 internal sealed class MethodInfoStore : ICliReadOnlyKeyValueStore<string, MethodInfo, MethodInfo> {
-    public MethodInfoStore(object targetObject, BindingFlags bindingFlags,
-        IClassMemberStringifier classMemberStringifier, IAccessValidator accessValidator) {
+    public MethodInfoStore(object targetObject, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier, IAccessValidator accessValidator) {
         TargetObject = targetObject;
         BindingFlags = bindingFlags;
         ClassMemberStringifier = classMemberStringifier;
@@ -18,7 +12,9 @@ internal sealed class MethodInfoStore : ICliReadOnlyKeyValueStore<string, Method
         AccessorsByNames = GetAccessorsByNames();
     }
 
-    public IEnumerable<MethodInfo> Accessors => TargetType.GetMethods(BindingFlags).Where(ContainsAccessor);
+    public IEnumerable<MethodInfo> Accessors => TargetType.GetMethods(BindingFlags)
+        .Where(ContainsAccessor);
+
     public IAccessValidator AccessValidator { get; }
     private BindingFlags BindingFlags { get; }
     private IClassMemberStringifier ClassMemberStringifier { get; }
@@ -41,12 +37,11 @@ internal sealed class MethodInfoStore : ICliReadOnlyKeyValueStore<string, Method
     public Type GetValueType(string key) => this[key]!.ReturnType;
 
     public IEnumerable<AccessorKeysPair<MethodInfo>> GetAccessorKeysPairs() =>
-        AccessorsByNames
-            .GroupBy(kv => kv.Value)
+        AccessorsByNames.GroupBy(kv => kv.Value)
             .Select(g => new AccessorKeysPair<MethodInfo>(
                 g.Key,
-                g.Select(kv => kv.Key).ToArray()
-            ));
+                g.Select(kv => kv.Key)
+                    .ToArray()));
 
     public bool TryGetAccessor(string key, [MaybeNullWhen(false)] out MethodInfo result) =>
         AccessorsByNames.TryGetValue(key, out result);
@@ -55,9 +50,7 @@ internal sealed class MethodInfoStore : ICliReadOnlyKeyValueStore<string, Method
         accessor.ReflectedType == TargetType && AccessValidator.IsValid(accessor);
 
     private Dictionary<string, MethodInfo> GetAccessorsByNames() {
-        StringComparer stringComparer = BindingFlags.HasFlag(BindingFlags.IgnoreCase)
-            ? StringComparer.OrdinalIgnoreCase
-            : StringComparer.Ordinal;
+        StringComparer stringComparer = BindingFlags.HasFlag(BindingFlags.IgnoreCase) ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
 
         Dictionary<string, MethodInfo> accessorsByRequiredNames = new(stringComparer);
         foreach (MethodInfo accessor in Accessors) {

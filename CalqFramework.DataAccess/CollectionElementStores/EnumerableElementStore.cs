@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using CalqFramework.DataAccess.Extensions.System;
-
-namespace CalqFramework.DataAccess.CollectionElementStores;
+﻿namespace CalqFramework.DataAccess.CollectionElementStores;
 
 /// <summary>
 ///     Provides element store for IEnumerable using immutable append operations.
@@ -27,7 +24,9 @@ public sealed class EnumerableElementStore(IEnumerable enumerable) : CollectionE
     }
 
     public override Type GetValueType(string key) {
-        Type? elementType = TargetEnumerable.GetType().GetGenericArguments().FirstOrDefault();
+        Type? elementType = TargetEnumerable.GetType()
+            .GetGenericArguments()
+            .FirstOrDefault();
         return elementType ?? typeof(object);
     }
 

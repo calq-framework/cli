@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Reflection;
-
-namespace CalqFramework.Cli.Formatting;
+﻿namespace CalqFramework.Cli.Formatting;
 
 public abstract class ClassMemberStringifierBase : IClassMemberStringifier {
     public IEnumerable<string> GetAlternativeNames(FieldInfo info) =>
@@ -28,9 +25,7 @@ public abstract class ClassMemberStringifierBase : IClassMemberStringifier {
     public IEnumerable<string> GetRequiredNames(ParameterInfo info) =>
         GetRequiredNames(info.Name!, info.GetCustomAttributes<CliNameAttribute>());
 
-    protected abstract IEnumerable<string> GetAlternativeNames(string name,
-        IEnumerable<CliNameAttribute> cliNameAttributes);
+    protected abstract IEnumerable<string> GetAlternativeNames(string name, IEnumerable<CliNameAttribute> cliNameAttributes);
 
-    protected abstract IEnumerable<string> GetRequiredNames(string name,
-        IEnumerable<CliNameAttribute> cliNameAttributes);
+    protected abstract IEnumerable<string> GetRequiredNames(string name, IEnumerable<CliNameAttribute> cliNameAttributes);
 }

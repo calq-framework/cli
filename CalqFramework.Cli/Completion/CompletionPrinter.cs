@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using CalqFramework.Cli.Completion.Providers;
+﻿using CalqFramework.Cli.Completion.Providers;
 using CalqFramework.Cli.InterfaceComponents;
 
 namespace CalqFramework.Cli.Completion;
@@ -12,9 +7,10 @@ namespace CalqFramework.Cli.Completion;
 ///     Prints completion suggestions based on CLI state and metadata.
 /// </summary>
 internal sealed class CompletionPrinter : ICompletionPrinter {
+    private static readonly string[] s_sourceArray = ["true", "false"];
+
     public void PrintSubmodules(ICliContext context, IEnumerable<Submodule> submodules, string partialInput) {
-        IOrderedEnumerable<string> completions = submodules
-            .Select(s => s.Keys[0])
+        IOrderedEnumerable<string> completions = submodules.Select(s => s.Keys[0])
             .Where(k => k.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase))
             .Distinct()
             .OrderBy(k => k);
@@ -27,8 +23,7 @@ internal sealed class CompletionPrinter : ICompletionPrinter {
     }
 
     public void PrintSubcommands(ICliContext context, IEnumerable<Subcommand> subcommands, string partialInput) {
-        IOrderedEnumerable<string> completions = subcommands
-            .Select(s => s.Keys[0])
+        IOrderedEnumerable<string> completions = subcommands.Select(s => s.Keys[0])
             .Where(k => k.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase))
             .Distinct()
             .OrderBy(k => k);
@@ -40,8 +35,7 @@ internal sealed class CompletionPrinter : ICompletionPrinter {
         context.InterfaceOut.Flush();
     }
 
-    public void PrintParametersAndOptions(ICliContext context, IEnumerable<Parameter> parameters,
-        IEnumerable<Option> options, string partialInput) {
+    public void PrintParametersAndOptions(ICliContext context, IEnumerable<Parameter> parameters, IEnumerable<Option> options, string partialInput) {
         // Strip leading dashes from partial input for matching
         string partialInputStripped = partialInput.TrimStart('-', '+');
 
@@ -69,22 +63,17 @@ internal sealed class CompletionPrinter : ICompletionPrinter {
     }
 
     public void PrintOptionValue(ICliContext context, Option option, string partialInput, object? submodule) {
-        IEnumerable<string> completions =
-            GetValueCompletions(option.ValueType, option.MemberInfo, partialInput, submodule);
+        IEnumerable<string> completions = GetValueCompletions(option.ValueType, option.MemberInfo, partialInput, submodule);
         PrintCompletions(context, completions);
     }
 
     public void PrintParameterValue(ICliContext context, Parameter parameter, string partialInput, object? submodule) {
-        IEnumerable<string> completions =
-            GetValueCompletions(parameter.ValueType, parameter.ParameterInfo, partialInput, submodule);
+        IEnumerable<string> completions = GetValueCompletions(parameter.ValueType, parameter.ParameterInfo, partialInput, submodule);
         PrintCompletions(context, completions);
     }
-    private static readonly string[] s_sourceArray = ["true", "false"];
 
-    private static IEnumerable<string> GetValueCompletions(Type type, ICustomAttributeProvider attributeProvider,
-        string partialInput, object? submodule) {
-        CliCompletionAttribute? completionAttr = attributeProvider
-            .GetCustomAttributes(typeof(CliCompletionAttribute), false)
+    private static IEnumerable<string> GetValueCompletions(Type type, ICustomAttributeProvider attributeProvider, string partialInput, object? submodule) {
+        CliCompletionAttribute? completionAttr = attributeProvider.GetCustomAttributes(typeof(CliCompletionAttribute), false)
             .Cast<CliCompletionAttribute>()
             .FirstOrDefault();
 

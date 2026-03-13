@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
-namespace CalqFramework.Cli.Completion.Providers;
+﻿namespace CalqFramework.Cli.Completion.Providers;
 
 /// <summary>
 ///     Built-in completion provider for file paths.
@@ -35,15 +30,12 @@ public sealed class FileCompletionProvider : ICompletionProvider {
         }
 
         // Get glob patterns from filter (semicolon-separated)
-        string[] patterns = string.IsNullOrEmpty(context.Filter)
-            ? ["*"]
-            : context.Filter.Split(';', StringSplitOptions.RemoveEmptyEntries);
+        string[] patterns = string.IsNullOrEmpty(context.Filter) ? ["*"] : context.Filter.Split(';', StringSplitOptions.RemoveEmptyEntries);
 
         List<string> files = [];
         foreach (string pattern in patterns) {
             try {
-                IEnumerable<string?> matchingFiles = Directory
-                    .EnumerateFiles(directory, pattern, SearchOption.TopDirectoryOnly)
+                IEnumerable<string?> matchingFiles = Directory.EnumerateFiles(directory, pattern, SearchOption.TopDirectoryOnly)
                     .Select(Path.GetFileName)
                     .Where(f => f != null && f.StartsWith(searchPrefix, StringComparison.OrdinalIgnoreCase));
                 files.AddRange(matchingFiles!);
@@ -52,6 +44,7 @@ public sealed class FileCompletionProvider : ICompletionProvider {
             }
         }
 
-        return files.Distinct().OrderBy(f => f);
+        return files.Distinct()
+            .OrderBy(f => f);
     }
 }

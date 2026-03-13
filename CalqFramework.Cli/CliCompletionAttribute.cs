@@ -1,5 +1,4 @@
-﻿using System;
-using CalqFramework.Cli.Completion.Providers;
+﻿using CalqFramework.Cli.Completion.Providers;
 
 namespace CalqFramework.Cli;
 
@@ -33,9 +32,7 @@ public class CliCompletionAttribute : Attribute {
     ///     Shorthand for using <see cref="MethodCompletionProvider" /> with a method name filter.
     /// </summary>
     /// <param name="methodName">The name of the instance method to invoke for completions.</param>
-    public CliCompletionAttribute(string methodName)
-        : this(typeof(MethodCompletionProvider), methodName) {
-    }
+    public CliCompletionAttribute(string methodName) : this(typeof(MethodCompletionProvider), methodName) { }
 
     /// <summary>
     ///     Gets the type of the completion provider.

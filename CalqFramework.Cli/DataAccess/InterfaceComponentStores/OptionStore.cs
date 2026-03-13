@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using CalqFramework.Cli.InterfaceComponents;
+﻿using CalqFramework.Cli.InterfaceComponents;
 
 namespace CalqFramework.Cli.DataAccess.InterfaceComponentStores;
 
@@ -19,13 +15,14 @@ internal sealed class OptionStore(ICliKeyValueStore<string, string?, MemberInfo>
     public Type GetValueType(string key) => Store.GetValueType(key);
 
     public IEnumerable<Option> GetOptions() =>
-        Store.GetAccessorKeysPairs().Select(pair => new Option {
-            ValueType = GetValueType(pair.Keys[0]),
-            IsMultiValue = Store.IsMultiValue(pair.Keys[0]),
-            Keys = pair.Keys,
-            MemberInfo = pair.Accessor,
-            Value = this[pair.Keys[0]]
-        });
+        Store.GetAccessorKeysPairs()
+            .Select(pair => new Option {
+                ValueType = GetValueType(pair.Keys[0]),
+                IsMultiValue = Store.IsMultiValue(pair.Keys[0]),
+                Keys = pair.Keys,
+                MemberInfo = pair.Accessor,
+                Value = this[pair.Keys[0]]
+            });
 
     public string? GetValueOrInitialize(string key) => Store.GetValueOrInitialize(key);
 }

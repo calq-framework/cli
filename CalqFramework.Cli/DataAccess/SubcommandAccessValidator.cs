@@ -1,8 +1,4 @@
-﻿using System.Linq;
-using System.Reflection;
-using System.Runtime.CompilerServices;
-
-namespace CalqFramework.Cli.DataAccess;
+﻿namespace CalqFramework.Cli.DataAccess;
 
 /// <summary>
 ///     Validates whether a method is a valid CLI subcommand (excludes .NET-specific methods).
@@ -10,8 +6,6 @@ namespace CalqFramework.Cli.DataAccess;
 public sealed class SubcommandAccessValidator : IAccessValidator {
     public bool IsValid(MemberInfo accessor) => !IsDotnetSpecific((MethodInfo)accessor);
 
-    private static bool IsDotnetSpecific(MethodInfo methodInfo) => methodInfo.DeclaringType == typeof(object) ||
-                                                                   methodInfo
-                                                                       .GetCustomAttributes<
-                                                                           CompilerGeneratedAttribute>().Any();
+    private static bool IsDotnetSpecific(MethodInfo methodInfo) => methodInfo.DeclaringType == typeof(object) || methodInfo.GetCustomAttributes<CompilerGeneratedAttribute>()
+        .Any();
 }

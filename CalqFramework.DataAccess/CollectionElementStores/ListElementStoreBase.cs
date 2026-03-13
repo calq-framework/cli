@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using CalqFramework.DataAccess.Extensions.System;
-
-namespace CalqFramework.DataAccess.CollectionElementStores;
+﻿namespace CalqFramework.DataAccess.CollectionElementStores;
 
 /// <summary>
 ///     Base class for list stores that provide key-value access to list elements.
@@ -9,7 +6,8 @@ namespace CalqFramework.DataAccess.CollectionElementStores;
 public abstract class ListElementStoreBase<TKey, TValue>(IList targetList) : CollectionElementStoreBase<TKey, TValue> {
     protected IList List { get; } = targetList;
 
-    public override Type GetValueType(TKey key) => List.GetType().GetGenericArguments()[0];
+    public override Type GetValueType(TKey key) => List.GetType()
+        .GetGenericArguments()[0];
 
     public override void Add(TValue value) => List.Add(value);
 
@@ -19,7 +17,9 @@ public abstract class ListElementStoreBase<TKey, TValue>(IList targetList) : Col
     }
 
     public override TValue AddNew() {
-        object value = List.GetType().GetGenericArguments()[0].CreateInstance();
+        object value = List.GetType()
+            .GetGenericArguments()[0]
+            .CreateInstance();
         List.Add(value);
         return (TValue)value;
     }

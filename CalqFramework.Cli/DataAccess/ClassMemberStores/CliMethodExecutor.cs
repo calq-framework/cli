@@ -1,19 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Reflection;
-using CalqFramework.Cli.Formatting;
+﻿using CalqFramework.Cli.Formatting;
 using CalqFramework.DataAccess;
 using CalqFramework.DataAccess.ClassMemberStores;
 
 namespace CalqFramework.Cli.DataAccess.ClassMemberStores;
 
-internal sealed class CliMethodExecutor<TValue> : MethodExecutorBase<string, TValue>,
-    ICliFunctionExecutor<string, TValue, ParameterInfo> {
-    public CliMethodExecutor(MethodInfo method, object? obj, BindingFlags bindingFlags,
-        IClassMemberStringifier classMemberStringifier,
-        ICompositeValueConverter<TValue> compositeValueConverter) : base(method, obj) {
+internal sealed class CliMethodExecutor<TValue> : MethodExecutorBase<string, TValue>, ICliFunctionExecutor<string, TValue, ParameterInfo> {
+    public CliMethodExecutor(MethodInfo method, object? obj, BindingFlags bindingFlags, IClassMemberStringifier classMemberStringifier, ICompositeValueConverter<TValue> compositeValueConverter) : base(method, obj) {
         BindingFlags = bindingFlags;
         ClassMemberStringifier = classMemberStringifier;
         CompositeValueConverter = compositeValueConverter;
@@ -26,13 +18,12 @@ internal sealed class CliMethodExecutor<TValue> : MethodExecutorBase<string, TVa
     private ICompositeValueConverter<TValue> CompositeValueConverter { get; }
 
     public IEnumerable<AccessorKeysPair<ParameterInfo>> GetAccessorKeysPairs() =>
-        AccessorsByNames
-            .GroupBy(kv => kv.Value)
+        AccessorsByNames.GroupBy(kv => kv.Value)
             .OrderBy(g => ((ParameterInfo)g.Key).Position)
             .Select(g => new AccessorKeysPair<ParameterInfo>(
                 (ParameterInfo)g.Key,
-                g.Select(kv => kv.Key).ToArray()
-            ));
+                g.Select(kv => kv.Key)
+                    .ToArray()));
 
     public bool IsMultiValue(string key) {
         ParameterInfo accessor = GetAccessor(key);
@@ -74,9 +65,7 @@ internal sealed class CliMethodExecutor<TValue> : MethodExecutorBase<string, TVa
     }
 
     private Dictionary<string, ParameterInfo> GetAccessorsByNames() {
-        StringComparer stringComparer = BindingFlags.HasFlag(BindingFlags.IgnoreCase)
-            ? StringComparer.OrdinalIgnoreCase
-            : StringComparer.Ordinal;
+        StringComparer stringComparer = BindingFlags.HasFlag(BindingFlags.IgnoreCase) ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal;
 
         Dictionary<string, ParameterInfo> accessorsByRequiredNames = new(stringComparer);
         foreach (ParameterInfo accessor in Accessors) {
