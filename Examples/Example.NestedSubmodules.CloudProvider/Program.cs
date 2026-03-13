@@ -1,6 +1,6 @@
 using CalqFramework.Cli;
 using CalqFramework.Cli.DataAccess;
-using CloudProvider;
+using Example.NestedSubmodules.CloudProvider;
 
 try {
     var result = new CommandLineInterface {
