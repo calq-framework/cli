@@ -39,7 +39,7 @@ using CalqFramework.Cli;
 using CalqFramework.Cli.DataAccess;
 using System;
 using System.Text.Json;
-using CloudProvider;
+using Example.NestedSubmodules.CloudProvider;
 
 try {
     var result = new CommandLineInterface() {
