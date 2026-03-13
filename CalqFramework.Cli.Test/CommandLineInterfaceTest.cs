@@ -1,4 +1,4 @@
-﻿using CalqFramework.Cli.DataAccess;
+using CalqFramework.Cli.DataAccess;
 
 namespace CalqFramework.Cli.Test;
 
@@ -24,13 +24,13 @@ public class CommandLineInterfaceTest {
     }
 
     [Fact]
-    public void Execute_ObjectFieldWithNestedCommand_ExecutesNestedMethod() {
+    public static void Execute_ObjectFieldWithNestedCommand_ExecutesNestedMethod() {
         SomeClassLibrary tool = new();
         new CommandLineInterface().Execute(tool, $"{StringHelper.GetKebabCase(nameof(SomeClassLibrary.objectField))} nested-method".Split(' '));
     }
 
     [Fact]
-    public void Execute_HelpOption_GeneratesHelpOutput() {
+    public static void Execute_HelpOption_GeneratesHelpOutput() {
         SomeClassLibrary tool = new();
         new CommandLineInterface().Execute(tool, "--help".Split(' '));
     }

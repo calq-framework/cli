@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.Cli.Completion;
+namespace CalqFramework.Cli.Completion;
 
 internal sealed class CompletionScriptGenerator : ICompletionScriptGenerator {
     private const string BashTemplate = @"# Bash completion script for __PROGRAM_NAME__

@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.DataAccess.CollectionElementStores;
+namespace CalqFramework.DataAccess.CollectionElementStores;
 
 /// <summary>
 ///     Base class for collection element stores that use reflection to access collection methods.

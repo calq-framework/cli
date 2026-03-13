@@ -1,4 +1,4 @@
-﻿#pragma warning disable CS0649
+#pragma warning disable CS0649
 #pragma warning disable IDE0060
 
 using CalqFramework.Cli.Completion.Providers;

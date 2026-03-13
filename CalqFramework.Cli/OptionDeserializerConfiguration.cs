@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.Cli;
+namespace CalqFramework.Cli;
 
 /// <summary>
 ///     Configuration options for OptionDeserializer behavior.

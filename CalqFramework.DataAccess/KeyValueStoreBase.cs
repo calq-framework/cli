@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.DataAccess;
+namespace CalqFramework.DataAccess;
 
 public abstract class KeyValueStoreBase<TKey, TValue, TAccessor> : KeyValueStoreBase<TKey, TValue, TAccessor, TValue>, IKeyValueStore<TKey, TValue, TAccessor> {
     protected override TValue ConvertFromInternalValue(TValue value, TAccessor accessor) => value;

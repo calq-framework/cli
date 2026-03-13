@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.DataAccess;
+namespace CalqFramework.DataAccess;
 
 /// <summary>
 ///     Combines two key-value stores with primary and secondary lookup priority.

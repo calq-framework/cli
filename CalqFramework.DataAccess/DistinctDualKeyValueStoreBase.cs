@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.DataAccess;
+namespace CalqFramework.DataAccess;
 
 public abstract class DistinctDualKeyValueStoreBase<TKey, TValue> : IKeyValueStore<TKey, TValue> {
     public bool EnableShadowing { get; init; }

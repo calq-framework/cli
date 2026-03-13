@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.DataAccess.ClassMemberStores;
+namespace CalqFramework.DataAccess.ClassMemberStores;
 
 /// <summary>
 ///     Provides key-value access to object properties by name.

@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.DataAccess.CollectionElementStores;
+namespace CalqFramework.DataAccess.CollectionElementStores;
 
 /// <summary>
 ///     Provides element store for IEnumerable using immutable append operations.

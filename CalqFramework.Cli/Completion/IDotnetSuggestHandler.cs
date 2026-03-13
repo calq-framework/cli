@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.Cli.Completion;
+namespace CalqFramework.Cli.Completion;
 
 public interface IDotnetSuggestHandler {
     /// <summary>

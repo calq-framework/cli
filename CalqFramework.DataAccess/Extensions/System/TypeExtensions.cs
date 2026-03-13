@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.DataAccess.Extensions.System;
+namespace CalqFramework.DataAccess.Extensions.System;
 
 /// <summary>
 ///     Extension methods for parsing string values to typed objects.

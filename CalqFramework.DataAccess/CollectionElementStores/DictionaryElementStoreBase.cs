@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.DataAccess.CollectionElementStores;
+namespace CalqFramework.DataAccess.CollectionElementStores;
 
 /// <summary>
 ///     Base class for dictionary stores that provide key-value access to dictionary elements.

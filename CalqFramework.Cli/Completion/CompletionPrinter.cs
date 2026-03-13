@@ -1,4 +1,4 @@
-﻿using CalqFramework.Cli.Completion.Providers;
+using CalqFramework.Cli.Completion.Providers;
 using CalqFramework.Cli.InterfaceComponents;
 
 namespace CalqFramework.Cli.Completion;

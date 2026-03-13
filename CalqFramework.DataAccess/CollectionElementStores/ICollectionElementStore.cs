@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.DataAccess.CollectionElementStores;
+namespace CalqFramework.DataAccess.CollectionElementStores;
 
 /// <summary>
 ///     Provides key-value access to collection elements with additional collection-specific operations.

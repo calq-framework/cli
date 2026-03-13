@@ -1,4 +1,4 @@
-﻿using CalqFramework.Cli.Completion.Providers;
+using CalqFramework.Cli.Completion.Providers;
 
 namespace CalqFramework.Cli.Test;
 

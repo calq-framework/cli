@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.DataAccess;
+namespace CalqFramework.DataAccess;
 
 public abstract class ClassMemberStoreFactoryBase : IClassMemberStoreFactory {
     public const BindingFlags DefaultLookup = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public;

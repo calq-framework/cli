@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.DataAccess;
+namespace CalqFramework.DataAccess;
 
 /// <summary>
 ///     Provides read-only access to a key-value store for retrieving values from class members.

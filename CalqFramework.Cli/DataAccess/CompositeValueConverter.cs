@@ -1,4 +1,4 @@
-﻿using CalqFramework.DataAccess;
+using CalqFramework.DataAccess;
 using CalqFramework.DataAccess.CollectionElementStores;
 
 namespace CalqFramework.Cli.DataAccess;

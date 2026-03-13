@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.Cli.Test;
+namespace CalqFramework.Cli.Test;
 
 [Collection("DotnetSuggest Tests")]
 public class CommandLineInterfaceDotnetSuggestTest {

@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.DataAccess;
+namespace CalqFramework.DataAccess;
 
 /// <summary>
 ///     Factory class for creating common DataAccessException instances with consistent messaging.

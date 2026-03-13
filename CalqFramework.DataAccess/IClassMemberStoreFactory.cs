@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.DataAccess;
+namespace CalqFramework.DataAccess;
 
 /// <summary>
 ///     Factory for creating key-value stores that access class members (fields and properties).

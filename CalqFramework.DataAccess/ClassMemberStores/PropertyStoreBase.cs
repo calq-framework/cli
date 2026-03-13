@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.DataAccess.ClassMemberStores;
+namespace CalqFramework.DataAccess.ClassMemberStores;
 
 public abstract class PropertyStoreBase<TKey, TValue>(object targetObject, BindingFlags bindingFlags) : ClassDataMemberStoreBase<TKey, TValue, PropertyInfo, object?>(targetObject, bindingFlags) {
     public override IEnumerable<PropertyInfo> Accessors =>
