@@ -22,7 +22,7 @@ public enum VerbosityLevel {
 /// <summary>Custom completion provider for region strings.</summary>
 public class RegionCompletionProvider : ICompletionProvider {
     public IEnumerable<string> GetCompletions(ICompletionProviderContext context) {
-        string[] regions = new[] {
+        string[] regions = [
             "us-east-1",
             "us-west-1",
             "us-west-2",
@@ -30,7 +30,7 @@ public class RegionCompletionProvider : ICompletionProvider {
             "eu-central-1",
             "ap-southeast-1",
             "ap-northeast-1"
-        };
+        ];
         return regions.Where(r => r.StartsWith(context.PartialInput, StringComparison.OrdinalIgnoreCase));
     }
 }
@@ -38,13 +38,13 @@ public class RegionCompletionProvider : ICompletionProvider {
 /// <summary>Custom completion provider for output format strings.</summary>
 public class FormatCompletionProvider : ICompletionProvider {
     public IEnumerable<string> GetCompletions(ICompletionProviderContext context) {
-        string[] formats = new[] {
+        string[] formats = [
             "json",
             "yaml",
             "xml",
             "table",
             "csv"
-        };
+        ];
         return formats.Where(f => f.StartsWith(context.PartialInput, StringComparison.OrdinalIgnoreCase));
     }
 }
@@ -68,13 +68,13 @@ public class CloudProviderManager {
 
     /// <summary>Instance method providing profile name completions.</summary>
     private static IEnumerable<string> GetProfileNames(string partialInput) {
-        string[] profiles = new[] {
+        string[] profiles = [
             "default",
             "production",
             "staging",
             "development",
             "testing"
-        };
+        ];
         return profiles.Where(p => p.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase));
     }
 
