@@ -391,37 +391,9 @@ dotnet tool install -g dotnet-suggest
 git clone --branch latest https://github.com/calq-framework/cli docs/cli
 dotnet new console -n QuickStart
 cd QuickStart
+cp ../docs/cli/Examples/Example.Basics.QuickStart/Program.cs ./Program.cs
 dotnet add package CalqFramework.Cli
-```
-
-```csharp
-using CalqFramework.Cli;
-using System;
-using System.Text.Json;
-
-try {
-    var result = new CommandLineInterface().Execute(new QuickStart());
-    if (result is not ValueTuple) Console.WriteLine(JsonSerializer.Serialize(result));
-}
-catch (CliException ex) {
-    Console.Error.WriteLine(ex.Message);
-    Environment.Exit(1);
-}
-
-/// <summary>Displayed in the help menu.</summary>
-class QuickStart {
-    /// <summary>Displayed in the help menu.</summary>
-    public SubStart Submodule { get; } = new SubStart();
-    public void QuickRun() {}
-}
-class SubStart {
-    public string DefaultValue { get; set; } = "default";
-    [CliName("run")] // rename from 'sub-run' to 'run'
-    [CliName("r")] // add alias 'r'
-    public QuickResult SubRun(int requiredParameter, int optionalParameter = 1)
-        => new QuickResult(DefaultValue, requiredParameter, optionalParameter);
-}
-public record QuickResult(string s, int a, int b);
+dotnet run -- --help
 ```
 
 ## License
