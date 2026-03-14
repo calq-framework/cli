@@ -1,4 +1,4 @@
-namespace Example.InterfaceCollections.TaskManager;
+namespace Example.InterfaceCollections.TaskController;
 
 /// <summary>Task priority enum.</summary>
 public enum TaskPriority {
@@ -26,7 +26,7 @@ public class TaskItem {
 }
 
 /// <summary>CLI for task management demonstrating interface collection support.</summary>
-public class TaskManagerCli {
+public class TaskControllerManager {
     /// <summary>Default tags applied to new tasks.</summary>
     public List<string> DefaultTags { get; set; } = [
         "work"

@@ -20,7 +20,7 @@ Collection parameters require repeating the parameter name for each value (e.g.,
 
 ```bash
 dotnet pack
-dotnet tool install --global --add-source ./bin/Release Example.InterfaceCollections.TaskManager
+dotnet tool install --global --add-source ./bin/Release Example.InterfaceCollections.TaskController
 ```
 
 ## Usage Examples
@@ -79,5 +79,5 @@ taskmanager export --task-names task1 --task-names task2
 ## Uninstall
 
 ```bash
-dotnet tool uninstall --global Example.InterfaceCollections.TaskManager
+dotnet tool uninstall --global Example.InterfaceCollections.TaskController
 ```

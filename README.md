@@ -377,7 +377,7 @@ dotnet tool install -g dotnet-suggest
 ```
 
 ### Demo Examples
-[Interface Collections Example](https://github.com/calq-framework/cli/tree/main/Examples/Example.InterfaceCollections.TaskManager)  
+[Interface Collections Example](https://github.com/calq-framework/cli/tree/main/Examples/Example.InterfaceCollections.TaskController)  
 
 [Autocomplete Example](https://github.com/calq-framework/cli/tree/main/Examples/Example.Autocomplete.CloudProvider)  
 
