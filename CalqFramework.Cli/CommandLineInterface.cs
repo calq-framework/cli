@@ -18,6 +18,7 @@ public class CommandLineInterface : ICliContext {
     private ICompletionHandler? _completionHandler;
     private IDotnetSuggestHandler? _dotnetSuggestHandler;
     private IHelpPrinter? _helpPrinter;
+    private IVersionPrinter? _versionPrinter;
 
     public CommandLineInterface() => CliComponentStoreFactory = new CliComponentStoreFactory();
 
@@ -40,9 +41,12 @@ public class CommandLineInterface : ICliContext {
     }
 
     /// <summary>
-    ///     Include revision number in version output (4 digits instead of 3).
+    ///     Version printer for displaying CLI version information.
     /// </summary>
-    public bool UseRevisionVersion { get; init; } = false;
+    public IVersionPrinter VersionPrinter {
+        get => _versionPrinter ??= new VersionPrinter();
+        init => _versionPrinter = value;
+    }
 
     /// <summary>
     ///     Factory for creating CLI component stores (options, subcommands, submodules).
@@ -134,9 +138,8 @@ public class CommandLineInterface : ICliContext {
         }
 
         if (subcommandName == "--version" || subcommandName == "-v") {
-            return Assembly.GetEntryAssembly()
-                ?.GetName()
-                .Version?.ToString(UseRevisionVersion ? 4 : 3);
+            VersionPrinter.PrintVersion(this, target.GetType());
+            return default(ValueTuple);
         }
 
         ISubcommandStore subcommandStore = CliComponentStoreFactory.CreateSubcommandStore(submodule);
