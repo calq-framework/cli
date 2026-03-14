@@ -50,7 +50,7 @@ public class FormatCompletionProvider : ICompletionProvider {
 }
 
 /// <summary>CLI for cloud provider operations with autocomplete examples.</summary>
-public class CloudProviderCli {
+public class CloudProviderManager {
     /// <summary>Verbosity level option (enum with autocomplete).</summary>
     public VerbosityLevel Verbosity { get; set; } = VerbosityLevel.Normal;
 

@@ -3,7 +3,7 @@ using CalqFramework.Cli;
 using System.Text.Json;
 
 try {
-    object result = new CommandLineInterface().Execute(new CloudProviderCli());
+    object result = new CommandLineInterface().Execute(new CloudProviderManager());
 
     switch (result) {
         case ValueTuple:
