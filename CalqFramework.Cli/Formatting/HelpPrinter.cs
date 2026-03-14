@@ -400,7 +400,7 @@ public class HelpPrinter : IHelpPrinter {
         ResetConsoleColor();
     }
 
-    private void PrintSubcommandDescription(ICliContext context, Subcommand subcommand) {
+    private static void PrintSubcommandDescription(ICliContext context, Subcommand subcommand) {
         List<string> parts = [];
         string summaryDescription = GetSummary(subcommand.MethodInfo);
         if (!string.IsNullOrEmpty(summaryDescription)) {

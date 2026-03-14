@@ -1,4 +1,4 @@
-﻿namespace CalqFramework.Cli.Completion;
+namespace CalqFramework.Cli.Completion;
 
 /// <summary>
 ///     Handles dotnet-suggest protocol for shell completion integration.
