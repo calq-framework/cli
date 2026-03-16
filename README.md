@@ -3,12 +3,11 @@
 [![REUSE status](https://api.reuse.software/badge/github.com/calq-framework/cli)](https://api.reuse.software/info/github.com/calq-framework/cli)
 
 # Calq CLI
-Calq CLI automates development of command-line tools. It interprets CLI commands, making it possible to operate on any classlib directly from the command-line without requiring any programming, through a fully customizable CLI.
+Calq CLI is the world's first fully automatic and fully customizable CLI framework. Calq CLI automatically generates professional CLI tools from any .NET library using advanced API mirroring.  
+Calq CLI interprets commands dynamically, making it possible to operate on any classlib without requiring any programming.
 
 ## No programming required
 Calq CLI in its default configuration follows GNU (and POSIX) [conventions](https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html) and processes any classlib out of the box with comprehensive type support.
-
-Supports list-like collection types from `System.Collections` and `System.Collections.Generic` namespaces with automatic concrete type mapping for collection interfaces. Dictionary types are not supported.
 
 ## A Radically Simpler Approach
 
@@ -359,15 +358,12 @@ Type conversion is automatic for:
 - Nullable versions of all the above
 - List-like collection types from `System.Collections` and `System.Collections.Generic` namespaces, with automatic concrete type mapping for collection interfaces (e.g., `IList<T>` → `List<T>`, `ISet<T>` → `HashSet<T>`). Dictionary types are NOT supported.
 
-To customize type conversion, see [How to Customize Value Conversion](#how-to-customize-value-conversion).
-
 **Key points:**
 - Options are properties or fields with convertible types; parameters are method arguments
 - Parameters can be used positionally or as named options (e.g., `--source`)
 - Collection parameters MUST use named options (e.g., `--files`), not positional arguments
-- To control which members are exposed as options, see [How to Control Member Visibility](#how-to-control-member-visibility)
 
-See also: [How to Customize Value Conversion](#how-to-customize-value-conversion)
+See also: [How to Customize Value Conversion](#how-to-customize-value-conversion), [How to Control Member Visibility](#how-to-control-member-visibility)
 
 #### How to Configure Naming & Aliases
 
@@ -388,7 +384,6 @@ class MyApplication {
 - `[CliName]` can be applied to methods, properties, fields, and parameters
 - Multiple `[CliName]` attributes create multiple aliases
 - Automatic single-character aliases are created unless you use `[CliName]`
-- To fully customize name conversion (e.g., snake_case), see [How to Customize Name Conversion](#how-to-customize-name-conversion)
 
 See also: [How to Customize Name Conversion](#how-to-customize-name-conversion)
 
@@ -535,8 +530,6 @@ myapp --version
 myapp -v
 ```
 
-To customize the help menu layout, see [How to Customize Help Printing](#how-to-customize-help-printing).
-
 See also: [How to Generate Help](#how-to-generate-help)
 
 ---
@@ -640,7 +633,7 @@ See also: [How to Customize Help Printing](#how-to-customize-help-printing)
 
 #### How to Control Member Visibility
 
-By default, the default `CliComponentStoreFactory` exposes both fields and properties as CLI options. You can control which members are accessible and validate them.
+The default `CliComponentStoreFactory` exposes both fields and properties as CLI options. You can control which members are accessible and validate them.
 
 **Access only properties (not fields):**
 
@@ -823,9 +816,9 @@ myapp deploy production --environment staging
 
 #### How to Customize Name Conversion
 
-For the default naming behavior and `[CliName]` usage, see [How to Configure Naming & Aliases](#how-to-configure-naming--aliases). To go beyond that, implement a custom stringifier:
+Implement `ClassMemberStringifierBase` to replace the default kebab-case conversion with your own naming scheme (e.g., snake_case). Assign it to `CliComponentStoreFactory.ClassMemberStringifier`.
 
-**Custom stringifier (e.g., snake_case):**
+**Custom stringifier (snake_case):**
 
 ```csharp
 class SnakeCaseStringifier : ClassMemberStringifierBase {
@@ -1231,8 +1224,6 @@ dotnet tool install -g dotnet-suggest
 myapp [suggest:1] deploy --region
 ```
 
-To implement a fully custom completion handler, see [How to Customize Completion Handling](#how-to-customize-completion-handling).
-
 **Key points:**
 - Completion works out of the box for most types
 - Use `[CliCompletion]` for custom suggestions
@@ -1253,6 +1244,8 @@ See also: [How to Configure Autocomplete](#how-to-configure-autocomplete), [How 
 ![SubcommandHelpExample](https://github.com/calq-framework/cli/blob/main/Examples/Example.NestedSubmodules.CloudProvider/SubcommandHelpExample.png?raw=true)
 
 ### Quick Start
+[QuickStart Example](https://github.com/calq-framework/cli/tree/main/Examples/Example.Basics.QuickStart)  
+
 ```bash
 git clone --branch latest https://github.com/calq-framework/cli docs/cli
 dotnet new console -n QuickStart
