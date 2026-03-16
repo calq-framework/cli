@@ -1233,7 +1233,7 @@ myapp [suggest:1] deploy --region
 
 See also: [How to Configure Autocomplete](#how-to-configure-autocomplete), [How to Customize Completion Handling](#how-to-customize-completion-handling)
 
-### Demo Examples
+## Demo Examples
 [Interface Collections Example](https://github.com/calq-framework/cli/tree/main/Examples/Example.InterfaceCollections.TaskController)  
 
 [Autocomplete Example](https://github.com/calq-framework/cli/tree/main/Examples/Example.Autocomplete.CloudProvider)  
@@ -1243,7 +1243,7 @@ See also: [How to Configure Autocomplete](#how-to-configure-autocomplete), [How 
 ![SubmoduleHelpExample](https://github.com/calq-framework/cli/blob/main/Examples/Example.NestedSubmodules.CloudProvider/SubmoduleHelpExample.png?raw=true)  
 ![SubcommandHelpExample](https://github.com/calq-framework/cli/blob/main/Examples/Example.NestedSubmodules.CloudProvider/SubcommandHelpExample.png?raw=true)
 
-### Quick Start
+## Quick Start
 [QuickStart Example](https://github.com/calq-framework/cli/tree/main/Examples/Example.Basics.QuickStart)  
 
 ```bash
