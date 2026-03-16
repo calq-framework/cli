@@ -6,7 +6,7 @@
 Calq CLI is the world's first fully automatic and fully customizable CLI framework. Calq CLI automatically generates professional CLI tools from any .NET library using advanced API mirroring.  
 Calq CLI interprets commands dynamically, making it possible to operate on any classlib without requiring any programming.
 
-## No programming required
+## No Programming CLI Generation for .NET
 Calq CLI in its default configuration follows GNU (and POSIX) [conventions](https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html) and processes any classlib out of the box with comprehensive type support.
 
 ## A Radically Simpler Approach
