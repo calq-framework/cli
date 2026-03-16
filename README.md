@@ -1192,13 +1192,13 @@ myapp completion all uninstall
 ```
 
 **Installation locations:**
-- Bash (Linux): `/etc/bash_completion.d/myapp`
+- Bash (Linux/Mac): `/etc/bash_completion.d/myapp`
 - Bash (Windows): `~/.bash_completion.d/myapp.bash`
-- Zsh (Linux): `/usr/local/share/zsh/site-functions/_myapp`
+- Zsh (Linux/Mac): `/usr/local/share/zsh/site-functions/_myapp`
 - Zsh (Windows): `~/.zsh/completion/_myapp`
 - PowerShell 5: `~/Documents/WindowsPowerShell/Completions/myapp.ps1`
-- PowerShell 7: `~/Documents/PowerShell/Completions/myapp.ps1` (Windows)
-- PowerShell 7: `~/.config/powershell/Completions/myapp.ps1` (Linux/Mac)
+- PowerShell 7 (Linux/Mac): `~/.config/powershell/Completions/myapp.ps1`
+- PowerShell 7 (Windows): `~/Documents/PowerShell/Completions/myapp.ps1`
 - Fish (Linux/Mac): `~/.config/fish/completions/myapp.fish`
 - Fish (Windows): `%APPDATA%/fish/completions/myapp.fish`
 
