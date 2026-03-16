@@ -983,28 +983,28 @@ The help printer receives rich metadata about CLI components:
 
 ```csharp
 // Submodule metadata
-submodule.Keys           // ["database", "db"]
-submodule.MemberInfo     // PropertyInfo or FieldInfo
+submodule.Keys            // ["database", "db"]
+submodule.MemberInfo      // PropertyInfo or FieldInfo
 
 // Subcommand metadata
-subcommand.Keys          // ["migrate", "m"]
-subcommand.MethodInfo    // MethodInfo
-subcommand.Parameters    // Parameter collection
-subcommand.ReturnType    // Type
+subcommand.Keys           // ["migrate", "m"]
+subcommand.MethodInfo     // MethodInfo
+subcommand.Parameters     // Parameter collection
+subcommand.ReturnType     // Type
 
 // Option metadata
-option.Keys              // ["verbose", "v"]
-option.MemberInfo        // PropertyInfo or FieldInfo
-option.ValueType         // Type (string, int, bool, etc.)
-option.IsMultiValue      // bool (true for collections)
-option.Value             // Current value (string)
+option.Keys               // ["verbose", "v"]
+option.MemberInfo         // PropertyInfo or FieldInfo
+option.ValueType          // Type (string, int, bool, etc.)
+option.IsMultiValue       // bool (true for collections)
+option.Value              // Current value (string)
 
 // Parameter metadata
-parameter.Keys           // ["filename", "f"]
-parameter.ParameterInfo  // ParameterInfo
-parameter.ValueType      // Type
+parameter.Keys            // ["filename", "f"]
+parameter.ParameterInfo   // ParameterInfo
+parameter.ValueType       // Type
 parameter.HasDefaultValue // bool
-parameter.IsMultiValue   // bool (true for collections)
+parameter.IsMultiValue    // bool (true for collections)
 ```
 
 See also: [How to Generate Help](#how-to-generate-help), [How to Manage Output](#how-to-manage-output)
