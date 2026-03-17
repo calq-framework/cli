@@ -1,6 +1,6 @@
 using CalqFramework.Cli.Completion.Providers;
 
-namespace CalqFramework.Cli.Test;
+namespace CalqFramework.Cli.Tests;
 
 public class EnvironmentCompletionProvider : ICompletionProvider {
     public IEnumerable<string> GetCompletions(ICompletionProviderContext context) {

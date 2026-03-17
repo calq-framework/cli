@@ -1,6 +1,6 @@
 #pragma warning disable CS0649
 
-namespace CalqFramework.Cli.Test;
+namespace CalqFramework.Cli.Tests;
 
 internal sealed class SomeConfiguration {
     public byte aByteNumber;

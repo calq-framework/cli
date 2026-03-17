@@ -1,6 +1,6 @@
 using CalqFramework.Cli.DataAccess;
 
-namespace CalqFramework.Cli.Test;
+namespace CalqFramework.Cli.Tests;
 
 public class CommandLineInterfaceTest {
     private static readonly bool[] s_expected = [false, true];

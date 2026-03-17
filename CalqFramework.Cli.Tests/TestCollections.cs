@@ -1,4 +1,4 @@
-namespace CalqFramework.Cli.Test;
+namespace CalqFramework.Cli.Tests;
 
 [CollectionDefinition("Completion Tests", DisableParallelization = true)]
 public class CompletionTestCollection {

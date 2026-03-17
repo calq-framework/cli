@@ -1,4 +1,4 @@
-namespace CalqFramework.Cli.Test;
+namespace CalqFramework.Cli.Tests;
 
 internal sealed class StringHelper {
     public static string GetKebabCase(string value) {
