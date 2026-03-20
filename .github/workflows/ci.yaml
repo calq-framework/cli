@@ -22,3 +22,4 @@ jobs:
         uses: calq-framework/flow@latest
         with:
           subcommand: 'publish --dry-run'
+        env: ${{ secrets }}
