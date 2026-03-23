@@ -362,8 +362,9 @@ public class HelpPrinter : IHelpPrinter {
     private void PrintSections(ICliContext context, IEnumerable<SectionInfo> sections) {
         List<int> maxLengths = NormalizeKeyCounts(sections);
 
-        SectionInfo firstSection = sections.SkipWhile(x => x.ItemInfos.Count == 0)
-            .First();
+        SectionInfo? firstSection = sections.SkipWhile(x => x.ItemInfos.Count == 0)
+            .FirstOrDefault();
+        if (firstSection == null) return;
         foreach (SectionInfo section in sections) {
             if (section.ItemInfos.Count == 0) {
                 continue;
