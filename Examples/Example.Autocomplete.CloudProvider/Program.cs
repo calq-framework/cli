@@ -1,5 +1,3 @@
-using System.Text.Json;
-using CalqFramework.Cli;
 using Example.Autocomplete.CloudProvider;
 
 try {

@@ -1,4 +1,3 @@
-using CalqFramework.Cli;
 using CalqFramework.Cli.DataAccess;
 using Example.NestedSubmodules.CloudProvider;
 
