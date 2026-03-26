@@ -99,12 +99,6 @@
           "xunit.extensibility.core": "[2.9.3]"
         }
       },
-      "calqframework.cli": {
-        "type": "Project",
-        "dependencies": {
-          "CalqFramework.DataAccess": "[1.0.0, )"
-        }
-      },
       "calqframework.dataaccess": {
         "type": "Project"
       }
