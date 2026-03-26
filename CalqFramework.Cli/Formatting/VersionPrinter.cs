@@ -1,5 +1,3 @@
-using System.Reflection;
-
 namespace CalqFramework.Cli.Formatting;
 
 /// <summary>
@@ -13,7 +11,8 @@ public class VersionPrinter : IVersionPrinter {
 
     /// <inheritdoc />
     public void PrintVersion(ICliContext context, Type rootSubmoduleType) {
-        string? version = Assembly.GetEntryAssembly()?.GetName()
+        string? version = Assembly.GetEntryAssembly()
+            ?.GetName()
             .Version?.ToString(UseRevisionVersion ? 4 : 3);
         if (version != null) {
             context.InterfaceOut.WriteLine(version);

@@ -37,10 +37,10 @@ public class TaskControllerManager {
     /// <returns>Result message.</returns>
     public static string Create(IList<string> names) {
         var tasks = names.Select(n => new TaskItem {
-            Name = n,
-            Priority = TaskPriority.Medium,
-            Status = TaskStatus.Pending
-        })
+                Name = n,
+                Priority = TaskPriority.Medium,
+                Status = TaskStatus.Pending
+            })
             .ToList();
 
         return $"Created {tasks.Count} tasks: {string.Join(", ", tasks)}";

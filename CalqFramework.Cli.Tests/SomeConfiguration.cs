@@ -18,8 +18,7 @@ internal sealed class SomeConfiguration {
 
     [CliName("s")] public bool shadowedfield;
 
-    [CliName("differentname")]
-    [CliName("y")]
+    [CliName("differentname")] [CliName("y")]
     public bool shortOption;
 
     public string text;

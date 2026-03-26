@@ -223,12 +223,20 @@ public class HelpPrinter : IHelpPrinter {
             return "";
         }
 
-        string value = string.Join(" ", targetElement.Value
-            .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
-            .Select(x => x.Trim())
-            .Where(x => x.Length > 0));
-        while (value.Contains("  "))
+        string value = string.Join(
+            " ",
+            targetElement.Value.Split(
+                    new[] {
+                        '\r',
+                        '\n'
+                    },
+                    StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => x.Trim())
+                .Where(x => x.Length > 0));
+        while (value.Contains("  ")) {
             value = value.Replace("  ", " ");
+        }
+
         return value.Trim();
     }
 
@@ -365,7 +373,10 @@ public class HelpPrinter : IHelpPrinter {
 
         SectionInfo? firstSection = sections.SkipWhile(x => x.ItemInfos.Count == 0)
             .FirstOrDefault();
-        if (firstSection == null) return;
+        if (firstSection == null) {
+            return;
+        }
+
         foreach (SectionInfo section in sections) {
             if (section.ItemInfos.Count == 0) {
                 continue;
