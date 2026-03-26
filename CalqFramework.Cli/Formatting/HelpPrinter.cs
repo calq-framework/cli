@@ -223,12 +223,13 @@ public class HelpPrinter : IHelpPrinter {
             return "";
         }
 
-        string value = targetElement.Value;
-        value = string.Join(
-            Environment.NewLine,
-            value.Split(Environment.NewLine)
-                .Select(x => x.Trim()));
-        return value;
+        string value = string.Join(" ", targetElement.Value
+            .Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+            .Select(x => x.Trim())
+            .Where(x => x.Length > 0));
+        while (value.Contains("  "))
+            value = value.Replace("  ", " ");
+        return value.Trim();
     }
 
     private static string GetXmlFilePath(Assembly assembly) => Path.ChangeExtension(assembly.Location, "xml");
