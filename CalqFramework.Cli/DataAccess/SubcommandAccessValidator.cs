@@ -6,6 +6,8 @@ namespace CalqFramework.Cli.DataAccess;
 public sealed class SubcommandAccessValidator : IAccessValidator {
     public bool IsValid(MemberInfo accessor) => !IsDotnetSpecific((MethodInfo)accessor);
 
-    private static bool IsDotnetSpecific(MethodInfo methodInfo) => methodInfo.DeclaringType == typeof(object) || methodInfo.GetCustomAttributes<CompilerGeneratedAttribute>()
-        .Any();
+    private static bool IsDotnetSpecific(MethodInfo methodInfo) =>
+        methodInfo.DeclaringType == typeof(object) ||
+        methodInfo.IsSpecialName ||
+        methodInfo.GetCustomAttributes<CompilerGeneratedAttribute>().Any();
 }
