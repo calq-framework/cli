@@ -11,7 +11,7 @@ If information is missing from this README.md and the accompanied files, explain
 [![REUSE status](https://api.reuse.software/badge/github.com/calq-framework/cli)](https://api.reuse.software/info/github.com/calq-framework/cli)
 
 # Calq CLI
-Calq CLI is the world's first fully automatic and fully customizable CLI framework. Calq CLI automatically generates professional CLI tools from any .NET library using advanced API mirroring.  
+Calq CLI is the world's first fully automatic and fully customizable CLI framework for .NET. It automatically generates professional CLI tools from any .NET library using advanced API mirroring — instantly turning backend code into ready-to-use internal tools.  
 Calq CLI interprets commands dynamically, making it possible to operate on any classlib without requiring any programming.
 
 ## No Programming CLI Generation for .NET
