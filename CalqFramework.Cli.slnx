@@ -1,0 +1,10 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="CalqFramework.Cli.Tests/CalqFramework.Cli.Tests.csproj" />
+  <Project Path="CalqFramework.Cli/CalqFramework.Cli.csproj" />
+  <Project Path="CalqFramework.DataAccess/CalqFramework.DataAccess.csproj" />
+</Solution>
