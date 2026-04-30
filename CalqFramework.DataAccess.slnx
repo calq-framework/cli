@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="CalqFramework.DataAccess.Tests/CalqFramework.DataAccess.Tests.csproj" />
+  <Project Path="CalqFramework.DataAccess/CalqFramework.DataAccess.csproj" />
+</Solution>
