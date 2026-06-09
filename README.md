@@ -11,36 +11,79 @@ If information is missing from this README.md and the accompanied files, explain
 [![REUSE status](https://api.reuse.software/badge/github.com/calq-framework/cli)](https://api.reuse.software/info/github.com/calq-framework/cli)
 
 # Calq CLI
-Calq CLI is the world's first code-to-tool framework that automatically generates professional internal tools from any .NET library via advanced metaprogramming (API mirroring) — instantly turning backend code into ready-to-use cross-platform utilities, eliminating dedicated tool development effort and reducing R&D costs.  
-Calq CLI mirrors the .NET type system at runtime, making it possible to operate on any backend project without defining commands, options, or parameters — eliminating the interface layer that AI cannot reliably produce, so AI-generatable business logic becomes a working tool without additional code or build errors.
 
-## Zero-Code Internal Tool Generation
-Calq CLI in its default configuration follows GNU (and POSIX) [conventions](https://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html) and processes any classlib out of the box with comprehensive type support.
+Calq CLI is a compiler-like engine that transforms source code into backend tools. Designed for instantly building production-ready backend (CLI) tools from existing source code, without any additional development.
 
-## A Radically Simpler Approach
+## Table of Contents
 
-### Calq CLI vs. System.CommandLine
-| Feature | Calq CLI | System.CommandLine |
-| :--- | :--- | :--- |
-| **CLI Definition** | Auto-generated from Classlib | Fluent API |
-| **Option Sources** | Fields + Properties + Method Parameters | Method Parameters |
-| **Help Documentation** | XML Docs + Code | Code |
-| **Completion Protocols** | Cobra + dotnet-suggest | dotnet-suggest |
-| **Custom Completion** | Delegate + Class-based | Delegate + Class-based |
-| **Enum Completion** | ✅ | ❌ |
-| **Infer Subcommands from Methods** | ✅ | ❌ |
-| **Infer Options from Properties/Fields/Parameters** | ✅ | ❌ |
-| **Infer Multi-Value Options from Collections** | ✅ | ❌ |
-| **Deserialize CLI Args to Objects** | ✅ | ❌ |
-| **Learning Curve** | Low | Moderate |
-| **Development Time** | Very Fast | Moderate |
+- [Comparison](#comparison)
+- [Usage - Calq CLI](#usage---calq-cli)
+- [1. Foundations](#1-foundations)
+  - [1.1 Command definition](#11-command-definition)
+  - [1.2 Subcommands](#12-subcommands)
+  - [1.3 Submodules](#13-submodules)
+  - [1.4 Options and flags](#14-options-and-flags)
+  - [1.5 Parameters (positional arguments)](#15-parameters-positional-arguments)
+  - [1.6 Naming conventions](#16-naming-conventions)
+  - [1.7 Attributes and metadata](#17-attributes-and-metadata)
+- [2. Formatting & Naming](#2-formatting--naming)
+  - [2.1 Kebab-case conversion](#21-kebab-case-conversion)
+  - [2.2 Member stringification](#22-member-stringification)
+  - [2.3 Alias support](#23-alias-support)
+  - [2.4 CLI name attribute](#24-cli-name-attribute)
+- [3. Parsing & Data Binding](#3-parsing--data-binding)
+  - [3.1 Value conversion](#31-value-conversion)
+  - [3.2 Composite value conversion](#32-composite-value-conversion)
+  - [3.3 Collection binding](#33-collection-binding)
+  - [3.4 Boolean / flag handling](#34-boolean--flag-handling)
+  - [3.5 Enum binding](#35-enum-binding)
+  - [3.6 Nullable and optional values](#36-nullable-and-optional-values)
+  - [3.7 Custom type converters](#37-custom-type-converters)
+  - [3.8 Argument tokenization](#38-argument-tokenization)
+  - [3.9 Strict vs lenient parsing](#39-strict-vs-lenient-parsing)
+  - [3.10 Object population (without execution)](#310-object-population-without-execution)
+  - [3.11 Parameter shadowing](#311-parameter-shadowing)
+- [4. Validation & Access Control](#4-validation--access-control)
+  - [4.1 Required vs optional](#41-required-vs-optional)
+  - [4.2 Error handling](#42-error-handling)
+  - [4.3 Option access validation](#43-option-access-validation)
+  - [4.4 Subcommand access validation](#44-subcommand-access-validation)
+  - [4.5 Submodule access validation](#45-submodule-access-validation)
+- [5. Execution](#5-execution)
+  - [5.1 Command resolution](#51-command-resolution)
+  - [5.2 Command invocation](#52-command-invocation)
+  - [5.3 Return values](#53-return-values)
+- [6. User Feedback](#6-user-feedback)
+  - [6.1 Help generation](#61-help-generation)
+  - [6.2 Version display](#62-version-display)
+  - [6.3 Error formatting](#63-error-formatting)
+- [7. Input/Output](#7-inputoutput)
+  - [7.1 Output redirection](#71-output-redirection)
+- [8. Completions](#8-completions)
+  - [8.1 Automatic completion](#81-automatic-completion)
+  - [8.2 Completion script generation](#82-completion-script-generation)
+  - [8.3 Completion protocols](#83-completion-protocols)
+  - [8.4 Custom completion providers](#84-custom-completion-providers)
+  - [8.5 Completion attributes](#85-completion-attributes)
+- [9. Extensibility](#9-extensibility)
+  - [9.1 Custom value converters](#91-custom-value-converters)
+  - [9.2 Custom access validators](#92-custom-access-validators)
+  - [9.3 Custom help printers](#93-custom-help-printers)
+  - [9.4 Custom completion handlers](#94-custom-completion-handlers)
+- [Demo Examples](#demo-examples)
+- [Quick Start](#quick-start)
+- [License](#license)
 
-### Code Comparison
-Both examples implement a tool for the backend project from:  
-[https://github.com/calq-framework/cli/tree/main/Examples/Example.NestedSubmodules.CloudProvider](https://github.com/calq-framework/cli/tree/main/Examples/Example.NestedSubmodules.CloudProvider)
+## Comparison
+
+Both examples implement a tool for the backend project from:
+
+[Example.NestedSubmodules.CloudProvider](https://github.com/calq-framework/cli/tree/main/Examples/Example.NestedSubmodules.CloudProvider)
 
 ### Calq CLI
+
 The following template is a complete implementation.
+
 ```csharp
 using CalqFramework.Cli;
 using CalqFramework.Cli.DataAccess;
@@ -73,8 +116,11 @@ catch (CliException ex) {
 ```
 
 ### System.CommandLine
-The following code was generated with AI using Gemini 2.5 Pro.  
+
+The following code was generated with AI using Gemini 2.5 Pro.
+
 The build failed with 170 errors, compiled with Visual Studio 2022 using .NET 9.
+
 ```csharp
 using System.CommandLine;
 using CloudProviderTool;
@@ -91,45 +137,35 @@ var rootCommand = new RootCommand("A CLI for managing cloud provider resources."
 // Global Options and Root Commands
 var apiKeyOption = new Option<string>("--api-key", "API Key used for authentication. Overrides saved key.");
 rootCommand.AddGlobalOption(apiKeyOption);
-
 var addCommand = new Command("add", "Permanently saves an API key for the CLI.")
 // ... another 19 lines of code
 
 // Compute Module
 var computeCommand = new Command("compute", "Manage compute resources.");
 AddComputeOptions(computeCommand);
-
 var computeRunCommand = new Command("run", "Runs a generic compute action.")
 // ... another 50 lines of code
 
 // Storage Module
 var storageCommand = new Command("storage", "Manage storage resources.");
 AddStorageOptions(storageCommand);
-
 var storageRunCommand = new Command("run", "Runs a generic storage action.") { new Argument<string>("action", () => "default", "The action to perform.") };
 // ... another 61 lines of code
 
 // Network Module
 var networkCommand = new Command("network", "Manage network resources.");
 AddNetworkOptions(networkCommand);
-
 var networkRunCommand = new Command("run", "Runs a generic network action.") { new Argument<string>("action", () => "default", "The action to perform.") };
 // ... another 77 lines of code
 
 return await rootCommand.InvokeAsync(args);
 ```
 
-## Usage
+## Usage - Calq CLI
 
-### 1. Application Setup & Initialization
+### 1. Foundations
 
-*How to bootstrap the CLI and start the execution engine.*
-
-#### How to Use the CLI Framework
-
-The CLI framework requires minimal setup. Here's a complete working example:
-
-**Complete CLI application:**
+#### 1.1 Command definition
 
 ```csharp
 using CalqFramework.Cli;
@@ -138,10 +174,9 @@ using System.Text.Json;
 
 try {
     var result = new CommandLineInterface().Execute(new MyApplication());
-    
+
     switch (result) {
         case ValueTuple:
-            // Command returned void or handled help/completion
             break;
         case string str:
             Console.WriteLine(str);
@@ -156,12 +191,6 @@ catch (CliException ex) {
     Environment.Exit(1);
 }
 ```
-
-**What `CommandLineInterface` does automatically:**
-- Parses command-line arguments from `Environment.GetCommandLineArgs()`
-- Discovers submodules (properties/fields returning class instances), subcommands (methods), and options (properties/fields with convertible types)
-- Routes to the appropriate method based on the arguments
-- Returns the method's result
 
 **Custom configuration:**
 
@@ -187,15 +216,470 @@ var result = cli.Execute(new MyApplication(), args);
 ```
 
 **Key points:**
+
+- `CommandLineInterface` parses arguments from `Environment.GetCommandLineArgs()` by default
+- Discovers submodules (properties/fields returning class instances), subcommands (methods), and options (properties/fields with convertible types) automatically
+- Routes to the appropriate method based on parsed arguments
 - Always wrap `Execute()` in a try-catch for `CliException`
-- `CommandLineInterface` automatically handles `--help`, `--version`, and completion protocols
-- Built-in subcommands such as help/version/completion and void methods return ValueTuple; non-void methods return the invocation result
+- Built-in subcommands (help/version/completion) and void methods return `ValueTuple`; non-void methods return the invocation result
 
-See also: [How to Populate Objects Without Executing Commands](#how-to-populate-objects-without-executing-commands), [How to Handle Exceptions](#how-to-handle-exceptions)
+#### 1.2 Subcommands
 
-#### How to Populate Objects Without Executing Commands
+Subcommands are public methods on your class.
 
-Use `OptionDeserializer` to populate an existing object with CLI arguments without executing a full command. This is a standalone utility, independent from `CommandLineInterface`.
+```csharp
+class MyApplication {
+    public void Build() {
+        Console.WriteLine("Building project...");
+    }
+
+    public void Deploy(string environment, string configuration = "Release") {
+        Console.WriteLine($"Deploying to {environment} in {configuration} mode");
+    }
+
+    public string GetVersion() {
+        return "1.0.0";
+    }
+}
+```
+
+```bash
+myapp build
+myapp deploy production Debug
+myapp get-version  # Returns: 1.0.0
+```
+
+**Key points:**
+
+- `CommandLineInterface` automatically exposes public methods as CLI commands
+- Method names are converted to kebab-case (see [2.1 Kebab-case conversion](#21-kebab-case-conversion))
+- Method arguments become parameters (positional or named)
+- Non-void methods return their result through `Execute()`
+
+#### 1.3 Submodules
+
+Submodules are properties or fields that return class instances, creating multi-level command hierarchies.
+
+```csharp
+class MyApplication {
+    public DatabaseCommands Database { get; } = new DatabaseCommands();
+}
+
+class DatabaseCommands {
+    public void Migrate() {
+        Console.WriteLine("Running migrations...");
+    }
+}
+```
+
+```bash
+myapp database migrate
+cloudmanager compute instance start i-12345
+```
+
+**Key points:**
+
+- Submodules are properties or fields that return class instances (not primitives or collections)
+- The class can be defined anywhere (same file, different file, separate assembly)
+- Nesting depth is unlimited
+- Each level can have its own options and subcommands
+
+#### 1.4 Options and flags
+
+Options are class-level properties or fields that become named arguments.
+
+```csharp
+class MyApplication {
+    // Becomes: --verbose or -v
+    public bool Verbose { get; set; } = false;
+
+    // Becomes: --output or -o
+    public string Output { get; set; } = "output.txt";
+
+    public void Run() {
+        if (Verbose) {
+            Console.WriteLine($"Writing to {Output}");
+        }
+    }
+}
+```
+
+```bash
+myapp run --verbose --output result.txt
+myapp run -v -o result.txt
+```
+
+**Collection options:**
+
+```csharp
+class MyApplication {
+    public List<string> Tags { get; set; } = new();
+
+    public void Tag() {
+        Console.WriteLine($"Tags: {string.Join(", ", Tags)}");
+    }
+}
+```
+
+```bash
+myapp tag --tags feature bugfix hotfix
+myapp tag --tags feature --tags bugfix --tags hotfix
+```
+
+**Key points:**
+
+- Options are properties or fields with convertible types
+- Apply to the current submodule and all subcommands within it
+- Collection options MUST use named syntax (e.g., `--files`), not positional arguments
+
+#### 1.5 Parameters (positional arguments)
+
+Parameters are method arguments that can be used either positionally or as named options.
+
+```csharp
+class MyApplication {
+    public void Copy(string source, string destination) {
+        Console.WriteLine($"Copying {source} to {destination}");
+    }
+}
+```
+
+```bash
+myapp copy file1.txt file2.txt
+myapp copy --source file1.txt --destination file2.txt
+myapp copy file1.txt --destination file2.txt
+```
+
+**Key points:**
+
+- Parameters can be used positionally or as named options (e.g., `--source`)
+- Options are class properties/fields; parameters are method arguments
+
+See also: [1.4 Options and flags](#14-options-and-flags)
+
+#### 1.6 Naming conventions
+
+The default `ClassMemberStringifier` converts C# names to kebab-case automatically and generates single-character aliases.
+
+```csharp
+class MyApplication {
+    public void RunTests() { }  // Becomes: run-tests, r
+}
+```
+
+**Key points:**
+
+- Kebab-case is applied automatically to all member names
+- Automatic single-character aliases are created unless `[CliName]` is present
+
+#### 1.7 Attributes and metadata
+
+Use `[CliName]` to override names or add aliases.
+
+```csharp
+class MyApplication {
+    [CliName("run")]
+    [CliName("execute")]
+    public void ExecuteTests() { }  // Becomes: run, execute (no automatic alias)
+}
+```
+
+**Key points:**
+
+- `[CliName]` can be applied to methods, properties, fields, and parameters
+- Multiple `[CliName]` attributes create multiple aliases
+- Automatic single-character aliases and kebab-case naming are suppressed when `[CliName]` is present
+
+See also: [1.6 Naming conventions](#16-naming-conventions)
+
+---
+
+### 2. Formatting & Naming
+
+#### 2.1 Kebab-case conversion
+
+The default `ClassMemberStringifier` converts PascalCase C# identifiers to kebab-case.
+
+**Key points:**
+
+- `RunTests` → `run-tests`
+- `EnableSsl` → `enable-ssl`
+- `GetVersion` → `get-version`
+- Applied to subcommands, submodules, options, and parameters
+
+See also: [1.6 Naming conventions](#16-naming-conventions)
+
+#### 2.2 Member stringification
+
+Implement `ClassMemberStringifierBase` to replace the default naming scheme.
+
+```csharp
+class SnakeCaseStringifier : ClassMemberStringifierBase {
+    protected override IEnumerable<string> GetRequiredNames(string name, IEnumerable<CliNameAttribute> cliNameAttributes) {
+        if (cliNameAttributes.Any()) {
+            return cliNameAttributes.Select(a => a.Name);
+        }
+        return new[] { ToSnakeCase(name) };
+    }
+
+    protected override IEnumerable<string> GetAlternativeNames(string name, IEnumerable<CliNameAttribute> cliNameAttributes) {
+        return Enumerable.Empty<string>();
+    }
+
+    private string ToSnakeCase(string value) {
+        return Regex.Replace(value, "([a-z0-9])([A-Z])", "$1_$2").ToLower();
+    }
+}
+
+var cli = new CommandLineInterface() {
+    CliComponentStoreFactory = new CliComponentStoreFactory() {
+        ClassMemberStringifier = new SnakeCaseStringifier()
+    }
+};
+
+class MyApplication {
+    public void RunTests() { }  // Becomes: run_tests
+}
+```
+
+**Key points:**
+
+- `GetRequiredNames` returns the primary names (used for matching and display)
+- `GetAlternativeNames` returns additional aliases (used for matching only)
+- When `[CliName]` attributes are present, they override automatic name generation
+- Assign via `CliComponentStoreFactory.ClassMemberStringifier`
+
+See also: [1.6 Naming conventions](#16-naming-conventions), [1.7 Attributes and metadata](#17-attributes-and-metadata), [2.1 Kebab-case conversion](#21-kebab-case-conversion)
+
+#### 2.3 Alias support
+
+The default `ClassMemberStringifier` generates single-character aliases from the first character of the member name.
+
+**Key points:**
+
+- `RunTests` → alias `r`
+- `Verbose` → alias `v`
+- Aliases are suppressed when `[CliName]` is used
+
+See also: [1.7 Attributes and metadata](#17-attributes-and-metadata), [2.2 Member stringification](#22-member-stringification)
+
+#### 2.4 CLI name attribute
+
+`[CliName]` overrides automatic name generation.
+
+```csharp
+[CliName("run")]
+[CliName("execute")]
+public void ExecuteTests() { }  // Becomes: run, execute
+```
+
+**Key points:**
+
+- Can be applied to methods, properties, fields, and parameters
+- Multiple attributes create multiple aliases
+- Suppresses automatic kebab-case naming and single-character aliases
+
+See also: [1.7 Attributes and metadata](#17-attributes-and-metadata), [2.2 Member stringification](#22-member-stringification), [2.1 Kebab-case conversion](#21-kebab-case-conversion), [2.3 Alias support](#23-alias-support)
+
+---
+
+### 3. Parsing & Data Binding
+
+#### 3.1 Value conversion
+
+The default `ValueConverter` automatically converts string arguments to .NET types.
+
+**Supported types:**
+
+- Primitives (`bool`, `byte`, `sbyte`, `char`, `decimal`, `double`, `float`, `int`, `uint`, `long`, `ulong`, `short`, `ushort`), `string`, `DateTime`
+- Enums (case-insensitive matching)
+- Any `IParsable<T>` type (e.g., `Guid`, `FileInfo`, `DirectoryInfo`, `FileSystemInfo`)
+- Nullable versions of all the above
+- List-like collection types from `System.Collections` and `System.Collections.Generic` namespaces, with automatic concrete type mapping for collection interfaces (e.g., `IList<T>` → `List<T>`, `ISet<T>` → `HashSet<T>`). Dictionary types are NOT supported.
+
+**Custom format provider:**
+
+```csharp
+var cli = new CommandLineInterface() {
+    CliComponentStoreFactory = new CliComponentStoreFactory() {
+        FormatProvider = CultureInfo.CurrentCulture
+    }
+};
+```
+
+**Key points:**
+
+- Conversion is automatic for all supported types
+- The default `ValueConverter` converts type parsing errors to `CliException`
+
+See also: [1.4 Options and flags](#14-options-and-flags)
+
+#### 3.2 Composite value conversion
+
+`CompositeValueConverter` chains multiple converters together, enabling support for collections and custom types simultaneously.
+
+```csharp
+var cli = new CommandLineInterface() {
+    CliComponentStoreFactory = new CliComponentStoreFactory() {
+        CompositeValueConverter = new CompositeValueConverter(new CustomValueConverter(), new CollectionElementStoreFactory())
+    }
+};
+```
+
+**Key points:**
+
+- Converters are evaluated in order — the first converter that can handle the target type wins
+- `CollectionElementStoreFactory` provides collection element binding support
+
+See also: [3.1 Value conversion](#31-value-conversion)
+
+#### 3.3 Collection binding
+
+Collection properties and parameters accept multiple values.
+
+```bash
+myapp tag --tags feature bugfix hotfix
+myapp tag --tags feature --tags bugfix --tags hotfix
+```
+
+**Key points:**
+
+- Supported collection interfaces are automatically mapped to concrete types (e.g., `IList<T>` → `List<T>`, `ISet<T>` → `HashSet<T>`)
+- Dictionary types are NOT supported
+- Collection options MUST use named syntax, not positional arguments
+
+See also: [1.4 Options and flags](#14-options-and-flags), [3.1 Value conversion](#31-value-conversion), [3.2 Composite value conversion](#32-composite-value-conversion)
+
+#### 3.4 Boolean / flag handling
+
+Boolean options act as flags.
+
+```bash
+myapp run --verbose           # Verbose = true
+myapp run --verbose false     # Verbose = false
+```
+
+**Key points:**
+
+- Providing the option name without a value sets it to `true`
+- Explicitly passing `true` or `false` is also supported
+
+See also: [1.4 Options and flags](#14-options-and-flags), [3.1 Value conversion](#31-value-conversion)
+
+#### 3.5 Enum binding
+
+Enums are matched case-insensitively.
+
+```csharp
+public enum LogLevel { Debug, Info, Warning, Error }
+
+class MyApplication {
+    public LogLevel Level { get; set; } = LogLevel.Info;
+}
+```
+
+```bash
+myapp --level debug    # Matches LogLevel.Debug
+myapp --level DEBUG    # Also matches LogLevel.Debug
+```
+
+**Key points:**
+
+- Case-insensitive matching by default
+- Invalid enum values throw `CliException`
+
+See also: [3.1 Value conversion](#31-value-conversion)
+
+#### 3.6 Nullable and optional values
+
+**Key points:**
+
+- Nullable types (`int?`, `string?`, etc.) and parameters with default values are optional
+- Parameters without default values are required
+
+See also: [1.4 Options and flags](#14-options-and-flags), [3.1 Value conversion](#31-value-conversion)
+
+#### 3.7 Custom type converters
+
+Implement `IValueConverter<string?>` to add support for types not covered by the default converter.
+
+```csharp
+class CustomValueConverter : IValueConverter<string?> {
+    public bool CanConvert(Type targetType) {
+        return targetType == typeof(CustomType);
+    }
+
+    public string? ConvertFrom(object? value, Type targetType) {
+        return value?.ToString();
+    }
+
+    public object? ConvertToOrUpdate(string? value, Type targetType, object? currentValue) {
+        if (targetType == typeof(CustomType)) {
+            return CustomType.Parse(value);
+        }
+        throw new NotSupportedException();
+    }
+}
+
+var cli = new CommandLineInterface() {
+    CliComponentStoreFactory = new CliComponentStoreFactory() {
+        CompositeValueConverter = new CompositeValueConverter(new CustomValueConverter(), new CollectionElementStoreFactory())
+    }
+};
+```
+
+**Key points:**
+
+- `CanConvert` determines whether this converter handles a given type
+- `ConvertToOrUpdate` performs the string-to-target conversion
+- `ConvertFrom` performs the reverse conversion (target-to-string)
+- Register via `CompositeValueConverter` to chain with built-in converters
+
+See also: [3.1 Value conversion](#31-value-conversion), [3.2 Composite value conversion](#32-composite-value-conversion)
+
+#### 3.8 Argument tokenization
+
+`CommandLineInterface` accepts arguments as a string array and interprets them left-to-right.
+
+```bash
+myapp database migrate --verbose        # submodule → subcommand → option
+myapp copy file1.txt file2.txt          # subcommand → positional args
+myapp deploy --environment production   # subcommand → named parameter
+```
+
+**Key points:**
+
+- Tokens matching a submodule name navigate into that submodule
+- Tokens matching a subcommand name select that method for invocation
+- Tokens prefixed with `--` or `-` are treated as named options
+- Remaining tokens are bound positionally to method parameters
+
+See also: [1.2 Subcommands](#12-subcommands), [1.3 Submodules](#13-submodules)
+
+#### 3.9 Strict vs lenient parsing
+
+Control how `CommandLineInterface` handles unknown or unexpected options.
+
+```csharp
+// Strict mode (default) — throws on unknown options
+var cli = new CommandLineInterface() {
+    SkipUnknown = false
+};
+
+// Lenient mode — ignores unknown options
+var cli = new CommandLineInterface() {
+    SkipUnknown = true
+};
+```
+
+**Key points:**
+
+- Default is strict: unknown options throw `CliException` with message `"Unknown option: --invalid"`
+- Lenient mode silently ignores unrecognized tokens
+
+#### 3.10 Object population (without execution)
+
+`OptionDeserializer` populates an existing object with CLI arguments without executing a full command. This is a standalone utility, independent from `CommandLineInterface`.
 
 ```csharp
 using CalqFramework.Cli;
@@ -215,349 +699,85 @@ OptionDeserializer.Deserialize(settings);
 OptionDeserializer.Deserialize(settings, new[] { "--host", "example.com", "--port", "443", "--enable-ssl", "true" });
 
 // With configuration
-OptionDeserializer.Deserialize(settings, args, 
-    new OptionDeserializerConfiguration { 
-        SkipUnknown = true  // Ignore unknown options instead of throwing
-    });
+OptionDeserializer.Deserialize(settings, args, new OptionDeserializerConfiguration { SkipUnknown = true});
 ```
 
 **Key points:**
-- `OptionDeserializer` only populates properties and fields, doesn't execute methods
+
+- Only populates properties and fields — does not execute methods
 - Supports all the same type conversions as full CLI execution
 - The default `ValueConverter` automatically converts type parsing errors to `CliException`
 
-See also: [How to Use the CLI Framework](#how-to-use-the-cli-framework)
+See also: [1.1 Command definition](#11-command-definition), [1.4 Options and flags](#14-options-and-flags), [3.1 Value conversion](#31-value-conversion), [3.9 Strict vs lenient parsing](#39-strict-vs-lenient-parsing)
 
----
+#### 3.11 Parameter shadowing
 
-### 2. Command Structure & Hierarchy
+Parameter shadowing allows method parameters to override class-level properties with the same name.
 
-*How to organize your tool into subcommands and modules.*
-
-#### How to Define Submodules
-
-Submodules are properties or fields that return class instances, creating multi-level command hierarchies (like `git remote add`).
+**Without shadowing (default):**
 
 ```csharp
 class MyApplication {
-    public DatabaseCommands Database { get; } = new DatabaseCommands();
-}
+    public string Environment { get; set; } = "development";
 
-class DatabaseCommands {
-    public void Migrate() {
-        Console.WriteLine("Running migrations...");
+    public void Deploy(string environment) {
+        Console.WriteLine($"Property: {Environment}, Parameter: {environment}");
     }
 }
 ```
-
-**Usage:**
-```bash
-myapp database migrate
-```
-
-Submodules can be nested to any depth:
 
 ```bash
-cloudmanager compute instance start i-12345
+myapp deploy production --environment staging
+# Output: Property: staging, Parameter: production
 ```
 
-**Key points:**
-- Submodules are properties or fields that return class instances (not primitives or collections)
-- The class can be defined anywhere (same file, different file, separate assembly)
-- Nesting depth is unlimited
-- Each level can have its own options and subcommands
-
-#### How to Define Subcommands
-
-Subcommands are public methods on your class. `CommandLineInterface` automatically exposes them as CLI commands.
-
-```csharp
-class MyApplication {
-    public void Build() {
-        Console.WriteLine("Building project...");
-    }
-    
-    public void Deploy(string environment, string configuration = "Release") {
-        Console.WriteLine($"Deploying to {environment} in {configuration} mode");
-    }
-    
-    public string GetVersion() {
-        return "1.0.0";
-    }
-}
-```
-
-**Usage:**
-```bash
-myapp build
-myapp deploy production Debug
-myapp get-version  # Returns: 1.0.0
-```
-
-#### How to Define Options and Parameters
-
-Options are class-level properties or fields that become flags (like `--verbose`). Parameters are method arguments that can be used either as positional arguments or as named options.
-
-**Options from properties:**
-
-```csharp
-class MyApplication {
-    // Becomes: --verbose or -v
-    public bool Verbose { get; set; } = false;
-    
-    // Becomes: --output or -o
-    public string Output { get; set; } = "output.txt";
-    
-    public void Run() {
-        if (Verbose) {
-            Console.WriteLine($"Writing to {Output}");
-        }
-    }
-}
-```
-
-**Usage:**
-```bash
-myapp run --verbose --output result.txt
-myapp run -v -o result.txt
-```
-
-**Parameters from method arguments:**
-
-```csharp
-class MyApplication {
-    public void Copy(string source, string destination) {
-        Console.WriteLine($"Copying {source} to {destination}");
-    }
-}
-```
-
-**Usage (positional, named, or mixed):**
-```bash
-myapp copy file1.txt file2.txt
-myapp copy --source file1.txt --destination file2.txt
-myapp copy file1.txt --destination file2.txt
-```
-
-**Collection options and parameters:**
-
-```csharp
-class MyApplication {
-    public List<string> Tags { get; set; } = new();
-    
-    public void Tag() {
-        Console.WriteLine($"Tags: {string.Join(", ", Tags)}");
-    }
-}
-```
-
-**Usage:**
-```bash
-myapp tag --tags feature bugfix hotfix
-myapp tag --tags feature --tags bugfix --tags hotfix
-```
-
-**Supported Types:**
-
-Type conversion is automatic for:
-- Primitives (`bool`, `byte`, `sbyte`, `char`, `decimal`, `double`, `float`, `int`, `uint`, `long`, `ulong`, `short`, `ushort`), `string`, `DateTime`
-- Enums (case-insensitive matching)
-- Any `IParsable<T>` type (e.g., `Guid`, `FileInfo`, `DirectoryInfo`, `FileSystemInfo`)
-- Nullable versions of all the above
-- List-like collection types from `System.Collections` and `System.Collections.Generic` namespaces, with automatic concrete type mapping for collection interfaces (e.g., `IList<T>` → `List<T>`, `ISet<T>` → `HashSet<T>`). Dictionary types are NOT supported.
-
-**Key points:**
-- Options are properties or fields with convertible types; parameters are method arguments
-- Parameters can be used positionally or as named options (e.g., `--source`)
-- Collection parameters MUST use named options (e.g., `--files`), not positional arguments
-
-See also: [How to Customize Value Conversion](#how-to-customize-value-conversion), [How to Control Member Visibility](#how-to-control-member-visibility)
-
-#### How to Configure Naming & Aliases
-
-The default `ClassMemberStringifier` converts C# names to kebab-case automatically (e.g., `RunTests` → `run-tests`) and generates single-character aliases (e.g., `r`). Use `[CliName]` to override names or add aliases:
-
-```csharp
-class MyApplication {
-    public void RunTests() { }  // Becomes: run-tests, r
-    
-    [CliName("run")]
-    [CliName("execute")]
-    public void ExecuteTests() { }  // Becomes: run, execute (no automatic alias)
-}
-```
-
-**Key points:**
-- Kebab-case is applied automatically to all member names
-- `[CliName]` can be applied to methods, properties, fields, and parameters
-- Multiple `[CliName]` attributes create multiple aliases
-- Automatic single-character aliases are created unless you use `[CliName]`
-
-See also: [How to Customize Name Conversion](#how-to-customize-name-conversion)
-
----
-
-### 3. Help & Documentation
-
-*How to make your CLI self-documenting.*
-
-#### How to Generate Help
-
-The default `HelpPrinter` automatically generates help menus from your code structure and XML documentation comments. Help is available at every level with `--help` or `-h`.
-
-**Automatic help generation:**
-
-```csharp
-class MyApplication {
-    public DatabaseCommands Database { get; } = new DatabaseCommands();
-    
-    public void Build() {
-        Console.WriteLine("Building...");
-    }
-}
-
-class DatabaseCommands {
-    public void Migrate() {
-        Console.WriteLine("Migrating...");
-    }
-}
-```
-
-**Usage:**
-```bash
-myapp --help              # Root help
-myapp database --help     # Submodule help
-myapp build --help        # Subcommand help
-```
-
-**Adding descriptions with XML documentation:**
-
-Enable `<GenerateDocumentationFile>` in your `.csproj` so the default `HelpPrinter` can read `<summary>` and `<param>` tags from your code:
-
-```csharp
-/// <summary>
-/// Main application for managing cloud resources.
-/// </summary>
-class CloudManager {
-    /// <summary>
-    /// Compute resource management commands.
-    /// </summary>
-    public ComputeModule Compute { get; } = new ComputeModule();
-    
-    /// <summary>
-    /// API key for authentication.
-    /// </summary>
-    public string ApiKey { get; set; } = "";
-}
-
-class ComputeModule {
-    /// <summary>
-    /// Number of instances to create.
-    /// </summary>
-    public int Count { get; set; } = 1;
-    
-    /// <summary>
-    /// Starts a new compute instance.
-    /// </summary>
-    /// <param name="instanceType">The type of instance to start (e.g., t2.micro, t2.small).</param>
-    /// <param name="region">The region where the instance will be created.</param>
-    public void Start(string instanceType, string region = "us-east-1") {
-        Console.WriteLine($"Starting {Count} {instanceType} instance(s) in {region}");
-    }
-}
-```
-
-```text
-myapp --help
-
-Main application for managing cloud resources.
-
-Submodules:
-  compute    Compute resource management commands
-
-Options:
-  --api-key    API key for authentication
-```
-
-```text
-myapp compute start --help
-
-Starts a new compute instance.
-
-Parameters:
-  instance-type    The type of instance to start (e.g., t2.micro, t2.small)
-  region          The region where the instance will be created (default: us-east-1)
-
-Options:
-  --count    Number of instances to create (default: 1)
-```
-
-**Key points:**
-- The default `HelpPrinter` reads `<summary>` and `<param>` tags only
-- `<GenerateDocumentationFile>` must be enabled in your `.csproj` for the default `HelpPrinter` to find the XML file
-- Help is automatically shown when the user provides `--help`/`-h`, provides no arguments, or provides only a submodule name without a subcommand
-
-See also: [How to Customize Help Printing](#how-to-customize-help-printing), [How to Display Version Information](#how-to-display-version-information)
-
-#### How to Display Version Information
-
-Version information is automatically available with `--version` or `-v`. The default `VersionPrinter` prints the version, which by default reads from the entry assembly's version (set via `<Version>` in your `.csproj`).
-
-**Include revision number (4 digits):**
+**With shadowing enabled:**
 
 ```csharp
 var cli = new CommandLineInterface() {
-    VersionPrinter = new VersionPrinter() {
-        UseRevisionVersion = true
+    CliComponentStoreFactory = new CliComponentStoreFactory() {
+        EnableShadowing = true
     }
-};
-
-// Prints: "1.0.0.0" instead of "1.0.0"
-```
-
-**Custom version printer:**
-
-```csharp
-using CalqFramework.Cli.Formatting;
-
-class CustomVersionPrinter : IVersionPrinter {
-    public void PrintVersion(ICliContext context, Type rootSubmoduleType) {
-        var version = Assembly.GetEntryAssembly()?.GetName().Version;
-        context.InterfaceOut.WriteLine($"MyApp v{version} (build {DateTime.Now:yyyyMMdd})");
-    }
-}
-
-var cli = new CommandLineInterface() {
-    VersionPrinter = new CustomVersionPrinter()
 };
 ```
 
-**Usage:**
 ```bash
-myapp --version
-myapp -v
+myapp deploy production --environment staging
+# With shadowing: Parameter wins, environment = "staging"
+# Without shadowing: Both are separate, environment = "production", Environment = "staging"
 ```
 
-See also: [How to Generate Help](#how-to-generate-help)
+**Key points:**
+
+- Shadowing only affects members with the same name
+- The parameter value takes precedence when shadowing is enabled
+- Disabled by default to avoid confusion
+- Works with both properties and fields
+
+See also: [1.1 Command definition](#11-command-definition), [1.4 Options and flags](#14-options-and-flags), [1.5 Parameters (positional arguments)](#15-parameters-positional-arguments)
 
 ---
 
-### 4. Error Handling
+### 4. Validation & Access Control
 
-*How to manage failures and provide feedback.*
+#### 4.1 Required vs optional
 
-#### How to Handle Exceptions
+**Key points:**
 
-`CommandLineInterface` throws `CliException` for all CLI-related errors. Always wrap `Execute()` in a try-catch block.
+- Parameters without default values are required
+- Properties and fields always have a default value (assigned in code), making them optional
+- Missing required parameters result in positional binding or `CliException` if insufficient arguments are provided
 
-**Basic error handling:**
+See also: [1.4 Options and flags](#14-options-and-flags), [1.5 Parameters (positional arguments)](#15-parameters-positional-arguments), [3.6 Nullable and optional values](#36-nullable-and-optional-values)
+
+#### 4.2 Error handling
+
+`CommandLineInterface` throws `CliException` for all CLI-related errors.
 
 ```csharp
-using CalqFramework.Cli;
-
 try {
     var result = new CommandLineInterface().Execute(new MyApplication());
-    
+
     switch (result) {
         case ValueTuple:
             break;
@@ -575,73 +795,46 @@ catch (CliException ex) {
 }
 ```
 
-**Common exception types and messages:**
+**Common error messages:**
 
 ```bash
 # Unknown option
-# Message: "Unknown option: --invalid"
+# "Unknown option: --invalid"
 myapp command --invalid value
 
 # Option requires value
-# Message: "Option '--output' requires a value"
+# "Option '--output' requires a value"
 myapp command --output
 
-# Ambiguous value (starts with -)
-# Message: "Ambiguous value '-123' for '--number', use option=value format for values starting with '-' or '+'"
+# Ambiguous value (starts with - or +)
+# "Ambiguous value '-123' for '--number', use option=value format for values starting with '-' or '+'"
 myapp command --number -123
 # Fix: myapp command --number=-123
 
 # Invalid format
-# Message: "option '--port=abc': Invalid format (expected Int32)"
+# "option '--port=abc': Invalid format (expected Int32)"
 myapp command --port abc
 
 # Out of range
-# Message: "option '--count=9999999999': Out of range (-2147483648-2147483647)"
+# "option '--count=9999999999': Out of range (-2147483648-2147483647)"
 myapp command --count 9999999999
 
 # Invalid enum value
-# Message: "option '--level=invalid': Invalid format (expected LogLevel)"
+# "option '--level=invalid': Invalid format (expected LogLevel)"
 myapp command --level invalid
 ```
 
 **Key points:**
+
 - `CliException` is the only exception type thrown by `CommandLineInterface`
 - The default `ValueConverter` automatically converts type parsing errors to `CliException`
-- Application exceptions thrown inside your methods propagate normally and are not wrapped by `CommandLineInterface`
+- Application exceptions thrown inside your methods propagate normally and are not wrapped
 
-See also: [How to Use the CLI Framework](#how-to-use-the-cli-framework)
+See also: [1.1 Command definition](#11-command-definition), [3.1 Value conversion](#31-value-conversion), [3.9 Strict vs lenient parsing](#39-strict-vs-lenient-parsing)
 
----
+#### 4.3 Option access validation
 
-### 5. Input/Output (I/O) Management
-
-*How the CLI communicates with the user and other tools.*
-
-#### How to Manage Output
-
-By default, `CommandLineInterface` writes help, version, and completion information to `Console.Out`. You can redirect this by setting `InterfaceOut` to any `TextWriter` (e.g., `StringWriter`, `StreamWriter`, `TextWriter.Null`).
-
-```csharp
-var cli = new CommandLineInterface() {
-    InterfaceOut = new StringWriter()  // or any TextWriter
-};
-```
-
-**Key points:**
-- `InterfaceOut` redirects help text, version info, completion output, and framework messages
-- Your application's `Console.WriteLine()` calls, `CliException` error messages, and subcommand return values are not redirected
-
-See also: [How to Customize Help Printing](#how-to-customize-help-printing)
-
----
-
-### 6. Configuration & Customization
-
-*How to change the internal behavior of the CLI engine.*
-
-#### How to Control Member Visibility
-
-The default `CliComponentStoreFactory` exposes both fields and properties as CLI options. You can control which members are accessible and validate them.
+The default `CliComponentStoreFactory` exposes both fields and properties as CLI options.
 
 **Access only properties (not fields):**
 
@@ -657,17 +850,6 @@ class MyApplication {
     public string Option1 { get; set; } = "value";  // Exposed
     public string _option2 = "value";               // Hidden
 }
-```
-
-**Access only fields (not properties):**
-
-```csharp
-var cli = new CommandLineInterface() {
-    CliComponentStoreFactory = new CliComponentStoreFactory() {
-        AccessFields = true,
-        AccessProperties = false
-    }
-};
 ```
 
 **Control case sensitivity:**
@@ -693,9 +875,7 @@ var cli = new CommandLineInterface() {
 ```csharp
 var cli = new CommandLineInterface() {
     CliComponentStoreFactory = new CliComponentStoreFactory() {
-        // Case-sensitive for options
         BindingFlags = BindingFlags.Instance | BindingFlags.Public,
-        // Case-insensitive for subcommands
         MethodBindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase
     }
 };
@@ -703,7 +883,548 @@ var cli = new CommandLineInterface() {
 
 **Fine-grained control with access validators:**
 
-Use `IAccessValidator` to control which members become CLI options, subcommands, or submodules based on custom logic:
+```csharp
+class CustomOptionValidator : IAccessValidator {
+    public bool IsValid(MemberInfo member) {
+        return member.GetCustomAttribute<ExposeToCliAttribute>() != null;
+    }
+}
+
+var cli = new CommandLineInterface() {
+    CliComponentStoreFactory = new CliComponentStoreFactory() {
+        OptionAccessValidator = new CustomOptionValidator()
+    }
+};
+```
+
+**Key points:**
+
+- `AccessFields` and `AccessProperties` control broad member categories
+- `BindingFlags` control case sensitivity and visibility scope
+- `MethodBindingFlags` can differ from `BindingFlags` for independent method/option sensitivity
+- `IAccessValidator` provides attribute-based or logic-based fine-grained control
+
+See also: [1.4 Options and flags](#14-options-and-flags), [2.2 Member stringification](#22-member-stringification)
+
+#### 4.4 Subcommand access validation
+
+Use `IAccessValidator` to control which methods become CLI subcommands.
+
+```csharp
+var cli = new CommandLineInterface() {
+    CliComponentStoreFactory = new CliComponentStoreFactory() {
+        SubcommandAccessValidator = new CustomSubcommandValidator()
+    }
+};
+```
+
+**Key points:**
+
+- Same `IAccessValidator` interface as option validation
+- Applied to `MethodInfo` instances
+
+See also: [1.2 Subcommands](#12-subcommands), [4.3 Option access validation](#43-option-access-validation)
+
+#### 4.5 Submodule access validation
+
+Use `IAccessValidator` to control which properties/fields become CLI submodules.
+
+```csharp
+var cli = new CommandLineInterface() {
+    CliComponentStoreFactory = new CliComponentStoreFactory() {
+        SubmoduleAccessValidator = new CustomSubmoduleValidator()
+    }
+};
+```
+
+**Attribute-based validation example:**
+
+```csharp
+class ValidatedOptionAccessValidator : IAccessValidator {
+    private readonly ICompositeValueConverter<string?> _converter;
+
+    public ValidatedOptionAccessValidator(ICompositeValueConverter<string?> converter) {
+        _converter = converter;
+    }
+
+    public bool IsValid(MemberInfo member) {
+        if (member.GetCustomAttribute<RequiredAttribute>() != null ||
+            member.GetCustomAttribute<RangeAttribute>() != null) {
+            Type memberType = member switch {
+                PropertyInfo prop => prop.PropertyType,
+                FieldInfo field => field.FieldType,
+                _ => throw new NotSupportedException()
+            };
+            return _converter.CanConvert(memberType);
+        }
+        return false;
+    }
+}
+```
+
+**Key points:**
+
+- Same `IAccessValidator` interface as option and subcommand validation
+- Applied to `PropertyInfo` or `FieldInfo` instances that return class types
+
+See also: [1.3 Submodules](#13-submodules), [4.3 Option access validation](#43-option-access-validation), [4.4 Subcommand access validation](#44-subcommand-access-validation)
+
+---
+
+### 5. Execution
+
+#### 5.1 Command resolution
+
+`CommandLineInterface` resolves commands by traversing arguments left-to-right.
+
+**Key points:**
+
+- Matches tokens against submodule names to navigate the hierarchy
+- Matches the next token against subcommand (method) names
+- Remaining tokens are parsed as options and parameters
+- Help is automatically shown when the user provides `--help`/`-h`, provides no arguments, or provides only a submodule name without a subcommand
+
+See also: [1.2 Subcommands](#12-subcommands), [1.3 Submodules](#13-submodules), [3.8 Argument tokenization](#38-argument-tokenization)
+
+#### 5.2 Command invocation
+
+Once a subcommand is resolved, `CommandLineInterface` binds all parsed arguments to the method's parameters and the parent class's properties/fields, then invokes the method.
+
+**Key points:**
+
+- Options are set on the class instance before method invocation
+- Parameters are bound to method arguments (positional or named)
+- The method is invoked via reflection
+
+See also: [1.4 Options and flags](#14-options-and-flags), [1.5 Parameters (positional arguments)](#15-parameters-positional-arguments), [3.11 Parameter shadowing](#311-parameter-shadowing), [5.1 Command resolution](#51-command-resolution)
+
+#### 5.3 Return values
+
+```csharp
+switch (result) {
+    case ValueTuple:
+        // Void methods, help, version, completion
+        break;
+    case string str:
+        Console.WriteLine(str);
+        break;
+    case object obj:
+        Console.WriteLine(JsonSerializer.Serialize(obj));
+        break;
+}
+```
+
+**Key points:**
+
+- Void methods return `ValueTuple`
+- Built-in subcommands (help/version/completion) return `ValueTuple`
+- Non-void methods return their result as `object?`
+- The caller is responsible for handling and displaying the result
+
+See also: [1.1 Command definition](#11-command-definition), [1.2 Subcommands](#12-subcommands), [5.2 Command invocation](#52-command-invocation)
+
+---
+
+### 6. User Feedback
+
+#### 6.1 Help generation
+
+The default `HelpPrinter` automatically generates help menus from your code structure and XML documentation comments.
+
+```bash
+myapp --help              # Root help
+myapp database --help     # Submodule help
+myapp build --help        # Subcommand help
+```
+
+**Adding descriptions with XML documentation:**
+
+```csharp
+/// <summary>
+/// Main application for managing cloud resources.
+/// </summary>
+class CloudManager {
+    /// <summary>
+    /// Compute resource management commands.
+    /// </summary>
+    public ComputeModule Compute { get; } = new ComputeModule();
+
+    /// <summary>
+    /// API key for authentication.
+    /// </summary>
+    public string ApiKey { get; set; } = "";
+}
+
+class ComputeModule {
+    /// <summary>
+    /// Number of instances to create.
+    /// </summary>
+    public int Count { get; set; } = 1;
+
+    /// <summary>
+    /// Starts a new compute instance.
+    /// </summary>
+    /// <param name="instanceType">The type of instance to start (e.g., t2.micro, t2.small).</param>
+    /// <param name="region">The region where the instance will be created.</param>
+    public void Start(string instanceType, string region = "us-east-1") {
+        Console.WriteLine($"Starting {Count} {instanceType} instance(s) in {region}");
+    }
+}
+```
+
+```text
+myapp --help
+Main application for managing cloud resources.
+
+Submodules:
+  compute    Compute resource management commands
+
+Options:
+  --api-key    API key for authentication
+```
+
+```text
+myapp compute start --help
+Starts a new compute instance.
+
+Parameters:
+  instance-type    The type of instance to start (e.g., t2.micro, t2.small)
+  region          The region where the instance will be created (default: us-east-1)
+
+Options:
+  --count    Number of instances to create (default: 1)
+```
+
+**Key points:**
+
+- The default `HelpPrinter` reads `<summary>` and `<param>` tags only
+- `<GenerateDocumentationFile>` must be enabled in your `.csproj` for the default `HelpPrinter` to find the XML file
+- Help is automatically shown when the user provides `--help`/`-h`, provides no arguments, or provides only a submodule name without a subcommand
+
+See also: [1.6 Naming conventions](#16-naming-conventions), [2.1 Kebab-case conversion](#21-kebab-case-conversion), [5.1 Command resolution](#51-command-resolution)
+
+#### 6.2 Version display
+
+Version information is automatically available with `--version` or `-v`. The default `VersionPrinter` reads from the entry assembly's version (set via `<Version>` in your `.csproj`).
+
+**Include revision number (4 digits):**
+
+```csharp
+var cli = new CommandLineInterface() {
+    VersionPrinter = new VersionPrinter() {
+        UseRevisionVersion = true
+    }
+};
+// Prints: "1.0.0.0" instead of "1.0.0"
+```
+
+**Custom version printer:**
+
+```csharp
+using CalqFramework.Cli.Formatting;
+
+class CustomVersionPrinter : IVersionPrinter {
+    public void PrintVersion(ICliContext context, Type rootSubmoduleType) {
+        var version = Assembly.GetEntryAssembly()?.GetName().Version;
+        context.InterfaceOut.WriteLine($"MyApp v{version} (build {DateTime.Now:yyyyMMdd})");
+    }
+}
+
+var cli = new CommandLineInterface() {
+    VersionPrinter = new CustomVersionPrinter()
+};
+```
+
+**Key points:**
+
+- Available via `--version` or `-v`
+- Default reads from entry assembly version
+- `UseRevisionVersion = true` includes the fourth version segment
+
+See also: [5.3 Return values](#53-return-values), [6.1 Help generation](#61-help-generation)
+
+#### 6.3 Error formatting
+
+Error messages follow a consistent format indicating the failing option and the nature of the error.
+
+```text
+option '--port=abc': Invalid format (expected Int32)
+option '--count=9999999999': Out of range (-2147483648-2147483647)
+Unknown option: --invalid
+Option '--output' requires a value
+Ambiguous value '-123' for '--number', use option=value format for values starting with '-' or '+'
+```
+
+**Key points:**
+
+- Application exceptions thrown inside your methods propagate normally and are not wrapped by `CommandLineInterface`
+- All framework errors are surfaced as `CliException` with descriptive messages
+
+See also: [3.1 Value conversion](#31-value-conversion), [3.9 Strict vs lenient parsing](#39-strict-vs-lenient-parsing), [4.2 Error handling](#42-error-handling)
+
+---
+
+### 7. Input/Output
+
+#### 7.1 Output redirection
+
+By default, `CommandLineInterface` writes help, version, and completion information to `Console.Out`. Redirect this by setting `InterfaceOut` to any `TextWriter`.
+
+```csharp
+var cli = new CommandLineInterface() {
+    InterfaceOut = new StringWriter()  // or any TextWriter
+};
+```
+
+**Key points:**
+
+- `InterfaceOut` redirects help text, version info, completion output, and framework messages
+- Your application's `Console.WriteLine()` calls, `CliException` error messages, and subcommand return values are not redirected
+
+See also: [1.1 Command definition](#11-command-definition), [6.1 Help generation](#61-help-generation), [6.2 Version display](#62-version-display)
+
+---
+
+### 8. Completions
+
+#### 8.1 Automatic completion
+
+The default `CompletionHandler` provides automatic completion for many types without any configuration.
+
+**What gets completed automatically:**
+
+- Submodules and subcommands at all levels
+- All option and parameter names
+- Enum values (case-insensitive)
+- Boolean values (`true`, `false`)
+- File paths (via `FileInfo`), directory paths (via `DirectoryInfo`), file system paths (via `FileSystemInfo`)
+- Collection element types (if they are enums or bools)
+
+**Key points:**
+
+- No configuration required for built-in type completions
+- Completion is context-aware and can access application state
+
+See also: [3.5 Enum binding](#35-enum-binding), [3.4 Boolean / flag handling](#34-boolean--flag-handling), [3.1 Value conversion](#31-value-conversion)
+
+#### 8.2 Completion script generation
+
+The default `CompletionHandler` generates completion scripts for multiple shells and can install them automatically.
+
+**Generate completion script:**
+
+```bash
+myapp completion bash
+myapp completion zsh
+myapp completion powershell
+myapp completion pwsh
+myapp completion fish
+```
+
+**Install completion:**
+
+```bash
+myapp completion bash install
+myapp completion zsh install
+myapp completion powershell install
+myapp completion pwsh install
+myapp completion fish install
+myapp completion all install
+```
+
+**Uninstall completion:**
+
+```bash
+myapp completion bash uninstall
+myapp completion all uninstall
+```
+
+**Installation locations:**
+
+- Bash (Linux/Mac): `/etc/bash_completion.d/myapp`
+- Bash (Windows): `~/.bash_completion.d/myapp.bash`
+- Zsh (Linux/Mac): `/usr/local/share/zsh/site-functions/_myapp`
+- Zsh (Windows): `~/.zsh/completion/_myapp`
+- PowerShell 5: `~/Documents/WindowsPowerShell/Completions/myapp.ps1`
+- PowerShell 7 (Linux/Mac): `~/.config/powershell/Completions/myapp.ps1`
+- PowerShell 7 (Windows): `~/Documents/PowerShell/Completions/myapp.ps1`
+- Fish (Linux/Mac): `~/.config/fish/completions/myapp.fish`
+- Fish (Windows): `%APPDATA%/fish/completions/myapp.fish`
+
+**After installation:**
+
+```bash
+source ~/.bashrc          # Bash
+source ~/.zshrc           # Zsh
+. $PROFILE                # PowerShell
+# Fish automatically loads completions
+```
+
+**Key points:**
+
+- Install scripts with `completion <shell> install`
+- Uninstall with `completion <shell> uninstall`
+- `completion all install` installs for all supported shells
+
+See also: [7.1 Output redirection](#71-output-redirection), [8.1 Automatic completion](#81-automatic-completion)
+
+#### 8.3 Completion protocols
+
+The default `CompletionHandler` automatically detects and handles both Cobra-style and dotnet-suggest protocols.
+
+```bash
+# Cobra-style (used by generated shell scripts)
+myapp __complete deploy --region
+
+# dotnet-suggest protocol
+dotnet tool install -g dotnet-suggest
+myapp [suggest:1] deploy --region
+```
+
+**Key points:**
+
+- Both protocols are handled automatically — no configuration needed
+- Cobra-style is used by the generated shell scripts
+- dotnet-suggest is supported for interoperability with the .NET ecosystem
+
+See also: [8.1 Automatic completion](#81-automatic-completion), [8.2 Completion script generation](#82-completion-script-generation)
+
+#### 8.4 Custom completion providers
+
+Use class-based completion providers for reusable completion logic.
+
+```csharp
+using CalqFramework.Cli.Completion.Providers;
+
+class RegionCompletionProvider : ICompletionProvider {
+    public IEnumerable<string> GetCompletions(ICompletionProviderContext context) {
+        var regions = new[] { "us-east-1", "us-west-2", "eu-west-1", "eu-central-1", "ap-southeast-1" };
+        return regions.Where(r => r.StartsWith(context.PartialInput, StringComparison.OrdinalIgnoreCase));
+    }
+}
+
+class MyApplication {
+    [CliCompletion(typeof(RegionCompletionProvider))]
+    public string Region { get; set; } = "us-east-1";
+}
+```
+
+**Built-in file completion providers:**
+
+```csharp
+using CalqFramework.Cli.Completion.Providers;
+
+class MyApplication {
+    [CliCompletion(typeof(FileCompletionProvider), "*.json;*.yaml;*.yml")]
+    public string ConfigFile { get; set; } = "config.json";
+
+    [CliCompletion(typeof(DirectoryCompletionProvider))]
+    public string OutputDir { get; set; } = "output";
+
+    [CliCompletion(typeof(FileSystemCompletionProvider))]
+    public string Path { get; set; } = "";
+}
+```
+
+**Key points:**
+
+- Implement `ICompletionProvider` for reusable provider classes
+- `ICompletionProviderContext.PartialInput` provides the current user input for filtering
+- Built-in providers: `FileCompletionProvider`, `DirectoryCompletionProvider`, `FileSystemCompletionProvider`
+- `FileCompletionProvider` accepts a semicolon-separated glob pattern for filtering
+
+See also: [8.1 Automatic completion](#81-automatic-completion)
+
+#### 8.5 Completion attributes
+
+The `[CliCompletion]` attribute provides custom completion via method reference or provider type.
+
+**Method-based custom completion:**
+
+```csharp
+class MyApplication {
+    [CliCompletion("GetRegions")]
+    public string Region { get; set; } = "us-east-1";
+
+    // Signature: IEnumerable<string> MethodName(string partialInput)
+    // Can be static or instance, public or private
+    private IEnumerable<string> GetRegions(string partialInput) {
+        var regions = new[] { "us-east-1", "us-west-2", "eu-west-1", "eu-central-1", "ap-southeast-1" };
+        return regions.Where(r => r.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase));
+    }
+}
+```
+
+**Dynamic completion based on state:**
+
+```csharp
+class MyApplication {
+    public string Environment { get; set; } = "development";
+
+    [CliCompletion("GetAvailableRegions")]
+    public string Region { get; set; } = "us-east-1";
+
+    private IEnumerable<string> GetAvailableRegions(string partialInput) {
+        var regions = Environment switch {
+            "development" => new[] { "us-east-1", "us-west-2" },
+            "staging" => new[] { "us-east-1", "eu-west-1" },
+            "production" => new[] { "us-east-1", "us-west-2", "eu-west-1", "ap-southeast-1" },
+            _ => Array.Empty<string>()
+        };
+        return regions.Where(r => r.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase));
+    }
+}
+```
+
+**Completion for method parameters:**
+
+```csharp
+class MyApplication {
+    public void Deploy(
+        [CliCompletion("GetEnvironments")] string environment,
+        [CliCompletion("GetRegions")] string region) {
+        Console.WriteLine($"Deploying to {environment} in {region}");
+    }
+
+    private IEnumerable<string> GetEnvironments(string partialInput) {
+        return new[] { "development", "staging", "production" }
+            .Where(e => e.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private IEnumerable<string> GetRegions(string partialInput) {
+        return new[] { "us-east-1", "us-west-2", "eu-west-1" }
+            .Where(r => r.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase));
+    }
+}
+```
+
+**Key points:**
+
+- Method-based: `[CliCompletion("MethodName")]` — method must return `IEnumerable<string>` and accept `string partialInput`
+- Provider-based: `[CliCompletion(typeof(ProviderClass))]` or `[CliCompletion(typeof(ProviderClass), "args")]`
+- Can be applied to properties, fields, and method parameters
+- Completion methods can access instance state for dynamic suggestions
+
+See also: [1.4 Options and flags](#14-options-and-flags), [1.5 Parameters (positional arguments)](#15-parameters-positional-arguments), [1.7 Attributes and metadata](#17-attributes-and-metadata), [8.1 Automatic completion](#81-automatic-completion), [8.4 Custom completion providers](#84-custom-completion-providers)
+
+---
+
+### 9. Extensibility
+
+#### 9.1 Custom value converters
+
+Implement `IValueConverter<string?>` to add support for types not covered by the default converter.
+
+**Key points:**
+
+- Register via `CompositeValueConverter` on `CliComponentStoreFactory`
+- Converters are evaluated in order — first match wins
+
+See also: [3.1 Value conversion](#31-value-conversion), [3.2 Composite value conversion](#32-composite-value-conversion), [3.7 Custom type converters](#37-custom-type-converters)
+
+#### 9.2 Custom access validators
+
+Implement `IAccessValidator` to control which members become CLI options, subcommands, or submodules.
 
 ```csharp
 class CustomOptionValidator : IAccessValidator {
@@ -721,262 +1442,37 @@ var cli = new CommandLineInterface() {
 };
 ```
 
-**Attribute-based validation example:**
-
-```csharp
-class ValidatedOptionAccessValidator : IAccessValidator {
-    private readonly ICompositeValueConverter<string?> _converter;
-    
-    public ValidatedOptionAccessValidator(ICompositeValueConverter<string?> converter) {
-        _converter = converter;
-    }
-    
-    public bool IsValid(MemberInfo member) {
-        if (member.GetCustomAttribute<RequiredAttribute>() != null ||
-            member.GetCustomAttribute<RangeAttribute>() != null) {
-            
-            Type memberType = member switch {
-                PropertyInfo prop => prop.PropertyType,
-                FieldInfo field => field.FieldType,
-                _ => throw new NotSupportedException()
-            };
-            
-            return _converter.CanConvert(memberType);
-        }
-        
-        return false;
-    }
-}
-```
-
-See also: [How to Define Options and Parameters](#how-to-define-options-and-parameters)
-
-#### How to Configure Strictness
-
-Control how `CommandLineInterface` handles unknown or unexpected options.
-
-**Strict mode (default) - throw on unknown options:**
-
-```csharp
-var cli = new CommandLineInterface() {
-    SkipUnknown = false  // Default
-};
-
-// This will throw CliException: "Unknown option: --invalid"
-cli.Execute(new MyApplication(), new[] { "command", "--invalid", "value" });
-```
-
-**Lenient mode - ignore unknown options:**
-
-```csharp
-var cli = new CommandLineInterface() {
-    SkipUnknown = true
-};
-
-// This will ignore --invalid and continue execution
-cli.Execute(new MyApplication(), new[] { "command", "--invalid", "value" });
-```
-
-#### How to Configure Parameter Shadowing
-
-Parameter shadowing allows method parameters to override class-level properties with the same name.
-
-**Without shadowing (default):**
-
-```csharp
-class MyApplication {
-    public string Environment { get; set; } = "development";
-    
-    public void Deploy(string environment) {
-        Console.WriteLine($"Property: {Environment}, Parameter: {environment}");
-    }
-}
-```
-
-**Usage:**
-```bash
-myapp deploy production --environment staging
-# Output: Property: staging, Parameter: production
-```
-
-**With shadowing enabled:**
-
-```csharp
-var cli = new CommandLineInterface() {
-    CliComponentStoreFactory = new CliComponentStoreFactory() {
-        EnableShadowing = true
-    }
-};
-```
-
-**Usage:**
-```bash
-myapp deploy production --environment staging
-# With shadowing: Parameter wins, environment = "staging"
-# Without shadowing: Both are separate, environment = "production", Environment = "staging"
-```
-
 **Key points:**
-- Shadowing only affects members with the same name
-- The parameter value takes precedence when shadowing is enabled
-- Shadowing is disabled by default to avoid confusion
-- Works with both properties and fields
 
-#### How to Customize Name Conversion
+- Three independent validators: `OptionAccessValidator`, `SubcommandAccessValidator`, `SubmoduleAccessValidator`
+- Each receives the relevant `MemberInfo` or `MethodInfo`
+- Return `true` to expose, `false` to hide
 
-Implement `ClassMemberStringifierBase` to replace the default kebab-case conversion with your own naming scheme (e.g., snake_case). Assign it to `CliComponentStoreFactory.ClassMemberStringifier`.
+See also: [1.1 Command definition](#11-command-definition), [4.3 Option access validation](#43-option-access-validation), [4.4 Subcommand access validation](#44-subcommand-access-validation), [4.5 Submodule access validation](#45-submodule-access-validation)
 
-**Custom stringifier (snake_case):**
-
-```csharp
-class SnakeCaseStringifier : ClassMemberStringifierBase {
-    protected override IEnumerable<string> GetRequiredNames(string name, IEnumerable<CliNameAttribute> cliNameAttributes) {
-        if (cliNameAttributes.Any()) {
-            return cliNameAttributes.Select(a => a.Name);
-        }
-        return new[] { ToSnakeCase(name) };
-    }
-    
-    protected override IEnumerable<string> GetAlternativeNames(string name, IEnumerable<CliNameAttribute> cliNameAttributes) {
-        return Enumerable.Empty<string>();
-    }
-    
-    private string ToSnakeCase(string value) {
-        return Regex.Replace(value, "([a-z0-9])([A-Z])", "$1_$2").ToLower();
-    }
-}
-
-var cli = new CommandLineInterface() {
-    CliComponentStoreFactory = new CliComponentStoreFactory() {
-        ClassMemberStringifier = new SnakeCaseStringifier()
-    }
-};
-
-class MyApplication {
-    public void RunTests() { }  // Becomes: run_tests
-}
-```
-
-See also: [How to Configure Naming & Aliases](#how-to-configure-naming--aliases)
-
-#### How to Customize Value Conversion
-
-The default `ValueConverter` automatically converts string arguments to .NET types. You can customize this behavior for special cases.
-
-**Custom format provider:**
-
-```csharp
-var cli = new CommandLineInterface() {
-    CliComponentStoreFactory = new CliComponentStoreFactory() {
-        FormatProvider = CultureInfo.CurrentCulture
-    }
-};
-```
-
-**Custom converter for new types:**
-
-```csharp
-class CustomValueConverter : IValueConverter<string?> {
-    public bool CanConvert(Type targetType) {
-        return targetType == typeof(CustomType);
-    }
-    
-    public string? ConvertFrom(object? value, Type targetType) {
-        return value?.ToString();
-    }
-    
-    public object? ConvertToOrUpdate(string? value, Type targetType, object? currentValue) {
-        if (targetType == typeof(CustomType)) {
-            return CustomType.Parse(value);
-        }
-        throw new NotSupportedException();
-    }
-}
-
-var cli = new CommandLineInterface() {
-    CliComponentStoreFactory = new CliComponentStoreFactory() {
-        CompositeValueConverter = new CompositeValueConverter(
-            new CustomValueConverter(), 
-            new CollectionElementStoreFactory()
-        )
-    }
-};
-```
-
-See also: [How to Define Options and Parameters](#how-to-define-options-and-parameters)
-
-#### How to Customize Help Printing
+#### 9.3 Custom help printers
 
 Implement `IHelpPrinter` to fully customize the help menu layout.
-
-**Custom help printer:**
 
 ```csharp
 using CalqFramework.Cli.Formatting;
 using CalqFramework.Cli.InterfaceComponents;
 
 class CustomHelpPrinter : IHelpPrinter {
-    public void PrintHelp(ICliContext context, Type rootSubmoduleType, 
-        IEnumerable<Submodule> submodules, IEnumerable<Subcommand> subcommands, 
-        IEnumerable<Option> options) {
-        
+    public void PrintHelp(ICliContext context, Type rootSubmoduleType, IEnumerable<Submodule> submodules, IEnumerable<Subcommand> subcommands, IEnumerable<Option> options) {
         context.InterfaceOut.WriteLine("=== MY CUSTOM CLI ===");
-        PrintCommands(context, submodules, subcommands, options);
+        // Custom layout...
     }
-    
+
     public void PrintHelp(ICliContext context, Type rootSubmoduleType, Submodule submodule,
-        IEnumerable<Submodule> submodules, IEnumerable<Subcommand> subcommands, 
-        IEnumerable<Option> options) {
-        
+        IEnumerable<Submodule> submodules, IEnumerable<Subcommand> subcommands, IEnumerable<Option> options) {
         context.InterfaceOut.WriteLine($"=== {string.Join(" ", submodule.Keys)} ===");
-        PrintCommands(context, submodules, subcommands, options);
+        // Custom layout...
     }
-    
-    public void PrintSubcommandHelp(ICliContext context, Type rootSubmoduleType, 
-        Subcommand subcommand, IEnumerable<Option> options) {
-        
+
+    public void PrintSubcommandHelp(ICliContext context, Type rootSubmoduleType, Subcommand subcommand, IEnumerable<Option> options) {
         context.InterfaceOut.WriteLine($"Command: {string.Join(", ", subcommand.Keys)}");
-        
-        if (subcommand.Parameters.Any()) {
-            context.InterfaceOut.WriteLine("\nParameters:");
-            foreach (var param in subcommand.Parameters) {
-                context.InterfaceOut.WriteLine($"  {string.Join(", ", param.Keys)}");
-            }
-        }
-        
-        if (options.Any()) {
-            context.InterfaceOut.WriteLine("\nOptions:");
-            foreach (var option in options) {
-                var names = option.Keys.Select(k => k.Length > 1 ? $"--{k}" : $"-{k}");
-                context.InterfaceOut.WriteLine($"  {string.Join(", ", names)}");
-            }
-        }
-    }
-    
-    private void PrintCommands(ICliContext context, IEnumerable<Submodule> submodules, 
-        IEnumerable<Subcommand> subcommands, IEnumerable<Option> options) {
-        
-        if (submodules.Any()) {
-            context.InterfaceOut.WriteLine("\nSubmodules:");
-            foreach (var sm in submodules) {
-                context.InterfaceOut.WriteLine($"  {string.Join(", ", sm.Keys)}");
-            }
-        }
-        
-        if (subcommands.Any()) {
-            context.InterfaceOut.WriteLine("\nCommands:");
-            foreach (var sc in subcommands) {
-                context.InterfaceOut.WriteLine($"  {string.Join(", ", sc.Keys)}");
-            }
-        }
-        
-        if (options.Any()) {
-            context.InterfaceOut.WriteLine("\nOptions:");
-            foreach (var opt in options) {
-                var names = opt.Keys.Select(k => k.Length > 1 ? $"--{k}" : $"-{k}");
-                context.InterfaceOut.WriteLine($"  {string.Join(", ", names)}");
-            }
-        }
+        // Custom layout...
     }
 }
 
@@ -986,8 +1482,6 @@ var cli = new CommandLineInterface() {
 ```
 
 **Accessing component metadata:**
-
-The help printer receives rich metadata about CLI components:
 
 ```csharp
 // Submodule metadata
@@ -1015,11 +1509,17 @@ parameter.HasDefaultValue // bool
 parameter.IsMultiValue    // bool (true for collections)
 ```
 
-See also: [How to Generate Help](#how-to-generate-help), [How to Manage Output](#how-to-manage-output)
+**Key points:**
 
-#### How to Customize Completion Handling
+- Three overloads: root help, submodule help, subcommand help
+- Rich metadata available for all CLI components
+- `ICliContext.InterfaceOut` provides the output stream
 
-Implement `ICompletionHandler` to fully customize the built-in completion logic.
+See also: [1.2 Subcommands](#12-subcommands), [1.3 Submodules](#13-submodules), [1.4 Options and flags](#14-options-and-flags), [1.5 Parameters (positional arguments)](#15-parameters-positional-arguments), [6.1 Help generation](#61-help-generation), [7.1 Output redirection](#71-output-redirection)
+
+#### 9.4 Custom completion handlers
+
+Implement `ICompletionHandler` to fully replace the built-in completion logic.
 
 ```csharp
 class CustomCompletionHandler : ICompletionHandler {
@@ -1029,9 +1529,9 @@ class CustomCompletionHandler : ICompletionHandler {
             context.InterfaceOut.WriteLine(suggestion);
         }
     }
-    
+
     public void HandleCompletion(ICliContext context, IEnumerable<string> args, object target) {
-        // Handle "completion" command
+        // Handle "completion" command (install/uninstall/generate scripts)
     }
 }
 
@@ -1040,219 +1540,31 @@ var cli = new CommandLineInterface() {
 };
 ```
 
-See also: [How to Configure Autocomplete](#how-to-configure-autocomplete), [How to Install Shell Completions & Protocols](#how-to-install-shell-completions--protocols)
+**Key points:**
+
+- `HandleComplete` provides suggestions for the current input state
+- `HandleCompletion` handles the `completion` subcommand (script generation, install/uninstall)
+- `target` is the resolved object at the current navigation depth
+
+See also: [7.1 Output redirection](#71-output-redirection), [8.1 Automatic completion](#81-automatic-completion), [8.2 Completion script generation](#82-completion-script-generation), [8.3 Completion protocols](#83-completion-protocols), [8.5 Completion attributes](#85-completion-attributes)
 
 ---
 
-### 7. Shell Integration & Autocomplete
-
-*How to make the CLI feel "native" to the user's terminal.*
-
-#### How to Configure Autocomplete
-
-The default `CompletionHandler` provides automatic completion for many types without any configuration, and supports custom completion via the `[CliCompletion]` attribute.
-
-**What gets completed automatically:**
-- Submodules and subcommands at all levels
-- All option and parameter names
-- Enum values (case-insensitive)
-- Boolean values (`true`, `false`)
-- File paths (via `FileInfo`), directory paths (via `DirectoryInfo`), file system paths (via `FileSystemInfo`)
-- Collection element types (if they're enums or bools)
-
-**Method-based custom completion:**
-
-```csharp
-class MyApplication {
-    [CliCompletion("GetRegions")]
-    public string Region { get; set; } = "us-east-1";
-    
-    // Completion method signature: IEnumerable<string> MethodName(string partialInput)
-    // Can be static or instance, public or private
-    private IEnumerable<string> GetRegions(string partialInput) {
-        var regions = new[] { 
-            "us-east-1", "us-west-2", "eu-west-1", "eu-central-1", "ap-southeast-1" 
-        };
-        return regions.Where(r => r.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase));
-    }
-}
-```
-
-**Class-based completion provider:**
-
-```csharp
-using CalqFramework.Cli.Completion.Providers;
-
-class RegionCompletionProvider : ICompletionProvider {
-    public IEnumerable<string> GetCompletions(ICompletionProviderContext context) {
-        var regions = new[] { 
-            "us-east-1", "us-west-2", "eu-west-1", "eu-central-1", "ap-southeast-1" 
-        };
-        return regions.Where(r => 
-            r.StartsWith(context.PartialInput, StringComparison.OrdinalIgnoreCase)
-        );
-    }
-}
-
-class MyApplication {
-    [CliCompletion(typeof(RegionCompletionProvider))]
-    public string Region { get; set; } = "us-east-1";
-}
-```
-
-**Dynamic completion based on state:**
-
-```csharp
-class MyApplication {
-    public string Environment { get; set; } = "development";
-    
-    [CliCompletion("GetAvailableRegions")]
-    public string Region { get; set; } = "us-east-1";
-    
-    private IEnumerable<string> GetAvailableRegions(string partialInput) {
-        var regions = Environment switch {
-            "development" => new[] { "us-east-1", "us-west-2" },
-            "staging" => new[] { "us-east-1", "eu-west-1" },
-            "production" => new[] { "us-east-1", "us-west-2", "eu-west-1", "ap-southeast-1" },
-            _ => Array.Empty<string>()
-        };
-        return regions.Where(r => r.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase));
-    }
-}
-```
-
-**Built-in file completion providers:**
-
-```csharp
-using CalqFramework.Cli.Completion.Providers;
-
-class MyApplication {
-    [CliCompletion(typeof(FileCompletionProvider), "*.json;*.yaml;*.yml")]
-    public string ConfigFile { get; set; } = "config.json";
-    
-    [CliCompletion(typeof(DirectoryCompletionProvider))]
-    public string OutputDir { get; set; } = "output";
-    
-    [CliCompletion(typeof(FileSystemCompletionProvider))]
-    public string Path { get; set; } = "";
-}
-```
-
-**Completion for method parameters:**
-
-```csharp
-class MyApplication {
-    public void Deploy(
-        [CliCompletion("GetEnvironments")] string environment,
-        [CliCompletion("GetRegions")] string region) {
-        
-        Console.WriteLine($"Deploying to {environment} in {region}");
-    }
-    
-    private IEnumerable<string> GetEnvironments(string partialInput) {
-        return new[] { "development", "staging", "production" }
-            .Where(e => e.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase));
-    }
-    
-    private IEnumerable<string> GetRegions(string partialInput) {
-        return new[] { "us-east-1", "us-west-2", "eu-west-1" }
-            .Where(r => r.StartsWith(partialInput, StringComparison.OrdinalIgnoreCase));
-    }
-}
-```
-
-See also: [How to Install Shell Completions & Protocols](#how-to-install-shell-completions--protocols), [How to Customize Completion Handling](#how-to-customize-completion-handling)
-
-#### How to Install Shell Completions & Protocols
-
-The default `CompletionHandler` generates completion scripts for multiple shells, can install them automatically, and supports multiple completion protocols.
-
-**Generate completion script:**
-
-```bash
-# View the script (doesn't install)
-myapp completion bash
-myapp completion zsh
-myapp completion powershell
-myapp completion pwsh
-myapp completion fish
-```
-
-**Install completion:**
-
-```bash
-# Install for specific shell
-myapp completion bash install
-myapp completion zsh install
-myapp completion powershell install
-myapp completion pwsh install
-myapp completion fish install
-
-# Install for all supported shells
-myapp completion all install
-```
-
-**Uninstall completion:**
-
-```bash
-myapp completion bash uninstall
-myapp completion all uninstall
-```
-
-**Installation locations:**
-- Bash (Linux/Mac): `/etc/bash_completion.d/myapp`
-- Bash (Windows): `~/.bash_completion.d/myapp.bash`
-- Zsh (Linux/Mac): `/usr/local/share/zsh/site-functions/_myapp`
-- Zsh (Windows): `~/.zsh/completion/_myapp`
-- PowerShell 5: `~/Documents/WindowsPowerShell/Completions/myapp.ps1`
-- PowerShell 7 (Linux/Mac): `~/.config/powershell/Completions/myapp.ps1`
-- PowerShell 7 (Windows): `~/Documents/PowerShell/Completions/myapp.ps1`
-- Fish (Linux/Mac): `~/.config/fish/completions/myapp.fish`
-- Fish (Windows): `%APPDATA%/fish/completions/myapp.fish`
-
-**After installation:**
-
-```bash
-source ~/.bashrc          # Bash
-source ~/.zshrc           # Zsh
-. $PROFILE                # PowerShell
-# Fish automatically loads completions
-```
-
-**Supported completion protocols:**
-
-The default `CompletionHandler` automatically detects and handles both Cobra-style and dotnet-suggest protocols:
-
-```bash
-# Cobra-style (used by generated shell scripts)
-myapp __complete deploy --region
-
-# dotnet-suggest protocol
-dotnet tool install -g dotnet-suggest
-myapp [suggest:1] deploy --region
-```
-
-**Key points:**
-- Completion works out of the box for most types
-- Use `[CliCompletion]` for custom suggestions
-- Install scripts with `completion <shell> install`
-- The default `CompletionHandler` handles both Cobra and dotnet-suggest protocols automatically
-- Completion is context-aware and can access your application state
-
-See also: [How to Configure Autocomplete](#how-to-configure-autocomplete), [How to Customize Completion Handling](#how-to-customize-completion-handling)
-
 ## Demo Examples
-[Interface Collections Example](https://github.com/calq-framework/cli/tree/main/Examples/Example.InterfaceCollections.TaskController)  
 
-[Autocomplete Example](https://github.com/calq-framework/cli/tree/main/Examples/Example.Autocomplete.CloudProvider)  
+[Interface Collections Example](https://github.com/calq-framework/cli/tree/main/Examples/Example.InterfaceCollections.TaskController)
 
-[Nested Submodules Example](https://github.com/calq-framework/cli/tree/main/Examples/Example.NestedSubmodules.CloudProvider)  
+[Autocomplete Example](https://github.com/calq-framework/cli/tree/main/Examples/Example.Autocomplete.CloudProvider)
 
-![SubmoduleHelpExample](https://github.com/calq-framework/cli/blob/main/Examples/Example.NestedSubmodules.CloudProvider/SubmoduleHelpExample.png?raw=true)  
+[Nested Submodules Example](https://github.com/calq-framework/cli/tree/main/Examples/Example.NestedSubmodules.CloudProvider)
+
+![SubmoduleHelpExample](https://github.com/calq-framework/cli/blob/main/Examples/Example.NestedSubmodules.CloudProvider/SubmoduleHelpExample.png?raw=true)
+
 ![SubcommandHelpExample](https://github.com/calq-framework/cli/blob/main/Examples/Example.NestedSubmodules.CloudProvider/SubcommandHelpExample.png?raw=true)
 
 ## Quick Start
-[QuickStart Example](https://github.com/calq-framework/cli/tree/main/Examples/Example.Basics.QuickStart)  
+
+[QuickStart Example](https://github.com/calq-framework/cli/tree/main/Examples/Example.Basics.QuickStart)
 
 ```bash
 git clone --branch latest https://github.com/calq-framework/cli docs/cli
@@ -1264,4 +1576,5 @@ dotnet run -- --help
 ```
 
 ## License
+
 Calq CLI is dual-licensed under PolyForm Noncommercial (with Evaluation Grant) and the Calq Commercial License.
