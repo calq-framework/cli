@@ -14,67 +14,21 @@ If information is missing from this README.md and the accompanied files, explain
 
 Calq CLI is a compiler-like engine that transforms source code into backend tools. Designed for instantly building production-ready backend (CLI) tools from existing source code, without any additional development.
 
-## Table of Contents
-
-- [Comparison](#comparison)
-- [Usage - Calq CLI](#usage---calq-cli)
-- [1. Foundations](#1-foundations)
-  - [1.1 Command definition](#11-command-definition)
-  - [1.2 Subcommands](#12-subcommands)
-  - [1.3 Submodules](#13-submodules)
-  - [1.4 Options and flags](#14-options-and-flags)
-  - [1.5 Parameters (positional arguments)](#15-parameters-positional-arguments)
-  - [1.6 Naming conventions](#16-naming-conventions)
-  - [1.7 Attributes and metadata](#17-attributes-and-metadata)
-- [2. Formatting & Naming](#2-formatting--naming)
-  - [2.1 Kebab-case conversion](#21-kebab-case-conversion)
-  - [2.2 Member stringification](#22-member-stringification)
-  - [2.3 Alias support](#23-alias-support)
-  - [2.4 CLI name attribute](#24-cli-name-attribute)
-- [3. Parsing & Data Binding](#3-parsing--data-binding)
-  - [3.1 Value conversion](#31-value-conversion)
-  - [3.2 Composite value conversion](#32-composite-value-conversion)
-  - [3.3 Collection binding](#33-collection-binding)
-  - [3.4 Boolean / flag handling](#34-boolean--flag-handling)
-  - [3.5 Enum binding](#35-enum-binding)
-  - [3.6 Nullable and optional values](#36-nullable-and-optional-values)
-  - [3.7 Custom type converters](#37-custom-type-converters)
-  - [3.8 Argument tokenization](#38-argument-tokenization)
-  - [3.9 Strict vs lenient parsing](#39-strict-vs-lenient-parsing)
-  - [3.10 Object population (without execution)](#310-object-population-without-execution)
-  - [3.11 Parameter shadowing](#311-parameter-shadowing)
-- [4. Validation & Access Control](#4-validation--access-control)
-  - [4.1 Required vs optional](#41-required-vs-optional)
-  - [4.2 Error handling](#42-error-handling)
-  - [4.3 Option access validation](#43-option-access-validation)
-  - [4.4 Subcommand access validation](#44-subcommand-access-validation)
-  - [4.5 Submodule access validation](#45-submodule-access-validation)
-- [5. Execution](#5-execution)
-  - [5.1 Command resolution](#51-command-resolution)
-  - [5.2 Command invocation](#52-command-invocation)
-  - [5.3 Return values](#53-return-values)
-- [6. User Feedback](#6-user-feedback)
-  - [6.1 Help generation](#61-help-generation)
-  - [6.2 Version display](#62-version-display)
-  - [6.3 Error formatting](#63-error-formatting)
-- [7. Input/Output](#7-inputoutput)
-  - [7.1 Output redirection](#71-output-redirection)
-- [8. Completions](#8-completions)
-  - [8.1 Automatic completion](#81-automatic-completion)
-  - [8.2 Completion script generation](#82-completion-script-generation)
-  - [8.3 Completion protocols](#83-completion-protocols)
-  - [8.4 Custom completion providers](#84-custom-completion-providers)
-  - [8.5 Completion attributes](#85-completion-attributes)
-- [9. Extensibility](#9-extensibility)
-  - [9.1 Custom value converters](#91-custom-value-converters)
-  - [9.2 Custom access validators](#92-custom-access-validators)
-  - [9.3 Custom help printers](#93-custom-help-printers)
-  - [9.4 Custom completion handlers](#94-custom-completion-handlers)
-- [Demo Examples](#demo-examples)
-- [Quick Start](#quick-start)
-- [License](#license)
-
 ## Comparison
+
+| Feature | Calq CLI | Imperative Builder CLI Frameworks | Attribute-Based CLI Frameworks | Convention-Based CLI Frameworks | Source Generator CLI Frameworks |
+|---|---|---|---|---|---|
+| Instant development | ✅ | ❌ full surface duplication | ❌ command classes + wiring | ❌ command classes + registration | ❌ command classes + wiring |
+| Zero CLI-specific code / source reuse | ✅ plain classes, reusable anywhere | ❌ coupled to builder API | ❌ attributes leak into library | ⚠️ base class leaks | ❌ attributes leak into library |
+| Unlimited submodule nesting | ✅ property/field → class | ⚠️ manual wiring per level | ⚠️ manual nesting | ⚠️ manual registration | ⚠️ manual nesting |
+| Automatic member discovery | ✅ plain members | ❌ explicit registration | ❌ attributed members only | ✅ convention-based | ❌ attributed members only |
+| AI-operability | ✅ plain C# classes | ❌ complex builder API | ⚠️ attribute DSL | ⚠️ base class + config | ⚠️ attribute DSL |
+| Parameter shadowing | ✅ built-in | ❌ | ❌ | ❌ | ❌ |
+| Object population (standalone) | ✅ OptionDeserializer | ❌ | ❌ | ❌ | ❌ |
+| Replaceable naming scheme (global) | ✅ ClassMemberStringifier | ❌ per-option only | ❌ per-attribute only | ⚠️ framework conventions | ❌ per-attribute only |
+| Help from XML documentation | ✅ `<summary>` and `<param>` | ❌ description strings | ❌ attribute strings | ⚠️ varies | ❌ attribute strings |
+| Shell completion | ✅ bash/zsh/pwsh/fish + install | ✅ | ✅ | ✅ | ✅ |
+| Extensibility (DI, middleware, converters, validators) | ✅ | ✅ | ✅ | ✅ | ✅ |
 
 Both examples implement a tool for the backend project from:
 
@@ -160,6 +114,65 @@ var networkRunCommand = new Command("run", "Runs a generic network action.") { n
 
 return await rootCommand.InvokeAsync(args);
 ```
+
+## Table of Contents
+
+- [Usage - Calq CLI](#usage---calq-cli)
+- [1. Foundations](#1-foundations)
+  - [1.1 Command definition](#11-command-definition)
+  - [1.2 Subcommands](#12-subcommands)
+  - [1.3 Submodules](#13-submodules)
+  - [1.4 Options and flags](#14-options-and-flags)
+  - [1.5 Parameters (positional arguments)](#15-parameters-positional-arguments)
+  - [1.6 Naming conventions](#16-naming-conventions)
+  - [1.7 Attributes and metadata](#17-attributes-and-metadata)
+- [2. Formatting & Naming](#2-formatting--naming)
+  - [2.1 Kebab-case conversion](#21-kebab-case-conversion)
+  - [2.2 Member stringification](#22-member-stringification)
+  - [2.3 Alias support](#23-alias-support)
+  - [2.4 CLI name attribute](#24-cli-name-attribute)
+- [3. Parsing & Data Binding](#3-parsing--data-binding)
+  - [3.1 Value conversion](#31-value-conversion)
+  - [3.2 Composite value conversion](#32-composite-value-conversion)
+  - [3.3 Collection binding](#33-collection-binding)
+  - [3.4 Boolean / flag handling](#34-boolean--flag-handling)
+  - [3.5 Enum binding](#35-enum-binding)
+  - [3.6 Nullable and optional values](#36-nullable-and-optional-values)
+  - [3.7 Custom type converters](#37-custom-type-converters)
+  - [3.8 Argument tokenization](#38-argument-tokenization)
+  - [3.9 Strict vs lenient parsing](#39-strict-vs-lenient-parsing)
+  - [3.10 Object population (without execution)](#310-object-population-without-execution)
+  - [3.11 Parameter shadowing](#311-parameter-shadowing)
+- [4. Validation & Access Control](#4-validation--access-control)
+  - [4.1 Required vs optional](#41-required-vs-optional)
+  - [4.2 Error handling](#42-error-handling)
+  - [4.3 Option access validation](#43-option-access-validation)
+  - [4.4 Subcommand access validation](#44-subcommand-access-validation)
+  - [4.5 Submodule access validation](#45-submodule-access-validation)
+- [5. Execution](#5-execution)
+  - [5.1 Command resolution](#51-command-resolution)
+  - [5.2 Command invocation](#52-command-invocation)
+  - [5.3 Return values](#53-return-values)
+- [6. User Feedback](#6-user-feedback)
+  - [6.1 Help generation](#61-help-generation)
+  - [6.2 Version display](#62-version-display)
+  - [6.3 Error formatting](#63-error-formatting)
+- [7. Input/Output](#7-inputoutput)
+  - [7.1 Output redirection](#71-output-redirection)
+- [8. Completions](#8-completions)
+  - [8.1 Automatic completion](#81-automatic-completion)
+  - [8.2 Completion script generation](#82-completion-script-generation)
+  - [8.3 Completion protocols](#83-completion-protocols)
+  - [8.4 Custom completion providers](#84-custom-completion-providers)
+  - [8.5 Completion attributes](#85-completion-attributes)
+- [9. Extensibility](#9-extensibility)
+  - [9.1 Custom value converters](#91-custom-value-converters)
+  - [9.2 Custom access validators](#92-custom-access-validators)
+  - [9.3 Custom help printers](#93-custom-help-printers)
+  - [9.4 Custom completion handlers](#94-custom-completion-handlers)
+- [Demo Examples](#demo-examples)
+- [Quick Start](#quick-start)
+- [License](#license)
 
 ## Usage - Calq CLI
 
